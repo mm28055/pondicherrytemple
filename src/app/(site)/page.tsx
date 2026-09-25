@@ -15,6 +15,7 @@ import { articleRow, filmRow, noteRow, observanceRow } from "@/lib/view";
 import { ObservanceRow, TempleRow } from "@/components/Rows";
 import { TodayTamil } from "@/components/TodayTamil";
 import { Html } from "@/components/Prose";
+import { plainWithScripts } from "@/lib/richtext";
 
 export default async function HomePage() {
   const words = await getHomePage();
@@ -101,20 +102,49 @@ export default async function HomePage() {
         </section>
       </div>
 
-      {/* One line from Deepa's note; the whole note is on the About page. */}
+      {/* The dark band: a quotation (each line of the box on its own line),
+          who said it, and optionally a second passage and a link. All set in
+          the admin: Site pages → Home page. */}
       {words?.quote && (
       <section className="voice voice-line">
         <div className="wrap reveal">
-          <div className="kicker">Why these temples</div>
+          {words.quoteLabel && <div className="kicker">{words.quoteLabel}</div>}
           <blockquote>
-            <p>{words.quote}</p>
+            {words.quote
+              .split(/\n+/)
+              .filter((line) => line.trim())
+              .map((line, i) => (
+                <Html key={i} as="p" html={plainWithScripts(line.trim())} />
+              ))}
           </blockquote>
-          <div className="voice-foot">
-            {words.quoteBy && <cite>{words.quoteBy}</cite>}
-            <Link className="arrow-link" href="/about#why">
-              Read her note
-            </Link>
-          </div>
+          {words.quoteAfter ? (
+            <>
+              {words.quoteBy && (
+                <div className="voice-foot">
+                  <cite>{words.quoteBy}</cite>
+                </div>
+              )}
+              <p className="voice-after">{words.quoteAfter}</p>
+              {words.quoteLink && (
+                <div className="voice-foot">
+                  <Link className="arrow-link" href={words.quoteLink.href}>
+                    {words.quoteLink.text}
+                  </Link>
+                </div>
+              )}
+            </>
+          ) : (
+            (words.quoteBy || words.quoteLink) && (
+              <div className="voice-foot">
+                {words.quoteBy && <cite>{words.quoteBy}</cite>}
+                {words.quoteLink && (
+                  <Link className="arrow-link" href={words.quoteLink.href}>
+                    {words.quoteLink.text}
+                  </Link>
+                )}
+              </div>
+            )
+          )}
         </div>
       </section>
       )}

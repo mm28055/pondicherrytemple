@@ -597,8 +597,11 @@ export async function getHomePage(): Promise<HomePageText | null> {
   return {
     headline: g.headline,
     opening: toHTML(g.opening, L.paths),
+    quoteLabel: g.quoteLabel || undefined,
     quote: g.quote ?? undefined,
-    quoteBy: g.quoteBy ?? undefined,
+    quoteBy: g.quoteBy || undefined,
+    quoteAfter: g.quoteAfter || undefined,
+    quoteLink: g.quoteLinkText && g.quoteLink ? { text: g.quoteLinkText, href: g.quoteLink } : undefined,
     bookHeading: g.bookHeading ?? undefined,
     bookText: g.bookText ?? undefined,
   };

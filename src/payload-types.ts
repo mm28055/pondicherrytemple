@@ -1323,8 +1323,24 @@ export interface HomePage {
     };
     [k: string]: unknown;
   } | null;
+  /**
+   * Leave empty for none.
+   */
+  quoteLabel?: string | null;
+  /**
+   * Each line here shows on its own line (e.g. the Tamil, then its English). Leave empty to hide the whole band.
+   */
   quote?: string | null;
+  /**
+   * Leave empty for no name.
+   */
   quoteBy?: string | null;
+  /**
+   * Shown below the name, set a little apart.
+   */
+  quoteAfter?: string | null;
+  quoteLinkText?: string | null;
+  quoteLink?: string | null;
   bookHeading?: string | null;
   bookText?: string | null;
   updatedAt?: string | null;
@@ -1415,8 +1431,12 @@ export interface Instagram {
 export interface HomePageSelect<T extends boolean = true> {
   headline?: T;
   opening?: T;
+  quoteLabel?: T;
   quote?: T;
   quoteBy?: T;
+  quoteAfter?: T;
+  quoteLinkText?: T;
+  quoteLink?: T;
   bookHeading?: T;
   bookText?: T;
   updatedAt?: T;

@@ -594,6 +594,21 @@ a.temple-row:hover .temple-name { color: var(--ochre); }
   margin-bottom: 0;
 }
 
+.voice-line blockquote p + p { margin-top: 10px; }
+/* Tamil isn't slanted: an upright line, a touch heavier */
+.voice-line blockquote [lang="ta"] { font-style: normal; font-weight: 600; }
+
+/* A second passage under the quotation, set apart by a faint rule */
+.voice-after {
+  max-width: 34em;
+  margin-top: 40px;
+  padding-top: 28px;
+  border-top: 1px solid rgba(239, 232, 220, 0.18);
+  font-size: clamp(19px, 2vw, 23px);
+  line-height: 1.5;
+  color: var(--on-night);
+}
+
 .voice-foot { display: flex; flex-wrap: wrap; align-items: baseline; gap: 12px 32px; margin-top: 28px; }
 
 .voice-foot cite { margin-top: 0; }

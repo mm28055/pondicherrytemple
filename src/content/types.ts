@@ -215,8 +215,11 @@ export interface Book {
 export interface HomePageText {
   headline: string;
   opening: string; // HTML
+  quoteLabel?: string;
   quote?: string;
   quoteBy?: string;
+  quoteAfter?: string;
+  quoteLink?: { text: string; href: string };
   bookHeading?: string;
   bookText?: string;
 }

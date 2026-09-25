@@ -112,6 +112,12 @@ export function toHTML(data: RichText, paths: LinkPaths): string {
 /** Tamil and Sanskrit words typed in the editor get their script's font:
     runs of those letters are wrapped in <span lang="…">. Only the text
     between tags is touched, never the tags or their attributes. */
+/** Plain text (e.g. a one-line quotation) → safe HTML, with Tamil and
+    Sanskrit words in their script's font. */
+export function plainWithScripts(text: string): string {
+  return markScripts(escape(text));
+}
+
 function markScripts(html: string): string {
   return html
     .split(/(<[^>]*>)/)
