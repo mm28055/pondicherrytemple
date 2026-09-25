@@ -19,6 +19,12 @@ export const HomePage: GlobalConfig = {
   fields: [
     { name: 'headline', type: 'text', required: true, admin: { description: 'The large heading.' } },
     {
+      name: 'headlineItalic',
+      type: 'checkbox',
+      label: 'Show the headline in italics',
+      defaultValue: true,
+    },
+    {
       name: 'opening',
       type: 'richText',
       editor: shortEditor,

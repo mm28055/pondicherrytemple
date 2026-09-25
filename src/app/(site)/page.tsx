@@ -68,7 +68,7 @@ export default async function HomePage() {
         {/* The words are written in the admin: Settings → Home page. */}
         <section className="home-opening">
           <div>
-            <h1>{words?.headline}</h1>
+            <h1 className={words?.headlineItalic ? "italic" : undefined}>{words?.headline}</h1>
             {words?.opening && <Html html={words.opening} />}
             <Link className="more-link" href="/about#idea">
               About Sthalam

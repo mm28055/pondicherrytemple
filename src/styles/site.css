@@ -436,13 +436,15 @@ a.temple-row:hover .temple-name { color: var(--ochre); }
 }
 
 .home-opening h1 {
-  font-style: italic;
   font-weight: 500;
   font-size: clamp(28px, 3.2vw, 42px);
   line-height: 1.12;
   text-wrap: balance;
   margin-bottom: 20px;
 }
+
+/* ticked "Show the headline in italics" in the admin */
+.home-opening h1.italic { font-style: italic; }
 
 .home-name { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 28px; margin-top: 4px; }
 

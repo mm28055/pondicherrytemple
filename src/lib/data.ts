@@ -596,6 +596,7 @@ export async function getHomePage(): Promise<HomePageText | null> {
   const L = await lookups();
   return {
     headline: g.headline,
+    headlineItalic: g.headlineItalic !== false,
     opening: toHTML(g.opening, L.paths),
     quoteLabel: g.quoteLabel || undefined,
     quote: g.quote ?? undefined,
