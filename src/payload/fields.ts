@@ -105,6 +105,6 @@ export const reviewField: Field = {
       ],
       admin: { description: "For the team's tracking only. Never shown on the site." },
     },
-    { name: 'note', type: 'text', admin: { placeholder: 'e.g. To be checked by Dr. Ganesan' } },
+    { name: 'note', type: 'text', admin: { placeholder: 'e.g. To be checked by T. Ganesan' } },
   ],
 }

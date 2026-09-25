@@ -49,7 +49,7 @@ export const temples: Temple[] = [
     group: "shiva",
     street: "Mission Street",
     intro: [
-      "The Kalahasteeswarar temple on Mission Street, known in town as the Chetty Kovil, is where this project began: introductions by Dr. T. Ganesan on the morning of 16 March 2026, a Pradosham day, and the evening puja that followed.",
+      "The Kalahasteeswarar temple on Mission Street, known in town as the Chetty Kovil, is where this project began: introductions by T. Ganesan on the morning of 16 March 2026, a Pradosham day, and the evening puja that followed.",
       "A week later its Panguni Brahmotsavam began, and we followed it from the flag hoisting on 23 March to the Shankhabhishekam that closed it on 5 April.",
     ],
   },

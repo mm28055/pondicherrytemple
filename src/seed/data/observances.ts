@@ -5,12 +5,12 @@ import type { Observance } from "./types";
    Explainers (`about`) are DRAFTS: general, well-established facts, plus
    details the team actually observed (each such detail comes from the
    running log, via occasions.ts and fieldNotes.ts). To be checked by
-   Dr. Ganesan and replaced or corrected by Deepa and Arun. An observance
+   T. Ganesan and replaced or corrected by Deepa and Arun. An observance
    without an explainer still gets a page: where we've seen it, and the notes. */
 
 const DRAFT = {
   status: "awaiting-approval" as const,
-  note: "Draft explainer — to be checked by Dr. Ganesan",
+  note: "Draft explainer — to be checked by T. Ganesan",
 };
 
 export const observances: Observance[] = [

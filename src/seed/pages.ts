@@ -39,7 +39,7 @@ const about = {
     {
       heading: 'The project',
       body: toLexical([
-        "The work began on 16 March 2026 at the Chetty Kovil, and builds on reports Dr. T. Ganesan prepared on the town's temples in 2019. It follows each temple through its year: the daily and monthly rites, the great festivals, the people who keep it going.",
+        "The work began on 16 March 2026 at the Chetty Kovil, and builds on reports T. Ganesan prepared on the town's temples in 2019. It follows each temple through its year: the daily and monthly rites, the great festivals, the people who keep it going.",
         'What we record falls into two broad kinds. There is what a temple <em>is</em> — its architecture, its images, its history, its ritual framework and its lore. And there is what a temple <em>does</em> — its priests and devotees, its food and music and crafts, its place in the life of the streets around it. The first can be measured and checked; the second can only be learned by returning, again and again.',
       ]),
     },
@@ -81,7 +81,7 @@ const about = {
       bio: "Fieldwork and archival research, and keeper of the project's running log of every visit.",
     },
     {
-      name: 'Dr. T. Ganesan',
+      name: 'T. Ganesan',
       role: 'Senior scholar',
       bio: 'French Institute of Pondicherry, and Director of the Centre for Shaiva Studies. Guides the Āgamic and historical work.',
     },
