@@ -1,0 +1,33 @@
+# dependencies
+/node_modules
+
+# next.js build output
+/.next/
+/out/
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# environment — database URLs and storage keys never go in git
+.env
+.env*.local
+
+# local media uploads during development (move to R2, never commit)
+/media/
+
+# local database and uploads, if kept inside the project (see .env.example)
+/.data/
+
+# os / editor
+.DS_Store
+Thumbs.db
+*.log
+
+# Kept on this laptop only, never on GitHub: held/ and prototype/ contain the
+# 1748 Vedapuriswara history, held back at Deepa's request.
+/held/
+/prototype/
+
+# Claude's per-laptop settings
+.claude/settings.local.json

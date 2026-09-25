@@ -1,0 +1,55 @@
+import type { Metadata } from "next";
+import { countTemplesForObservance, getObservances, getOccasionsForObservance } from "@/lib/data";
+import { observanceRow } from "@/lib/view";
+import { ObservanceRow } from "@/components/Rows";
+
+export const metadata: Metadata = {
+  title: "Festivals & Rituals",
+  description:
+    "The festivals and rituals of the temples — each explained once, with every field note and article about it.",
+};
+
+export default async function ObservancesPage() {
+  const all = await Promise.all(
+    (await getObservances()).map(async (o) => ({
+      o,
+      row: observanceRow(o, await countTemplesForObservance(o.id)),
+      seen: (await getOccasionsForObservance(o.id)).length,
+    }))
+  );
+  // most often seen first, within each kind
+  const sorted = all.sort((a, b) => b.seen - a.seen || a.o.name.localeCompare(b.o.name));
+  const festivals = sorted.filter((x) => x.o.kind === "festival");
+  const rituals = sorted.filter((x) => x.o.kind === "ritual");
+
+  return (
+    <div className="wrap">
+      <header className="page-head">
+        <div className="kicker">The ritual year</div>
+        <h1 className="page-title">Festivals &amp; Rituals</h1>
+        <p className="page-lede">
+          The festivals and rituals we have been present for so far. Each is explained once, and
+          gathers every field note and article about it, from every temple where it was seen.
+        </p>
+      </header>
+
+      <section className="section">
+        <div className="section-head">
+          <h2>Festivals</h2>
+        </div>
+        {festivals.map(({ row }) => (
+          <ObservanceRow key={row.id} row={row} />
+        ))}
+      </section>
+
+      <section className="section tight">
+        <div className="section-head">
+          <h2>Rituals</h2>
+        </div>
+        {rituals.map(({ row }) => (
+          <ObservanceRow key={row.id} row={row} />
+        ))}
+      </section>
+    </div>
+  );
+}

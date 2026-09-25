@@ -1,0 +1,1208 @@
+/* ============================================================
+   Sthalam — site stylesheet
+
+   Drawn from the temple wall: lime-white, red ochre (kaavi) and
+   lamp-black, with the red-and-white wall stripes as the signature.
+   Type: Anek Latin + Anek Tamil (one family) for display, condensed;
+   Newsreader for reading. Structure comes from rules and lists, not
+   boxes.
+   ============================================================ */
+
+:root {
+  --chalk: #f5f4f0;
+  --chalk-2: #ebe7de;
+  --ink: #191512;
+  --ink-2: #463e38;
+  --muted: #72675e;
+  --rule: #d8d1c5;
+  --ochre: #a8321e;
+  --ochre-deep: #7c2213;
+  --turmeric: #9a6406;
+  --night: #16110e;
+  --on-night: #efe8dc;
+  --on-night-dim: #b0a598;
+  --lamp: #e0a93b;
+
+  /* the variables below are set on <html> by next/font */
+  --display: var(--font-anek-latin), "Arial Narrow", system-ui, sans-serif;
+  --tamil: var(--font-anek-tamil), "Noto Sans Tamil", "Latha", sans-serif;
+  --devanagari: var(--font-anek-devanagari), "Noto Sans Devanagari", "Nirmala UI", sans-serif;
+  --text: var(--font-newsreader), Georgia, "Times New Roman", serif;
+
+  --gutter: clamp(16px, 4vw, 40px);
+  --max: 1240px;
+  /* the sticky menu bar: 10px stripes + 72px bar + 1px rule */
+  --nav-h: 83px;
+  --stripe: repeating-linear-gradient(90deg, var(--ochre) 0 20px, var(--chalk) 20px 40px);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+
+body {
+  background: var(--chalk);
+  color: var(--ink);
+  font-family: var(--text);
+  font-size: 18px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+img, video { max-width: 100%; display: block; }
+a { color: inherit; text-decoration: none; }
+ul, ol { list-style: none; }
+
+.wrap { max-width: var(--max); margin-inline: auto; padding-inline: var(--gutter); }
+
+[lang="ta"] { font-family: var(--tamil); }
+[lang="sa"] { font-family: var(--devanagari); }
+
+a:focus-visible, button:focus-visible {
+  outline: 2px solid var(--ochre);
+  outline-offset: 3px;
+}
+
+/* ---------- The temple-wall stripes ---------- */
+.stripes { height: 10px; background: var(--stripe); }
+.stripes.tall { height: 40px; }
+
+/* ---------- Shared type ---------- */
+.kicker {
+  font-family: var(--display);
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ochre);
+}
+
+.caps {
+  font-family: var(--display);
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.arrow-link {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border-bottom: 2px solid var(--ochre);
+  padding-bottom: 3px;
+  transition: color 0.15s;
+}
+.arrow-link::after { content: " →"; }
+.arrow-link:hover { color: var(--ochre); }
+
+/* ---------- Navigation ---------- */
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: var(--chalk);
+  border-bottom: 1px solid var(--rule);
+}
+
+.nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  height: 72px;
+  position: relative;
+}
+
+.brand { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+
+.brand-word {
+  font-family: var(--display);
+  font-weight: 800;
+  font-variation-settings: "wdth" 75;
+  font-size: 27px;
+  line-height: 1;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.brand-tamil {
+  display: block;
+  font-family: var(--tamil);
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 1.2;
+  color: var(--ochre);
+  margin-top: 2px;
+}
+
+.nav-links { display: flex; align-items: center; gap: 26px; }
+
+.nav-links a {
+  font-family: var(--display);
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  padding: 6px 0;
+  border-bottom: 2px solid transparent;
+  transition: color 0.15s, border-color 0.15s;
+}
+.nav-links a:hover { color: var(--ochre); }
+.nav-links a.active { color: var(--ink); border-bottom-color: var(--ochre); }
+
+.nav-toggle {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--ink);
+  padding: 8px;
+  cursor: pointer;
+}
+
+@media (max-width: 1060px) {
+  .nav-links { display: none; }
+  .nav-toggle { display: block; }
+  .nav-links.open {
+    display: flex;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
+    background: var(--chalk);
+    border-bottom: 2px solid var(--ink);
+    padding: 8px var(--gutter) 20px;
+  }
+  .nav-links.open li { width: 100%; border-bottom: 1px solid var(--rule); }
+  .nav-links.open a { display: block; font-size: 19px; padding: 14px 0; border-bottom: none; }
+}
+
+/* ---------- Page heads ---------- */
+.page-head {
+  padding-block: clamp(40px, 7vw, 88px) clamp(28px, 4vw, 48px);
+  border-bottom: 2px solid var(--ink);
+}
+
+.page-head .kicker { margin-bottom: 16px; }
+
+.page-title {
+  font-family: var(--display);
+  font-weight: 800;
+  font-variation-settings: "wdth" 75;
+  font-size: clamp(54px, 11vw, 148px);
+  line-height: 0.86;
+  letter-spacing: -0.005em;
+  text-transform: uppercase;
+  text-wrap: balance;
+}
+
+.page-lede {
+  font-size: clamp(19px, 2vw, 23px);
+  line-height: 1.5;
+  color: var(--ink-2);
+  max-width: 38em;
+  margin-top: 24px;
+}
+
+.page-lede + .page-lede { margin-top: 12px; }
+.page-lede p + p { margin-top: 12px; }
+
+.crumb {
+  display: inline-block;
+  font-family: var(--display);
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 22px;
+}
+.crumb:hover { color: var(--ochre); }
+
+/* A festival or ritual: the Tamil name is the headline */
+.tamil-title {
+  font-family: var(--tamil);
+  font-weight: 700;
+  font-variation-settings: "wdth" 80;
+  font-size: clamp(36px, 10vw, 128px);
+  line-height: 1.25;
+  text-wrap: balance;
+  /* some names are one long word; never let one push the page sideways */
+  overflow-wrap: break-word;
+}
+
+.name-title {
+  font-style: italic;
+  font-weight: 500;
+  font-size: clamp(26px, 3.2vw, 40px);
+  line-height: 1.2;
+  margin-top: 4px;
+}
+
+.gloss { margin-top: 14px; }
+
+/* A temple: its name is the headline */
+.temple-title {
+  font-weight: 600;
+  font-size: clamp(40px, 6.4vw, 88px);
+  line-height: 1.02;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+}
+
+.temple-facts { margin-top: 18px; display: flex; flex-wrap: wrap; gap: 6px 18px; }
+
+/* ---------- Sections ---------- */
+.section { padding-block: clamp(48px, 7vw, 96px); }
+.section.tight { padding-top: 0; }
+
+.section-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
+  border-bottom: 2px solid var(--ink);
+  padding-bottom: 10px;
+}
+
+.section-head h2 {
+  font-family: var(--display);
+  font-weight: 800;
+  font-variation-settings: "wdth" 75;
+  font-size: clamp(30px, 4vw, 46px);
+  line-height: 0.95;
+  text-transform: uppercase;
+}
+
+.section-head .arrow-link { border-bottom: none; padding-bottom: 0; color: var(--ochre); font-size: 14px; }
+
+.sub-head {
+  font-family: var(--display);
+  font-weight: 800;
+  font-variation-settings: "wdth" 75;
+  font-size: 24px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  border-bottom: 2px solid var(--ink);
+  padding-bottom: 8px;
+}
+
+.note-line {
+  font-style: italic;
+  color: var(--muted);
+  font-size: 16px;
+  margin-top: 10px;
+}
+
+.empty {
+  font-style: italic;
+  font-size: 21px;
+  color: var(--ink-2);
+  max-width: 30em;
+  padding-block: 32px;
+}
+
+/* ---------- Rows: field notes and articles ---------- */
+.note-row {
+  display: grid;
+  grid-template-columns: 110px minmax(0, 1fr);
+  gap: 28px;
+  padding-block: 26px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.date-stamp .d {
+  display: block;
+  font-family: var(--display);
+  font-weight: 800;
+  font-variation-settings: "wdth" 75;
+  font-size: 58px;
+  line-height: 0.85;
+  color: var(--ochre);
+  font-variant-numeric: tabular-nums;
+}
+
+.date-stamp .m {
+  display: block;
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-top: 8px;
+}
+
+.date-stamp .t {
+  display: block;
+  font-style: italic;
+  font-size: 15px;
+  color: var(--muted);
+}
+
+.row-meta { margin-bottom: 6px; }
+.row-meta .kind { color: var(--ochre); }
+
+.row-title {
+  font-weight: 600;
+  font-size: clamp(22px, 2.4vw, 28px);
+  line-height: 1.2;
+  transition: color 0.15s;
+}
+
+.note-row:hover .row-title { color: var(--ochre); }
+
+.row-excerpt { color: var(--ink-2); font-size: 17px; margin-top: 8px; max-width: 62ch; }
+.row-by { font-style: italic; color: var(--muted); font-size: 15.5px; margin-top: 8px; }
+
+/* ---------- Rows: festivals and rituals ---------- */
+.obs-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1.4fr) auto;
+  gap: 24px;
+  align-items: baseline;
+  padding-block: 18px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.obs-row .obs-tamil {
+  font-family: var(--tamil);
+  font-weight: 700;
+  font-variation-settings: "wdth" 85;
+  font-size: clamp(24px, 2.8vw, 36px);
+  line-height: 1.3;
+  transition: color 0.15s;
+}
+
+.obs-row .obs-name { font-weight: 600; font-size: 21px; line-height: 1.25; }
+.obs-row .obs-gloss { font-style: italic; color: var(--ink-2); font-size: 17px; }
+.obs-row:hover .obs-tamil { color: var(--ochre); }
+
+.obs-row.compact { grid-template-columns: minmax(0, 1fr) auto; }
+.obs-row.compact .obs-tamil { font-size: 24px; }
+
+/* ---------- Rows: temples ---------- */
+.temple-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 24px;
+  align-items: baseline;
+  padding-block: 22px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.temple-row .temple-name {
+  font-weight: 600;
+  font-size: clamp(24px, 2.8vw, 34px);
+  line-height: 1.15;
+  transition: color 0.15s;
+}
+
+a.temple-row:hover .temple-name { color: var(--ochre); }
+.temple-row .temple-sub { font-size: 16.5px; color: var(--muted); margin-top: 4px; }
+
+.temple-row.plain { padding-block: 14px; }
+.temple-row.plain .temple-name { font-size: 20px; font-weight: 500; color: var(--ink-2); }
+
+/* ---------- Home ---------- */
+/* The masthead: the name with today's Tamil date beside it, like a newspaper's
+   dateline. The headline opens the text below. */
+.home-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas: "mark today";
+  gap: 18px clamp(32px, 5vw, 80px);
+  align-items: end;
+  padding-block: clamp(36px, 6vw, 80px) clamp(36px, 5vw, 64px);
+  border-bottom: 2px solid var(--ink);
+}
+
+/* The word is sized from its own width (cqi), so it always fits */
+.home-mark { grid-area: mark; container-type: inline-size; }
+
+
+.home-tamil {
+  font-family: var(--tamil);
+  font-weight: 800;
+  font-variation-settings: "wdth" 75;
+  font-size: clamp(72px, 26cqi, 232px);
+  line-height: 1.1;
+}
+
+.home-opening h1 {
+  font-weight: 500;
+  font-size: clamp(28px, 3.2vw, 42px);
+  line-height: 1.12;
+  text-wrap: balance;
+  margin-bottom: 20px;
+}
+
+.home-name { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 28px; margin-top: 4px; }
+
+.home-latin {
+  font-family: var(--display);
+  font-weight: 800;
+  font-variation-settings: "wdth" 75;
+  font-size: clamp(20px, 2.6vw, 32px);
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--ochre);
+}
+
+.home-gloss { font-style: italic; font-size: clamp(18px, 1.7vw, 21px); color: var(--muted); }
+
+/* Filled in by the browser; the space is kept so nothing jumps when it appears.
+   It sits level with the STHALAM line under the Tamil name. */
+.today {
+  grid-area: today;
+  min-width: 250px;
+  min-height: 150px;
+  border-left: 2px solid var(--ochre);
+  padding-left: clamp(20px, 2.4vw, 32px);
+  margin-bottom: 6px;
+}
+
+.today .kicker { margin-bottom: 8px; }
+
+.today-tamil {
+  font-family: var(--tamil);
+  font-weight: 700;
+  font-size: clamp(34px, 3.4vw, 46px);
+  line-height: 1.2;
+}
+
+.today-en { font-style: italic; font-size: 20px; color: var(--ink-2); margin-top: 6px; }
+
+.today .caps { color: var(--ink-2); margin-top: 6px; }
+
+
+/* The opening paragraph, with the latest field notes beside it */
+.home-opening {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  gap: clamp(36px, 5vw, 80px);
+  align-items: start;
+  padding-block: clamp(40px, 5.5vw, 72px) clamp(56px, 8vw, 96px);
+}
+
+.home-opening p {
+  font-size: clamp(18px, 1.5vw, 20px);
+  line-height: 1.6;
+  color: var(--ink-2);
+  max-width: 36em;
+  text-wrap: pretty;
+}
+
+.home-opening p + p { margin-top: 1em; }
+
+.more-link {
+  display: inline-block;
+  margin-top: 26px;
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ochre);
+}
+.more-link::after { content: " →"; }
+.more-link:hover { color: var(--ochre-deep); }
+
+.home-links { display: flex; flex-wrap: wrap; gap: 26px; margin-top: 26px; }
+
+.home-latest li { border-bottom: 1px solid var(--rule); }
+
+.home-latest li a { display: block; padding-block: 16px; }
+
+.home-latest .where { color: var(--ochre); }
+.home-latest .kind { color: var(--ink); }
+
+.home-latest .latest-title {
+  display: block;
+  font-size: 21px;
+  font-weight: 500;
+  line-height: 1.25;
+  margin-top: 4px;
+  transition: color 0.15s;
+}
+
+.home-latest li a:hover .latest-title { color: var(--ochre); }
+
+@media (max-width: 900px) {
+  .home-hero { grid-template-columns: minmax(0, 1fr); grid-template-areas: "mark" "today"; }
+  .today { margin: 18px 0 0; }
+}
+
+.split {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: clamp(36px, 5vw, 72px);
+}
+
+/* A passage in the team's own words */
+.voice {
+  background: var(--night);
+  color: var(--on-night);
+  padding-block: clamp(56px, 8vw, 104px);
+}
+
+.voice .kicker { color: var(--lamp); margin-bottom: 26px; }
+
+.voice p {
+  font-size: clamp(19px, 2vw, 23px);
+  line-height: 1.65;
+  max-width: 38em;
+  margin-bottom: 1.1em;
+}
+
+.voice:not(.voice-line) p:first-of-type::first-letter {
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: 4.4em;
+  float: left;
+  line-height: 0.8;
+  padding: 8px 12px 0 0;
+  color: var(--lamp);
+}
+
+.voice cite {
+  display: block;
+  font-family: var(--display);
+  font-style: normal;
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--on-night-dim);
+  margin-top: 30px;
+}
+
+/* A single line from a longer passage, with a link to the whole */
+.voice-line { padding-block: clamp(48px, 6vw, 80px); }
+
+.voice-line blockquote p {
+  font-style: italic;
+  font-size: clamp(24px, 3vw, 36px);
+  line-height: 1.35;
+  max-width: 28em;
+  margin-bottom: 0;
+}
+
+.voice-foot { display: flex; flex-wrap: wrap; align-items: baseline; gap: 12px 32px; margin-top: 28px; }
+
+.voice-foot cite { margin-top: 0; }
+
+.voice-foot .arrow-link { color: var(--on-night); border-bottom-color: var(--lamp); }
+.voice-foot .arrow-link:hover { color: var(--lamp); }
+
+.band {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+  padding-block: 34px;
+  border-top: 2px solid var(--ink);
+  border-bottom: 2px solid var(--ink);
+}
+
+.band h2 {
+  font-family: var(--display);
+  font-weight: 800;
+  font-variation-settings: "wdth" 75;
+  font-size: clamp(28px, 3.6vw, 44px);
+  line-height: 0.95;
+  text-transform: uppercase;
+}
+
+.band p { color: var(--ink-2); font-size: 18px; margin-top: 8px; max-width: 34em; }
+
+/* ---------- Temple and festival pages ---------- */
+.two-col {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+  gap: clamp(36px, 5vw, 80px);
+  padding-block: clamp(40px, 5vw, 64px);
+  align-items: start;
+}
+
+.prose p {
+  font-size: 19.5px;
+  line-height: 1.7;
+  max-width: 36em;
+  margin-bottom: 1em;
+}
+
+/* a signature under a passage */
+.prose p.caps { font-size: 13px; line-height: 1.6; margin-top: 1.6em; }
+
+.stack > * + * { margin-top: clamp(40px, 5vw, 60px); }
+
+/* On wide screens the side column stays in view while the main column
+   scrolls. Its heading stays put; a list too long for the screen scrolls
+   inside the column. */
+@media (min-width: 901px) {
+  .side-sticky {
+    position: sticky;
+    top: calc(var(--nav-h) + 24px);
+    display: flex;
+    flex-direction: column;
+    max-height: calc(100vh - var(--nav-h) - 48px);
+  }
+
+  .side-scroll {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--rule) transparent;
+  }
+}
+
+/* festivals & rituals seen at a temple */
+.tag-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  column-gap: 20px;
+}
+
+.tag-grid a { display: block; padding-block: 14px; border-bottom: 1px solid var(--rule); }
+
+.tag-grid .t {
+  display: block;
+  font-family: var(--tamil);
+  font-weight: 700;
+  font-size: 20px;
+  line-height: 1.35;
+  transition: color 0.15s;
+}
+
+.tag-grid a:hover .t { color: var(--ochre); }
+
+/* Drawings, on temple and festival pages. A drawing always fills the width it
+   is given — the whole page for a wide one, the main column for a tall one
+   (see drawingsInColumn) — so its edges line up with the text around it. */
+.drawings { padding-top: clamp(28px, 4vw, 48px); }
+.stack > .drawings { padding-top: 0; }
+
+.drawing img { display: block; width: 100%; height: auto; }
+
+.drawing figcaption {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 16px;
+  margin-top: 12px;
+  font-size: 16.5px;
+  color: var(--ink-2);
+}
+
+.drawing-title { font-weight: 600; }
+.drawing-caption { font-weight: 400; font-style: italic; }
+
+.drawing-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 24px;
+  margin-top: 32px;
+}
+
+.drawing-row figcaption { font-size: 15px; }
+
+/* The temple, and its people */
+.entry { padding-block: 24px; border-bottom: 1px solid var(--rule); }
+
+.entry figure { margin-bottom: 16px; }
+.entry figure img { display: block; width: 100%; height: auto; }
+.entry figcaption { font-size: 15px; font-style: italic; color: var(--muted); margin-top: 6px; }
+
+.entry-title { font-weight: 600; font-size: 25px; line-height: 1.2; }
+.entry-name { margin-top: 4px; }
+.entry-body p { font-size: 18.5px; line-height: 1.65; max-width: 36em; margin-top: 10px; }
+
+/* the year so far */
+.year-month + .year-month { margin-top: 26px; }
+
+.year-month h3 {
+  font-family: var(--display);
+  font-weight: 800;
+  font-variation-settings: "wdth" 75;
+  font-size: 22px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ochre);
+  border-bottom: 2px solid var(--ochre);
+  padding-bottom: 6px;
+}
+
+.year-items li {
+  display: grid;
+  grid-template-columns: 70px minmax(0, 1fr);
+  gap: 14px;
+  align-items: baseline;
+  padding-block: 10px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.year-date {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.year-what { font-size: 17px; line-height: 1.45; }
+
+.year-note {
+  display: inline-block;
+  margin-top: 3px;
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 12.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ochre);
+}
+.year-note::after { content: " →"; }
+
+/* the explainer: plain questions and answers */
+.qa > div { padding-block: 20px; border-bottom: 1px solid var(--rule); }
+.qa > div:first-child { padding-top: 0; }
+.qa dt { margin-bottom: 8px; }
+.qa dd { font-size: 20px; line-height: 1.65; max-width: 34em; }
+.qa dd p + p { margin-top: 0.8em; }
+
+/* where we've seen it */
+.seen > li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr);
+  gap: 20px;
+  padding-block: 16px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.seen .where { font-weight: 600; font-size: 21px; line-height: 1.25; }
+.seen a.where:hover { color: var(--ochre); }
+.seen .when li { font-size: 16.5px; line-height: 1.45; padding-block: 2px; }
+.seen .when time {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 13.5px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-right: 10px;
+}
+
+/* ---------- A field note ---------- */
+.note-head { padding-block: clamp(36px, 6vw, 72px) clamp(28px, 4vw, 44px); border-bottom: 2px solid var(--ink); }
+
+.note-dateline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 14px;
+  margin-bottom: 14px;
+}
+
+.note-dateline .date {
+  font-family: var(--display);
+  font-weight: 800;
+  font-variation-settings: "wdth" 75;
+  font-size: 22px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ochre);
+}
+
+.note-dateline .local { font-style: italic; color: var(--muted); font-size: 18px; }
+
+.note-title {
+  font-weight: 600;
+  font-size: clamp(34px, 5vw, 64px);
+  line-height: 1.08;
+  letter-spacing: -0.01em;
+  max-width: 17em;
+  text-wrap: balance;
+}
+
+.note-meta { display: flex; flex-wrap: wrap; gap: 8px 22px; margin-top: 20px; }
+.note-meta a { color: var(--ink); border-bottom: 1px solid var(--ochre); }
+.note-meta a:hover { color: var(--ochre); }
+
+.note-body { max-width: 720px; margin-inline: auto; padding: clamp(36px, 5vw, 64px) var(--gutter); }
+.note-body p { font-size: 20px; line-height: 1.72; margin-bottom: 1.1em; }
+.note-body h3 {
+  font-family: var(--display);
+  font-weight: 800;
+  font-variation-settings: "wdth" 75;
+  font-size: 24px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  margin: 1.8em 0 0.6em;
+}
+.note-body h2 { font-weight: 600; font-size: 30px; line-height: 1.2; margin: 1.6em 0 0.5em; }
+.note-body li { font-size: 20px; line-height: 1.72; }
+
+/* Text from the admin's editor: lists, quotations, and the photos, videos
+   and recordings placed in it */
+.rich ul, .rich ol { padding-left: 1.3em; margin-bottom: 1.1em; }
+.rich li { margin-bottom: 0.35em; }
+.rich blockquote {
+  margin: 1.4em 0;
+  padding-left: 1em;
+  border-left: 3px solid var(--ochre);
+  font-style: italic;
+  color: var(--ink-2);
+}
+.rich hr { border: 0; height: 10px; background: var(--stripe); margin: 2em 0; }
+.rich a, .prose a, .qa dd a { color: var(--ochre); border-bottom: 1px solid currentColor; }
+.rich-media { margin: 1.6em 0; }
+.rich-media img, .rich-media video { display: block; width: 100%; height: auto; }
+.rich-media audio { width: 100%; }
+.rich-media figcaption { font-size: 15px; color: var(--muted); margin-top: 8px; font-style: italic; }
+.rich-media .credit { font-style: normal; }
+.prose li { font-size: 19.5px; line-height: 1.7; }
+.entry-body li { font-size: 18.5px; line-height: 1.65; }
+
+/* Shown while an editor previews unpublished drafts from the admin */
+.preview-bar {
+  padding: 9px var(--gutter);
+  background: var(--turmeric);
+  color: #fff;
+  font-family: var(--display);
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: 0.04em;
+  text-align: center;
+}
+.preview-bar a { color: #fff; text-decoration: underline; margin-left: 6px; }
+
+.media { margin-block: 8px 32px; }
+.media video { display: block; width: 100%; height: auto; background: var(--ink); }
+.media figcaption { font-size: 15px; color: var(--muted); margin-top: 8px; font-style: italic; }
+.media audio { width: 100%; }
+
+.photos {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+  margin-block: 8px 32px;
+}
+.photos img { display: block; width: 100%; height: auto; }
+.photos figcaption { font-size: 14px; color: var(--muted); margin-top: 6px; font-style: italic; }
+
+.note-foot { max-width: 720px; margin-inline: auto; padding: 0 var(--gutter) clamp(56px, 7vw, 88px); }
+
+/* ---------- Field notes filter ---------- */
+.filters { display: flex; flex-wrap: wrap; gap: 8px 24px; padding-block: 18px 2px; }
+
+.filters button {
+  font-family: var(--display);
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 6px 0;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.filters button[aria-pressed="true"] { color: var(--ink); border-bottom-color: var(--ochre); }
+.filters .count { font-weight: 500; margin-left: 5px; color: var(--muted); }
+
+/* ---------- Films: stills in a grid; the one playing opens across the row ---------- */
+.video-wall {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr));
+  gap: 36px 24px;
+  padding-top: 24px;
+}
+
+.video-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: left;
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+.video-tile .still {
+  position: relative;
+  display: block;
+  aspect-ratio: 4 / 5;
+  background: var(--ink);
+  margin-bottom: 8px;
+  overflow: hidden;
+}
+.video-tile .still img,
+.video-tile .still video { width: 100%; height: 100%; object-fit: cover; }
+.video-tile .play {
+  position: absolute;
+  left: 14px;
+  bottom: 14px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--chalk);
+  transition: background 0.15s;
+}
+.video-tile .play::after {
+  content: "";
+  position: absolute;
+  left: 17px;
+  top: 13px;
+  border-style: solid;
+  border-width: 9px 0 9px 14px;
+  border-color: transparent transparent transparent var(--ink);
+}
+.video-tile:hover .play { background: var(--ochre); }
+.video-tile:hover .play::after { border-left-color: var(--chalk); }
+.video-title { font-weight: 600; font-size: 19px; line-height: 1.25; }
+.video-tile:hover .video-title { color: var(--ochre); }
+.video-where { font-size: 15.5px; color: var(--muted); font-style: italic; }
+
+/* A film opened over the page: the film sized to the screen, its words beside it */
+.film-viewer {
+  width: 100vw;
+  height: 100dvh;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  border: none;
+  padding: 0;
+  background: var(--night);
+  color: var(--on-night);
+}
+.film-viewer::backdrop { background: var(--night); }
+.film-viewer-inner {
+  display: grid;
+  grid-template-columns: minmax(0, auto) minmax(300px, 30em);
+  justify-content: center;
+  align-items: center;
+  gap: 40px;
+  height: 100%;
+  padding: 32px 88px;
+}
+.film-viewer video {
+  max-height: calc(100dvh - 64px);
+  max-width: 100%;
+  background: #000;
+  justify-self: end;
+}
+.film-viewer-text {
+  max-height: calc(100dvh - 64px);
+  overflow-y: auto;
+  padding-right: 8px;
+}
+.film-viewer-text .caps { color: var(--on-night-dim); }
+.film-viewer-title { font-weight: 600; font-size: 28px; line-height: 1.2; margin: 8px 0 6px; }
+.film-viewer-by { font-style: italic; color: var(--on-night-dim); font-size: 16px; margin-bottom: 14px; }
+.film-viewer .film-text p { font-size: 17.5px; line-height: 1.6; color: var(--on-night); }
+.film-viewer .rich a { color: var(--lamp); }
+.film-viewer-links { display: flex; flex-wrap: wrap; gap: 14px 28px; margin-top: 18px; }
+.film-viewer .arrow-link { border-bottom-color: var(--lamp); font-size: 13.5px; }
+.film-viewer .arrow-link:hover { color: var(--lamp); }
+.film-viewer-close,
+.film-viewer-step {
+  position: absolute;
+  background: none;
+  border: none;
+  color: var(--on-night);
+  font-family: var(--display);
+  line-height: 1;
+  cursor: pointer;
+  padding: 8px 14px;
+}
+.film-viewer-close { top: 12px; right: 16px; font-size: 44px; }
+.film-viewer-step { top: 50%; transform: translateY(-50%); font-size: 64px; }
+.film-viewer-step.prev { left: 12px; }
+.film-viewer-step.next { right: 12px; }
+.film-viewer-close:hover,
+.film-viewer-step:hover { color: var(--lamp); }
+@media (max-width: 860px) {
+  /* phones: the film on top, its words below, the whole viewer scrolls */
+  .film-viewer { overflow-y: auto; }
+  .film-viewer-inner {
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+    height: auto;
+    gap: 20px;
+    padding: 72px 16px 40px;
+  }
+  .film-viewer video { max-height: 70dvh; justify-self: center; }
+  .film-viewer-text { max-height: none; overflow: visible; }
+  .film-viewer-title { font-size: 23px; }
+  .film-viewer-close { top: 4px; }
+  .film-viewer-step { top: 4px; transform: none; font-size: 44px; }
+  .film-viewer-step.prev { left: 4px; }
+  .film-viewer-step.next { left: 56px; right: auto; }
+}
+@media (max-width: 560px) {
+  .video-wall { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px 12px; }
+  .video-title { font-size: 16.5px; }
+  .video-where { font-size: 14px; }
+  .video-tile .play { left: 10px; bottom: 10px; width: 36px; height: 36px; }
+  .video-tile .play::after { left: 14px; top: 10px; border-width: 8px 0 8px 12px; }
+}
+
+/* A film's own page: the film, and its words beside it */
+.film {
+  display: grid;
+  grid-template-columns: minmax(0, auto) minmax(0, 1fr);
+  gap: 28px 48px;
+  align-items: start;
+  padding-block: clamp(32px, 5vw, 56px) clamp(56px, 7vw, 96px);
+}
+.film video { max-height: 82vh; max-width: 100%; background: var(--ink); }
+.film-text p { font-size: 19px; line-height: 1.65; margin-bottom: 0.9em; max-width: 34em; }
+.film .arrow-link { display: inline-block; margin-top: 12px; }
+@media (max-width: 720px) {
+  .film { grid-template-columns: minmax(0, 1fr); }
+  .film video { margin-inline: auto; }
+}
+
+/* ---------- The book ---------- */
+.credits { display: flex; flex-wrap: wrap; gap: 6px 28px; margin-top: 24px; font-size: 17.5px; color: var(--ink-2); }
+.credits b { font-weight: 600; color: var(--ink); }
+
+.book-parts { counter-reset: part; }
+
+.book-parts li {
+  counter-increment: part;
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr);
+  gap: 24px;
+  padding-block: 28px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.book-parts li::before {
+  content: counter(part, upper-roman);
+  font-family: var(--display);
+  font-weight: 800;
+  font-variation-settings: "wdth" 75;
+  font-size: 46px;
+  line-height: 0.9;
+  color: var(--ochre);
+}
+
+.book-parts h2 { font-weight: 600; font-size: 28px; line-height: 1.2; }
+.book-parts p { color: var(--ink-2); font-size: 18px; max-width: 36em; margin-top: 6px; }
+.book-parts .arrow-link { display: inline-block; margin-top: 12px; font-size: 13.5px; }
+
+/* ---------- About ---------- */
+.about-block {
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 2fr);
+  gap: clamp(20px, 4vw, 56px);
+  padding-block: 36px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.about-block h2 {
+  font-family: var(--display);
+  font-weight: 800;
+  font-variation-settings: "wdth" 75;
+  font-size: 30px;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.team {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: clamp(24px, 4vw, 56px);
+}
+
+.team li { padding-block: 18px; border-bottom: 1px solid var(--rule); }
+.team .who { font-weight: 600; font-size: 22px; }
+.team .role { margin-top: 2px; }
+.team p { color: var(--ink-2); font-size: 17px; margin-top: 8px; }
+
+/* ---------- Footer ---------- */
+.site-footer { background: var(--night); color: var(--on-night-dim); }
+
+.footer-inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr) minmax(0, 1fr);
+  gap: 32px;
+  padding-block: 52px 36px;
+}
+
+.site-footer .brand-word { color: var(--on-night); }
+.site-footer .brand-tamil { color: var(--lamp); }
+.site-footer p { font-size: 16px; max-width: 30em; margin-top: 14px; }
+
+.site-footer h4 {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--on-night);
+  margin-bottom: 12px;
+}
+
+.site-footer li + li { margin-top: 8px; }
+.site-footer a { font-size: 16px; transition: color 0.15s; }
+.site-footer a:hover { color: #fff; }
+
+.footer-bottom {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+  border-top: 1px solid #3a322b;
+  padding-block: 18px 28px;
+  font-size: 14px;
+}
+
+/* ---------- Reveal on scroll (never hides what has loaded) ---------- */
+.reveal { transition: opacity 0.6s ease, transform 0.6s ease; }
+.reveal-ready .reveal:not(.visible) { opacity: 0; transform: translateY(16px); }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .reveal { transition: none; }
+  .reveal-ready .reveal:not(.visible) { opacity: 1; transform: none; }
+}
+
+/* ---------- Narrow screens ---------- */
+@media (max-width: 900px) {
+  .home-hero, .home-opening, .split, .two-col, .about-block { grid-template-columns: minmax(0, 1fr); }
+  .footer-inner { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .footer-inner > :first-child { grid-column: 1 / -1; }
+}
+
+@media (max-width: 640px) {
+  body { font-size: 17px; }
+  .note-row { grid-template-columns: minmax(0, 1fr); gap: 10px; padding-block: 22px; }
+  .date-stamp { display: flex; align-items: baseline; gap: 10px; }
+  .date-stamp .d { font-size: 40px; }
+  .date-stamp .m { margin-top: 0; }
+  .obs-row, .obs-row.compact { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+  .temple-row { grid-template-columns: minmax(0, 1fr); gap: 6px; }
+  .seen > li { grid-template-columns: minmax(0, 1fr); gap: 6px; }
+  .book-parts li { grid-template-columns: 56px minmax(0, 1fr); gap: 16px; }
+  .book-parts li::before { font-size: 32px; }
+  .team { grid-template-columns: minmax(0, 1fr); }
+  .footer-inner { grid-template-columns: minmax(0, 1fr); }
+  .note-body p, .prose p, .qa dd { font-size: 18.5px; }
+}

@@ -1,0 +1,73 @@
+/* The admin's own touches: the site's ochre, and the welcome panel. */
+
+:root {
+  --sthalam-ochre: #a8321e;
+}
+
+.sthalam-logo {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+
+  .word {
+    font-size: 30px;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    line-height: 1;
+  }
+
+  .ta {
+    color: var(--sthalam-ochre);
+    font-size: 16px;
+    margin-top: 4px;
+  }
+}
+
+.sthalam-welcome {
+  margin-bottom: calc(var(--base) * 2);
+  padding: calc(var(--base) * 1.5);
+  border: 1px solid var(--theme-elevation-150);
+  border-left: 6px solid var(--sthalam-ochre);
+  border-radius: 4px;
+  background: var(--theme-elevation-50);
+
+  h2 {
+    margin: 0 0 calc(var(--base) * 0.5);
+  }
+
+  p {
+    margin: 0 0 var(--base);
+    max-width: 60em;
+  }
+}
+
+.sthalam-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: var(--base);
+
+  a {
+    padding: 10px 16px;
+    border-radius: 4px;
+    background: var(--sthalam-ochre);
+    color: #fff;
+    font-weight: 600;
+    text-decoration: none;
+
+    &:hover {
+      filter: brightness(1.1);
+    }
+  }
+}
+
+.sthalam-tips {
+  margin: 0;
+  padding-left: 1.2em;
+  color: var(--theme-elevation-700);
+
+  li {
+    margin: 4px 0;
+  }
+}
