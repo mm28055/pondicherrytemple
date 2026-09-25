@@ -3,14 +3,15 @@ import { isAdmin, isEditor } from '../access'
 import { shortEditor } from '../editor'
 import { slugField } from '../fields'
 import { refreshHooks } from '../revalidate'
+import { describedBy } from '../descriptions'
 
 export const Regions: CollectionConfig = {
   slug: 'regions',
   labels: { singular: 'Region', plural: 'Regions' },
   admin: {
+    components: describedBy('regions'),
     group: 'Admin',
     useAsTitle: 'name',
-    description: 'The towns the project documents. Only Pondicherry for now.',
   },
   access: { read: () => true, create: isAdmin, update: isEditor, delete: isAdmin },
   hooks: refreshHooks,

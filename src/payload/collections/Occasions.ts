@@ -2,17 +2,17 @@ import type { CollectionConfig } from 'payload'
 import { canUpdateOwn, isEditor, isLoggedIn } from '../access'
 import { createdByField, observancesField, regionField } from '../fields'
 import { refreshHooks } from '../revalidate'
+import { describedBy } from '../descriptions'
 
 export const Occasions: CollectionConfig = {
   slug: 'occasions',
   labels: { singular: 'Date in the year so far', plural: 'The year so far' },
   defaultSort: '-date',
   admin: {
+    components: describedBy('occasions'),
     group: 'Temple pages',
     useAsTitle: 'label',
     defaultColumns: ['date', 'label', 'temple'],
-    description:
-      "Every occasion the team was present for. These make each temple's 'year so far', and the 'where we've seen it' list on festival pages.",
   },
   access: { read: () => true, create: isLoggedIn, update: canUpdateOwn, delete: isEditor },
   hooks: refreshHooks,

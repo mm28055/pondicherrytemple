@@ -21,6 +21,7 @@ import { fullEditor } from './payload/editor'
 import { AboutPage } from './payload/globals/AboutPage'
 import { HomePage } from './payload/globals/HomePage'
 import { Instagram } from './payload/globals/Instagram'
+import { SectionDescriptions } from './payload/globals/SectionDescriptions'
 
 /* The admin at /admin, where the team writes and uploads everything the
    site shows. The site reads the same database through src/lib/data.ts. */
@@ -71,7 +72,7 @@ export default buildConfig({
     Users,
     Regions,
   ],
-  globals: [HomePage, AboutPage, Instagram],
+  globals: [HomePage, AboutPage, Instagram, SectionDescriptions],
   editor: fullEditor,
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: { outputFile: path.resolve(dirname, 'payload-types.ts') },

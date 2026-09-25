@@ -2,6 +2,7 @@ import type { GlobalConfig } from 'payload'
 import { isEditor } from '../access'
 import { fullEditor } from '../editor'
 import { refreshAfterGlobalChange } from '../revalidate'
+import { globalDescribedBy } from '../descriptions'
 
 /* The About page: an opening line, then sections in order, the team, and
    how to get in touch. */
@@ -10,8 +11,8 @@ export const AboutPage: GlobalConfig = {
   slug: 'about-page',
   label: 'About page',
   admin: {
+    components: globalDescribedBy('about-page'),
     group: 'Site pages',
-    description: 'Everything on the About page. Drag sections to reorder them. "Save" puts changes on the site.',
   },
   access: { read: () => true, update: isEditor },
   hooks: { afterChange: [refreshAfterGlobalChange] },

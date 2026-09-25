@@ -4,6 +4,7 @@ import { shortEditor } from '../editor'
 import { createdByField, reviewField, slugField } from '../fields'
 import { draftButtons, previewURL } from '../preview'
 import { refreshHooks } from '../revalidate'
+import { describedBy } from '../descriptions'
 
 export const Observances: CollectionConfig = {
   slug: 'observances',
@@ -12,10 +13,8 @@ export const Observances: CollectionConfig = {
     group: 'Temple pages',
     useAsTitle: 'name',
     defaultColumns: ['name', 'tamil', 'kind', '_status'],
-    description:
-      'Each festival or ritual is explained once. Its page then gathers every temple, date, field note and article tagged with it.',
     preview: previewURL('observances'),
-    components: draftButtons,
+    components: { ...draftButtons, ...describedBy('observances') },
   },
   versions: { drafts: true, maxPerDoc: 25 },
   access: { read: publishedOrTeam, create: isEditor, update: isEditor, delete: isAdmin },

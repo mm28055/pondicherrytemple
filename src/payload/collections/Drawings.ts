@@ -9,6 +9,7 @@ import {
 } from '../fields'
 import { draftButtons, previewURL } from '../preview'
 import { refreshHooks } from '../revalidate'
+import { describedBy } from '../descriptions'
 
 export const Drawings: CollectionConfig = {
   slug: 'drawings',
@@ -17,10 +18,8 @@ export const Drawings: CollectionConfig = {
     group: 'Temple pages',
     useAsTitle: 'title',
     defaultColumns: ['title', 'kind', 'image', '_status'],
-    description:
-      "Abishek's drawings: each temple's illustrated plan, and scenes photographs can't capture. A drawing appears at the top of every temple and festival page it is tagged with.",
     preview: previewURL('drawings'),
-    components: draftButtons,
+    components: { ...draftButtons, ...describedBy('drawings') },
   },
   versions: { drafts: true, maxPerDoc: 25 },
   access: {

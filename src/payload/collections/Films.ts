@@ -11,6 +11,7 @@ import {
 } from '../fields'
 import { draftButtons, previewURL } from '../preview'
 import { refreshHooks } from '../revalidate'
+import { describedBy } from '../descriptions'
 
 /* Films: finished, edited videos made to be shared — the Centre's Instagram
    reels and anything like them. (A rough clip from a day at a temple is a
@@ -28,10 +29,8 @@ export const Films: CollectionConfig = {
     group: 'Add to the site',
     useAsTitle: 'title',
     defaultColumns: ['title', 'date', 'temples', '_status'],
-    description:
-      'Finished short films, such as the Centre’s Instagram reels. New Instagram posts arrive here as drafts every morning.',
     preview: previewURL('films'),
-    components: draftButtons,
+    components: { ...draftButtons, ...describedBy('films') },
   },
   versions: { drafts: { autosave: { interval: 2000 } }, maxPerDoc: 50 },
   access: {

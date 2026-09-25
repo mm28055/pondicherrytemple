@@ -5,6 +5,7 @@ import { shortEditor } from '../editor'
 import { createdByField, regionField, slugField } from '../fields'
 import { draftButtons, previewURL } from '../preview'
 import { refreshHooks } from '../revalidate'
+import { describedBy } from '../descriptions'
 
 /* A temple's screen in the admin is the hub for everything on its page: its
    own details, and — in the other tabs — every piece tagged with it, each
@@ -19,10 +20,8 @@ export const Temples: CollectionConfig = {
     group: 'Temple pages',
     useAsTitle: 'name',
     defaultColumns: ['name', 'knownAs', 'deityGroup', 'street', '_status'],
-    description:
-      'The temples being documented, in the order the site shows them — drag to reorder. Open a temple to edit everything on its page.',
     preview: previewURL('temples'),
-    components: draftButtons,
+    components: { ...draftButtons, ...describedBy('temples') },
   },
   versions: { drafts: true, maxPerDoc: 25 },
   access: { read: publishedOrTeam, create: isEditor, update: isEditor, delete: isAdmin },

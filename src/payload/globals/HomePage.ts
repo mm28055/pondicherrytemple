@@ -2,6 +2,7 @@ import type { GlobalConfig } from 'payload'
 import { isEditor } from '../access'
 import { shortEditor } from '../editor'
 import { refreshAfterGlobalChange } from '../revalidate'
+import { globalDescribedBy } from '../descriptions'
 
 /* The words on the home page. Everything else there (the newest additions,
    the temples, the festivals) fills itself in from the rest of the admin. */
@@ -10,9 +11,8 @@ export const HomePage: GlobalConfig = {
   slug: 'home-page',
   label: 'Home page',
   admin: {
+    components: globalDescribedBy('home-page'),
     group: 'Site pages',
-    description:
-      'The words on the home page. The newest additions, temples and festivals shown there fill themselves in. "Save" puts changes on the site.',
   },
   access: { read: () => true, update: isEditor },
   hooks: { afterChange: [refreshAfterGlobalChange] },

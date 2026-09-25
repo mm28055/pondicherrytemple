@@ -10,6 +10,7 @@ import {
 } from '../fields'
 import { draftButtons, previewURL } from '../preview'
 import { refreshHooks } from '../revalidate'
+import { describedBy } from '../descriptions'
 
 export const Articles: CollectionConfig = {
   slug: 'articles',
@@ -19,10 +20,8 @@ export const Articles: CollectionConfig = {
     group: 'Add to the site',
     useAsTitle: 'title',
     defaultColumns: ['title', 'author', 'date', '_status'],
-    description:
-      'Essays and finished pieces. Tag a temple or festival only if the article actually discusses it.',
     preview: previewURL('articles'),
-    components: draftButtons,
+    components: { ...draftButtons, ...describedBy('articles') },
   },
   versions: { drafts: { autosave: { interval: 2000 } }, maxPerDoc: 50 },
   access: {
