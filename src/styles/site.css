@@ -436,6 +436,7 @@ a.temple-row:hover .temple-name { color: var(--ochre); }
 }
 
 .home-opening h1 {
+  font-style: italic;
   font-weight: 500;
   font-size: clamp(28px, 3.2vw, 42px);
   line-height: 1.12;
