@@ -1,10 +1,11 @@
 import config from '@payload-config'
-import { ViewDescription } from '@payloadcms/ui'
+import Link from 'next/link'
 import { getPayload } from 'payload'
 import { fieldName, SECTIONS } from '@/payload/descriptions'
 
 /** A section's line of help in the admin, as saved under Admin → Section
-    descriptions (or its original text, if that box is empty). */
+    descriptions (or its original text, if that box is empty), with a link
+    straight to the box where it is changed. */
 export async function SectionDescription({ slug }: { slug: string }) {
   const original = SECTIONS.find((s) => s.slug === slug)?.text ?? ''
   let text = original
@@ -16,5 +17,11 @@ export async function SectionDescription({ slug }: { slug: string }) {
   } catch {
     // Not saved yet, or the database is unreachable: the original text will do.
   }
-  return text ? <ViewDescription description={text} /> : null
+  // The class is Payload's own, so it looks like every other description
+  return (
+    <div className="custom-view-description sthalam-description">
+      {text}{' '}
+      <Link href={`/admin/globals/section-descriptions#field-${fieldName(slug)}`}>Edit</Link>
+    </div>
+  )
 }
