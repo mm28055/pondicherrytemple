@@ -3,6 +3,7 @@ import * as migration_20260925_134649_quotation_band from './20260925_134649_quo
 import * as migration_20260925_135034_quotation_second_passage from './20260925_135034_quotation_second_passage';
 import * as migration_20260925_150727_section_descriptions from './20260925_150727_section_descriptions';
 import * as migration_20260925_150957_headline_italic from './20260925_150957_headline_italic';
+import * as migration_20260926_041707_section_intros from './20260926_041707_section_intros';
 
 export const migrations = [
   {
@@ -28,6 +29,11 @@ export const migrations = [
   {
     up: migration_20260925_150957_headline_italic.up,
     down: migration_20260925_150957_headline_italic.down,
-    name: '20260925_150957_headline_italic'
+    name: '20260925_150957_headline_italic',
+  },
+  {
+    up: migration_20260926_041707_section_intros.up,
+    down: migration_20260926_041707_section_intros.down,
+    name: '20260926_041707_section_intros'
   },
 ];

@@ -62,20 +62,6 @@
   }
 }
 
-/* "Edit" after a section's description (src/components/admin/SectionDescription.tsx) */
-.sthalam-description a {
-  margin-left: 6px;
-  font-size: 0.85em;
-  font-weight: 600;
-  color: var(--sthalam-ochre);
-  text-decoration: underline;
-  text-underline-offset: 3px;
-
-  &:hover {
-    filter: brightness(1.2);
-  }
-}
-
 .sthalam-tips {
   margin: 0;
   padding-left: 1.2em;

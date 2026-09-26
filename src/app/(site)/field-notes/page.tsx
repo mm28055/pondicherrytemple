@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { getFieldNotes, getRegion, getTemples } from "@/lib/data";
+import { getFieldNotes, getRegion, getSectionIntro, getTemples } from "@/lib/data";
 import { FIELD_KIND_LABELS } from "@/content/labels";
 import type { FieldKind } from "@/content/types";
 import { noteRow } from "@/lib/view";
@@ -28,11 +28,7 @@ export default async function FieldNotesPage() {
       <header className="page-head">
         <div className="kicker">From the temples</div>
         <h1 className="page-title">Field Notes</h1>
-        <p className="page-lede">
-          Everything recorded at the temples — notes written on the day, interviews, videos and
-          photographs. Working material, lightly edited: the raw stuff of everything else on this
-          site.
-        </p>
+        <p className="page-lede">{await getSectionIntro("fieldNotes")}</p>
       </header>
       <section className="section" style={{ paddingTop: 12 }}>
         <FieldNotesBrowser rows={rows} kinds={kinds} />

@@ -156,6 +156,8 @@ export interface UserAuthOperations {
   };
 }
 /**
+ * Everything recorded at the temples: what happened, in words, photographs and videos.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "field-notes".
  */
@@ -237,6 +239,8 @@ export interface FieldNote {
   _status?: ('draft' | 'published') | null;
 }
 /**
+ * The temples being documented, in the order the site shows them — drag to reorder. Open a temple to edit everything on its page.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "temples".
  */
@@ -309,6 +313,8 @@ export interface Temple {
   _status?: ('draft' | 'published') | null;
 }
 /**
+ * Short finished pieces for the "The temple" and "The people" sections of temple pages, polished from the field notes.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "temple-pieces".
  */
@@ -370,6 +376,8 @@ export interface TemplePiece {
   _status?: ('draft' | 'published') | null;
 }
 /**
+ * Every photo, video, recording and document. Drag several files in at once to upload them together.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "media".
  */
@@ -435,6 +443,8 @@ export interface Media {
   };
 }
 /**
+ * Everyone who can sign in. Admins add people here and choose what they can do.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "users".
  */
@@ -463,6 +473,8 @@ export interface User {
   collection: 'users';
 }
 /**
+ * The towns the project documents. Only Pondicherry for now.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "regions".
  */
@@ -500,6 +512,8 @@ export interface Region {
   createdAt: string;
 }
 /**
+ * Every occasion the team was present for. These make each temple's 'year so far', and the 'where we've seen it' list on festival pages.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "occasions".
  */
@@ -522,6 +536,8 @@ export interface Occasion {
   createdAt: string;
 }
 /**
+ * Each festival or ritual is explained once. Its page then gathers every temple, date, field note and article tagged with it.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "observances".
  */
@@ -576,6 +592,8 @@ export interface Observance {
   _status?: ('draft' | 'published') | null;
 }
 /**
+ * Abishek's drawings: each temple's illustrated plan, and scenes photographs can't capture. A drawing appears at the top of every temple and festival page it is tagged with.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "drawings".
  */
@@ -614,6 +632,8 @@ export interface Drawing {
   _status?: ('draft' | 'published') | null;
 }
 /**
+ * Essays and finished pieces. Tag a temple or festival only if the article actually discusses it.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "articles".
  */
@@ -666,6 +686,8 @@ export interface Article {
   _status?: ('draft' | 'published') | null;
 }
 /**
+ * Finished short films, such as the Centre’s Instagram reels. New Instagram posts arrive here as drafts every morning.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "films".
  */
@@ -726,6 +748,8 @@ export interface Film {
   _status?: ('draft' | 'published') | null;
 }
 /**
+ * The outline shown on The Book page. It will change as the writing does.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "books".
  */
@@ -1272,6 +1296,8 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   createdAt?: T;
 }
 /**
+ * The words on the home page. The newest additions, temples and festivals shown there fill themselves in. "Save" puts changes on the site.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "home-page".
  */
@@ -1324,6 +1350,8 @@ export interface HomePage {
   createdAt?: string | null;
 }
 /**
+ * Everything on the About page. Drag sections to reorder them. "Save" puts changes on the site.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "about-page".
  */
@@ -1372,6 +1400,8 @@ export interface AboutPage {
   createdAt?: string | null;
 }
 /**
+ * New Instagram videos arrive every morning as draft films, marked "awaiting review". Nothing appears on the site until someone checks the temples, festivals and consent, and publishes it.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "instagram".
  */
@@ -1398,28 +1428,18 @@ export interface Instagram {
   createdAt?: string | null;
 }
 /**
- * The line of help shown under each section’s name here in the admin. Change any of them and save; an empty box brings back the original.
+ * The line under the title of each section of the site. "Save" puts changes on the site; an empty box brings back the original.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "section-descriptions".
  */
 export interface SectionDescription {
   id: number;
+  observances?: string | null;
   fieldNotes?: string | null;
   films?: string | null;
   articles?: string | null;
-  media?: string | null;
-  temples?: string | null;
-  templePieces?: string | null;
-  occasions?: string | null;
-  drawings?: string | null;
-  observances?: string | null;
   books?: string | null;
-  users?: string | null;
-  regions?: string | null;
-  homePage?: string | null;
-  aboutPage?: string | null;
-  instagram?: string | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -1491,21 +1511,11 @@ export interface InstagramSelect<T extends boolean = true> {
  * via the `definition` "section-descriptions_select".
  */
 export interface SectionDescriptionsSelect<T extends boolean = true> {
+  observances?: T;
   fieldNotes?: T;
   films?: T;
   articles?: T;
-  media?: T;
-  temples?: T;
-  templePieces?: T;
-  occasions?: T;
-  drawings?: T;
-  observances?: T;
   books?: T;
-  users?: T;
-  regions?: T;
-  homePage?: T;
-  aboutPage?: T;
-  instagram?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

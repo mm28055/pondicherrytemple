@@ -1,6 +1,5 @@
 import type { GlobalConfig } from 'payload'
 import { adminOnlyField, isAdmin, isEditor } from '../access'
-import { globalDescribedBy } from '../descriptions'
 
 /* The link to the Centre's Instagram account. Once a key is pasted here, new
    posts are brought in every morning as draft films (see
@@ -10,8 +9,10 @@ export const Instagram: GlobalConfig = {
   slug: 'instagram',
   label: 'Instagram',
   admin: {
-    components: globalDescribedBy('instagram'),
     group: 'Admin',
+    description:
+      'New Instagram videos arrive every morning as draft films, marked "awaiting review". ' +
+      'Nothing appears on the site until someone checks the temples, festivals and consent, and publishes it.',
   },
   access: { read: isEditor, update: isAdmin },
   fields: [

@@ -1,24 +1,26 @@
 import type { GlobalConfig } from 'payload'
-import { isEditor, isLoggedIn } from '../access'
-import { fieldName, SECTIONS } from '../descriptions'
+import { isEditor } from '../access'
+import { refreshAfterGlobalChange } from '../revalidate'
+import { SECTION_INTROS } from '../sectionIntros'
 
-/* The line of help shown under each section's name in the admin. Only the
-   admin shows these; nothing here appears on the public site. */
+/* The opening line under the title of each section page on the site. The
+   Temples, Home and About pages keep theirs with the rest of their words. */
 
 export const SectionDescriptions: GlobalConfig = {
   slug: 'section-descriptions',
   label: 'Section descriptions',
   admin: {
-    group: 'Admin',
+    group: 'Site pages',
     description:
-      'The line of help shown under each section’s name here in the admin. Change any of them and save; an empty box brings back the original.',
+      'The line under the title of each section of the site. "Save" puts changes on the site; an empty box brings back the original.',
   },
-  access: { read: isLoggedIn, update: isEditor },
-  fields: SECTIONS.map((s) => ({
-    name: fieldName(s.slug),
+  access: { read: () => true, update: isEditor },
+  hooks: { afterChange: [refreshAfterGlobalChange] },
+  fields: SECTION_INTROS.map((s) => ({
+    name: s.name,
     type: 'textarea' as const,
     label: s.label,
     defaultValue: s.text,
-    admin: { rows: 2 },
+    admin: { rows: 3 },
   })),
 }

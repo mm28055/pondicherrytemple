@@ -11,7 +11,6 @@ import {
 } from '../fields'
 import { draftButtons, previewURL } from '../preview'
 import { refreshHooks } from '../revalidate'
-import { describedBy } from '../descriptions'
 
 /* A field note is simply: a title, a date, the temples and festivals it is
    about, the text, photographs and videos. What kind of note it is (a note,
@@ -33,8 +32,9 @@ export const FieldNotes: CollectionConfig = {
     group: 'Add to the site',
     useAsTitle: 'title',
     defaultColumns: ['title', 'date', 'temples', '_status'],
+    description: 'Everything recorded at the temples: what happened, in words, photographs and videos.',
     preview: previewURL('field-notes'),
-    components: { ...draftButtons, ...describedBy('field-notes') },
+    components: draftButtons,
   },
   // Saves as you type; "Publish" puts it on the site.
   versions: { drafts: { autosave: { interval: 2000 } }, maxPerDoc: 50 },

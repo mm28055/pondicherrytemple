@@ -1,15 +1,14 @@
 import type { CollectionConfig } from 'payload'
 import { adminOnlyField, isAdmin, isLoggedIn, roleOf } from '../access'
-import { describedBy } from '../descriptions'
 
 export const Users: CollectionConfig = {
   slug: 'users',
   labels: { singular: 'Team member', plural: 'Team' },
   admin: {
-    components: describedBy('users'),
     group: 'Admin',
     useAsTitle: 'name',
     defaultColumns: ['name', 'email', 'role'],
+    description: 'Everyone who can sign in. Admins add people here and choose what they can do.',
   },
   // Stay signed in for two weeks, so no one is logged out mid-writing.
   auth: { tokenExpiration: 60 * 60 * 24 * 14 },

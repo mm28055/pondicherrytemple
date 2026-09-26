@@ -4,7 +4,6 @@ import { fullEditor } from '../editor'
 import { createdByField, regionField, reviewField, templesField } from '../fields'
 import { draftButtons, previewURL } from '../preview'
 import { refreshHooks } from '../revalidate'
-import { describedBy } from '../descriptions'
 
 export const TemplePieces: CollectionConfig = {
   slug: 'temple-pieces',
@@ -13,8 +12,10 @@ export const TemplePieces: CollectionConfig = {
     group: 'Temple pages',
     useAsTitle: 'title',
     defaultColumns: ['title', 'topic', 'temples', '_status'],
+    description:
+      'Short finished pieces for the "The temple" and "The people" sections of temple pages, polished from the field notes.',
     preview: previewURL('temple-pieces'),
-    components: { ...draftButtons, ...describedBy('temple-pieces') },
+    components: draftButtons,
   },
   versions: { drafts: { autosave: { interval: 2000 } }, maxPerDoc: 50 },
   access: {

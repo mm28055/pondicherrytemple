@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getBook, getRegion, getRegions } from "@/lib/data";
+import { getBook, getRegion, getRegions, getSectionIntro } from "@/lib/data";
 
 type Props = { params: Promise<{ region: string }> };
 
@@ -29,10 +29,7 @@ export default async function BookPage({ params }: Props) {
           {region.name} · {book.status}
         </div>
         <h1 className="page-title">The Book</h1>
-        <p className="page-lede">
-          Alongside this site, a book is being written from the year&apos;s fieldwork. Below is its
-          provisional shape — the parts it may contain. It will change as the writing does.
-        </p>
+        <p className="page-lede">{await getSectionIntro("books")}</p>
         <div className="credits">
           <span>
             By <b>{book.byline}</b>

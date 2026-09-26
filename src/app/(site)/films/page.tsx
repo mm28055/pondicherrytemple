@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { getFilms, getObservances, getRegion, getTemples } from "@/lib/data";
+import { getFilms, getObservances, getRegion, getSectionIntro, getTemples } from "@/lib/data";
 import { filmTile } from "@/lib/view";
 import { FilmWall } from "@/components/FilmWall";
 
@@ -28,10 +28,7 @@ export default async function FilmsPage() {
       <header className="page-head">
         <div className="kicker">From the temples</div>
         <h1 className="page-title">Films</h1>
-        <p className="page-lede">
-          Short films from the temples, newest first. Press one to play it here; each has its own
-          page with the words that go with it.
-        </p>
+        <p className="page-lede">{await getSectionIntro("films")}</p>
       </header>
       <section className="section" style={{ paddingTop: 12 }}>
         {tiles.length ? <FilmWall tiles={tiles} filters={filters} /> : <p className="empty">No films yet.</p>}

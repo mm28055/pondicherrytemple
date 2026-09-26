@@ -36,6 +36,7 @@ import type {
   AboutPageText,
 } from "@/content/types";
 import { openingText, plainText, toHTML, type LinkPaths } from "./richtext";
+import { SECTION_INTROS, type SectionName } from "@/payload/sectionIntros";
 
 const byDateDesc = <T extends { date: string }>(a: T, b: T) => b.date.localeCompare(a.date);
 const byDateAsc = <T extends { date: string }>(a: T, b: T) => a.date.localeCompare(b.date);
@@ -588,6 +589,18 @@ export async function getBook(regionId: string): Promise<Book | null> {
 }
 
 /* ---------- The Home and About pages (Settings in the admin) ---------- */
+
+/** The line under a section page's title, as saved under Section
+    descriptions; the original text if that box is empty. */
+export async function getSectionIntro(name: SectionName): Promise<string> {
+  const original = SECTION_INTROS.find((s) => s.name === name)!.text;
+  try {
+    const g = await (await db()).findGlobal({ slug: "section-descriptions", depth: 0, overrideAccess: true });
+    return g[name]?.trim() || original;
+  } catch {
+    return original;
+  }
+}
 
 /** The home page's words, or null if not yet written. */
 export async function getHomePage(): Promise<HomePageText | null> {

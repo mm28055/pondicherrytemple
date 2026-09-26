@@ -3,7 +3,6 @@ import { isAdmin, isEditor, publishedOrTeam } from '../access'
 import { regionField, reviewField } from '../fields'
 import { draftButtons, previewURL } from '../preview'
 import { refreshHooks } from '../revalidate'
-import { describedBy } from '../descriptions'
 
 export const Books: CollectionConfig = {
   slug: 'books',
@@ -11,8 +10,9 @@ export const Books: CollectionConfig = {
   admin: {
     group: 'Site pages',
     useAsTitle: 'title',
+    description: "The outline shown on The Book page. It will change as the writing does.",
     preview: previewURL('books'),
-    components: { ...draftButtons, ...describedBy('books') },
+    components: draftButtons,
   },
   versions: { drafts: true, maxPerDoc: 25 },
   access: { read: publishedOrTeam, create: isAdmin, update: isEditor, delete: isAdmin },

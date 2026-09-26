@@ -4,7 +4,6 @@ import { fileURLToPath } from 'url'
 import { canUpdateOwn, isEditor, isLoggedIn } from '../access'
 import { createdByField } from '../fields'
 import { refreshHooks } from '../revalidate'
-import { describedBy } from '../descriptions'
 
 const dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -12,9 +11,10 @@ export const Media: CollectionConfig = {
   slug: 'media',
   labels: { singular: 'Photo, video or file', plural: 'Photos & videos' },
   admin: {
-    components: describedBy('media'),
     group: 'Add to the site',
     defaultColumns: ['filename', 'caption', 'consent', 'temples'],
+    description:
+      'Every photo, video, recording and document. Drag several files in at once to upload them together.',
   },
   access: {
     // Files of people who have not agreed are kept off the public site.

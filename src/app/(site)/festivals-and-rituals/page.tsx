@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { countTemplesForObservance, getObservances, getOccasionsForObservance } from "@/lib/data";
+import { countTemplesForObservance, getObservances, getOccasionsForObservance, getSectionIntro } from "@/lib/data";
 import { observanceRow } from "@/lib/view";
 import { ObservanceRow } from "@/components/Rows";
 
@@ -27,10 +27,7 @@ export default async function ObservancesPage() {
       <header className="page-head">
         <div className="kicker">The ritual year</div>
         <h1 className="page-title">Festivals &amp; Rituals</h1>
-        <p className="page-lede">
-          The festivals and rituals we have been present for so far. Each is explained once, and
-          gathers every field note and article about it, from every temple where it was seen.
-        </p>
+        <p className="page-lede">{await getSectionIntro("observances")}</p>
       </header>
 
       <section className="section">
