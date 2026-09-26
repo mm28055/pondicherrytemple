@@ -25,7 +25,7 @@ const home = {
 }
 
 const about = {
-  lede: "A temple documentation project of the Centre for Shaiva Studies, Pondicherry. Since March 2026 we have been following fifteen of the town's temples through a full ritual year.",
+  lede: "A temple documentation project of the Centre for Shaiva Studies, Pondicherry. Since March 2026 we have been following fifteen of the town's temples through a full ritual year. test",
   sections: [
     {
       heading: 'The temple and the town',
