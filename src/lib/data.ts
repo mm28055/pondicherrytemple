@@ -556,6 +556,11 @@ export async function getRitualYear(): Promise<{
   return { months, throughYear: all.filter((o) => o.throughYear) };
 }
 
+/** Every date the team was present that falls in a Tamil month, in any year. */
+export async function getOccasionsInMonth(monthSlug: string): Promise<Occasion[]> {
+  return (await occasions()).filter((o) => tamilMonthOf(o.date) === monthSlug).sort(byDateAsc);
+}
+
 /** The festivals and rituals seen at a temple, in the order first seen. */
 export async function getObservancesForTemple(regionId: string, templeId: string): Promise<Observance[]> {
   const ids: string[] = [];

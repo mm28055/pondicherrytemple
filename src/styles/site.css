@@ -1356,7 +1356,7 @@ a.temple-row:hover .temple-name { color: var(--ochre); }
 }
 
 /* One month of the ritual year */
-.month-steps { display: flex; justify-content: space-between; gap: 16px; margin-top: 28px; }
+.month-steps { display: flex; justify-content: space-between; gap: 16px; margin-top: 28px; grid-column: 1 / -1; }
 .month-steps a {
   font-family: var(--display);
   font-weight: 600;
@@ -1402,4 +1402,138 @@ a.temple-row:hover .temple-name { color: var(--ochre); }
 .month-link:hover { color: var(--ochre); }
 @media (max-width: 700px) {
   .month-entries > li { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+}
+
+/* ---------- Each month's colour and motif ---------- */
+.motif {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.motif .fill { fill: currentColor; stroke: none; }
+
+.rasi-motif { width: 38px; height: 38px; flex: none; color: var(--m); margin: -2px -4px 0 0; }
+.rasi-month:hover .rasi-ta { color: var(--m); }
+.rasi-month.now .rasi-motif { color: var(--lamp); }
+.rasi-now { color: var(--lamp); }
+
+.month-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 24px;
+  align-items: center;
+}
+.month-head .tamil-title { color: var(--m); }
+.month-head .kicker { color: var(--m); }
+.month-head-motif { width: clamp(96px, 16vw, 220px); height: auto; color: var(--m); }
+@media (max-width: 700px) {
+  .month-head { grid-template-columns: minmax(0, 1fr); row-gap: 0; }
+  .month-head > div,
+  .month-head-motif { grid-row: 1; grid-column: 1; }
+  .month-head-motif { width: 76px; justify-self: end; align-self: start; }
+}
+
+/* ---------- A month as a sheet calendar ---------- */
+.month-cal { padding-block: 8px clamp(40px, 5vw, 64px); }
+.month-cal-head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 4px 24px;
+  border-bottom: 2px solid var(--ink);
+  padding-bottom: 8px;
+  margin-bottom: 14px;
+}
+.month-cal-head h2 {
+  font-family: var(--display);
+  font-weight: 800;
+  font-variation-settings: "wdth" 75;
+  font-size: 24px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+.month-cal-dates { font-style: italic; color: var(--muted); font-size: 16px; }
+.cal {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 4px;
+}
+.cal-wd {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-bottom: 6px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.cal-wd [lang="ta"] { font-family: var(--tamil); font-size: 14px; color: var(--ink-2); }
+.cal-wd:first-child [lang="ta"],
+.cal-wd:first-child .caps { color: var(--ochre); }
+.cal-day {
+  min-height: 108px;
+  padding: 8px 9px 10px;
+  background: #fff;
+  border: 1px solid var(--rule);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.cal-day:nth-child(7n + 1) .cal-num { color: var(--ochre); } /* Sundays in red, as on the wall */
+.cal-top { display: flex; justify-content: space-between; align-items: baseline; }
+.cal-num {
+  font-family: var(--display);
+  font-weight: 800;
+  font-variation-settings: "wdth" 75;
+  font-size: 28px;
+  line-height: 1;
+}
+.cal-ta { font-size: 13px; color: var(--muted); font-feature-settings: "tnum"; }
+.cal-day.has {
+  background: color-mix(in srgb, var(--m) 10%, #fff);
+  border-color: var(--m);
+  box-shadow: inset 0 3px 0 var(--m);
+}
+.cal-day.today { outline: 2px solid var(--ink); outline-offset: -2px; }
+.cal-moon { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; color: var(--ink-2); }
+.cal-moon [lang="ta"] { font-family: var(--tamil); }
+.cal-moon .dot { width: 11px; height: 11px; border-radius: 50%; border: 1.5px solid var(--ink); flex: none; }
+.cal-moon.new .dot { background: var(--ink); }
+.cal-moon.full .dot { background: #fff; }
+.cal-evs li { font-size: 13.5px; line-height: 1.3; padding-top: 2px; }
+.cal-evs a:hover,
+.cal-list a:hover { color: var(--m); }
+.cal-place { font-weight: 600; }
+.cal-list { display: none; }
+.month-cal-none { margin-top: 14px; }
+.month-cal-key {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 22px;
+  margin-top: 12px;
+  font-size: 13.5px;
+  color: var(--muted);
+}
+@media (max-width: 700px) {
+  .cal { gap: 2px; }
+  .cal-wd [lang="ta"] { display: none; }
+  .cal-day { min-height: 54px; padding: 4px 5px; }
+  .cal-num { font-size: 19px; }
+  .cal-ta { font-size: 10.5px; }
+  .cal-moon [lang="ta"],
+  .cal-evs { display: none; }
+  .cal-moon .dot { width: 9px; height: 9px; }
+  .cal-list { display: block; margin-top: 16px; }
+  .cal-list > li { padding-block: 8px; border-bottom: 1px solid var(--rule); }
+  .cal-list time {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 13.5px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--m);
+  }
+  .cal-list li li { font-size: 16px; line-height: 1.4; }
 }

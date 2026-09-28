@@ -3,6 +3,7 @@ import type { CSSProperties } from "react";
 import type { Observance } from "@/content/types";
 import type { MonthEntry } from "@/lib/data";
 import type { TamilMonth } from "@/lib/calendar";
+import { MonthMotif } from "./MonthMotif";
 
 const SHOWN = 4;
 
@@ -26,15 +27,18 @@ export function RitualYear({
           key={m.slug}
           href={`/festivals-and-rituals/month/${m.slug}`}
           className={`rasi-month${m.slug === now ? " now" : ""}`}
-          style={{ "--r": m.rasi[0], "--c": m.rasi[1] } as CSSProperties}
+          style={{ "--r": m.rasi[0], "--c": m.rasi[1], "--m": m.colour } as CSSProperties}
         >
           <span className="rasi-head">
             <span className="rasi-ta" lang="ta">
               {m.tamil}
             </span>
-            {m.slug === now && <span className="rasi-now caps">Now</span>}
+            <MonthMotif month={m.slug} className="rasi-motif" />
           </span>
-          <span className="caps">{m.name}</span>
+          <span className="caps">
+            {m.name}
+            {m.slug === now && <span className="rasi-now"> · Now</span>}
+          </span>
           <span className="rasi-span">{m.span}</span>
           {entries.length > 0 ? (
             <ul className="rasi-list">

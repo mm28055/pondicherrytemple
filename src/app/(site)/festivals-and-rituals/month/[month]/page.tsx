@@ -1,10 +1,16 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getRitualYear, getTemple, hasPage, type MonthEntry } from "@/lib/data";
-import { dateParts, TAMIL_MONTHS } from "@/lib/calendar";
+import type { CSSProperties } from "react";
+import { getOccasionsInMonth, getRitualYear, getTemple, hasPage, type MonthEntry } from "@/lib/data";
+import { dateParts, monthDates, monthYearOf, TAMIL_MONTHS } from "@/lib/calendar";
+import { MonthCalendar, type CalendarEvent } from "@/components/MonthCalendar";
+import { MonthMotif } from "@/components/MonthMotif";
 
 type Props = { params: Promise<{ month: string }> };
+
+// Rebuilt once a day, so "today" on the calendar moves on by itself.
+export const revalidate = 86400;
 
 export function generateStaticParams() {
   return TAMIL_MONTHS.map((m) => ({ month: m.slug }));
@@ -14,7 +20,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const slug = (await params).month;
   const m = TAMIL_MONTHS.find((x) => x.slug === slug);
   return m
-    ? { title: `${m.name}: festivals & rituals`, description: `The festivals and rituals of ${m.name}, ${m.span}.` }
+    ? {
+        title: `${m.name}: festivals & rituals`,
+        description: `The festivals and rituals of ${m.name}, ${m.span}.`,
+      }
     : {};
 }
 
@@ -33,31 +42,61 @@ export default async function MonthPage({ params }: Props) {
   const festivals = entries.filter((e) => e.observance.kind === "festival");
   const rituals = entries.filter((e) => e.observance.kind === "ritual");
 
+  // The calendar: the days the team was present this month, a grid for each
+  // year recorded, newest first; with none yet, the month as it next comes.
+  const today = new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Kolkata" });
+  const events: (CalendarEvent & { year: number })[] = await Promise.all(
+    (await getOccasionsInMonth(month.slug)).map(async (o) => {
+      const t = await getTemple(o.region, o.temple);
+      return {
+        date: o.date,
+        year: monthYearOf(o.date),
+        place: t ? (t.knownAs ?? t.name) : "",
+        label: o.label,
+        href: o.note ? `/field-notes/${o.note}` : t && hasPage(t) ? `/${t.region}/${t.id}` : undefined,
+      };
+    }),
+  );
+  let upcoming = Number(today.slice(0, 4)) - 1;
+  while (monthDates(month.slug, upcoming).last < today) upcoming++;
+  const years = events.length ? [...new Set(events.map((e) => e.year))].sort((a, b) => b - a) : [upcoming];
+
   return (
-    <div className="wrap">
-      <header className="page-head">
-        <Link className="crumb" href="/festivals-and-rituals">
-          ← Festivals &amp; rituals
-        </Link>
-        <div className="kicker">
-          Tamil month · {at + 1} of 12
+    <div className="wrap" style={{ "--m": month.colour } as CSSProperties}>
+      <header className="page-head month-head">
+        <div>
+          <Link className="crumb" href="/festivals-and-rituals">
+            ← Festivals &amp; rituals
+          </Link>
+          <div className="kicker">Tamil month · {at + 1} of 12</div>
+          <p className="tamil-title" lang="ta">
+            {month.tamil}
+          </p>
+          <h1 className="name-title">{month.name}</h1>
+          <p className="gloss kicker">{month.span}</p>
         </div>
-        <p className="tamil-title" lang="ta">
-          {month.tamil}
-        </p>
-        <h1 className="name-title">{month.name}</h1>
-        <p className="gloss kicker">{month.span}</p>
+        <MonthMotif month={month.slug} className="month-head-motif" />
         <nav className="month-steps" aria-label="Other months">
           <Link href={`/festivals-and-rituals/month/${prev.slug}`}>← {prev.name}</Link>
           <Link href={`/festivals-and-rituals/month/${next.slug}`}>{next.name} →</Link>
         </nav>
       </header>
 
+      {years.map((y) => (
+        <MonthCalendar
+          key={y}
+          month={month}
+          year={y}
+          events={events.filter((e) => e.year === y)}
+          today={today}
+        />
+      ))}
+
       {entries.length === 0 && (
         <section className="section">
           <p className="note-line" style={{ maxWidth: "40em" }}>
-            Nothing recorded in {month.name} yet. As the team is present at the temples through the year,
-            this month will fill in.
+            Nothing recorded in {month.name} yet. As the team is present at the temples through the year, this
+            month will fill in.
           </p>
         </section>
       )}
@@ -118,14 +157,14 @@ async function MonthSection({ title, entries }: { title: string; entries: MonthE
                           {s.label && <span className="month-seen-label"> · {s.label}</span>}
                         </li>
                       );
-                    })
+                    }),
                   )}
                 </ul>
               ) : (
                 <p className="month-unseen">Not yet seen by the team in this month.</p>
               )}
             </li>
-          ))
+          )),
         )}
       </ul>
     </section>
