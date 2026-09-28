@@ -141,6 +141,23 @@ export const Temples: CollectionConfig = {
           ],
         },
         {
+          label: 'Photographs',
+          description:
+            'Photos tagged with this temple. "Add new" uploads one already tagged. Photos in its field notes are shown on the page too, without being listed here.',
+          fields: [
+            {
+              name: 'photographs',
+              type: 'join',
+              collection: 'media',
+              on: 'temples',
+              where: { mimeType: { contains: 'image' } },
+              defaultSort: '-createdAt',
+              defaultLimit: 50,
+              admin: { defaultColumns: ['filename', 'caption', 'observances', 'consent'] },
+            },
+          ],
+        },
+        {
           label: 'Field notes & articles',
           description: 'Everything written about this temple. "Add new" starts one already tagged with it.',
           fields: [

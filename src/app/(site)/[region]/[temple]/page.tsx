@@ -8,6 +8,7 @@ import {
   getIllustrationsForTemple,
   getObservancesForTemple,
   getOccasionsForTemple,
+  getPhotosForTemple,
   getRegion,
   getRegions,
   getTemple,
@@ -22,6 +23,7 @@ import { articleRow, filmTile, noteRow } from "@/lib/view";
 import { Drawings, drawingsInColumn } from "@/components/Drawings";
 import { Entries } from "@/components/Entries";
 import { FilmWall } from "@/components/FilmWall";
+import { PhotoWall } from "@/components/PhotoWall";
 import { NoteRow } from "@/components/Rows";
 import { YearSoFar } from "@/components/YearSoFar";
 
@@ -58,6 +60,7 @@ export default async function TemplePage({ params }: Props) {
   const articles = (await getArticlesForTemple(t.id)).map((a) => articleRow(a, region.calendar));
   const films = (await getFilmsForTemple(region.id, t.id)).map((f) => filmTile(f, allTemples));
   const drawings = await getIllustrationsForTemple(region.id, t.id);
+  const photos = await getPhotosForTemple(region.id, t.id);
   const inColumn = drawingsInColumn(drawings);
   const aboutPlace = await getTempleEntries(region.id, t.id, "temple");
   const aboutPeople = await getTempleEntries(region.id, t.id, "people");
@@ -88,6 +91,13 @@ export default async function TemplePage({ params }: Props) {
             <section>
               <h2 className="sub-head">Films</h2>
               <FilmWall tiles={films} />
+            </section>
+          )}
+
+          {photos.length > 0 && (
+            <section>
+              <h2 className="sub-head">Photographs</h2>
+              <PhotoWall photos={photos} />
             </section>
           )}
 

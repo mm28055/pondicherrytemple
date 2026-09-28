@@ -1,7 +1,15 @@
 import type { Metadata } from "next";
-import { countTemplesForObservance, getObservances, getOccasionsForObservance, getSectionIntro } from "@/lib/data";
+import {
+  countTemplesForObservance,
+  getObservances,
+  getOccasionsForObservance,
+  getRitualYear,
+  getSectionIntro,
+} from "@/lib/data";
+import { tamilMonthOf } from "@/lib/calendar";
 import { observanceRow } from "@/lib/view";
 import { ObservanceRow } from "@/components/Rows";
+import { RitualYear } from "@/components/RitualYear";
 
 export const metadata: Metadata = {
   title: "Festivals & Rituals",
@@ -9,7 +17,13 @@ export const metadata: Metadata = {
     "The festivals and rituals of the temples — each explained once, with every field note and article about it.",
 };
 
+// Rebuilt once a day, so the month marked "Now" moves on by itself.
+export const revalidate = 86400;
+
 export default async function ObservancesPage() {
+  const year = await getRitualYear();
+  const today = new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Kolkata" });
+
   const all = await Promise.all(
     (await getObservances()).map(async (o) => ({
       o,
@@ -32,7 +46,14 @@ export default async function ObservancesPage() {
 
       <section className="section">
         <div className="section-head">
-          <h2>Festivals</h2>
+          <h2>By month</h2>
+        </div>
+        <RitualYear months={year.months} throughYear={year.throughYear} now={tamilMonthOf(today)} />
+      </section>
+
+      <section className="section">
+        <div className="section-head">
+          <h2>All festivals</h2>
         </div>
         {festivals.map(({ row }) => (
           <ObservanceRow key={row.id} row={row} />
@@ -41,7 +62,7 @@ export default async function ObservancesPage() {
 
       <section className="section tight">
         <div className="section-head">
-          <h2>Rituals</h2>
+          <h2>All rituals</h2>
         </div>
         {rituals.map(({ row }) => (
           <ObservanceRow key={row.id} row={row} />

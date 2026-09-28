@@ -12,7 +12,7 @@ export const Media: CollectionConfig = {
   labels: { singular: 'Photo, video or file', plural: 'Photos & videos' },
   admin: {
     group: 'Add to the site',
-    defaultColumns: ['filename', 'caption', 'consent', 'temples'],
+    defaultColumns: ['filename', 'caption', 'consent', 'temples', 'observances'],
     description:
       'Every photo, video, recording and document. Drag several files in at once to upload them together.',
   },
@@ -77,7 +77,22 @@ export const Media: CollectionConfig = {
       type: 'relationship',
       relationTo: 'temples',
       hasMany: true,
-      admin: { position: 'sidebar', description: 'Optional. Helps find files later.' },
+      admin: {
+        position: 'sidebar',
+        description: 'A photo tagged here appears in the Photographs section of each temple’s page.',
+      },
+    },
+    {
+      name: 'observances',
+      label: 'Festivals & rituals',
+      type: 'relationship',
+      relationTo: 'observances',
+      hasMany: true,
+      admin: {
+        position: 'sidebar',
+        description:
+          'A photo tagged here appears in the Photographs section of each festival’s or ritual’s page. Photos in a field note appear there by themselves.',
+      },
     },
     createdByField,
   ],

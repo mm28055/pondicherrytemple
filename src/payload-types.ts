@@ -89,8 +89,12 @@ export interface Config {
       pieces: 'temple-pieces';
       yearSoFar: 'occasions';
       drawings: 'drawings';
+      photographs: 'media';
       fieldNotes: 'field-notes';
       articles: 'articles';
+    };
+    observances: {
+      photographs: 'media';
     };
   };
   collectionsSelect: {
@@ -292,6 +296,11 @@ export interface Temple {
     hasNextPage?: boolean;
     totalDocs?: number;
   };
+  photographs?: {
+    docs?: (number | Media)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
   fieldNotes?: {
     docs?: (number | FieldNote)[];
     hasNextPage?: boolean;
@@ -398,9 +407,13 @@ export interface Media {
    */
   consent: 'not-needed' | 'given' | 'withhold';
   /**
-   * Optional. Helps find files later.
+   * A photo tagged here appears in the Photographs section of each temple’s page.
    */
   temples?: (number | Temple)[] | null;
+  /**
+   * A photo tagged here appears in the Photographs section of each festival’s or ritual’s page. Photos in a field note appear there by themselves.
+   */
+  observances?: (number | Observance)[] | null;
   createdBy?: (number | null) | User;
   prefix?: string | null;
   _objectKey?: string | null;
@@ -441,6 +454,87 @@ export interface Media {
       filename?: string | null;
     };
   };
+}
+/**
+ * Each festival or ritual is explained once. Its page then gathers every temple, date, field note and article tagged with it.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "observances".
+ */
+export interface Observance {
+  id: number;
+  name: string;
+  /**
+   * Shown large at the top of the page.
+   */
+  tamil?: string | null;
+  kind: 'festival' | 'ritual';
+  alsoKnownAs?: string | null;
+  gloss: string;
+  /**
+   * The Tamil month or months it usually falls in, for the calendar on the Festivals & rituals page. Months the team saw it in are added by themselves. For rituals done again and again, like Pradosham, choose "All through the year".
+   */
+  months?:
+    | (
+        | 'year'
+        | 'chithirai'
+        | 'vaikasi'
+        | 'aani'
+        | 'aadi'
+        | 'aavani'
+        | 'purattasi'
+        | 'aippasi'
+        | 'karthigai'
+        | 'margazhi'
+        | 'thai'
+        | 'masi'
+        | 'panguni'
+      )[]
+    | null;
+  /**
+   * Questions and answers, in order: "What is it?", "When does it happen?", "What happens?", "What to look for", "In Pondicherry"…
+   */
+  about?:
+    | {
+        question: string;
+        answer: {
+          root: {
+            type: string;
+            children: {
+              type: any;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        };
+        id?: string | null;
+      }[]
+    | null;
+  photographs?: {
+    docs?: (number | Media)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
+  /**
+   * Made from the title when left empty. Change it only before publishing.
+   */
+  slug?: string | null;
+  review?: {
+    /**
+     * For the team's tracking only. Never shown on the site.
+     */
+    status?: ('awaiting' | 'approved') | null;
+    note?: string | null;
+  };
+  createdBy?: (number | null) | User;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
 }
 /**
  * Everyone who can sign in. Admins add people here and choose what they can do.
@@ -534,62 +628,6 @@ export interface Occasion {
   createdBy?: (number | null) | User;
   updatedAt: string;
   createdAt: string;
-}
-/**
- * Each festival or ritual is explained once. Its page then gathers every temple, date, field note and article tagged with it.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "observances".
- */
-export interface Observance {
-  id: number;
-  name: string;
-  /**
-   * Shown large at the top of the page.
-   */
-  tamil?: string | null;
-  kind: 'festival' | 'ritual';
-  alsoKnownAs?: string | null;
-  gloss: string;
-  /**
-   * Questions and answers, in order: "What is it?", "When does it happen?", "What happens?", "What to look for", "In Pondicherry"…
-   */
-  about?:
-    | {
-        question: string;
-        answer: {
-          root: {
-            type: string;
-            children: {
-              type: any;
-              version: number;
-              [k: string]: unknown;
-            }[];
-            direction: ('ltr' | 'rtl') | null;
-            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-            indent: number;
-            version: number;
-          };
-          [k: string]: unknown;
-        };
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Made from the title when left empty. Change it only before publishing.
-   */
-  slug?: string | null;
-  review?: {
-    /**
-     * For the team's tracking only. Never shown on the site.
-     */
-    status?: ('awaiting' | 'approved') | null;
-    note?: string | null;
-  };
-  createdBy?: (number | null) | User;
-  updatedAt: string;
-  createdAt: string;
-  _status?: ('draft' | 'published') | null;
 }
 /**
  * Abishek's drawings: each temple's illustrated plan, and scenes photographs can't capture. A drawing appears at the top of every temple and festival page it is tagged with.
@@ -1008,6 +1046,7 @@ export interface MediaSelect<T extends boolean = true> {
   poster?: T;
   consent?: T;
   temples?: T;
+  observances?: T;
   createdBy?: T;
   prefix?: T;
   _objectKey?: T;
@@ -1078,6 +1117,7 @@ export interface TemplesSelect<T extends boolean = true> {
   pieces?: T;
   yearSoFar?: T;
   drawings?: T;
+  photographs?: T;
   fieldNotes?: T;
   articles?: T;
   slug?: T;
@@ -1165,6 +1205,7 @@ export interface ObservancesSelect<T extends boolean = true> {
   kind?: T;
   alsoKnownAs?: T;
   gloss?: T;
+  months?: T;
   about?:
     | T
     | {
@@ -1172,6 +1213,7 @@ export interface ObservancesSelect<T extends boolean = true> {
         answer?: T;
         id?: T;
       };
+  photographs?: T;
   slug?: T;
   review?:
     | T

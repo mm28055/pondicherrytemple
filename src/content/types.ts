@@ -72,6 +72,10 @@ export interface Observance {
   gloss: string;
   /** The explanation, as questions and answers (answers in HTML). */
   about?: { q: string; a: string }[];
+  /** The Tamil months (slugs) it usually falls in, as set in the admin. */
+  months: string[];
+  /** Done again and again, all year (like Pradosham): not placed in a month. */
+  throughYear: boolean;
 }
 
 /** A dated occasion the team was present for, at one temple. These build
@@ -162,6 +166,25 @@ export interface Picture {
   caption?: string;
   /** "Drawing by Abishek P.", "Photograph: Arunaditya" */
   credit?: string;
+}
+
+/** A photograph in the Photographs section of temple and festival pages. It
+    is there because it is tagged with that temple or festival itself, or
+    because it is in a field note that is. */
+export interface Photo extends Picture {
+  id: string;
+  /** A smaller copy, for the grid. */
+  thumb: string;
+  /** Where the photo's subject sits, in % — the grid crops around it. */
+  focus: [number, number];
+  /** "region/temple" */
+  temples: string[];
+  observances: string[];
+  /** The field note's date; for a photo on its own, when it was uploaded
+      (used only to order them, not shown). */
+  date: string;
+  /** The newest field note it appears in. */
+  note?: { href: string; title: string };
 }
 
 /** Abishek P.'s drawings: the illustrated plan of each temple, and scenes
