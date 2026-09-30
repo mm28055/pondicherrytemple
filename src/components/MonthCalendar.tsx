@@ -226,7 +226,11 @@ export function MonthCalendar({
           )}
           <p className="cal-hint">Tap a marked day to see what happened.</p>
           <button className="cal-all" onClick={() => setShowAll((v) => !v)} aria-expanded={showAll}>
-            {showAll ? "Hide the list" : `See all ${marked.length} days as a list`}
+            {showAll
+              ? "Hide the list"
+              : marked.length === 1
+                ? "See the day we were there, as a list"
+                : `See the ${marked.length} days we were there, as a list`}
           </button>
         </div>
       )}
