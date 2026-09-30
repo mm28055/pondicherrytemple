@@ -139,6 +139,17 @@ export default async function MonthPage({ params }: Props) {
   );
 }
 
+/** A day's description without the festival's name at its start, where the
+    festival is already the heading: under Davana utsavam, "Davana utsavam:
+    homam and the closing veethi ula" is just "Homam and the closing veethi ula". */
+function withoutName(label: string, name: string): string {
+  if (!label.toLowerCase().startsWith(name.toLowerCase())) return label;
+  const rest = label.slice(name.length);
+  if (rest && !/^[\s:;,.–—-]/.test(rest)) return label; // "Purappadu" is not the start of "Purappadus"
+  const trimmed = rest.replace(/^[\s:;,.–—-]+/, "");
+  return trimmed.charAt(0).toUpperCase() + trimmed.slice(1);
+}
+
 async function MonthSection({ title, entries }: { title: string; entries: MonthEntry[] }) {
   return (
     <section className="section tight">
@@ -172,7 +183,9 @@ async function MonthSection({ title, entries }: { title: string; entries: MonthE
                             {d.day} {d.shortMonth} {d.year}
                           </time>
                           {t && hasPage(t) ? <Link href={`/${t.region}/${t.id}`}>{place}</Link> : place}
-                          {s.label && <span className="month-seen-label"> · {s.label}</span>}
+                          {withoutName(s.label, o.name) && (
+                            <span className="month-seen-label"> · {withoutName(s.label, o.name)}</span>
+                          )}
                           {also.map((x) => (
                             <Link key={x.id} className="month-seen-tag" href={`/festivals-and-rituals/${x.id}`}>
                               {x.name}

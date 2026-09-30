@@ -30,9 +30,34 @@ const WEEK = [
 /** At most this many entries in a day's box; the rest are in the list below. */
 const IN_BOX = 2;
 
-/** Long words may break, with a hyphen, every few letters: in a narrow box
-    "Shankhabhishekam" becomes "Shankh-abhishekam" rather than spilling out. */
-const breakable = (text: string) => text.replace(/\S{9,}/g, (w) => w.replace(/(.{5})(?=.{3})/g, "$1\u00AD"));
+/** Long words may break, with a hyphen, between their syllables: in a narrow
+    box "Brahmotsavam" becomes "Brah-mot-sa-vam" rather than spilling out.
+    The names are Tamil and Sanskrit in Roman letters, so a break goes before
+    a single consonant (sa-vam) or between two (Brah-mot); "bh", "sh", "th"
+    and the like count as one. The browser shows a hyphen only where it breaks. */
+const DIGRAPHS = ["bh", "ch", "dh", "gh", "jh", "kh", "ph", "sh", "th", "zh"];
+const isVowel = (c: string) => "aeiou".includes(c.toLowerCase());
+
+function syllables(word: string): string {
+  const units: { at: number; vowel: boolean }[] = [];
+  for (let i = 0; i < word.length; ) {
+    const n = DIGRAPHS.includes(word.slice(i, i + 2).toLowerCase()) ? 2 : 1;
+    units.push({ at: i, vowel: n === 1 && isVowel(word[i]) });
+    i += n;
+  }
+  const cuts: number[] = [];
+  for (let i = 0; i < units.length; i++) {
+    if (!units[i].vowel || units[i + 1]?.vowel !== false) continue; // a vowel, then consonants
+    let j = i + 1;
+    while (j < units.length && !units[j].vowel) j++;
+    if (j >= units.length) break; // consonants to the end of the word
+    const cut = j - i === 2 ? units[i + 1].at : units[i + 2].at; // V-CV, or VC-CV
+    if (cut >= 3 && word.length - cut >= 3) cuts.push(cut);
+  }
+  return cuts.reduceRight((w, c) => w.slice(0, c) + "\u00AD" + w.slice(c), word);
+}
+
+const breakable = (text: string) => text.replace(/[A-Za-z]{8,}/g, syllables);
 
 const MOON = {
   full: { ta: "பௌர்ணமி", en: "Full moon (pournami)" },
