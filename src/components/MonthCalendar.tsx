@@ -3,9 +3,14 @@ import { daysBetween, formatDate, monthDates, moonsBetween, type TamilMonth } fr
 
 export interface CalendarEvent {
   date: string;
+  /** The temple, and its page. */
   place: string;
+  placeHref?: string;
+  /** What happened, and the field note about it. */
   label: string;
-  href?: string;
+  noteHref?: string;
+  /** The festivals and rituals it was part of, each with its page. */
+  observances: { label: string; href: string }[];
 }
 
 const WEEK = [
@@ -45,10 +50,37 @@ export function MonthCalendar({
   const on = (day: string) => events.filter((e) => e.date === day);
   const marked = days.filter((d) => on(d).length > 0);
 
+  // the temple, what happened, and the festivals it was part of — each its own link
   const item = (e: CalendarEvent) => (
     <>
-      <span className="cal-place">{e.place}</span>
-      {e.label && ` · ${e.label}`}
+      {e.placeHref ? (
+        <Link className="cal-place" href={e.placeHref}>
+          {e.place}
+        </Link>
+      ) : (
+        <span className="cal-place">{e.place}</span>
+      )}
+      {e.label && (
+        <>
+          {" · "}
+          {e.noteHref ? (
+            <Link className="cal-note" href={e.noteHref} title="Read the field note">
+              {e.label}
+            </Link>
+          ) : (
+            e.label
+          )}
+        </>
+      )}
+      {e.observances.length > 0 && (
+        <span className="cal-tags">
+          {e.observances.map((o) => (
+            <Link key={o.href} href={o.href}>
+              {o.label}
+            </Link>
+          ))}
+        </span>
+      )}
     </>
   );
 
@@ -83,7 +115,14 @@ export function MonthCalendar({
               className={`cal-day${evs.length ? " has" : ""}${day === today ? " today" : ""}`}
             >
               <div className="cal-top">
-                <span className="cal-num">{Number(day.slice(8))}</span>
+                {evs.length ? (
+                  // on a phone, where the words are hidden, a tap goes to the day in the list below
+                  <a className="cal-num" href={`#day-${day}`}>
+                    {Number(day.slice(8))}
+                  </a>
+                ) : (
+                  <span className="cal-num">{Number(day.slice(8))}</span>
+                )}
                 <span className="cal-ta" title={`${month.name} ${i + 1}`}>
                   {i + 1}
                 </span>
@@ -97,7 +136,7 @@ export function MonthCalendar({
               {evs.length > 0 && (
                 <ul className="cal-evs">
                   {evs.map((e) => (
-                    <li key={e.place + e.label}>{e.href ? <Link href={e.href}>{item(e)}</Link> : item(e)}</li>
+                    <li key={e.place + e.label}>{item(e)}</li>
                   ))}
                 </ul>
               )}
@@ -110,11 +149,11 @@ export function MonthCalendar({
       {marked.length > 0 ? (
         <ul className="cal-list">
           {marked.map((day) => (
-            <li key={day}>
+            <li key={day} id={`day-${day}`}>
               <time dateTime={day}>{formatDate(day)}</time>
               <ul>
                 {on(day).map((e) => (
-                  <li key={e.place + e.label}>{e.href ? <Link href={e.href}>{item(e)}</Link> : item(e)}</li>
+                  <li key={e.place + e.label}>{item(e)}</li>
                 ))}
               </ul>
             </li>

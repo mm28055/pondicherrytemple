@@ -2,7 +2,14 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { CSSProperties } from "react";
-import { getOccasionsInMonth, getRitualYear, getTemple, hasPage, type MonthEntry } from "@/lib/data";
+import {
+  getObservancesById,
+  getOccasionsInMonth,
+  getRitualYear,
+  getTemple,
+  hasPage,
+  type MonthEntry,
+} from "@/lib/data";
 import { dateParts, monthDates, monthYearOf, TAMIL_MONTHS } from "@/lib/calendar";
 import { MonthCalendar, type CalendarEvent } from "@/components/MonthCalendar";
 import { MonthMotif } from "@/components/MonthMotif";
@@ -52,8 +59,13 @@ export default async function MonthPage({ params }: Props) {
         date: o.date,
         year: monthYearOf(o.date),
         place: t ? (t.knownAs ?? t.name) : "",
+        placeHref: t && hasPage(t) ? `/${t.region}/${t.id}` : undefined,
         label: o.label,
-        href: o.note ? `/field-notes/${o.note}` : t && hasPage(t) ? `/${t.region}/${t.id}` : undefined,
+        noteHref: o.note ? `/field-notes/${o.note}` : undefined,
+        observances: (await getObservancesById(o.observances)).map((x) => ({
+          label: x.name,
+          href: `/festivals-and-rituals/${x.id}`,
+        })),
       };
     }),
   );
