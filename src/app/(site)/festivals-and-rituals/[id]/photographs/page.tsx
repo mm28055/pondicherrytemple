@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getObservance, getObservances, getPhotosForObservance } from "@/lib/data";
+import { getObservance, getObservances, getPhotoFilters, getPhotosForObservance } from "@/lib/data";
 import { PhotoWall } from "@/components/PhotoWall";
 
 type Props = { params: Promise<{ id: string }> };
@@ -15,12 +15,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return o ? { title: `${o.name}: photographs` } : {};
 }
 
-/** Every photograph of a festival or ritual, by year. */
+/** Every photograph of a festival or ritual, which can be narrowed by
+    temple, deity and year. */
 export default async function ObservancePhotosPage({ params }: Props) {
   const o = await getObservance((await params).id);
   if (!o) notFound();
   const photos = await getPhotosForObservance(o.id);
   if (!photos.length) notFound();
+  const filters = await getPhotoFilters(photos, ["temples", "deities", "years"]);
 
   return (
     <div className="wrap">
@@ -39,7 +41,7 @@ export default async function ObservancePhotosPage({ params }: Props) {
         <h1 className="name-title">{o.name}</h1>
       </header>
       <section className="section">
-        <PhotoWall photos={photos} layout="years" />
+        <PhotoWall photos={photos} layout="all" filters={filters} />
       </section>
     </div>
   );

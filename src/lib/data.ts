@@ -22,6 +22,7 @@ import type * as P from "@/payload-types";
 import type {
   Article,
   Book,
+  DeityGroup,
   EntryTopic,
   FieldNote,
   Film,
@@ -29,6 +30,7 @@ import type {
   Observance,
   Occasion,
   Photo,
+  PhotoFilter,
   Picture,
   Region,
   Temple,
@@ -37,6 +39,7 @@ import type {
   AboutPageText,
 } from "@/content/types";
 import { openingText, plainText, toHTML, type LinkPaths } from "./richtext";
+import { DEITY_GROUP_LABELS } from "@/content/labels";
 import { SECTION_INTROS, type SectionName } from "@/payload/sectionIntros";
 import { TAMIL_MONTHS, tamilMonthOf, type TamilMonth } from "./calendar";
 
@@ -449,6 +452,7 @@ const photos = cache(async () => {
       focus: [m.focalX ?? 50, m.focalY ?? 50],
       temples: [...temples],
       observances: [...observances],
+      deities: [...new Set([...temples].flatMap((key) => templeByKey.get(key)?.group ?? []))],
       tags: [
         ...[...temples].flatMap((key) => {
           const t = templeByKey.get(key);
@@ -693,6 +697,33 @@ export async function getPhotosForTemple(regionId: string, templeId: string): Pr
 
 export async function getPhotosForObservance(observanceId: string): Promise<Photo[]> {
   return (await photos()).filter((p) => p.observances.includes(observanceId));
+}
+
+/** The ways a page of photographs can be narrowed, each a row of buttons:
+    only the rows that offer a real choice (two options or more). */
+export async function getPhotoFilters(list: Photo[], keys: PhotoFilter["key"][]): Promise<PhotoFilter[]> {
+  const templeByKey = new Map((await temples()).map((t) => [`${t.region}/${t.id}`, t]));
+  const observanceById = new Map((await observances()).map((o) => [o.id, o]));
+  const rows: Record<PhotoFilter["key"], { label: string; of: (p: Photo) => string[]; name: (id: string) => string }> = {
+    temples: {
+      label: "Temple",
+      of: (p) => p.temples,
+      name: (id) => templeByKey.get(id)?.knownAs ?? templeByKey.get(id)?.name ?? id,
+    },
+    observances: { label: "Festival", of: (p) => p.observances, name: (id) => observanceById.get(id)?.name ?? id },
+    deities: { label: "Deity", of: (p) => p.deities, name: (id) => DEITY_GROUP_LABELS[id as DeityGroup] ?? id },
+    years: { label: "Year", of: (p) => [p.date.slice(0, 4)], name: (id) => id },
+  };
+  return keys
+    .map((key) => {
+      const counts = new Map<string, number>();
+      for (const p of list) for (const id of rows[key].of(p)) counts.set(id, (counts.get(id) ?? 0) + 1);
+      const options = [...counts]
+        .map(([id, count]) => ({ id, label: rows[key].name(id), count }))
+        .sort((a, b) => (key === "years" ? b.id.localeCompare(a.id) : b.count - a.count));
+      return { key, label: rows[key].label, options };
+    })
+    .filter((f) => f.options.length > 1);
 }
 
 /* ---------- Newest additions (the home page) ---------- */

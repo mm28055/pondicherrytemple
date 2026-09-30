@@ -182,6 +182,8 @@ export interface Photo extends Picture {
   /** "region/temple" */
   temples: string[];
   observances: string[];
+  /** The deities of its temples (shiva, vishnu…), for narrowing by deity. */
+  deities: string[];
   /** The temples and festivals it belongs to, named, for under the photo. */
   tags: { label: string; href?: string }[];
   /** The day it was taken: its "Taken on" date, or its field note's date;
@@ -193,6 +195,14 @@ export interface Photo extends Picture {
   featured: boolean;
   /** The newest field note it appears in. */
   note?: { href: string; title: string };
+}
+
+/** A row of buttons for narrowing a page of photographs: by temple, by
+    festival, by deity or by year. */
+export interface PhotoFilter {
+  key: "temples" | "observances" | "deities" | "years";
+  label: string;
+  options: { id: string; label: string; count: number }[];
 }
 
 /** Abishek P.'s drawings: the illustrated plan of each temple, and scenes

@@ -1091,17 +1091,9 @@ a.temple-row:hover .temple-name { color: var(--ochre); }
 .photo-wall.lead { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .photo-tile.big { grid-column: span 2; grid-row: span 2; }
 .photo-all { display: inline-block; margin-top: 18px; }
-.photo-year {
-  font-family: var(--display);
-  font-weight: 800;
-  font-variation-settings: "wdth" 75;
-  font-size: 22px;
-  letter-spacing: 0.02em;
-  border-bottom: 1px solid var(--rule);
-  padding-bottom: 6px;
-  margin-top: 36px;
-}
-.photo-year:first-child { margin-top: 8px; }
+.photo-controls { display: flex; flex-direction: column; gap: 2px; margin-bottom: 8px; }
+.photo-filter { align-items: baseline; gap: 6px 20px; padding-block: 6px 0; }
+.photo-filter-label { min-width: 5.5em; color: var(--ochre); font-size: 12.5px; }
 @media (max-width: 560px) {
   .photo-wall { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; padding-top: 18px; }
 }

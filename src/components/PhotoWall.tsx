@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type { Photo } from "@/content/types";
+import type { Photo, PhotoFilter } from "@/content/types";
 import { formatDate } from "@/lib/calendar";
 
 const PAGE = 30;
@@ -12,20 +12,23 @@ const LEAD = 6;
 type Props = {
   photos: Photo[];
   /** "lead": on a temple's or festival's page, one photo large and five
-      small, with a link to see them all. "years": the page of all its
-      photographs, grouped by year. */
-  layout: "lead" | "years";
+      small, with a link to see them all. "all": the page of all of them,
+      which can be narrowed and sorted. */
+  layout: "lead" | "all";
   seeAll?: string;
-  /** Buttons to narrow the photos to one festival (a temple's photographs). */
-  filters?: { id: string; label: string; count: number }[];
+  /** Rows of buttons to narrow the photos: by temple, festival, deity, year. */
+  filters?: PhotoFilter[];
 };
+
+const valuesOf = (p: Photo, key: PhotoFilter["key"]) => (key === "years" ? [p.date.slice(0, 4)] : p[key]);
 
 /** Photographs of a temple or festival. Press one and it opens over the page,
     whole and as large as the screen allows, with its caption and where it
     belongs; the arrows (or a swipe) go through all of them. An open photo has
     its own address, so it can be sent to someone, and Back closes it. */
 export function PhotoWall({ photos, layout, seeAll, filters = [] }: Props) {
-  const [filter, setFilter] = useState<string | null>(null);
+  const [chosen, setChosen] = useState<Partial<Record<PhotoFilter["key"], string>>>({});
+  const [oldestFirst, setOldestFirst] = useState(false);
   const [open, setOpen] = useState<number | null>(null);
   const [limit, setLimit] = useState(PAGE);
   const more = useRef<HTMLDivElement>(null);
@@ -34,9 +37,17 @@ export function PhotoWall({ photos, layout, seeAll, filters = [] }: Props) {
 
   // the photos in the order they are shown, and stepped through
   const order = useMemo(() => {
-    const shown = filter ? photos.filter((p) => p.observances.includes(filter)) : photos;
-    return layout === "lead" ? [...shown.filter((p) => p.featured), ...shown.filter((p) => !p.featured)] : shown;
-  }, [photos, filter, layout]);
+    if (layout === "lead") return [...photos.filter((p) => p.featured), ...photos.filter((p) => !p.featured)];
+    const shown = photos.filter((p) =>
+      Object.entries(chosen).every(([key, id]) => !id || valuesOf(p, key as PhotoFilter["key"]).includes(id))
+    );
+    return oldestFirst ? [...shown].reverse() : shown;
+  }, [photos, chosen, oldestFirst, layout]);
+
+  const choose = (key: PhotoFilter["key"], id: string | null) => {
+    setChosen((c) => ({ ...c, [key]: id ?? undefined }));
+    setLimit(PAGE);
+  };
 
   /* ----- the open photo, kept in the address as ?photo=… ----- */
 
@@ -137,17 +148,31 @@ export function PhotoWall({ photos, layout, seeAll, filters = [] }: Props) {
 
   return (
     <>
-      {filters.length > 1 && (
-        <div className="filters" role="group" aria-label="Show">
-          <button aria-pressed={!filter} onClick={() => (setFilter(null), setLimit(PAGE))}>
-            All<span className="count">{photos.length}</span>
-          </button>
+      {layout === "all" && (
+        <div className="photo-controls">
           {filters.map((f) => (
-            <button key={f.id} aria-pressed={filter === f.id} onClick={() => (setFilter(f.id), setLimit(PAGE))}>
-              {f.label}
-              <span className="count">{f.count}</span>
-            </button>
+            <div key={f.key} className="filters photo-filter" role="group" aria-label={f.label}>
+              <span className="photo-filter-label caps">{f.label}</span>
+              <button aria-pressed={!chosen[f.key]} onClick={() => choose(f.key, null)}>
+                All
+              </button>
+              {f.options.map((o) => (
+                <button key={o.id} aria-pressed={chosen[f.key] === o.id} onClick={() => choose(f.key, o.id)}>
+                  {o.label}
+                  <span className="count">{o.count}</span>
+                </button>
+              ))}
+            </div>
           ))}
+          <div className="filters photo-filter photo-sort" role="group" aria-label="Order">
+            <span className="photo-filter-label caps">Order</span>
+            <button aria-pressed={!oldestFirst} onClick={() => setOldestFirst(false)}>
+              Newest first
+            </button>
+            <button aria-pressed={oldestFirst} onClick={() => setOldestFirst(true)}>
+              Oldest first
+            </button>
+          </div>
         </div>
       )}
 
@@ -166,12 +191,8 @@ export function PhotoWall({ photos, layout, seeAll, filters = [] }: Props) {
         </>
       ) : (
         <>
-          {groupByYear(order.slice(0, limit)).map(({ year, items }) => (
-            <Fragment key={year}>
-              <h2 className="photo-year">{year}</h2>
-              <div className="photo-wall">{items.map(({ p, i }) => tile(p, i))}</div>
-            </Fragment>
-          ))}
+          <div className="photo-wall">{order.slice(0, limit).map((p, i) => tile(p, i))}</div>
+          {order.length === 0 && <p className="note-line">No photographs match.</p>}
           {limit < order.length && <div ref={more} aria-hidden="true" style={{ height: 1 }} />}
         </>
       )}
@@ -245,16 +266,4 @@ export function PhotoWall({ photos, layout, seeAll, filters = [] }: Props) {
       </dialog>
     </>
   );
-}
-
-/** Newest year first, keeping each photo's place in the whole order. */
-function groupByYear(photos: Photo[]) {
-  const groups: { year: string; items: { p: Photo; i: number }[] }[] = [];
-  photos.forEach((p, i) => {
-    const year = p.date.slice(0, 4);
-    const g = groups.find((x) => x.year === year);
-    if (g) g.items.push({ p, i });
-    else groups.push({ year, items: [{ p, i }] });
-  });
-  return groups;
 }
