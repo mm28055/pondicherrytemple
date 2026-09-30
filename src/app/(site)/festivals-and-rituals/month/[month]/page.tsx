@@ -79,11 +79,16 @@ export default async function MonthPage({ params }: Props) {
   return (
     <div className="wrap" style={{ "--m": month.colour } as CSSProperties}>
       <header className="page-head month-head">
-        <div>
+        <div className="month-topline">
           <Link className="crumb" href="/festivals-and-rituals">
             ← Festivals &amp; rituals
           </Link>
-          <div className="kicker">Tamil month · {at + 1} of 12</div>
+          <nav className="month-steps" aria-label="Other months">
+            <Link href={`/festivals-and-rituals/month/${prev.slug}`}>← {prev.name}</Link>
+            <Link href={`/festivals-and-rituals/month/${next.slug}`}>{next.name} →</Link>
+          </nav>
+        </div>
+        <div className="month-head-text">
           <p className="tamil-title" lang="ta">
             {month.tamil}
           </p>
@@ -91,10 +96,6 @@ export default async function MonthPage({ params }: Props) {
           <p className="gloss kicker">{month.span}</p>
         </div>
         <MonthMotif month={month.slug} className="month-head-motif" />
-        <nav className="month-steps" aria-label="Other months">
-          <Link href={`/festivals-and-rituals/month/${prev.slug}`}>← {prev.name}</Link>
-          <Link href={`/festivals-and-rituals/month/${next.slug}`}>{next.name} →</Link>
-        </nav>
       </header>
 
       {years.map((y) => (

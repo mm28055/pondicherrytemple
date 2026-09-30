@@ -1370,7 +1370,7 @@ a.temple-row:hover .temple-name { color: var(--ochre); }
 }
 
 /* One month of the ritual year */
-.month-steps { display: flex; justify-content: space-between; gap: 16px; margin-top: 28px; grid-column: 1 / -1; }
+.month-steps { display: flex; gap: 12px 28px; }
 .month-steps a {
   font-family: var(--display);
   font-weight: 600;
@@ -1468,13 +1468,27 @@ a.temple-row:hover .temple-name { color: var(--ochre); }
   gap: 24px;
   align-items: center;
 }
+/* the way back, and the months either side, on one line above the name */
+.month-topline {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px 24px;
+}
+.month-topline .crumb { margin-bottom: 0; }
 .month-head .tamil-title { color: var(--m); }
 .month-head .kicker { color: var(--m); }
 .month-head-motif { width: clamp(96px, 16vw, 220px); height: auto; color: var(--m); }
 @media (max-width: 700px) {
   .month-head { grid-template-columns: minmax(0, 1fr); row-gap: 0; }
-  .month-head > div,
-  .month-head-motif { grid-row: 1; grid-column: 1; }
+  .month-head-text,
+  .month-head-motif { grid-row: 2; grid-column: 1; }
+  .month-topline { margin-bottom: 22px; }
+  .month-topline .crumb,
+  .month-steps a { font-size: 12px; letter-spacing: 0.08em; }
+  .month-steps { gap: 16px; }
   .month-head-motif { width: 76px; justify-self: end; align-self: start; }
 }
 
