@@ -1522,7 +1522,15 @@ a.temple-row:hover .temple-name { color: var(--ochre); }
 .cal-more a { font-style: italic; color: var(--muted); font-size: 13px; border-bottom: 1px solid var(--rule); }
 .cal-evs a:hover,
 .cal-list a:hover { color: var(--m); }
-.cal-note { border-bottom: 1px solid var(--rule); }
+.cal-read {
+  display: inline-block;
+  margin-top: 8px;
+  font-size: 12.5px;
+  border-bottom-color: var(--m);
+  padding-bottom: 2px;
+}
+.cal-read.short { margin-top: 5px; font-size: 10.5px; letter-spacing: 0.05em; border-bottom-width: 1.5px; }
+.cal-read:hover { color: var(--m); }
 .cal-tags { display: flex; flex-wrap: wrap; gap: 3px 4px; margin-top: 4px; }
 .cal-tags a {
   max-width: 100%;
@@ -1574,6 +1582,7 @@ a.temple-row:hover .temple-name { color: var(--ochre); }
    happened is in the list below */
 @container cal (max-width: 999px) {
   .cal-evs .cal-label,
+  .cal-evs .cal-read,
   .cal-moon [lang="ta"] { display: none; }
   .cal-day { min-height: 92px; padding: 6px 6px 8px; }
   .cal-num { font-size: 22px; }

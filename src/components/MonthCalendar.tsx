@@ -93,18 +93,7 @@ export function MonthCalendar({
           ) : (
             <span className="cal-place">{place}</span>
           )}
-          {e.label && (
-            <span className="cal-label">
-              {" · "}
-              {e.noteHref ? (
-                <Link className="cal-note" href={e.noteHref} title="Read the field note">
-                  {e.label}
-                </Link>
-              ) : (
-                e.label
-              )}
-            </span>
-          )}
+          {e.label && <span className="cal-label"> · {e.label}</span>}
         </span>
         {e.observances.length > 0 && (
           <span className="cal-tags">
@@ -114,6 +103,12 @@ export function MonthCalendar({
               </Link>
             ))}
           </span>
+        )}
+        {/* the field note about the day, if there is one: a link of its own */}
+        {e.noteHref && (
+          <Link className={`cal-read arrow-link${inBox ? " short" : ""}`} href={e.noteHref}>
+            {inBox ? "Note" : "Read the field note"}
+          </Link>
         )}
       </>
     );
