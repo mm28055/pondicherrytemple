@@ -1613,8 +1613,11 @@ a.temple-row:hover .temple-name { color: var(--ochre); }
    happened is in the list below */
 @container cal (max-width: 999px) {
   .cal-evs .cal-label,
-  .cal-evs .cal-read,
   .cal-moon [lang="ta"] { display: none; }
+  /* the whole box goes to the day in the list below; its own links stay on top */
+  .cal-day.has { position: relative; cursor: pointer; }
+  .cal-day.has a.cal-num::after { content: ""; position: absolute; inset: 0; }
+  .cal-evs a { position: relative; z-index: 1; }
   .cal-day { min-height: 92px; padding: 6px 6px 8px; }
   .cal-num { font-size: 22px; }
   .cal-ta { font-size: 11.5px; }
