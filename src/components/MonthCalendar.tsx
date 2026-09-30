@@ -3,8 +3,9 @@ import { daysBetween, formatDate, monthDates, moonsBetween, type TamilMonth } fr
 
 export interface CalendarEvent {
   date: string;
-  /** The temple, and its page. */
+  /** The temple, and its page; `short` without "Koil" or "Devasthanam". */
   place: string;
+  short: string;
   placeHref?: string;
   /** What happened, and the field note about it. */
   label: string;
@@ -22,6 +23,13 @@ const WEEK = [
   ["Fri", "வெள்ளி"],
   ["Sat", "சனி"],
 ];
+
+/** At most this many entries in a day's box; the rest are in the list below. */
+const IN_BOX = 2;
+
+/** Long words may break, with a hyphen, every few letters: in a narrow box
+    "Shankhabhishekam" becomes "Shankh-abhishekam" rather than spilling out. */
+const breakable = (text: string) => text.replace(/\S{9,}/g, (w) => w.replace(/(.{5})(?=.{3})/g, "$1\u00AD"));
 
 const MOON = {
   full: { ta: "பௌர்ணமி", en: "Full moon (pournami)" },
@@ -49,43 +57,53 @@ export function MonthCalendar({
   const blanks = new Date(`${first}T00:00:00Z`).getUTCDay();
   const on = (day: string) => events.filter((e) => e.date === day);
   const marked = days.filter((d) => on(d).length > 0);
+  // a box that can't show all its day: the list below is then shown even on a laptop
+  const overflows = marked.some((d) => on(d).length > IN_BOX);
 
-  // the temple, what happened, and the festivals it was part of — each its own link
-  const item = (e: CalendarEvent) => (
-    <>
-      {e.placeHref ? (
-        <Link className="cal-place" href={e.placeHref}>
-          {e.place}
-        </Link>
-      ) : (
-        <span className="cal-place">{e.place}</span>
-      )}
-      {e.label && (
-        <>
-          {" · "}
-          {e.noteHref ? (
-            <Link className="cal-note" href={e.noteHref} title="Read the field note">
-              {e.label}
+  // the temple, what happened, and the festivals it was part of — each its own
+  // link. In a box: the short name, words that can break, and at most three
+  // lines of it; in the list below: everything, in full.
+  const item = (e: CalendarEvent, inBox: boolean) => {
+    const fit = inBox ? breakable : (text: string) => text;
+    const place = fit(inBox ? e.short : e.place);
+    return (
+      <>
+        <span className="cal-line">
+          {e.placeHref ? (
+            <Link className="cal-place" href={e.placeHref} title={e.place}>
+              {place}
             </Link>
           ) : (
-            e.label
+            <span className="cal-place">{place}</span>
           )}
-        </>
-      )}
-      {e.observances.length > 0 && (
-        <span className="cal-tags">
-          {e.observances.map((o) => (
-            <Link key={o.href} href={o.href}>
-              {o.label}
-            </Link>
-          ))}
+          {e.label && (
+            <span className="cal-label">
+              {" · "}
+              {e.noteHref ? (
+                <Link className="cal-note" href={e.noteHref} title="Read the field note">
+                  {e.label}
+                </Link>
+              ) : (
+                e.label
+              )}
+            </span>
+          )}
         </span>
-      )}
-    </>
-  );
+        {e.observances.length > 0 && (
+          <span className="cal-tags">
+            {e.observances.map((o) => (
+              <Link key={o.href} href={o.href} title={o.label}>
+                {fit(o.label)}
+              </Link>
+            ))}
+          </span>
+        )}
+      </>
+    );
+  };
 
   return (
-    <section className="month-cal">
+    <section className={`month-cal${overflows ? " overflows" : ""}`}>
       <div className="month-cal-head">
         <h2>
           {month.name} {year}
@@ -135,9 +153,14 @@ export function MonthCalendar({
               )}
               {evs.length > 0 && (
                 <ul className="cal-evs">
-                  {evs.map((e) => (
-                    <li key={e.place + e.label}>{item(e)}</li>
+                  {evs.slice(0, IN_BOX).map((e) => (
+                    <li key={e.place + e.label}>{item(e, true)}</li>
                   ))}
+                  {evs.length > IN_BOX && (
+                    <li className="cal-more">
+                      <a href={`#day-${day}`}>+ {evs.length - IN_BOX} more</a>
+                    </li>
+                  )}
                 </ul>
               )}
             </div>
@@ -145,7 +168,7 @@ export function MonthCalendar({
         })}
       </div>
 
-      {/* on a phone the days are too narrow for words: what happened, listed below */}
+      {/* where the boxes are too narrow for everything: the days in full, listed below */}
       {marked.length > 0 ? (
         <ul className="cal-list">
           {marked.map((day) => (
@@ -153,7 +176,7 @@ export function MonthCalendar({
               <time dateTime={day}>{formatDate(day)}</time>
               <ul>
                 {on(day).map((e) => (
-                  <li key={e.place + e.label}>{item(e)}</li>
+                  <li key={e.place + e.label}>{item(e, false)}</li>
                 ))}
               </ul>
             </li>

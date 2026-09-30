@@ -13,6 +13,7 @@ import {
 import { dateParts, monthDates, monthYearOf, TAMIL_MONTHS } from "@/lib/calendar";
 import { MonthCalendar, type CalendarEvent } from "@/components/MonthCalendar";
 import { MonthMotif } from "@/components/MonthMotif";
+import { shortTempleName } from "@/lib/view";
 
 type Props = { params: Promise<{ month: string }> };
 
@@ -59,6 +60,8 @@ export default async function MonthPage({ params }: Props) {
         date: o.date,
         year: monthYearOf(o.date),
         place: t ? (t.knownAs ?? t.name) : "",
+        // the name the town uses stays whole ("Chetty Koil"); a formal one loses its "Koil"
+        short: t ? (t.knownAs ?? shortTempleName(t)) : "",
         placeHref: t && hasPage(t) ? `/${t.region}/${t.id}` : undefined,
         label: o.label,
         noteHref: o.note ? `/field-notes/${o.note}` : undefined,
