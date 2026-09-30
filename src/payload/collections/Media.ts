@@ -12,7 +12,7 @@ export const Media: CollectionConfig = {
   labels: { singular: 'Photo, video or file', plural: 'Photos & videos' },
   admin: {
     group: 'Add to the site',
-    defaultColumns: ['filename', 'caption', 'consent', 'temples'],
+    defaultColumns: ['filename', 'caption', 'consent', 'temples', 'observances'],
     description:
       'Every photo, video, recording and document. Drag several files in at once to upload them together.',
   },
@@ -47,6 +47,17 @@ export const Media: CollectionConfig = {
     { name: 'caption', type: 'text' },
     { name: 'credit', type: 'text', admin: { placeholder: 'e.g. Photograph: Arunaditya' } },
     {
+      name: 'takenOn',
+      type: 'date',
+      label: 'Taken on',
+      admin: {
+        condition: (data) => !data?.mimeType || Boolean(data.mimeType.startsWith('image/')),
+        date: { pickerAppearance: 'dayOnly', displayFormat: 'd MMMM yyyy' },
+        description:
+          'Optional. The day the photo was taken, so it is grouped under the right year. Photos in a field note take the note’s date.',
+      },
+    },
+    {
       name: 'poster',
       type: 'upload',
       relationTo: 'media',
@@ -55,6 +66,18 @@ export const Media: CollectionConfig = {
       admin: {
         condition: (data) => Boolean(data?.mimeType?.startsWith('video/')),
         description: 'The picture shown before the video plays. Optional.',
+      },
+    },
+    {
+      name: 'featured',
+      type: 'checkbox',
+      label: 'Show first',
+      defaultValue: false,
+      admin: {
+        position: 'sidebar',
+        condition: (data) => !data?.mimeType || Boolean(data.mimeType.startsWith('image/')),
+        description:
+          'Put this photo first in the Photographs section of its temples and festivals. The very first is shown large.',
       },
     },
     {
@@ -77,7 +100,22 @@ export const Media: CollectionConfig = {
       type: 'relationship',
       relationTo: 'temples',
       hasMany: true,
-      admin: { position: 'sidebar', description: 'Optional. Helps find files later.' },
+      admin: {
+        position: 'sidebar',
+        description: 'A photo tagged here appears in the Photographs section of each temple’s page.',
+      },
+    },
+    {
+      name: 'observances',
+      label: 'Festivals & rituals',
+      type: 'relationship',
+      relationTo: 'observances',
+      hasMany: true,
+      admin: {
+        position: 'sidebar',
+        description:
+          'A photo tagged here appears in the Photographs section of each festival’s or ritual’s page. Photos in a field note appear there by themselves.',
+      },
     },
     createdByField,
   ],

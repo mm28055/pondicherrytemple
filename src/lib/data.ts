@@ -22,12 +22,15 @@ import type * as P from "@/payload-types";
 import type {
   Article,
   Book,
+  DeityGroup,
   EntryTopic,
   FieldNote,
   Film,
   Illustration,
   Observance,
   Occasion,
+  Photo,
+  PhotoFilter,
   Picture,
   Region,
   Temple,
@@ -36,7 +39,9 @@ import type {
   AboutPageText,
 } from "@/content/types";
 import { openingText, plainText, toHTML, type LinkPaths } from "./richtext";
+import { DEITY_GROUP_LABELS } from "@/content/labels";
 import { SECTION_INTROS, type SectionName } from "@/payload/sectionIntros";
+import { TAMIL_MONTHS, tamilMonthOf, type TamilMonth } from "./calendar";
 
 const byDateDesc = <T extends { date: string }>(a: T, b: T) => b.date.localeCompare(a.date);
 const byDateAsc = <T extends { date: string }>(a: T, b: T) => a.date.localeCompare(b.date);
@@ -91,9 +96,18 @@ const rawTemples = cache(async () =>
   ).docs
 );
 
+// (joins: false — the admin's lists of each festival's photographs aren't needed here)
 const rawObservances = cache(async () =>
-  (await (await db()).find({ ...base, ...(await visible()), collection: "observances", depth: 1, sort: "createdAt" }))
-    .docs
+  (
+    await (await db()).find({
+      ...base,
+      ...(await visible()),
+      collection: "observances",
+      depth: 1,
+      sort: "createdAt",
+      joins: false,
+    })
+  ).docs
 );
 
 const rawOccasions = cache(async () =>
@@ -140,6 +154,20 @@ async function rawOne<C extends "field-notes" | "articles" | "films">(collection
   return docs[0] ?? null;
 }
 
+/** Every photograph (not videos or files): the ones tagged with a temple or
+    festival, and the ones in field notes, are picked out below. */
+const rawPhotos = cache(async () =>
+  (
+    await (await db()).find({
+      ...base,
+      collection: "media",
+      depth: 0,
+      where: { mimeType: { contains: "image" } },
+      sort: "-createdAt",
+    })
+  ).docs
+);
+
 /** Films, with their video files and still frames (so depth 2). */
 const rawFilms = cache(async () =>
   (await (await db()).find({ ...base, ...(await visible()), collection: "films", depth: 2, sort: "-date" })).docs
@@ -169,6 +197,7 @@ const lookups = cache(async () => {
   return {
     regionOf,
     templeSlug,
+    templeKey: new Map(temples.filter((t) => t.slug).map((t) => [t.id, `${regionOf(t.region)}/${t.slug}`])),
     observanceSlug: new Map(observances.filter((o) => o.slug).map((o) => [o.id, o.slug!])),
     noteSlug: new Map(notes.filter((n) => n.slug).map((n) => [n.id, n.slug!])),
     paths,
@@ -231,6 +260,8 @@ const toObservance = (o: P.Observance, L: Lookups): Observance => ({
   alsoKnownAs: o.alsoKnownAs ?? undefined,
   gloss: o.gloss,
   about: o.about?.map((x) => ({ q: x.question, a: toHTML(x.answer, L.paths) })),
+  months: (o.months ?? []).filter((m) => m !== "year"),
+  throughYear: (o.months ?? []).includes("year"),
 });
 
 const toOccasion = (o: P.Occasion, L: Lookups): Occasion => ({
@@ -386,6 +417,62 @@ const illustrations = cache(async () => {
   return (await rawDrawings()).map((d) => toIllustration(d, L)).filter((d): d is Illustration => d !== null);
 });
 
+/* A photo shows wherever it is tagged itself, and wherever each visible
+   field note it is in is tagged. */
+const photos = cache(async () => {
+  const L = await lookups();
+  const notesWith = new Map<number, P.FieldNote[]>(); // newest note first
+  for (const n of await rawNotes()) {
+    if (!n.slug) continue;
+    for (const ref of n.photos ?? []) {
+      const id = idOf(ref);
+      if (id !== undefined) notesWith.set(id, [...(notesWith.get(id) ?? []), n]);
+    }
+  }
+  const templeByKey = new Map((await temples()).map((t) => [`${t.region}/${t.id}`, t]));
+  const observanceById = new Map((await observances()).map((o) => [o.id, o]));
+  const out: Photo[] = [];
+  for (const m of await rawPhotos()) {
+    const picture = toPicture(m);
+    if (!picture) continue;
+    const notes = notesWith.get(m.id) ?? [];
+    const temples = new Set(slugs(m.temples, L.templeKey));
+    const observances = new Set(slugs(m.observances, L.observanceSlug));
+    for (const n of notes) {
+      slugs(n.temples, L.templeKey).forEach((t) => temples.add(t));
+      slugs(n.observances, L.observanceSlug).forEach((o) => observances.add(o));
+    }
+    if (!temples.size && !observances.size) continue;
+    const note = notes[0];
+    const taken = m.takenOn ?? note?.date;
+    out.push({
+      ...picture,
+      id: String(m.id),
+      small: m.sizes?.thumbnail?.url ?? picture.src,
+      medium: m.sizes?.card?.url ?? picture.src,
+      focus: [m.focalX ?? 50, m.focalY ?? 50],
+      temples: [...temples],
+      observances: [...observances],
+      deities: [...new Set([...temples].flatMap((key) => templeByKey.get(key)?.group ?? []))],
+      tags: [
+        ...[...temples].flatMap((key) => {
+          const t = templeByKey.get(key);
+          return t ? [{ label: t.knownAs ?? t.name, href: hasPage(t) ? `/${t.region}/${t.id}` : undefined }] : [];
+        }),
+        ...[...observances].flatMap((id) => {
+          const o = observanceById.get(id);
+          return o ? [{ label: o.name, href: `/festivals-and-rituals/${o.id}` }] : [];
+        }),
+      ],
+      date: dayOf(taken ?? m.createdAt),
+      dated: Boolean(taken),
+      featured: Boolean(m.featured),
+      note: note ? { href: `/field-notes/${note.slug}`, title: note.title } : undefined,
+    });
+  }
+  return out.sort(byDateDesc);
+});
+
 const templeEntries = cache(async () => {
   const L = await lookups();
   return (await rawPieces()).map((e) => toTempleEntry(e, L));
@@ -447,6 +534,52 @@ export async function getOccasionsForTemple(regionId: string, templeId: string):
 /** Every occasion involving a festival or ritual, oldest first. */
 export async function getOccasionsForObservance(observanceId: string): Promise<Occasion[]> {
   return (await occasions()).filter((o) => o.observances.includes(observanceId)).sort(byDateAsc);
+}
+
+/* ---------- The ritual year ---------- */
+
+export interface MonthEntry {
+  observance: Observance;
+  /** The dates the team saw it in this month, oldest first. */
+  seen: Occasion[];
+}
+
+/** Every festival and ritual placed in its Tamil months — the months set in
+    the admin, and every month the team has seen it in — plus the ones done
+    all through the year, which belong to no month. One timeless year:
+    dates from every year fall into the same twelve months. */
+export async function getRitualYear(): Promise<{
+  months: { month: TamilMonth; entries: MonthEntry[] }[];
+  throughYear: Observance[];
+}> {
+  const all = await observances();
+  const seenAll = await occasions();
+  const months = TAMIL_MONTHS.map((month) => ({ month, entries: [] as MonthEntry[] }));
+  for (const o of all) {
+    if (o.throughYear) continue;
+    const seen = seenAll.filter((x) => x.observances.includes(o.id)).sort(byDateAsc);
+    const inMonths = new Set([...o.months, ...seen.map((x) => tamilMonthOf(x.date))]);
+    for (const m of months) {
+      if (inMonths.has(m.month.slug)) {
+        m.entries.push({ observance: o, seen: seen.filter((x) => tamilMonthOf(x.date) === m.month.slug) });
+      }
+    }
+  }
+  // festivals first; then the most often seen
+  for (const m of months) {
+    m.entries.sort(
+      (a, b) =>
+        Number(a.observance.kind === "ritual") - Number(b.observance.kind === "ritual") ||
+        b.seen.length - a.seen.length ||
+        a.observance.name.localeCompare(b.observance.name)
+    );
+  }
+  return { months, throughYear: all.filter((o) => o.throughYear) };
+}
+
+/** Every date the team was present that falls in a Tamil month, in any year. */
+export async function getOccasionsInMonth(monthSlug: string): Promise<Occasion[]> {
+  return (await occasions()).filter((o) => tamilMonthOf(o.date) === monthSlug).sort(byDateAsc);
 }
 
 /** The festivals and rituals seen at a temple, in the order first seen. */
@@ -555,6 +688,43 @@ export async function getFilmsForTemple(regionId: string, templeId: string): Pro
 
 export async function getFilmsForObservance(observanceId: string): Promise<Film[]> {
   return (await getFilms()).filter((f) => f.observances.includes(observanceId));
+}
+
+/* ---------- Photographs ---------- */
+
+export async function getPhotosForTemple(regionId: string, templeId: string): Promise<Photo[]> {
+  return (await photos()).filter((p) => p.temples.includes(`${regionId}/${templeId}`));
+}
+
+export async function getPhotosForObservance(observanceId: string): Promise<Photo[]> {
+  return (await photos()).filter((p) => p.observances.includes(observanceId));
+}
+
+/** The ways a page of photographs can be narrowed, each a row of buttons:
+    only the rows that offer a real choice (two options or more). */
+export async function getPhotoFilters(list: Photo[], keys: PhotoFilter["key"][]): Promise<PhotoFilter[]> {
+  const templeByKey = new Map((await temples()).map((t) => [`${t.region}/${t.id}`, t]));
+  const observanceById = new Map((await observances()).map((o) => [o.id, o]));
+  const rows: Record<PhotoFilter["key"], { label: string; of: (p: Photo) => string[]; name: (id: string) => string }> = {
+    temples: {
+      label: "Temple",
+      of: (p) => p.temples,
+      name: (id) => templeByKey.get(id)?.knownAs ?? templeByKey.get(id)?.name ?? id,
+    },
+    observances: { label: "Festival", of: (p) => p.observances, name: (id) => observanceById.get(id)?.name ?? id },
+    deities: { label: "Deity", of: (p) => p.deities, name: (id) => DEITY_GROUP_LABELS[id as DeityGroup] ?? id },
+    years: { label: "Year", of: (p) => [p.date.slice(0, 4)], name: (id) => id },
+  };
+  return keys
+    .map((key) => {
+      const counts = new Map<string, number>();
+      for (const p of list) for (const id of rows[key].of(p)) counts.set(id, (counts.get(id) ?? 0) + 1);
+      const options = [...counts]
+        .map(([id, count]) => ({ id, label: rows[key].name(id), count }))
+        .sort((a, b) => (key === "years" ? b.id.localeCompare(a.id) : b.count - a.count));
+      return { key, label: rows[key].label, options };
+    })
+    .filter((f) => f.options.length > 1);
 }
 
 /* ---------- Newest additions (the home page) ---------- */

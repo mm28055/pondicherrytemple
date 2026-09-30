@@ -8,6 +8,7 @@ import {
   getIllustrationsForObservance,
   getObservance,
   getObservances,
+  getPhotosForObservance,
   getOccasionsForObservance,
   getRegion,
   getTemple,
@@ -18,6 +19,7 @@ import { dateParts } from "@/lib/calendar";
 import { articleRow, filmTile, noteRow } from "@/lib/view";
 import { Drawings, drawingsInColumn } from "@/components/Drawings";
 import { FilmWall } from "@/components/FilmWall";
+import { PhotoWall } from "@/components/PhotoWall";
 import { Html } from "@/components/Prose";
 import { NoteRow } from "@/components/Rows";
 import type { Occasion, Temple } from "@/content/types";
@@ -46,6 +48,7 @@ export default async function ObservancePage({ params }: Props) {
   const articles = (await getArticlesForObservance(o.id)).map((a) => articleRow(a, region.calendar));
   const films = (await getFilmsForObservance(o.id)).map((f) => filmTile(f, temples));
   const drawings = await getIllustrationsForObservance(o.id);
+  const photos = await getPhotosForObservance(o.id);
 
   // Where we've seen it: occasions grouped by temple, in the order first seen
   const groups: { temple: Temple; items: Occasion[] }[] = [];
@@ -58,7 +61,7 @@ export default async function ObservancePage({ params }: Props) {
   }
 
   const inColumn = drawingsInColumn(drawings);
-  const hasMain = Boolean(o.about?.length || films.length || notes.length || articles.length || inColumn);
+  const hasMain = Boolean(o.about?.length || films.length || photos.length || notes.length || articles.length || inColumn);
 
   const seenHead = <h2 className="sub-head">Where we&apos;ve seen it</h2>;
   const seenList = (
@@ -138,6 +141,13 @@ export default async function ObservancePage({ params }: Props) {
               <section>
                 <h2 className="sub-head">Films</h2>
                 <FilmWall tiles={films} />
+              </section>
+            )}
+
+            {photos.length > 0 && (
+              <section>
+                <h2 className="sub-head">Photographs</h2>
+                <PhotoWall photos={photos} layout="lead" seeAll={`/festivals-and-rituals/${o.id}/photographs`} />
               </section>
             )}
 

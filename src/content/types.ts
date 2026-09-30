@@ -72,6 +72,10 @@ export interface Observance {
   gloss: string;
   /** The explanation, as questions and answers (answers in HTML). */
   about?: { q: string; a: string }[];
+  /** The Tamil months (slugs) it usually falls in, as set in the admin. */
+  months: string[];
+  /** Done again and again, all year (like Pradosham): not placed in a month. */
+  throughYear: boolean;
 }
 
 /** A dated occasion the team was present for, at one temple. These build
@@ -162,6 +166,43 @@ export interface Picture {
   caption?: string;
   /** "Drawing by Abishek P.", "Photograph: Arunaditya" */
   credit?: string;
+}
+
+/** A photograph in the Photographs section of temple and festival pages. It
+    is there because it is tagged with that temple or festival itself, or
+    because it is in a field note that is. */
+export interface Photo extends Picture {
+  id: string;
+  /** Smaller copies: `small` (480 px) for the grid, `medium` (960 px) for
+      the large lead photo. */
+  small: string;
+  medium: string;
+  /** Where the photo's subject sits, in % — the grid crops around it. */
+  focus: [number, number];
+  /** "region/temple" */
+  temples: string[];
+  observances: string[];
+  /** The deities of its temples (shiva, vishnu…), for narrowing by deity. */
+  deities: string[];
+  /** The temples and festivals it belongs to, named, for under the photo. */
+  tags: { label: string; href?: string }[];
+  /** The day it was taken: its "Taken on" date, or its field note's date;
+      failing both, the day it was uploaded. */
+  date: string;
+  /** False when `date` is only the upload day — then it is not shown. */
+  dated: boolean;
+  /** Ticked "Show first" in the admin: leads the Photographs section. */
+  featured: boolean;
+  /** The newest field note it appears in. */
+  note?: { href: string; title: string };
+}
+
+/** A row of buttons for narrowing a page of photographs: by temple, by
+    festival, by deity or by year. */
+export interface PhotoFilter {
+  key: "temples" | "observances" | "deities" | "years";
+  label: string;
+  options: { id: string; label: string; count: number }[];
 }
 
 /** Abishek P.'s drawings: the illustrated plan of each temple, and scenes
