@@ -45,8 +45,9 @@ export const regionField: Field = {
   relationTo: 'regions',
   required: true,
   admin: { position: 'sidebar' },
+  // The town itself (the first region made), never "In and around …".
   defaultValue: async ({ req }) => {
-    const { docs } = await req.payload.find({ collection: 'regions', limit: 1, depth: 0, req })
+    const { docs } = await req.payload.find({ collection: 'regions', sort: 'createdAt', limit: 1, depth: 0, req })
     return docs[0]?.id
   },
 }

@@ -12,9 +12,12 @@ export const metadata: Metadata = {
 };
 
 export default async function FieldNotesPage() {
+  // Pondicherry's notes and those filed under "In and around Pondicherry".
   const region = (await getRegion("pondicherry"))!;
-  const temples = await getTemples(region.id);
-  const notes = await getFieldNotes(region.id);
+  const around = await getRegion(`in-and-around-${region.id}`);
+  const regionIds = [region.id, ...(around ? [around.id] : [])];
+  const temples = (await Promise.all(regionIds.map((id) => getTemples(id)))).flat();
+  const notes = (await getFieldNotes()).filter((n) => regionIds.includes(n.region));
   const rows = notes.map((n) => noteRow(n, temples, region.calendar));
 
   // one filter per kind actually present

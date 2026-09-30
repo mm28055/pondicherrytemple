@@ -9,10 +9,15 @@ export const metadata: Metadata = {
 };
 
 export default async function FilmsPage() {
+  // Pondicherry's films and those filed under "In and around Pondicherry".
   const region = (await getRegion("pondicherry"))!;
-  const temples = await getTemples(region.id);
+  const around = await getRegion(`in-and-around-${region.id}`);
+  const regionIds = [region.id, ...(around ? [around.id] : [])];
+  const temples = (await Promise.all(regionIds.map((id) => getTemples(id)))).flat();
   const observances = await getObservances();
-  const tiles = (await getFilms(region.id)).map((f) => filmTile(f, temples));
+  const tiles = (await getFilms())
+    .filter((f) => regionIds.includes(f.region))
+    .map((f) => filmTile(f, temples));
 
   // one filter per temple or festival that actually has a film
   const count = (key: "temples" | "observances", id: string) => tiles.filter((t) => t[key].includes(id)).length;
