@@ -142,7 +142,7 @@ export function MonthCalendar({
             <div
               key={day}
               role="gridcell"
-              className={`cal-day${evs.length ? " has" : ""}${day === today ? " today" : ""}${
+              className={`cal-day${evs.length ? " has" : ""}${day === today ? " is-today" : ""}${
                 day === selected ? " selected" : ""
               }`}
             >
