@@ -210,10 +210,11 @@ const toTemple = (t: P.Temple, L: Lookups): Temple => ({
   id: t.slug ?? "",
   region: L.regionOf(t.region),
   name: t.name,
-  knownAs: t.knownAs ?? undefined,
+  // A box cleared in the admin is saved as "", which would hide the name.
+  knownAs: t.knownAs?.trim() || undefined,
   deity: t.deity,
   group: t.deityGroup,
-  street: t.street ?? undefined,
+  street: t.street?.trim() || undefined,
   intro: toHTML(t.intro, L.paths) || undefined,
   introText: plainText(t.intro) || undefined,
   coordinates:
