@@ -92,7 +92,7 @@ export function observanceRow(o: Observance, seenAt: number): ObservanceRowData 
   };
 }
 
-/** Where a film was made, by temple name: "Vedapuriswara Koil, Chetty Kovil". */
+/** Where a film was made, by temple name: "Vedapuriswara Koil, Chetty Koil". */
 function placesOf(ids: string[], temples: Temple[]) {
   return ids
     .map((id) => temples.find((t) => t.id === id))

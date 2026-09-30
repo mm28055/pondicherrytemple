@@ -18,7 +18,7 @@
 
    Everything is written in the admin (/admin) and stored in the database;
    src/lib/data.ts turns what is stored into these shapes. Ids here are the
-   web addresses ("chetty-kovil"), and every "…HTML" field is the finished
+   web addresses ("chetty-koil"), and every "…HTML" field is the finished
    text from the editor. */
 
 export type RegionId = string;
@@ -40,7 +40,7 @@ export interface Region {
 export type DeityGroup = "shiva" | "vishnu" | "amman" | "vinayaka" | "murugan";
 
 export interface Temple {
-  /** Web address, unique within its region: /pondicherry/chetty-kovil */
+  /** Web address, unique within its region: /pondicherry/chetty-koil */
   id: string;
   region: RegionId;
   name: string;

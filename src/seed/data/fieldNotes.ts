@@ -12,17 +12,17 @@ import type { FieldNote } from "./types";
 
 export const fieldNotes: FieldNote[] = [
   {
-    id: "2026-03-23-first-day-at-chetty-kovil",
+    id: "2026-03-23-first-day-at-chetty-koil",
     kind: "note",
     region: "pondicherry",
     date: "2026-03-23",
-    temples: ["chetty-kovil"],
+    temples: ["chetty-koil"],
     observances: ["brahmotsavam", "dhvajarohanam"],
     occasion: "The Brahmotsavam begins",
-    title: "The first day at Chetty Kovil",
+    title: "The first day at Chetty Koil",
     authors: ["Arunaditya"],
     body: [
-      "My first day at Chetty Kovil. I arrive a little after the dhvajarohanam, as they offer rice balls as bali around the dhvajasthambham.",
+      "My first day at Chetty Koil. I arrive a little after the dhvajarohanam, as they offer rice balls as bali around the dhvajasthambham.",
       "The little astra utsava murti — the one that eventually takes a dip in the sea on the Teerthavari day — is kept on a stool to the left of the dhvajasthambham, and all archanais and offerings are made to it as well. All the other utsava murtis are out, watching the bali offerings and the deeparchanais.",
     ],
     editorial: {
@@ -46,7 +46,7 @@ export const fieldNotes: FieldNote[] = [
     body: [
       "Alangaram for the utsava murtis first; then the ubhayakarar must be present before the swamis are taken out around the temple prakaram. The time given is 7pm, but the swamis don't come out until 9, and the procession starts at 9:30.",
       "Meanwhile the vahana and cart owners have been waiting since 7:30. They're paid for this work, so they don't mind. Everyone works part time; they have day jobs. The man we speak to works at a school. We talk for a long time about the part-time, gig-work-like system all around — the only way, it seems, to make things work, from the priests down to the men arranging the carts for street festivals.",
-      "The gajavahana is from the Chetty Kovil. The man who looks after it tells us he manages forty temples, and that they share these things between them freely, at no cost. If a temple asks, they give.",
+      "The gajavahana is from the Chetty Koil. The man who looks after it tells us he manages forty temples, and that they share these things between them freely, at no cost. If a temple asks, they give.",
       "The woman minding the shoe stall is from Tirunelveli. People leave their chappals outside anyway, the crowds are small, and the stall barely gets by. Why did you come here, in spite of all the hardship? we ask her. <em>“Because sitting in front of Him feels good,”</em> she says immediately. <em>“He brought me here and made me sit.”</em>",
       "And not to forget the mooshikas at the shoe stall, eating bits of prasadam.",
     ],

@@ -13,15 +13,15 @@ import type { Occasion } from "./types";
 const P = "pondicherry" as const;
 
 export const occasions: Occasion[] = [
-  // Chetty Kovil (Kalahasteeswarar) — the Panguni Brahmotsavam
-  { date: "2026-03-16", region: P, temple: "chetty-kovil", label: "Pradosham — the first day of documentation", observances: ["pradosham"] },
-  { date: "2026-03-23", region: P, temple: "chetty-kovil", label: "Brahmotsavam begins: the flag is hoisted", observances: ["brahmotsavam", "dhvajarohanam"], note: "2026-03-23-first-day-at-chetty-kovil" },
-  { date: "2026-03-27", region: P, temple: "chetty-kovil", label: "Tirukalyanam, the divine wedding", observances: ["brahmotsavam", "tirukalyanam"] },
-  { date: "2026-04-01", region: P, temple: "chetty-kovil", label: "Natarajar Teerthavari", observances: ["brahmotsavam", "teerthavari"] },
-  { date: "2026-04-03", region: P, temple: "chetty-kovil", label: "Unjal utsavam", observances: ["brahmotsavam", "unjal"] },
-  { date: "2026-04-05", region: P, temple: "chetty-kovil", label: "Shankhabhishekam — the Brahmotsavam closes", observances: ["brahmotsavam", "shankhabhishekam"] },
-  { date: "2026-04-12", region: P, temple: "chetty-kovil", label: "Bhairava archanai", observances: [] },
-  { date: "2026-04-14", region: P, temple: "chetty-kovil", label: "Varsha Pirappu: Garuda vahana with Adhikara Nandi", observances: ["varsha-pirappu", "purappadu"] },
+  // Chetty Koil (Kalahasteeswarar) — the Panguni Brahmotsavam
+  { date: "2026-03-16", region: P, temple: "chetty-koil", label: "Pradosham — the first day of documentation", observances: ["pradosham"] },
+  { date: "2026-03-23", region: P, temple: "chetty-koil", label: "Brahmotsavam begins: the flag is hoisted", observances: ["brahmotsavam", "dhvajarohanam"], note: "2026-03-23-first-day-at-chetty-koil" },
+  { date: "2026-03-27", region: P, temple: "chetty-koil", label: "Tirukalyanam, the divine wedding", observances: ["brahmotsavam", "tirukalyanam"] },
+  { date: "2026-04-01", region: P, temple: "chetty-koil", label: "Natarajar Teerthavari", observances: ["brahmotsavam", "teerthavari"] },
+  { date: "2026-04-03", region: P, temple: "chetty-koil", label: "Unjal utsavam", observances: ["brahmotsavam", "unjal"] },
+  { date: "2026-04-05", region: P, temple: "chetty-koil", label: "Shankhabhishekam — the Brahmotsavam closes", observances: ["brahmotsavam", "shankhabhishekam"] },
+  { date: "2026-04-12", region: P, temple: "chetty-koil", label: "Bhairava archanai", observances: [] },
+  { date: "2026-04-14", region: P, temple: "chetty-koil", label: "Varsha Pirappu: Garuda vahana with Adhikara Nandi", observances: ["varsha-pirappu", "purappadu"] },
 
   // Manakkula Vinayakar
   { date: "2026-03-29", region: P, temple: "manakkula-vinayakar", label: "Andu Vizha", observances: ["andu-vizha"] },

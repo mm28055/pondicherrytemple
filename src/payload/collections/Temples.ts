@@ -43,7 +43,7 @@ export const Temples: CollectionConfig = {
                   name: 'knownAs',
                   type: 'text',
                   label: 'Known in town as',
-                  admin: { width: '50%', placeholder: 'e.g. Chetty Kovil' },
+                  admin: { width: '50%', placeholder: 'e.g. Chetty Koil' },
                 },
               ],
             },

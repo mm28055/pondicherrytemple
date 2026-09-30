@@ -28,7 +28,7 @@ export const observances: Observance[] = [
       },
       {
         q: "When does it happen?",
-        a: "Once a year, in a month fixed by each temple's own tradition. In Pondicherry we followed it at the Chetty Kovil in Panguni, and at Varadaraja Perumal and Vedapuriswara in Vaikasi.",
+        a: "Once a year, in a month fixed by each temple's own tradition. In Pondicherry we followed it at the Chetty Koil in Panguni, and at Varadaraja Perumal and Vedapuriswara in Vaikasi.",
       },
       {
         q: "What happens?",
@@ -36,7 +36,7 @@ export const observances: Observance[] = [
       },
       {
         q: "What to look for",
-        a: "On the first morning at the Chetty Kovil: rice balls offered as bali around the flagstaff, and the small astra murti waiting on a stool beside it — the one that will be taken to the sea on the last day.",
+        a: "On the first morning at the Chetty Koil: rice balls offered as bali around the flagstaff, and the small astra murti waiting on a stool beside it — the one that will be taken to the sea on the last day.",
       },
     ],
     editorial: DRAFT,
@@ -185,7 +185,7 @@ export const observances: Observance[] = [
       },
       {
         q: "In Pondicherry",
-        a: "At the Chetty Kovil the day's procession brought out the Garuda vahana and the Adhikara Nandi. At Varadaraja Perumal it was the day of the Laksha Deepam.",
+        a: "At the Chetty Koil the day's procession brought out the Garuda vahana and the Adhikara Nandi. At Varadaraja Perumal it was the day of the Laksha Deepam.",
       },
     ],
     editorial: DRAFT,
@@ -236,7 +236,7 @@ export const observances: Observance[] = [
       },
       {
         q: "What to look for",
-        a: "The bali offerings made around the foot of the flagstaff. At the Chetty Kovil, on 23 March 2026, they were balls of rice.",
+        a: "The bali offerings made around the foot of the flagstaff. At the Chetty Koil, on 23 March 2026, they were balls of rice.",
       },
     ],
     editorial: DRAFT,
@@ -299,11 +299,11 @@ export const observances: Observance[] = [
       },
       {
         q: "When does it happen?",
-        a: "Usually in the evening, sometimes as one day of a larger festival. In Pondicherry we saw it at the Chetty Kovil during its Brahmotsavam, and at Varadaraja Perumal in April.",
+        a: "Usually in the evening, sometimes as one day of a larger festival. In Pondicherry we saw it at the Chetty Koil during its Brahmotsavam, and at Varadaraja Perumal in April.",
       },
       {
         q: "What to look for",
-        a: "The change of mood. At the Chetty Kovil it was noticeably more relaxed than the days of procession around it.",
+        a: "The change of mood. At the Chetty Koil it was noticeably more relaxed than the days of procession around it.",
       },
     ],
     editorial: DRAFT,
@@ -321,7 +321,7 @@ export const observances: Observance[] = [
       },
       {
         q: "When does it happen?",
-        a: "Often as one of the days of a temple's Brahmotsavam. At the Chetty Kovil it fell on 27 March 2026.",
+        a: "Often as one of the days of a temple's Brahmotsavam. At the Chetty Koil it fell on 27 March 2026.",
       },
       {
         q: "What happens?",
@@ -347,7 +347,7 @@ export const observances: Observance[] = [
       },
       {
         q: "What to look for",
-        a: "Which image goes into the water. At the Chetty Kovil it is the small astra murti — kept by the flagstaff from the festival's first day — that takes the dip in the sea.",
+        a: "Which image goes into the water. At the Chetty Koil it is the small astra murti — kept by the flagstaff from the festival's first day — that takes the dip in the sea.",
       },
     ],
     editorial: DRAFT,
@@ -373,7 +373,7 @@ export const observances: Observance[] = [
       },
       {
         q: "In Pondicherry",
-        a: "The project's first evening in a temple, 16 March 2026 at the Chetty Kovil, was a Pradosham.",
+        a: "The project's first evening in a temple, 16 March 2026 at the Chetty Koil, was a Pradosham.",
       },
     ],
     editorial: DRAFT,
@@ -399,7 +399,7 @@ export const observances: Observance[] = [
       },
       {
         q: "In Pondicherry",
-        a: "At Manakkula Vinayakar, a sahasra shankhabhishekam on 31 March 2026, two days after its Andu Vizha. At the Chetty Kovil, a shankhabhishekam closed the Brahmotsavam on 5 April 2026.",
+        a: "At Manakkula Vinayakar, a sahasra shankhabhishekam on 31 March 2026, two days after its Andu Vizha. At the Chetty Koil, a shankhabhishekam closed the Brahmotsavam on 5 April 2026.",
       },
     ],
     editorial: DRAFT,

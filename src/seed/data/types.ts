@@ -42,7 +42,7 @@ export interface Region {
 export type DeityGroup = "shiva" | "vishnu" | "amman" | "vinayaka" | "murugan";
 
 export interface Temple {
-  /** URL slug, unique within its region: /pondicherry/chetty-kovil */
+  /** URL slug, unique within its region: /pondicherry/chetty-koil */
   id: string;
   region: RegionId;
   name: string;

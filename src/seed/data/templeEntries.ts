@@ -82,10 +82,10 @@ export const templeEntries: TempleEntry[] = [
     id: "vahana-keeper",
     region: P,
     topic: "people",
-    temples: ["chetty-kovil", "manakkula-vinayakar"],
+    temples: ["chetty-koil", "manakkula-vinayakar"],
     title: "The vahana keeper",
     body: [
-      "The gajavahana, the elephant vahana, in Manakkula Vinayakar's Pancha Vinayaka procession on 6 April 2026 belongs to the Chetty Kovil. The man who looks after it told us he manages forty temples, and that they share such things between them freely, at no cost: if a temple asks, they give.",
+      "The gajavahana, the elephant vahana, in Manakkula Vinayakar's Pancha Vinayaka procession on 6 April 2026 belongs to the Chetty Koil. The man who looks after it told us he manages forty temples, and that they share such things between them freely, at no cost: if a temple asks, they give.",
     ],
     sources: [PANCHA_VINAYAKA_NOTE],
     editorial: DRAFT,

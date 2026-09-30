@@ -120,7 +120,7 @@ Photo-only posts are passed over. Nothing is published: each waits,
 The site reads as Pondicherry-only. Underneath, only the two things that are
 expensive to change later are built for more regions:
 
-- **Addresses include the town** — `/pondicherry/chetty-kovil`. The region
+- **Addresses include the town** — `/pondicherry/chetty-koil`. The region
   routes are `src/app/(site)/[region]/…`, so a second town needs data, not code.
 - **Everything records its region, and dates are ordinary dates.** The Tamil
   month is a display label computed in `src/lib/calendar.ts`; another region

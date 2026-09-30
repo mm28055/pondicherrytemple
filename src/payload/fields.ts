@@ -1,7 +1,7 @@
 import type { Field } from 'payload'
 import { adminOnlyField } from './access'
 
-/** Turn a title into a web address: "The first day at Chetty Kovil" → "the-first-day-at-chetty-kovil". */
+/** Turn a title into a web address: "The first day at Chetty Koil" → "the-first-day-at-chetty-koil". */
 export function slugify(text: string): string {
   return text
     .normalize('NFKD')

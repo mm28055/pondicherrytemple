@@ -25,5 +25,5 @@ const PLACEHOLDER: Omit<Illustration, "id" | "title" | "temples"> = {
 export const illustrations: Illustration[] = [
   { ...PLACEHOLDER, id: "manakkula-vinayakar-plan", title: "Manakkula Vinayakar Devasthanam", temples: ["manakkula-vinayakar"] },
   { ...PLACEHOLDER, id: "varadaraja-perumal-plan", title: "Varadaraja Perumal Koil", temples: ["varadaraja-perumal"] },
-  { ...PLACEHOLDER, id: "chetty-kovil-plan", title: "Chetty Kovil", temples: ["chetty-kovil"] },
+  { ...PLACEHOLDER, id: "chetty-koil-plan", title: "Chetty Koil", temples: ["chetty-koil"] },
 ];
