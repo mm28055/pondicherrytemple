@@ -1428,9 +1428,7 @@ a.temple-row:hover .temple-name { color: var(--ochre); }
 }
 .motif .fill { fill: currentColor; stroke: none; }
 
-.rasi-motif { width: 38px; height: 38px; flex: none; color: var(--m); margin: -2px -4px 0 0; }
 .rasi-month:hover .rasi-ta { color: var(--m); }
-.rasi-month.now .rasi-motif { color: var(--lamp); }
 .rasi-now { color: var(--lamp); }
 
 .month-head {

@@ -3,7 +3,6 @@ import type { CSSProperties } from "react";
 import type { Observance } from "@/content/types";
 import type { MonthEntry } from "@/lib/data";
 import type { TamilMonth } from "@/lib/calendar";
-import { MonthMotif } from "./MonthMotif";
 
 const SHOWN = 4;
 
@@ -33,7 +32,6 @@ export function RitualYear({
             <span className="rasi-ta" lang="ta">
               {m.tamil}
             </span>
-            <MonthMotif month={m.slug} className="rasi-motif" />
           </span>
           <span className="caps">
             {m.name}
