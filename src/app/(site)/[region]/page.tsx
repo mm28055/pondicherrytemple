@@ -77,7 +77,8 @@ export default async function RegionPage({ params }: Props) {
       {around && aroundRows.length > 0 && (
         <section className="section tight" id={around.id}>
           <h2 className="sub-head">{around.name}</h2>
-          <p className="note-line">Temples outside {region.name} that are part of this study.</p>
+          {/* The region's Introduction (Admin → Regions), or this line if it is empty. */}
+          <p className="note-line">{around.introText || `Temples outside ${region.name} that are part of this study.`}</p>
           {aroundRows.map(({ t, meta }) =>
             meta ? <TempleRow key={t.id} temple={t} meta={meta} /> : <TempleRowPlain key={t.id} temple={t} />
           )}
