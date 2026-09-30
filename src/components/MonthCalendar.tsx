@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { useRef, useState, type MouseEvent } from "react";
 import { daysBetween, formatDate, monthDates, moonsBetween, type TamilMonth } from "@/lib/calendar";
 
 export interface CalendarEvent {
@@ -59,6 +62,20 @@ export function MonthCalendar({
   const marked = days.filter((d) => on(d).length > 0);
   // a box that can't show all its day: the list below is then shown even on a laptop
   const overflows = marked.some((d) => on(d).length > IN_BOX);
+
+  // On a phone the boxes hold only the date: a dot marks the days the team was
+  // there, and the chosen day is shown under the grid — the first one to begin
+  // with, so there is always something to read.
+  const [selected, setSelected] = useState<string | null>(marked[0] ?? null);
+  const [showAll, setShowAll] = useState(false);
+  const panel = useRef<HTMLDivElement>(null);
+  const choose = (e: MouseEvent, day: string) => {
+    // only where the panel is showing (a phone); wider, the link goes to the list
+    if (panel.current && getComputedStyle(panel.current).display !== "none") {
+      e.preventDefault();
+      setSelected(day);
+    }
+  };
 
   // the temple, what happened, and the festivals it was part of — each its own
   // link. In a box: the short name, words that can break, and at most three
@@ -130,12 +147,14 @@ export function MonthCalendar({
             <div
               key={day}
               role="gridcell"
-              className={`cal-day${evs.length ? " has" : ""}${day === today ? " today" : ""}`}
+              className={`cal-day${evs.length ? " has" : ""}${day === today ? " today" : ""}${
+                day === selected ? " selected" : ""
+              }`}
             >
               <div className="cal-top">
                 {evs.length ? (
                   // on a phone, where the words are hidden, a tap goes to the day in the list below
-                  <a className="cal-num" href={`#day-${day}`}>
+                  <a className="cal-num" href={`#day-${day}`} onClick={(e) => choose(e, day)}>
                     {Number(day.slice(8))}
                   </a>
                 ) : (
@@ -145,6 +164,7 @@ export function MonthCalendar({
                   {i + 1}
                 </span>
               </div>
+              {evs.length > 0 && <span className="cal-dot" aria-hidden="true" />}
               {moon && (
                 <span className={`cal-moon ${moon}`} title={MOON[moon].en}>
                   <span className="dot" aria-hidden="true" />
@@ -168,9 +188,32 @@ export function MonthCalendar({
         })}
       </div>
 
+      {/* on a phone: the chosen day */}
+      {marked.length > 0 && (
+        <div className="cal-panel" ref={panel} aria-live="polite">
+          {selected && (
+            <>
+              <div className="cal-panel-date">
+                {WEEK[new Date(`${selected}T00:00:00Z`).getUTCDay()][0]} · {formatDate(selected)} · {month.name}{" "}
+                {days.indexOf(selected) + 1}
+              </div>
+              <ul>
+                {on(selected).map((e) => (
+                  <li key={e.place + e.label}>{item(e, false)}</li>
+                ))}
+              </ul>
+            </>
+          )}
+          <p className="cal-hint">Tap a marked day to see what happened.</p>
+          <button className="cal-all" onClick={() => setShowAll((v) => !v)} aria-expanded={showAll}>
+            {showAll ? "Hide the list" : `See all ${marked.length} days as a list`}
+          </button>
+        </div>
+      )}
+
       {/* where the boxes are too narrow for everything: the days in full, listed below */}
       {marked.length > 0 ? (
-        <ul className="cal-list">
+        <ul className={`cal-list${showAll ? " open" : ""}`}>
           {marked.map((day) => (
             <li key={day} id={`day-${day}`}>
               <time dateTime={day}>{formatDate(day)}</time>

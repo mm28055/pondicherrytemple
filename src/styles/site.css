@@ -1573,7 +1573,7 @@ a.temple-row:hover .temple-name { color: var(--ochre); }
 /* Medium (a tablet, a small window): the temple and its festivals; what
    happened is in the list below */
 @container cal (max-width: 999px) {
-  .cal-label,
+  .cal-evs .cal-label,
   .cal-moon [lang="ta"] { display: none; }
   .cal-day { min-height: 92px; padding: 6px 6px 8px; }
   .cal-num { font-size: 22px; }
@@ -1582,8 +1582,66 @@ a.temple-row:hover .temple-name { color: var(--ochre); }
   .cal-tags a { font-size: 10px; letter-spacing: 0.03em; padding: 1px 4px; }
   .cal-list { display: block; }
 }
-/* Narrow (a phone): the date and the moon; a tap on a marked day goes to it in the list */
+/* On a phone only: the dot under a marked day, and the chosen day under the grid */
+.cal-dot,
+.cal-panel { display: none; }
+
+/* Narrow (a phone), like a phone's own calendar: plain boxes, a dot under the
+   days the team was there, and a tap shows that day under the grid */
 @container cal (max-width: 619px) {
+  .cal-day.has { background: #fff; border-color: var(--rule); box-shadow: none; }
+  .cal-day { position: relative; }
+  .cal-top { justify-content: center; }
+  .cal-top .cal-ta { position: absolute; top: 3px; right: 4px; }
+  .cal-day .cal-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    margin-top: 4px;
+    border-radius: 50%;
+  }
+  .cal-day.selected .cal-num { background: var(--m); color: #fff !important; }
+  .cal-dot { display: block; width: 7px; height: 7px; margin: 3px auto 0; border-radius: 50%; background: var(--m); }
+  .cal-moon { justify-content: center; margin-top: 3px; }
+  .cal-moon .dot { width: 7px; height: 7px; border-color: var(--muted); }
+  .cal-moon.new .dot { background: var(--muted); }
+  .cal-panel {
+    display: block;
+    margin-top: 14px;
+    padding: 14px 16px 12px;
+    background: #fff;
+    border: 1px solid var(--rule);
+    border-top: 3px solid var(--m);
+  }
+  .cal-panel-date {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 13.5px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--m);
+    margin-bottom: 6px;
+  }
+  .cal-panel li { font-size: 16.5px; line-height: 1.4; padding-block: 4px; }
+  .cal-panel li + li { border-top: 1px solid var(--rule); }
+  .cal-panel .cal-tags a { font-size: 11px; }
+  .cal-hint { font-size: 13.5px; font-style: italic; color: var(--muted); margin-top: 10px; }
+  .cal-all {
+    margin-top: 6px;
+    padding: 0;
+    background: none;
+    border: none;
+    border-bottom: 1px solid var(--rule);
+    font: inherit;
+    font-size: 14.5px;
+    color: var(--ink-2);
+    cursor: pointer;
+  }
+  .cal-list { display: none; }
+  .cal-list.open { display: block; }
+
   .cal { gap: 2px; }
   .cal-wd [lang="ta"] { display: none; }
   .cal-day { min-height: 54px; padding: 4px 5px; }
