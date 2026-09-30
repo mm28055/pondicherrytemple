@@ -18,7 +18,7 @@ import {
 } from "@/lib/data";
 import { Html } from "@/components/Prose";
 import { DEITY_GROUP_LABELS } from "@/content/labels";
-import { articleRow, filmTile, noteRow } from "@/lib/view";
+import { articleRow, filmTile, noteRow, templesOf } from "@/lib/view";
 import { Drawings, drawingsInColumn } from "@/components/Drawings";
 import { Entries } from "@/components/Entries";
 import { FilmWall } from "@/components/FilmWall";
@@ -66,7 +66,7 @@ export default async function TemplePage({ params }: Props) {
     <div className="wrap">
       <header className="page-head">
         <Link className="crumb" href={`/${region.id}`}>
-          ← The temples of {region.name}
+          ← {templesOf(region.name)}
         </Link>
         <h1 className="temple-title">{t.knownAs ?? t.name}</h1>
         <div className="temple-facts caps">

@@ -20,6 +20,14 @@ export interface NoteRowData {
   by: string;
 }
 
+/** "The temples of Pondicherry", but "The temples in and around Pondicherry"
+    for a region named "In and around …". */
+export function templesOf(regionName: string) {
+  return /^(in and )?around\s/i.test(regionName)
+    ? `The temples ${regionName.charAt(0).toLowerCase()}${regionName.slice(1)}`
+    : `The temples of ${regionName}`;
+}
+
 function excerpt(text: string, max = 180) {
   return text.length > max ? text.slice(0, max).replace(/\s+\S*$/, "") + "…" : text;
 }

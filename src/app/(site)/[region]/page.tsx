@@ -9,6 +9,7 @@ import {
   hasPage,
 } from "@/lib/data";
 import { Html } from "@/components/Prose";
+import { templesOf } from "@/lib/view";
 import { TempleRow, TempleRowPlain } from "@/components/Rows";
 
 type Props = { params: Promise<{ region: string }> };
@@ -19,7 +20,7 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const r = await getRegion((await params).region);
-  return r ? { title: `The temples of ${r.name}`, description: r.introText } : {};
+  return r ? { title: templesOf(r.name), description: r.introText } : {};
 }
 
 export default async function RegionPage({ params }: Props) {
@@ -35,6 +36,19 @@ export default async function RegionPage({ params }: Props) {
     })
   );
   const others = temples.filter((t) => !hasPage(t));
+
+  // Temples outside the town live in their own region, "In and around <town>"
+  // (address in-and-around-<town>), and are listed at the foot of the town's page.
+  const around = await getRegion(`in-and-around-${region.id}`);
+  const aroundTemples = around ? await getTemples(around.id) : [];
+  const aroundRows = await Promise.all(
+    aroundTemples.map(async (t) => {
+      if (!hasPage(t)) return { t };
+      const occ = (await getOccasionsForTemple(around!.id, t.id)).length;
+      const notes = (await getFieldNotesForTemple(around!.id, t.id)).length;
+      return { t, meta: `${occ} occasions · ${notes} field note${notes === 1 ? "" : "s"}` };
+    })
+  );
 
   return (
     <div className="wrap">
@@ -57,6 +71,16 @@ export default async function RegionPage({ params }: Props) {
           {others.map((t) => (
             <TempleRowPlain key={t.id} temple={t} />
           ))}
+        </section>
+      )}
+
+      {around && aroundRows.length > 0 && (
+        <section className="section tight" id={around.id}>
+          <h2 className="sub-head">{around.name}</h2>
+          <p className="note-line">Temples outside {region.name} that are part of this study.</p>
+          {aroundRows.map(({ t, meta }) =>
+            meta ? <TempleRow key={t.id} temple={t} meta={meta} /> : <TempleRowPlain key={t.id} temple={t} />
+          )}
         </section>
       )}
     </div>
