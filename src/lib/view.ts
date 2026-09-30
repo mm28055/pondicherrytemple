@@ -28,6 +28,13 @@ export function templesOf(regionName: string) {
     : `The temples of ${regionName}`;
 }
 
+/** A temple's name without "Koil", "Thirukoil" or "Devasthanam", for short
+    labels such as the Films page's filters: "Vedapuriswara Koil" → "Vedapuriswara". */
+export function shortTempleName(t: Temple) {
+  const full = t.knownAs ?? t.name;
+  return full.replace(/\s*\b(thiru)?koil\b|\s*\bdevasthanam\b/gi, "").replace(/\s+/g, " ").trim() || full;
+}
+
 function excerpt(text: string, max = 180) {
   return text.length > max ? text.slice(0, max).replace(/\s+\S*$/, "") + "…" : text;
 }
