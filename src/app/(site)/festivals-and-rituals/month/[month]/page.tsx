@@ -155,6 +155,7 @@ async function MonthSection({ title, entries }: { title: string; entries: MonthE
                 </span>
                 <span className="obs-name">{o.name}</span>
                 <span className="obs-gloss">{o.gloss}</span>
+                <span className="month-obs-more">About {o.name}</span>
               </Link>
               {seen.length > 0 ? (
                 <ul className="month-seen">
@@ -163,6 +164,8 @@ async function MonthSection({ title, entries }: { title: string; entries: MonthE
                       const t = await getTemple(s.region, s.temple);
                       const d = dateParts(s.date);
                       const place = t ? (t.knownAs ?? t.name) : "";
+                      // the day's other festivals and rituals (this one is the heading)
+                      const also = await getObservancesById(s.observances.filter((id) => id !== o.id));
                       return (
                         <li key={s.date + s.temple + s.label}>
                           <time dateTime={s.date}>
@@ -170,6 +173,16 @@ async function MonthSection({ title, entries }: { title: string; entries: MonthE
                           </time>
                           {t && hasPage(t) ? <Link href={`/${t.region}/${t.id}`}>{place}</Link> : place}
                           {s.label && <span className="month-seen-label"> · {s.label}</span>}
+                          {also.map((x) => (
+                            <Link key={x.id} className="month-seen-tag" href={`/festivals-and-rituals/${x.id}`}>
+                              {x.name}
+                            </Link>
+                          ))}
+                          {s.note && (
+                            <Link className="cal-read short arrow-link" href={`/field-notes/${s.note}`}>
+                              Note
+                            </Link>
+                          )}
                         </li>
                       );
                     }),

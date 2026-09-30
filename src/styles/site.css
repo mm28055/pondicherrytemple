@@ -1411,6 +1411,37 @@ a.temple-row:hover .temple-name { color: var(--ochre); }
 .month-seen a { border-bottom: 1px solid var(--rule); }
 .month-seen a:hover { color: var(--ochre); border-bottom-color: var(--ochre); }
 .month-seen-label { color: var(--ink-2); }
+.month-seen-tag,
+.month-seen .cal-read { margin-left: 8px; vertical-align: 1px; }
+.month-seen-tag {
+  display: inline-block;
+  font-family: var(--display);
+  font-weight: 600;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  line-height: 1.2;
+  padding: 2px 6px;
+  color: var(--m);
+  border: 1px solid color-mix(in srgb, var(--m) 45%, transparent);
+  background: #fff;
+  border-bottom-color: color-mix(in srgb, var(--m) 45%, transparent) !important;
+}
+.month-seen-tag:hover { background: var(--m); color: #fff !important; }
+.month-seen .cal-read { margin-top: 0; border-bottom: 1.5px solid var(--m); }
+.month-obs-more {
+  margin-top: 8px;
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 12.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  align-self: flex-start;
+  border-bottom: 2px solid var(--m);
+  padding-bottom: 2px;
+}
+.month-obs-more::after { content: " →"; }
+.month-obs:hover .month-obs-more { color: var(--m); }
 .month-unseen { font-style: italic; color: var(--muted); font-size: 16px; align-self: center; }
 .month-link { border-bottom: 1px solid var(--rule); }
 .month-link:hover { color: var(--ochre); }
