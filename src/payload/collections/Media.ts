@@ -47,6 +47,17 @@ export const Media: CollectionConfig = {
     { name: 'caption', type: 'text' },
     { name: 'credit', type: 'text', admin: { placeholder: 'e.g. Photograph: Arunaditya' } },
     {
+      name: 'takenOn',
+      type: 'date',
+      label: 'Taken on',
+      admin: {
+        condition: (data) => !data?.mimeType || Boolean(data.mimeType.startsWith('image/')),
+        date: { pickerAppearance: 'dayOnly', displayFormat: 'd MMMM yyyy' },
+        description:
+          'Optional. The day the photo was taken, so it is grouped under the right year. Photos in a field note take the note’s date.',
+      },
+    },
+    {
       name: 'poster',
       type: 'upload',
       relationTo: 'media',
@@ -55,6 +66,18 @@ export const Media: CollectionConfig = {
       admin: {
         condition: (data) => Boolean(data?.mimeType?.startsWith('video/')),
         description: 'The picture shown before the video plays. Optional.',
+      },
+    },
+    {
+      name: 'featured',
+      type: 'checkbox',
+      label: 'Show first',
+      defaultValue: false,
+      admin: {
+        position: 'sidebar',
+        condition: (data) => !data?.mimeType || Boolean(data.mimeType.startsWith('image/')),
+        description:
+          'Put this photo first in the Photographs section of its temples and festivals. The very first is shown large.',
       },
     },
     {

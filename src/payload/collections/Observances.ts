@@ -112,7 +112,7 @@ export const Observances: CollectionConfig = {
               where: { mimeType: { contains: 'image' } },
               defaultSort: '-createdAt',
               defaultLimit: 50,
-              admin: { defaultColumns: ['filename', 'caption', 'temples', 'consent'] },
+              admin: { defaultColumns: ['filename', 'caption', 'temples', 'featured', 'consent'] },
             },
           ],
         },

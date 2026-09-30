@@ -97,7 +97,7 @@ export default async function TemplePage({ params }: Props) {
           {photos.length > 0 && (
             <section>
               <h2 className="sub-head">Photographs</h2>
-              <PhotoWall photos={photos} />
+              <PhotoWall photos={photos} layout="lead" seeAll={`/${region.id}/${t.id}/photographs`} />
             </section>
           )}
 

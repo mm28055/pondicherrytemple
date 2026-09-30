@@ -425,6 +425,8 @@ const photos = cache(async () => {
       if (id !== undefined) notesWith.set(id, [...(notesWith.get(id) ?? []), n]);
     }
   }
+  const templeByKey = new Map((await temples()).map((t) => [`${t.region}/${t.id}`, t]));
+  const observanceById = new Map((await observances()).map((o) => [o.id, o]));
   const out: Photo[] = [];
   for (const m of await rawPhotos()) {
     const picture = toPicture(m);
@@ -438,14 +440,28 @@ const photos = cache(async () => {
     }
     if (!temples.size && !observances.size) continue;
     const note = notes[0];
+    const taken = m.takenOn ?? note?.date;
     out.push({
       ...picture,
       id: String(m.id),
-      thumb: m.sizes?.card?.url ?? picture.src,
+      small: m.sizes?.thumbnail?.url ?? picture.src,
+      medium: m.sizes?.card?.url ?? picture.src,
       focus: [m.focalX ?? 50, m.focalY ?? 50],
       temples: [...temples],
       observances: [...observances],
-      date: dayOf(note?.date ?? m.createdAt),
+      tags: [
+        ...[...temples].flatMap((key) => {
+          const t = templeByKey.get(key);
+          return t ? [{ label: t.knownAs ?? t.name, href: hasPage(t) ? `/${t.region}/${t.id}` : undefined }] : [];
+        }),
+        ...[...observances].flatMap((id) => {
+          const o = observanceById.get(id);
+          return o ? [{ label: o.name, href: `/festivals-and-rituals/${o.id}` }] : [];
+        }),
+      ],
+      date: dayOf(taken ?? m.createdAt),
+      dated: Boolean(taken),
+      featured: Boolean(m.featured),
       note: note ? { href: `/field-notes/${note.slug}`, title: note.title } : undefined,
     });
   }

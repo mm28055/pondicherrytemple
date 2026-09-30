@@ -173,16 +173,24 @@ export interface Picture {
     because it is in a field note that is. */
 export interface Photo extends Picture {
   id: string;
-  /** A smaller copy, for the grid. */
-  thumb: string;
+  /** Smaller copies: `small` (480 px) for the grid, `medium` (960 px) for
+      the large lead photo. */
+  small: string;
+  medium: string;
   /** Where the photo's subject sits, in % — the grid crops around it. */
   focus: [number, number];
   /** "region/temple" */
   temples: string[];
   observances: string[];
-  /** The field note's date; for a photo on its own, when it was uploaded
-      (used only to order them, not shown). */
+  /** The temples and festivals it belongs to, named, for under the photo. */
+  tags: { label: string; href?: string }[];
+  /** The day it was taken: its "Taken on" date, or its field note's date;
+      failing both, the day it was uploaded. */
   date: string;
+  /** False when `date` is only the upload day — then it is not shown. */
+  dated: boolean;
+  /** Ticked "Show first" in the admin: leads the Photographs section. */
+  featured: boolean;
   /** The newest field note it appears in. */
   note?: { href: string; title: string };
 }

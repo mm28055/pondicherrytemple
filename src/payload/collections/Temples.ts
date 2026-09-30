@@ -153,7 +153,7 @@ export const Temples: CollectionConfig = {
               where: { mimeType: { contains: 'image' } },
               defaultSort: '-createdAt',
               defaultLimit: 50,
-              admin: { defaultColumns: ['filename', 'caption', 'observances', 'consent'] },
+              admin: { defaultColumns: ['filename', 'caption', 'observances', 'featured', 'consent'] },
             },
           ],
         },

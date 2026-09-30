@@ -1083,10 +1083,25 @@ a.temple-row:hover .temple-name { color: var(--ochre); }
 /* Photographs on temple and festival pages: square crops, opened whole */
 .photo-wall {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
   gap: 6px;
   padding-top: 24px;
 }
+/* one large, five small: the large one fills two columns and two rows */
+.photo-wall.lead { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.photo-tile.big { grid-column: span 2; grid-row: span 2; }
+.photo-all { display: inline-block; margin-top: 18px; }
+.photo-year {
+  font-family: var(--display);
+  font-weight: 800;
+  font-variation-settings: "wdth" 75;
+  font-size: 22px;
+  letter-spacing: 0.02em;
+  border-bottom: 1px solid var(--rule);
+  padding-bottom: 6px;
+  margin-top: 36px;
+}
+.photo-year:first-child { margin-top: 8px; }
 @media (max-width: 560px) {
   .photo-wall { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; padding-top: 18px; }
 }
@@ -1125,6 +1140,9 @@ a.temple-row:hover .temple-name { color: var(--ochre); }
 .photo-viewer-inner .caps { color: var(--on-night-dim); }
 .photo-viewer-caption { font-size: 17px; }
 .photo-viewer-credit { font-style: italic; color: var(--on-night-dim); font-size: 15px; }
+.photo-viewer-tags { font-size: 15px; color: var(--on-night-dim); }
+.photo-viewer-tags a { color: var(--on-night); border-bottom: 1px solid var(--on-night-dim); }
+.photo-viewer-tags a:hover { color: var(--lamp); border-bottom-color: var(--lamp); }
 @media (max-width: 860px) {
   .photo-viewer-inner { padding: 64px 12px 24px; }
   .photo-viewer-inner img { max-height: calc(100dvh - 200px); }

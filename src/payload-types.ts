@@ -399,9 +399,17 @@ export interface Media {
   caption?: string | null;
   credit?: string | null;
   /**
+   * Optional. The day the photo was taken, so it is grouped under the right year. Photos in a field note take the note’s date.
+   */
+  takenOn?: string | null;
+  /**
    * The picture shown before the video plays. Optional.
    */
   poster?: (number | null) | Media;
+  /**
+   * Put this photo first in the Photographs section of its temples and festivals. The very first is shown large.
+   */
+  featured?: boolean | null;
   /**
    * Photos, videos and recordings of people need their consent.
    */
@@ -1043,7 +1051,9 @@ export interface MediaSelect<T extends boolean = true> {
   alt?: T;
   caption?: T;
   credit?: T;
+  takenOn?: T;
   poster?: T;
+  featured?: T;
   consent?: T;
   temples?: T;
   observances?: T;

@@ -6,6 +6,7 @@ import * as migration_20260925_150957_headline_italic from './20260925_150957_he
 import * as migration_20260926_041707_section_intros from './20260926_041707_section_intros';
 import * as migration_20260928_105405_photo_festival_tags from './20260928_105405_photo_festival_tags';
 import * as migration_20260928_110504_festival_months from './20260928_110504_festival_months';
+import * as migration_20260930_102837_photo_show_first_taken_on from './20260930_102837_photo_show_first_taken_on';
 
 export const migrations = [
   {
@@ -46,6 +47,11 @@ export const migrations = [
   {
     up: migration_20260928_110504_festival_months.up,
     down: migration_20260928_110504_festival_months.down,
-    name: '20260928_110504_festival_months'
+    name: '20260928_110504_festival_months',
+  },
+  {
+    up: migration_20260930_102837_photo_show_first_taken_on.up,
+    down: migration_20260930_102837_photo_show_first_taken_on.down,
+    name: '20260930_102837_photo_show_first_taken_on'
   },
 ];

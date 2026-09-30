@@ -147,7 +147,7 @@ export default async function ObservancePage({ params }: Props) {
             {photos.length > 0 && (
               <section>
                 <h2 className="sub-head">Photographs</h2>
-                <PhotoWall photos={photos} />
+                <PhotoWall photos={photos} layout="lead" seeAll={`/festivals-and-rituals/${o.id}/photographs`} />
               </section>
             )}
 
