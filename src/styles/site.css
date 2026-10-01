@@ -259,6 +259,114 @@ a:focus-visible, button:focus-visible {
 
 .temple-facts { margin-top: 18px; display: flex; flex-wrap: wrap; gap: 6px 18px; }
 
+/* The new temple-page header: the same two columns as the page below, so the
+   drawing's red rule stands over the right-hand column. "Temple Layout" lines
+   up with "← The temples of …", and the drawing, turned on its side, fills the
+   rest of the title block's height. Less space above it than other pages. */
+.temple-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+  column-gap: clamp(36px, 5vw, 80px);
+  align-items: stretch;
+  padding-top: clamp(20px, 3.5vw, 44px);
+}
+.temple-head .crumb { display: table; } /* flush with the top of the header */
+
+/* The temple's plan: turned on its side in the wall-stripe frame, on a
+   lime-white mount, hanging from the top of the header over the line below it
+   like a pinned card. The right-hand column starts lower to make room. */
+/* The card hangs the same distance below the line whatever the length of the
+   temple's name: its foot is --layout-hang below the bottom of the title block
+   (the line is the header's bottom padding below that). */
+.temple-head, .temple-body { --layout-hang: clamp(110px, 10vw, 160px); }
+.temple-head-drawing { display: flex; justify-content: flex-end; align-items: flex-end; }
+.layout-card {
+  position: relative;
+  z-index: 2;
+  margin: 0 0 calc(-1 * var(--layout-hang));
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+}
+.layout-frame {
+  display: block;
+  padding: 6px;
+  border: 0;
+  cursor: zoom-in;
+  background: repeating-linear-gradient(90deg, var(--ochre) 0 10px, var(--chalk) 10px 20px);
+  box-shadow: 0 12px 30px rgba(25, 21, 18, 0.16);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.layout-frame:hover { transform: translateY(-3px); box-shadow: 0 16px 34px rgba(25, 21, 18, 0.22); }
+.layout-mount { display: block; padding: 10px; background: var(--chalk-2); }
+.layout-turned { position: relative; display: block; overflow: hidden; height: clamp(190px, 18vw, 280px); }
+.layout-turned img {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  max-width: none;
+  height: auto;
+  transform: translate(-50%, -50%) rotate(-90deg);
+}
+.layout-turned.upright img { position: static; width: 100%; transform: none; }
+.layout-card .kicker { margin: 0; }
+/* The right-hand column starts 30px below the card's foot: the card hangs
+   (--layout-hang − the header's bottom padding) below the line, and the
+   columns already start (two-col's top padding) below it. */
+.below-layout > aside {
+  padding-top: max(0px, calc(var(--layout-hang) - clamp(28px, 4vw, 48px) - clamp(40px, 5vw, 64px) + 30px));
+}
+
+/* The full plan, upright, over the page */
+.layout-dialog { margin: auto; border: 0; padding: 20px 20px 14px; background: var(--chalk); max-width: 92vw; max-height: 94vh; }
+.layout-dialog::backdrop { background: rgba(22, 17, 14, 0.78); }
+.layout-dialog img { display: block; max-width: 100%; max-height: calc(94vh - 90px); width: auto; height: auto; }
+.layout-dialog-caption { margin-top: 10px; font-size: 16px; }
+.layout-close {
+  position: absolute;
+  top: 4px;
+  right: 8px;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  font-size: 30px;
+  line-height: 1;
+  color: var(--ink);
+}
+
+/* A temple's "The Temple and its Stories" page */
+/* Its header, tighter than other pages: the title with the temple's name
+   centred beneath it. */
+.stories-head { padding-block: clamp(18px, 3vw, 36px) clamp(16px, 2.5vw, 28px); }
+.stories-head .crumb { display: table; }
+.stories-title { display: table; margin-top: 10px; }
+.stories-title .kicker { margin: 10px 0 0; text-align: center; }
+/* One list, newest first: the date at the left as on field notes; the
+   section in small red letters over each title. */
+.temple-stories { padding-block: clamp(8px, 2vw, 24px) clamp(40px, 5vw, 64px); }
+.story-row {
+  display: grid;
+  grid-template-columns: 110px minmax(0, 1fr) minmax(180px, 300px);
+  gap: 28px;
+  padding-block: 26px;
+  border-bottom: 1px solid var(--rule);
+}
+.story-row .kicker { margin: 0 0 6px; }
+.story-title { font-weight: 600; font-size: clamp(22px, 2.2vw, 28px); line-height: 1.2; margin-bottom: 12px; }
+/* Its picture at the right, or a placeholder until one is chosen in the admin */
+.story-picture { margin: 0; }
+.story-picture img { display: block; width: 100%; height: auto; }
+.story-picture figcaption { font-size: 15px; color: var(--ink-2); margin-top: 8px; }
+.story-picture.empty {
+  aspect-ratio: 4 / 3;
+  display: grid;
+  place-items: center;
+  background: var(--chalk-2);
+  border: 1px dashed var(--rule);
+}
+.story-picture.empty .caps { color: var(--muted); font-size: 11px; }
+
 /* ---------- Sections ---------- */
 .section { padding-block: clamp(48px, 7vw, 96px); }
 .section.tight { padding-top: 0; }
@@ -665,6 +773,8 @@ a.temple-row:hover .temple-name { color: var(--ochre); }
 .prose p.caps { font-size: 13px; line-height: 1.6; margin-top: 1.6em; }
 
 .stack > * + * { margin-top: clamp(40px, 5vw, 60px); }
+/* The new temple-page design: half the space between sections, in both columns */
+.temple-body .stack > * + * { margin-top: clamp(20px, 2.5vw, 30px); }
 
 /* On wide screens the side column stays in view while the main column
    scrolls. Its heading stays put; a list too long for the screen scrolls
@@ -997,6 +1107,13 @@ a.temple-row:hover .temple-name { color: var(--ochre); }
 .video-tile:hover .play { background: var(--ochre); }
 .video-tile:hover .play::after { border-left-color: var(--chalk); }
 .video-title { font-weight: 600; font-size: 19px; line-height: 1.25; }
+/* A temple page's Films: three to a row (two on a phone), smaller type to suit */
+.temple-body .video-wall { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px 16px; }
+.temple-body .video-title { font-size: 16.5px; }
+.temple-body .video-where { font-size: 14px; }
+@media (max-width: 560px) {
+  .temple-body .video-wall { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px 12px; }
+}
 .video-tile:hover .video-title { color: var(--ochre); }
 .video-where { font-size: 15.5px; color: var(--muted); font-style: italic; }
 
@@ -1268,14 +1385,23 @@ a.temple-row:hover .temple-name { color: var(--ochre); }
 
 /* ---------- Narrow screens ---------- */
 @media (max-width: 900px) {
-  .home-hero, .home-opening, .split, .two-col, .about-block { grid-template-columns: minmax(0, 1fr); }
+  .home-hero, .home-opening, .split, .two-col, .about-block, .temple-head { grid-template-columns: minmax(0, 1fr); }
+  .temple-head { row-gap: 28px; }
+  .story-row { grid-template-columns: 110px minmax(0, 1fr); }
+  .story-row .story-picture { grid-column: 2; max-width: 420px; }
+  .temple-head-drawing { position: static; }
+  .layout-card { position: static; align-items: flex-start; margin-bottom: 0; }
+  .temple-head-drawing { justify-content: flex-start; }
+  .layout-turned { height: auto; width: min(calc(100vw - 2 * var(--gutter) - 32px), 360px); } /* 32px: the frame and mount */
+  .below-layout > aside { padding-top: 0; }
   .footer-inner { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
   .footer-inner > :first-child { grid-column: 1 / -1; }
 }
 
 @media (max-width: 640px) {
   body { font-size: 17px; }
-  .note-row { grid-template-columns: minmax(0, 1fr); gap: 10px; padding-block: 22px; }
+  .note-row, .story-row { grid-template-columns: minmax(0, 1fr); gap: 10px; padding-block: 22px; }
+  .story-row .story-picture { grid-column: auto; }
   .date-stamp { display: flex; align-items: baseline; gap: 10px; }
   .date-stamp .d { font-size: 40px; }
   .date-stamp .m { margin-top: 0; }
@@ -1709,3 +1835,5 @@ a.temple-row:hover .temple-name { color: var(--ochre); }
   .cal-evs { display: none; }
   .cal-moon .dot { width: 9px; height: 9px; }
 }
+
+

@@ -12,20 +12,19 @@ import {
   getRegion,
   getRegions,
   getTemple,
-  getTempleEntries,
+  getTempleStories,
   getTemples,
   getTemplesWithPages,
   hasPage,
 } from "@/lib/data";
 import { Html } from "@/components/Prose";
-import { DEITY_GROUP_LABELS } from "@/content/labels";
 import { articleRow, filmTile, noteRow, templesOf } from "@/lib/view";
-import { Drawings, drawingsInColumn } from "@/components/Drawings";
-import { Entries } from "@/components/Entries";
+import { Drawings } from "@/components/Drawings";
 import { FilmWall } from "@/components/FilmWall";
 import { PhotoWall } from "@/components/PhotoWall";
 import { NoteRow } from "@/components/Rows";
 import { YearSoFar } from "@/components/YearSoFar";
+import { TempleLayout } from "@/components/TempleLayout";
 
 type Props = { params: Promise<{ region: string; temple: string }> };
 
@@ -45,6 +44,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return t ? { title: t.knownAs ?? t.name, description: t.introText } : {};
 }
 
+/* A temple's page. The header: the name, and the temple's plan as a card at
+   the right that hangs over the line below. Then two columns: on the left the
+   introduction, a link to "The Temple and its Stories", field notes, photographs, films and articles;
+   on the right the festivals and rituals seen here and the ritual year,
+   newest first. (First designed on the Chetty Koil page, October 2026.) */
 export default async function TemplePage({ params }: Props) {
   const { region: regionId, temple: templeId } = await params;
   const region = await getRegion(regionId);
@@ -61,36 +65,48 @@ export default async function TemplePage({ params }: Props) {
   const films = (await getFilmsForTemple(region.id, t.id)).map((f) => filmTile(f, allTemples));
   const drawings = await getIllustrationsForTemple(region.id, t.id);
   const photos = await getPhotosForTemple(region.id, t.id);
-  const inColumn = drawingsInColumn(drawings);
-  const aboutPlace = await getTempleEntries(region.id, t.id, "temple");
-  const aboutPeople = await getTempleEntries(region.id, t.id, "people");
+  // Its histories, the place, its people, its stories and songs: on a page of their own.
+  const hasStories = (await getTempleStories(region.id, t.id)).length > 0;
+  const [plan, ...otherDrawings] = drawings;
 
   return (
     <div className="wrap">
-      <header className="page-head">
-        <Link className="crumb" href={`/${region.id}`}>
-          ← {templesOf(region.name)}
-        </Link>
-        <h1 className="temple-title">{t.knownAs ?? t.name}</h1>
-        <div className="temple-facts caps">
-          {t.knownAs && <span>{t.name}</span>}
-          <span>{DEITY_GROUP_LABELS[t.group]}</span>
-          {t.street && <span>{t.street}</span>}
+      <header className="page-head temple-head">
+        <div>
+          <Link className="crumb" href={`/${region.id}`}>
+            ← {templesOf(region.name)}
+          </Link>
+          <h1 className="temple-title">{t.knownAs ?? t.name}</h1>
+          <div className="temple-facts caps">
+            {t.knownAs && <span>{t.name}</span>}
+            {t.street && <span>{t.street}</span>}
+          </div>
         </div>
+        {/* The temple's plan, turned on its side, hanging over the line below
+            the header at the right of the right-hand column. */}
+        {plan && (
+          <div className="temple-head-drawing">
+            <TempleLayout d={plan} />
+          </div>
+        )}
       </header>
 
-      {!inColumn && <Drawings items={drawings} />}
-
-      <div className="two-col">
+      <div className={plan ? "two-col temple-body below-layout" : "two-col temple-body"}>
         <div className="stack">
-          {inColumn && <Drawings items={drawings} />}
-
           <Html className="prose" html={t.intro} />
 
-          {films.length > 0 && (
+          {hasStories && (
+            <Link className="arrow-link" href={`/${region.id}/${t.id}/temple-and-its-stories`}>
+              Explore the temple&apos;s history and stories
+            </Link>
+          )}
+
+          {notes.length > 0 && (
             <section>
-              <h2 className="sub-head">Films</h2>
-              <FilmWall tiles={films} />
+              <h2 className="sub-head">Field notes</h2>
+              {notes.map((r) => (
+                <NoteRow key={r.id} row={r} />
+              ))}
             </section>
           )}
 
@@ -101,8 +117,26 @@ export default async function TemplePage({ params }: Props) {
             </section>
           )}
 
-          {aboutPlace.length > 0 && <Entries title="The temple" entries={aboutPlace} />}
-          {aboutPeople.length > 0 && <Entries title="The people" entries={aboutPeople} />}
+          {films.length > 0 && (
+            <section>
+              <h2 className="sub-head">Films</h2>
+              <FilmWall tiles={films} />
+            </section>
+          )}
+
+          {articles.length > 0 && (
+            <section>
+              <h2 className="sub-head">Articles</h2>
+              {articles.map((r) => (
+                <NoteRow key={r.id} row={r} />
+              ))}
+            </section>
+          )}
+        </div>
+
+        {/* A column that scrolls with the page. */}
+        <aside className="stack">
+          {otherDrawings.length > 0 && <Drawings items={otherDrawings} />}
 
           {observances.length > 0 && (
             <section>
@@ -120,34 +154,14 @@ export default async function TemplePage({ params }: Props) {
             </section>
           )}
 
-          {notes.length > 0 && (
-            <section>
-              <h2 className="sub-head">Field notes</h2>
-              {notes.map((r) => (
-                <NoteRow key={r.id} row={r} />
-              ))}
-            </section>
-          )}
-
-          {articles.length > 0 && (
-            <section>
-              <h2 className="sub-head">Articles</h2>
-              {articles.map((r) => (
-                <NoteRow key={r.id} row={r} />
-              ))}
-            </section>
-          )}
-        </div>
-
-        <aside className="side-sticky">
-          <h2 className="sub-head">The year so far</h2>
-          <p className="note-line" style={{ marginBottom: 18 }}>
-            What we have been present for, month by month. By the end of the year, this is the
-            temple&apos;s ritual calendar.
-          </p>
-          <div className="side-scroll">
-            <YearSoFar occasions={occasions} calendar={region.calendar} />
-          </div>
+          <section>
+            <h2 className="sub-head">The Ritual Year</h2>
+            <p className="note-line" style={{ marginBottom: 18 }}>
+              What we have been present for, month by month. By the end of the year, this is the
+              temple&apos;s ritual calendar.
+            </p>
+            <YearSoFar occasions={occasions} calendar={region.calendar} newestFirst />
+          </section>
         </aside>
       </div>
     </div>

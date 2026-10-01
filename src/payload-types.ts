@@ -322,7 +322,7 @@ export interface Temple {
   _status?: ('draft' | 'published') | null;
 }
 /**
- * Short finished pieces for the "The temple" and "The people" sections of temple pages, polished from the field notes.
+ * Short finished pieces, polished from the field notes, for each temple's "The Temple and its Stories" page: its histories, the place itself, its people, and its stories and songs.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "temple-pieces".
@@ -333,11 +333,15 @@ export interface TemplePiece {
    * For people, their role: "The Bhattars", "The vahana keeper".
    */
   title: string;
-  topic: 'temple' | 'people';
+  topic: 'temple' | 'people' | 'history' | 'stories';
   /**
    * It appears on the page of every temple chosen here.
    */
   temples?: (number | Temple)[] | null;
+  /**
+   * Shown beside the title. The page lists the newest first.
+   */
+  date?: string | null;
   body: {
     root: {
       type: string;
@@ -1145,6 +1149,7 @@ export interface TemplePiecesSelect<T extends boolean = true> {
   title?: T;
   topic?: T;
   temples?: T;
+  date?: T;
   body?: T;
   picture?: T;
   named?:

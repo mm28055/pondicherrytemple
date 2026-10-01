@@ -13,6 +13,8 @@ const nextConfig: NextConfig = {
       // While Pondicherry is the only region, /temples means its temples.
       // When a second region exists, /temples becomes the list of regions.
       { source: "/temples", destination: "/pondicherry", permanent: false },
+      // A temple's History page became "The Temple and its Stories" (October 2026).
+      { source: "/:region/:temple/history", destination: "/:region/:temple/temple-and-its-stories", permanent: true },
     ];
   },
 

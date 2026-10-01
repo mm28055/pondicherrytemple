@@ -357,6 +357,7 @@ const toTempleEntry = (e: P.TemplePiece, L: Lookups): TempleEntry => ({
   title: e.title,
   // A name is shown only when consent has been recorded with it.
   named: e.named?.name && e.named.consent ? { name: e.named.name } : undefined,
+  date: dayOf(e.date ?? e.createdAt),
   body: toHTML(e.body, L.paths),
   picture: toPicture(e.picture),
 });
@@ -646,6 +647,14 @@ export async function getTempleEntries(
   return (await templeEntries()).filter(
     (e) => e.region === regionId && e.topic === topic && e.temples.includes(templeId)
   );
+}
+
+/** Everything on a temple's "The Temple and its Stories" page — its
+    histories, the place, its people, its stories and songs — newest first. */
+export async function getTempleStories(regionId: string, templeId: string): Promise<TempleEntry[]> {
+  return (await templeEntries())
+    .filter((e) => e.region === regionId && e.temples.includes(templeId))
+    .sort(byDateDesc);
 }
 
 /* ---------- Articles ---------- */

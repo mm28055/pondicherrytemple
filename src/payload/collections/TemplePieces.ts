@@ -13,7 +13,7 @@ export const TemplePieces: CollectionConfig = {
     useAsTitle: 'title',
     defaultColumns: ['title', 'topic', 'temples', '_status'],
     description:
-      'Short finished pieces for the "The temple" and "The people" sections of temple pages, polished from the field notes.',
+      'Short finished pieces, polished from the field notes, for each temple\'s "The Temple and its Stories" page: its histories, the place itself, its people, and its stories and songs.',
     preview: previewURL('temple-pieces'),
     components: draftButtons,
   },
@@ -42,14 +42,33 @@ export const TemplePieces: CollectionConfig = {
           defaultValue: 'temple',
           label: 'Section',
           options: [
-            { label: 'The temple — the place itself', value: 'temple' },
+            { label: 'The place', value: 'temple' },
             { label: 'The people', value: 'people' },
+            { label: 'History', value: 'history' },
+            { label: 'Stories and Songs', value: 'stories' },
           ],
           admin: { width: '40%' },
         },
       ],
     },
-    templesField({ description: 'It appears on the page of every temple chosen here.' }),
+    {
+      type: 'row',
+      fields: [
+        templesField({ width: '65%', description: 'It appears on the page of every temple chosen here.' }),
+        {
+          name: 'date',
+          type: 'date',
+          label: 'Date',
+          // A new piece starts with today; change it if it should carry another date.
+          defaultValue: () => new Date().toISOString(),
+          admin: {
+            width: '35%',
+            date: { pickerAppearance: 'dayOnly', displayFormat: 'd MMMM yyyy' },
+            description: 'Shown beside the title. The page lists the newest first.',
+          },
+        },
+      ],
+    },
     { name: 'body', type: 'richText', editor: fullEditor, label: 'Text', required: true },
     {
       name: 'picture',

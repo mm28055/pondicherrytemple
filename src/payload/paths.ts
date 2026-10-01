@@ -31,7 +31,8 @@ export async function pathFor(payload: Payload, collection: string, id: string):
     case 'drawings':
     case 'temple-pieces': {
       const temple = first('temples')
-      if (temple) return `/${region}/${temple}`
+      // A temple piece lives on the temple's "The Temple and its Stories" page.
+      if (temple) return `/${region}/${temple}${collection === 'temple-pieces' ? '/temple-and-its-stories' : ''}`
       const observance = first('observances')
       return observance ? `/festivals-and-rituals/${observance}` : '/'
     }

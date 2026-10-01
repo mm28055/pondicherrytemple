@@ -218,10 +218,10 @@ export interface Illustration extends Picture {
   observances: string[];
 }
 
-/** The two sections a temple page can carry beyond its introduction:
-    "The temple" (the place itself: shrines and images, the building, the
-    tank, its stories) and "The people" (who keeps it going). */
-export type EntryTopic = "temple" | "people";
+/** The sections of a temple's "The Temple and its Stories" page: "History",
+    "The place" (shrines and images, the building, the tank — stored as
+    "temple"), "The people" (who keeps it going) and "Stories and Songs". */
+export type EntryTopic = "temple" | "people" | "history" | "stories";
 
 export interface TempleEntry {
   id: string;
@@ -233,6 +233,8 @@ export interface TempleEntry {
   title: string;
   /** Only for someone who has agreed to be named. */
   named?: { name: string };
+  /** ISO date: its date in the admin, or the day it was added. */
+  date: string;
   body: string; // HTML
   picture?: Picture;
 }

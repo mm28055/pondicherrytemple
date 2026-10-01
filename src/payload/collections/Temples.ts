@@ -94,7 +94,7 @@ export const Temples: CollectionConfig = {
         {
           label: 'The temple & its people',
           description:
-            'The pieces under "The temple" and "The people" on this temple’s page. Click one to edit it; "Add new" makes one already tagged with this temple.',
+            'The pieces on this temple’s "The Temple and its Stories" page: History, The place, The people, Stories and Songs. Click one to edit it; "Add new" makes one already tagged with this temple.',
           fields: [
             {
               name: 'pieces',

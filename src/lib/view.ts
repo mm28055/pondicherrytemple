@@ -29,10 +29,11 @@ export function templesOf(regionName: string) {
 }
 
 /** A temple's name without "Koil", "Thirukoil" or "Devasthanam", for short
-    labels such as the Films page's filters: "Vedapuriswara Koil" → "Vedapuriswara". */
+    labels such as the Films page's filters: "Vedapuriswara Koil" → "Vedapuriswara".
+    A "Known as" name ("Chetty Koil") is how the town says it, so it stays whole. */
 export function shortTempleName(t: Temple) {
-  const full = t.knownAs ?? t.name;
-  return full.replace(/\s*\b(thiru)?koil\b|\s*\bdevasthanam\b/gi, "").replace(/\s+/g, " ").trim() || full;
+  if (t.knownAs) return t.knownAs;
+  return t.name.replace(/\s*\b(thiru)?koil\b|\s*\bdevasthanam\b/gi, "").replace(/\s+/g, " ").trim() || t.name;
 }
 
 function excerpt(text: string, max = 180) {
