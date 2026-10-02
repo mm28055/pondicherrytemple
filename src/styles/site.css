@@ -637,6 +637,9 @@ a.temple-row:hover .temple-name { color: var(--ochre); }
 .today-link { display: block; width: 100%; padding: 0; border: 0; background: none; font: inherit; color: inherit; text-align: left; cursor: pointer; }
 .today-link > span { display: block; }
 .today-link.is-plain { cursor: default; }
+/* "Full calendar", as "All field notes" beside it */
+.today-more { display: inline-block; margin-top: 14px; border-bottom: none; padding-bottom: 0; color: var(--ochre); font-size: 14px; }
+.today-more:hover { color: var(--ochre-deep); }
 button.today-link:hover .today-tamil,
 button.today-link:focus-visible .today-tamil { color: var(--ochre); }
 
@@ -1987,3 +1990,7 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
 
 
 
+
+/* Arriving from the home page's "Full calendar": the chart just under the
+   menu bar on a laptop; lower, with its heading in view, on a taller screen */
+.calendar-anchor { scroll-margin-top: max(92px, calc(100svh - 660px)); }

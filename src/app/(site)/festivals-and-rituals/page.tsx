@@ -48,7 +48,10 @@ export default async function ObservancesPage() {
         <div className="section-head">
           <h2>By month</h2>
         </div>
-        <RitualYear months={year.months} throughYear={year.throughYear} now={tamilMonthOf(today)} />
+        {/* the home page's "Full calendar" opens here, the chart filling the screen */}
+        <div id="calendar" className="calendar-anchor">
+          <RitualYear months={year.months} throughYear={year.throughYear} now={tamilMonthOf(today)} />
+        </div>
       </section>
 
       <section className="section">

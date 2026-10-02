@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { DayDialog, type CalendarEvent } from "@/components/MonthCalendar";
 import { tamilDate, todayInIndia, type TamilDate } from "@/lib/tamilDate";
@@ -75,6 +76,12 @@ export function TodayTamil({ events }: { events: CalendarEvent[] }) {
         ) : (
           <div className="today-link is-plain">{words}</div>
         ))}
+      {/* the year's calendar, scrolled to, on the Festivals & rituals page */}
+      {today && (
+        <Link className="arrow-link today-more" href="/festivals-and-rituals#calendar">
+          Full calendar
+        </Link>
+      )}
     </aside>
   );
 }
