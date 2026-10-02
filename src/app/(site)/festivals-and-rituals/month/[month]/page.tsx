@@ -80,7 +80,7 @@ export default async function MonthPage({ params }: Props) {
           <h1 className="name-title">{month.name}</h1>
           <p className="gloss kicker">{month.span}</p>
         </div>
-        <MonthMotif month={month.slug} className="month-head-motif" />
+        <MonthMotif month={month.slug} className={`month-head-motif month-head-motif-${month.slug}`} />
       </header>
 
       {/* The months either side again, beside the calendar: no need to go back up */}

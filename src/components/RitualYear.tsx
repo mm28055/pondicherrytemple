@@ -29,7 +29,7 @@ export function RitualYear({
           style={{ "--r": m.rasi[0], "--c": m.rasi[1], "--m": m.colour } as CSSProperties}
         >
           {/* the month's drawing, as at the top of its page */}
-          <MonthMotif month={m.slug} className="rasi-motif" />
+          <MonthMotif month={m.slug} className={`rasi-motif rasi-motif-${m.slug}`} />
           <span className="rasi-ta" lang="ta">
             {m.tamil}
           </span>

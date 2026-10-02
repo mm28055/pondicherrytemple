@@ -153,30 +153,50 @@ const prabha = (
   </>
 );
 
-// Aadi: a lamp floating on the river in flood, for Aadi Perukku. The river
-// runs, and the lamp rides it.
-const river = (
-  <>
-    <g className="m-float">
-      <path d="M50 44 C44 36 47 28 50 20 C53 28 56 36 50 44 Z" />
-      <path d="M33 50 L67 50 Q59 60 50 60 Q41 60 33 50 Z" />
+// Aadi: the eyes of the Amman, the month being hers, and her trident between
+// them: tapering brows, the upper lids drawn out to a point, the pottu on the
+// trident's shaft. Pointed at, she blinks and looks about; the pottu glows.
+const ammanEye = (side: -1 | 1) => {
+  const x = (v: number) => 50 + side * v; // measured out from the middle
+  const open = `M${x(6)} 57 Q${x(21)} 46 ${x(37)} 54 Q${x(23)} 66 ${x(6)} 57 Z`;
+  const id = `amman-${side < 0 ? "l" : "r"}`;
+  return (
+    <g key={side}>
+      {/* the brow: thick at its inner end, tapering out and up */}
+      <path className="fill" d={`M${x(5)} 44 C${x(14)} 36 ${x(28)} 32.5 ${x(42)} 32.5 C${x(29)} 35 ${x(16)} 39.5 ${x(6)} 48 Z`} />
+      <clipPath id={`${id}-open`}>
+        <path d={open} />
+      </clipPath>
+      <mask id={`${id}-shine`}>
+        <rect x={0} y={0} width={100} height={100} fill="#fff" stroke="none" />
+        <circle cx={x(19)} cy={54} r={1.5} fill="#000" stroke="none" />
+      </mask>
+      <g className="m-blink">
+        {/* the iris, under the lid, with its glint; it looks about inside the eye */}
+        <g clipPath={`url(#${id}-open)`}>
+          <g className="m-gaze">
+            <circle cx={x(21)} cy={56.5} r={6} className="fill" mask={`url(#${id}-shine)`} />
+          </g>
+        </g>
+        {/* the lower lid, fine; the upper, heavy and drawn out to a point */}
+        <path d={`M${x(6)} 57 Q${x(23)} 66 ${x(37)} 54`} strokeWidth={1.6} />
+        <path className="fill" d={`M${x(5)} 57.5 Q${x(20)} 43 ${x(44)} 47.5 Q${x(38)} 50.5 ${x(37.5)} 54.5 Q${x(21)} 47.5 ${x(6.5)} 58.5 Z`} />
+      </g>
     </g>
-    <path
-      className="m-wave"
-      style={n(0)}
-      d="M8 64 Q18 56 28 64 T48 64 T68 64 T88 64"
-    />
-    <path
-      className="m-wave"
-      style={n(1)}
-      d="M8 76 Q18 68 28 76 T48 76 T68 76 T88 76"
-    />
-    <path
-      className="m-wave"
-      style={n(2)}
-      d="M8 88 Q18 80 28 88 T48 88 T68 88 T88 88"
-    />
-  </>
+  );
+};
+const ammanEyes = (
+  <g transform="translate(0 6)">
+    {ammanEye(-1)}
+    {ammanEye(1)}
+    {/* the trident, its shaft between the eyes, ending a little below them */}
+    <path d="M50 8 L50 30 M43.5 13 Q42 25 50 27 Q58 25 56.5 13 M45.5 30 L54.5 30" strokeWidth={2.2} />
+    <path className="fill" d="M50 5 L52.2 10 L47.8 10 Z M43.5 10 L45.4 14.5 L41.8 14.5 Z M56.5 10 L58.2 14.5 L54.6 14.5 Z" />
+    <path d="M50 30 L50 33 M50 45.5 L50 68" strokeWidth={2.2} />
+    {/* the pottu on it, and a smaller one below */}
+    <circle className="fill m-glow" cx={50} cy={38} r={4.6} />
+    <circle className="fill" cx={50} cy={45} r={1.6} />
+  </g>
 );
 
 // Aavani: the kozhukattai made for Vinayaka Chaturthi
@@ -387,7 +407,7 @@ const MOTIFS: Record<string, { art: ReactNode; label: string }> = {
   chithirai: { art: artemisia, label: "Artemisia" },
   vaikasi: { art: vel, label: "Murugan's vel" },
   aani: { art: prabha, label: "Nataraja's ring of fire" },
-  aadi: { art: river, label: "A lamp on the river" },
+  aadi: { art: ammanEyes, label: "The eyes of the Amman, and her trident" },
   aavani: { art: kozhukattai, label: "A kozhukattai" },
   purattasi: { art: namam, label: "Perumal's namam" },
   aippasi: { art: rain, label: "The first rains" },
