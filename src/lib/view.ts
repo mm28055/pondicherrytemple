@@ -18,6 +18,10 @@ export interface NoteRowData {
   title: string;
   excerpt: string;
   by: string;
+  /** A field note's first photograph, shown at the right on the Field Notes page. */
+  picture?: { src: string; alt: string };
+  /** More of its words, for the Field Notes page: as many as fit beside the picture. */
+  longExcerpt?: string;
 }
 
 /** "The temples of Pondicherry", but "The temples in and around Pondicherry"
@@ -58,7 +62,9 @@ export function noteRow(n: FieldNote, temples: Temple[], calendar: CalendarSyste
     where: [places.join(", "), n.occasion].filter(Boolean).join(" · "),
     title: n.title,
     excerpt: excerpt(n.excerpt),
-    by: n.authors.join(" and "),
+    by: "", // always Deepa or Arun: lists of field notes leave out who wrote each one
+    picture: n.lead && { src: n.lead.src, alt: n.lead.alt },
+    longExcerpt: n.summary,
   };
 }
 

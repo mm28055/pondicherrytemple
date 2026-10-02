@@ -171,9 +171,9 @@ export interface FieldNote {
   date: string;
   occasion: string;
   /**
-   * Type a name and press Enter. Add as many as needed.
+   * Optional. Type a name and press Enter; add as many as needed.
    */
-  authors: string[];
+  authors?: string[] | null;
   /**
    * Every temple this is about. It will appear on each of their pages.
    */
@@ -253,6 +253,10 @@ export interface Temple {
   _order?: string | null;
   name: string;
   knownAs?: string | null;
+  /**
+   * The common name shown in the boxes of the month calendars, where there is little room. Everywhere else, including the calendar's pop-up, the name above is used.
+   */
+  shortName?: string | null;
   deity: string;
   deityGroup: 'shiva' | 'vishnu' | 'amman' | 'vinayaka' | 'murugan';
   street?: string | null;
@@ -1118,6 +1122,7 @@ export interface TemplesSelect<T extends boolean = true> {
   _order?: T;
   name?: T;
   knownAs?: T;
+  shortName?: T;
   deity?: T;
   deityGroup?: T;
   street?: T;

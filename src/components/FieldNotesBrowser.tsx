@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import type { NoteRowData } from "@/lib/view";
 import { NoteRow } from "./Rows";
 
@@ -15,6 +15,31 @@ export function FieldNotesBrowser({
 }) {
   const [kind, setKind] = useState<string>("all");
   const shown = useMemo(() => (kind === "all" ? rows : rows.filter((r) => r.kind === kind)), [rows, kind]);
+
+  // Each note's words run down to "Read more →" at the foot of its picture,
+  // ending on a whole line: row by row, the lines that fit are counted and the
+  // line spacing eased (by a pixel or so) so the last one ends just above it.
+  const list = useRef<HTMLDivElement>(null);
+  useLayoutEffect(() => {
+    const fit = () => {
+      for (const p of list.current?.querySelectorAll<HTMLElement>(".row-excerpt.fill") ?? []) {
+        p.style.height = "";
+        p.style.lineHeight = "";
+        const cell = p.parentElement!;
+        if (getComputedStyle(cell).containerType !== "size") continue; // stacked, on small screens
+        const more = cell.querySelector<HTMLElement>(".row-more");
+        const line = parseFloat(getComputedStyle(p).lineHeight) || 27;
+        const room = cell.getBoundingClientRect().bottom - p.getBoundingClientRect().top - (more?.offsetHeight ?? 0);
+        if (p.scrollHeight <= room) continue; // all of it fits
+        const lines = Math.max(1, Math.round(room / line));
+        p.style.lineHeight = `${room / lines}px`;
+        p.style.height = `${room}px`;
+      }
+    };
+    fit();
+    window.addEventListener("resize", fit);
+    return () => window.removeEventListener("resize", fit);
+  }, [shown]);
 
   return (
     <>
@@ -31,9 +56,9 @@ export function FieldNotesBrowser({
           ))}
         </div>
       )}
-      <div>
+      <div ref={list}>
         {shown.map((r) => (
-          <NoteRow key={r.id} row={r} />
+          <NoteRow key={r.id} row={r} withPicture />
         ))}
       </div>
     </>

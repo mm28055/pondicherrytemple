@@ -39,7 +39,7 @@ export default async function TempleStoriesPage({ params }: Props) {
 
   return (
     <div className="wrap">
-      <header className="page-head stories-head">
+      <header className="page-head tight-head">
         <Link className="crumb" href={`/${region.id}/${t.id}`}>
           ← Back to the temple
         </Link>

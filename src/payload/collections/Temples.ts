@@ -48,6 +48,16 @@ export const Temples: CollectionConfig = {
               ],
             },
             {
+              name: 'shortName',
+              type: 'text',
+              label: 'Short name (for the calendar)',
+              admin: {
+                placeholder: 'e.g. Lawspet Murugan',
+                description:
+                  'The common name shown in the boxes of the month calendars, where there is little room. Everywhere else, including the calendar\'s pop-up, the name above is used.',
+              },
+            },
+            {
               type: 'row',
               fields: [
                 {

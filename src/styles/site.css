@@ -186,7 +186,7 @@ a:focus-visible, button:focus-visible {
 
 /* ---------- Page heads ---------- */
 .page-head {
-  padding-block: clamp(40px, 7vw, 88px) clamp(28px, 4vw, 48px);
+  padding-block: clamp(18px, 3vw, 36px) clamp(16px, 2.5vw, 28px);
   border-bottom: 2px solid var(--ink);
 }
 
@@ -268,7 +268,6 @@ a:focus-visible, button:focus-visible {
   grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
   column-gap: clamp(36px, 5vw, 80px);
   align-items: stretch;
-  padding-top: clamp(20px, 3.5vw, 44px);
 }
 .temple-head .crumb { display: table; } /* flush with the top of the header */
 
@@ -278,7 +277,7 @@ a:focus-visible, button:focus-visible {
 /* The card hangs the same distance below the line whatever the length of the
    temple's name: its foot is --layout-hang below the bottom of the title block
    (the line is the header's bottom padding below that). */
-.temple-head, .temple-body { --layout-hang: clamp(110px, 10vw, 160px); }
+.temple-head, .temple-body { --layout-hang: clamp(90px, 8.75vw, 140px); }
 .temple-head-drawing { display: flex; justify-content: flex-end; align-items: flex-end; }
 .layout-card {
   position: relative;
@@ -315,7 +314,7 @@ a:focus-visible, button:focus-visible {
    (--layout-hang − the header's bottom padding) below the line, and the
    columns already start (two-col's top padding) below it. */
 .below-layout > aside {
-  padding-top: max(0px, calc(var(--layout-hang) - clamp(28px, 4vw, 48px) - clamp(40px, 5vw, 64px) + 30px));
+  padding-top: max(0px, calc(var(--layout-hang) - clamp(16px, 2.5vw, 28px) - clamp(24px, 3vw, 40px) + 30px));
 }
 
 /* The full plan, upright, over the page */
@@ -338,8 +337,10 @@ a:focus-visible, button:focus-visible {
 /* A temple's "The Temple and its Stories" page */
 /* Its header, tighter than other pages: the title with the temple's name
    centred beneath it. */
-.stories-head { padding-block: clamp(18px, 3vw, 36px) clamp(16px, 2.5vw, 28px); }
-.stories-head .crumb { display: table; }
+/* Pages whose header has a back link or a short intro (Field Notes; a
+   temple's Stories). (Its spacing is now every page head's.) */
+.tight-head .crumb { display: table; }
+.tight-head .page-lede { margin-top: 14px; }
 .stories-title { display: table; margin-top: 10px; }
 .stories-title .kicker { margin: 10px 0 0; text-align: center; }
 /* One list, newest first: the date at the left as on field notes; the
@@ -358,22 +359,59 @@ a:focus-visible, button:focus-visible {
 .story-picture { margin: 0; }
 .story-picture img { display: block; width: 100%; height: auto; }
 .story-picture figcaption { font-size: 15px; color: var(--ink-2); margin-top: 8px; }
-.story-picture.empty {
+.story-picture.empty, .row-picture.empty {
   aspect-ratio: 4 / 3;
   display: grid;
   place-items: center;
   background: var(--chalk-2);
   border: 1px dashed var(--rule);
 }
-.story-picture.empty .caps { color: var(--muted); font-size: 11px; }
+.story-picture.empty .caps, .row-picture.empty .caps { color: var(--muted); font-size: 11px; }
+
+/* The Field Notes page: each note's first photograph at the right, the same
+   size and placeholder as on a temple's Stories page */
+.note-row.with-picture { grid-template-columns: 110px minmax(0, 1fr) minmax(180px, 300px); }
+/* The words beside the picture: the picture sets the row's height (the text
+   column is size-contained), and the words fill down to "Read more →", which
+   sits at the picture's foot; they end on a whole line (lines counted in
+   FieldNotesBrowser). The space before the picture mirrors the space seen
+   between the date and the words (about 70px: the gap plus the date column's
+   spare width). */
+.note-row.with-picture > div:nth-child(2) {
+  container-type: size;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding-right: 42px;
+}
+.row-excerpt.fill {
+  max-width: none;
+  overflow: hidden;
+  min-height: 0;
+  flex: 0 1 auto;
+}
+.row-more {
+  margin-top: auto;
+  padding-top: 8px;
+  font-family: var(--display);
+  font-weight: 600;
+  font-size: 13px;
+  line-height: 1;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ochre);
+}
+.row-more::after { content: " →"; }
+.note-row:hover .row-more { color: var(--ochre-deep); }
+.row-picture { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
+.row-picture.empty { display: grid; }
 
 /* ---------- Sections ---------- */
-.section { padding-block: clamp(48px, 7vw, 96px); }
+/* Sections: half the space they once had; the last one keeps a full space
+   above the footer. */
+.section { padding-block: clamp(24px, 3.5vw, 48px); }
+.wrap > .section:last-child { padding-bottom: clamp(48px, 7vw, 96px); }
 .section.tight { padding-top: 0; }
-/* The Temples page: half the space under the introduction and between its
-   lists; the space above the footer stays as it is. */
-.temples-page .section:first-of-type { padding-top: clamp(24px, 3.5vw, 48px); }
-.temples-page .section:not(:last-child) { padding-bottom: clamp(24px, 3.5vw, 48px); }
 
 .section-head {
   display: flex;
@@ -531,7 +569,7 @@ a.temple-row:hover .temple-name { color: var(--ochre); }
   grid-template-areas: "mark today";
   gap: 18px clamp(32px, 5vw, 80px);
   align-items: end;
-  padding-block: clamp(36px, 6vw, 80px) clamp(36px, 5vw, 64px);
+  padding-block: clamp(18px, 3vw, 40px) clamp(18px, 2.5vw, 32px);
   border-bottom: 2px solid var(--ink);
 }
 
@@ -595,6 +633,12 @@ a.temple-row:hover .temple-name { color: var(--ochre); }
 .today-en { font-style: italic; font-size: 20px; color: var(--ink-2); margin-top: 6px; }
 
 .today .caps { color: var(--ink-2); margin-top: 6px; }
+/* the whole of it opens today, in the calendar's pop-up */
+.today-link { display: block; width: 100%; padding: 0; border: 0; background: none; font: inherit; color: inherit; text-align: left; cursor: pointer; }
+.today-link > span { display: block; }
+.today-link.is-plain { cursor: default; }
+button.today-link:hover .today-tamil,
+button.today-link:focus-visible .today-tamil { color: var(--ochre); }
 
 
 /* The opening paragraph, with the latest field notes beside it */
@@ -603,7 +647,7 @@ a.temple-row:hover .temple-name { color: var(--ochre); }
   grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
   gap: clamp(36px, 5vw, 80px);
   align-items: start;
-  padding-block: clamp(40px, 5.5vw, 72px) clamp(56px, 8vw, 96px);
+  padding-block: clamp(20px, 2.75vw, 36px) clamp(28px, 4vw, 48px);
 }
 
 .home-opening p {
@@ -758,7 +802,7 @@ a.temple-row:hover .temple-name { color: var(--ochre); }
   display: grid;
   grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
   gap: clamp(36px, 5vw, 80px);
-  padding-block: clamp(40px, 5vw, 64px);
+  padding-block: clamp(24px, 3vw, 40px);
   align-items: start;
 }
 
@@ -772,9 +816,7 @@ a.temple-row:hover .temple-name { color: var(--ochre); }
 /* a signature under a passage */
 .prose p.caps { font-size: 13px; line-height: 1.6; margin-top: 1.6em; }
 
-.stack > * + * { margin-top: clamp(40px, 5vw, 60px); }
-/* The new temple-page design: half the space between sections, in both columns */
-.temple-body .stack > * + * { margin-top: clamp(20px, 2.5vw, 30px); }
+.stack > * + * { margin-top: clamp(20px, 2.5vw, 30px); }
 
 /* On wide screens the side column stays in view while the main column
    scrolls. Its heading stays put; a list too long for the screen scrolls
@@ -820,7 +862,7 @@ a.temple-row:hover .temple-name { color: var(--ochre); }
 /* Drawings, on temple and festival pages. A drawing always fills the width it
    is given — the whole page for a wide one, the main column for a tall one
    (see drawingsInColumn) — so its edges line up with the text around it. */
-.drawings { padding-top: clamp(28px, 4vw, 48px); }
+.drawings { padding-top: clamp(14px, 2vw, 24px); }
 .stack > .drawings { padding-top: 0; }
 
 .drawing img { display: block; width: 100%; height: auto; }
@@ -936,7 +978,7 @@ a.temple-row:hover .temple-name { color: var(--ochre); }
 }
 
 /* ---------- A field note ---------- */
-.note-head { padding-block: clamp(36px, 6vw, 72px) clamp(28px, 4vw, 44px); border-bottom: 2px solid var(--ink); }
+.note-head { padding-block: clamp(18px, 3vw, 36px) clamp(16px, 2.5vw, 28px); border-bottom: 2px solid var(--ink); }
 
 .note-dateline {
   display: flex;
@@ -971,7 +1013,7 @@ a.temple-row:hover .temple-name { color: var(--ochre); }
 .note-meta a { color: var(--ink); border-bottom: 1px solid var(--ochre); }
 .note-meta a:hover { color: var(--ochre); }
 
-.note-body { max-width: 720px; margin-inline: auto; padding: clamp(36px, 5vw, 64px) var(--gutter); }
+.note-body { max-width: 720px; margin-inline: auto; padding: clamp(18px, 2.5vw, 32px) var(--gutter) clamp(36px, 5vw, 64px); }
 .note-body p { font-size: 20px; line-height: 1.72; margin-bottom: 1.1em; }
 .note-body h3 {
   font-family: var(--display);
@@ -1267,7 +1309,7 @@ a.temple-row:hover .temple-name { color: var(--ochre); }
   grid-template-columns: minmax(0, auto) minmax(0, 1fr);
   gap: 28px 48px;
   align-items: start;
-  padding-block: clamp(32px, 5vw, 56px) clamp(56px, 7vw, 96px);
+  padding-block: clamp(16px, 2.5vw, 28px) clamp(56px, 7vw, 96px);
 }
 .film video { max-height: 82vh; max-width: 100%; background: var(--ink); }
 .film-text p { font-size: 19px; line-height: 1.65; margin-bottom: 0.9em; max-width: 34em; }
@@ -1311,7 +1353,7 @@ a.temple-row:hover .temple-name { color: var(--ochre); }
   display: grid;
   grid-template-columns: minmax(0, 0.8fr) minmax(0, 2fr);
   gap: clamp(20px, 4vw, 56px);
-  padding-block: 36px;
+  padding-block: clamp(16px, 2vw, 22px);
   border-bottom: 1px solid var(--rule);
 }
 
@@ -1389,6 +1431,11 @@ a.temple-row:hover .temple-name { color: var(--ochre); }
   .temple-head { row-gap: 28px; }
   .story-row { grid-template-columns: 110px minmax(0, 1fr); }
   .story-row .story-picture { grid-column: 2; max-width: 420px; }
+  .note-row.with-picture { grid-template-columns: 110px minmax(0, 1fr); }
+  .note-row.with-picture > div:nth-child(2) { container-type: normal; }
+  .row-excerpt.fill { max-height: 8em; } /* about five lines, then "Read more →" */
+  .note-row.with-picture > div:nth-child(2) { padding-right: 0; }
+  .note-row.with-picture .row-picture { grid-column: 2; max-width: 420px; }
   .temple-head-drawing { position: static; }
   .layout-card { position: static; align-items: flex-start; margin-bottom: 0; }
   .temple-head-drawing { justify-content: flex-start; }
@@ -1401,7 +1448,8 @@ a.temple-row:hover .temple-name { color: var(--ochre); }
 @media (max-width: 640px) {
   body { font-size: 17px; }
   .note-row, .story-row { grid-template-columns: minmax(0, 1fr); gap: 10px; padding-block: 22px; }
-  .story-row .story-picture { grid-column: auto; }
+  .note-row.with-picture { grid-template-columns: minmax(0, 1fr); }
+  .story-row .story-picture, .note-row.with-picture .row-picture { grid-column: auto; max-width: none; }
   .date-stamp { display: flex; align-items: baseline; gap: 10px; }
   .date-stamp .d { font-size: 40px; }
   .date-stamp .m { margin-top: 0; }
@@ -1419,15 +1467,15 @@ a.temple-row:hover .temple-name { color: var(--ochre); }
 .rasi {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  grid-auto-rows: minmax(190px, auto);
+  grid-auto-rows: minmax(150px, auto); /* the whole chart on one screen */
   border-top: 2px solid var(--ink);
   border-left: 2px solid var(--ink);
-  margin-top: 24px;
+  margin-top: 16px;
 }
 .rasi > * {
   border-right: 2px solid var(--ink);
   border-bottom: 2px solid var(--ink);
-  padding: 16px 18px 18px;
+  padding: 12px 16px 14px;
 }
 .rasi-month {
   grid-row: var(--r);
@@ -1445,12 +1493,12 @@ a.temple-row:hover .temple-name { color: var(--ochre); }
   font-weight: 700;
   font-variation-settings: "wdth" 85;
   font-size: clamp(22px, 2.2vw, 30px);
-  line-height: 1.3;
+  line-height: 1.2;
   transition: color 0.15s;
 }
 .rasi-month .caps { color: var(--ink); }
-.rasi-span { font-style: italic; color: var(--muted); font-size: 14.5px; margin-bottom: 10px; }
-.rasi-list li { font-size: 16px; line-height: 1.35; padding-block: 2px; }
+.rasi-span { font-style: italic; color: var(--muted); font-size: 14.5px; margin-bottom: 6px; }
+.rasi-list li { font-size: 16px; line-height: 1.3; padding-block: 1px; }
 .rasi-list .rasi-more,
 .rasi-empty { font-style: italic; color: var(--muted); font-size: 14.5px; }
 .rasi-month.now { background: var(--ink); color: var(--chalk); }
@@ -1619,6 +1667,37 @@ a.temple-row:hover .temple-name { color: var(--ochre); }
 }
 
 /* ---------- A month as a sheet calendar ---------- */
+/* The months either side, beside the calendar (on a phone, a row under it) */
+.cal-with-steps {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr) 72px;
+  gap: clamp(10px, 1.5vw, 20px);
+  align-items: center;
+}
+.cal-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding-block: 18px;
+  color: var(--m);
+  font-family: var(--display);
+  text-align: center;
+  transition: color 0.15s, transform 0.15s;
+}
+.cal-step-arrow { font-size: 38px; line-height: 1; }
+.cal-step-name { font-weight: 700; font-size: 12.5px; letter-spacing: 0.1em; text-transform: uppercase; }
+.cal-step:hover { color: var(--ink); }
+.cal-step.prev:hover { transform: translateX(-3px); }
+.cal-step.next:hover { transform: translateX(3px); }
+@media (max-width: 900px) {
+  .cal-with-steps { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .cal-with-steps .month-cal { grid-column: 1 / -1; order: -1; }
+  .cal-step { flex-direction: row; gap: 10px; padding-block: 8px 0; }
+  .cal-step.prev { justify-content: flex-start; }
+  .cal-step.next { justify-content: flex-end; flex-direction: row-reverse; }
+  .cal-step-arrow { font-size: 26px; }
+}
 .month-cal { padding-block: 8px clamp(40px, 5vw, 64px); }
 .month-cal-head {
   display: flex;
@@ -1680,17 +1759,83 @@ a.temple-row:hover .temple-name { color: var(--ochre); }
   box-shadow: inset 0 3px 0 var(--m);
 }
 .cal-day.is-today { outline: 2px solid var(--ink); outline-offset: -2px; }
+/* A day with something recorded opens, in a pop-up; on a laptop or tablet the boxes share the
+   screen's height so the whole month fits (--weeks: five or six rows). */
+.cal-day.has { cursor: pointer; }
+.cal-day { transition: border-color 0.15s, background 0.15s; }
+.cal-day.has:hover { border-color: var(--m); }
+.cal-day:focus-visible { outline: 2px solid var(--m); outline-offset: -2px; }
+@container cal (min-width: 620px) {
+  .cal-day { min-height: 0; height: max(82px, calc((100svh - 300px) / var(--weeks))); overflow: hidden; container: day / size; }
+}
+
+/* A day in a pop-up: its date large, the Tamil day and the moon, and
+   everything recorded, in full */
+.day-dialog { margin: auto; border: 0; padding: 28px 30px 26px; width: min(560px, 92vw); max-height: 88vh; background: var(--chalk); box-shadow: 0 24px 60px rgba(22, 17, 14, 0.35); }
+.day-dialog::backdrop { background: rgba(22, 17, 14, 0.62); }
+
+/* The home page's "Today": the pop-up drops down from just under its Tamil
+   date, over the rest of the box, pointing up at it */
+.day-dialog.day-by-today { position: absolute; margin: 0; max-height: none; padding: 22px 24px 20px; border-top: 3px solid var(--ochre); box-shadow: 0 18px 44px rgba(22, 17, 14, 0.28); overflow: visible; animation: today-drop 0.18s ease-out; }
+.day-by-today::backdrop { background: rgba(22, 17, 14, 0.22); }
+.day-by-today::before { content: ""; position: absolute; top: -11px; left: var(--caret); border: 8px solid transparent; border-top: 0; border-bottom: 8px solid var(--ochre); }
+.day-by-today .day-num { font-size: 56px; }
+.day-by-today .day-date { font-size: 17px; }
+.day-by-today .day-local { font-size: 14px; }
+.day-by-today .day-events > li { font-size: 15.5px; padding-block: 11px; }
+@keyframes today-drop { from { opacity: 0; transform: translateY(-8px); } }
+.day-close { position: absolute; top: 6px; right: 12px; border: 0; background: none; cursor: pointer; font-size: 30px; line-height: 1; color: var(--ink); }
+.day-head { display: flex; gap: 18px; align-items: center; padding-bottom: 14px; border-bottom: 2px solid var(--m, var(--ink)); }
+.day-head > span:last-child { display: flex; flex-direction: column; gap: 4px; }
+.day-num { font-family: var(--display); font-weight: 800; font-variation-settings: "wdth" 75; font-size: 72px; line-height: 0.9; color: var(--m, var(--ochre)); }
+.day-date { font-weight: 600; font-size: 20px; }
+.day-local { font-size: 15px; color: var(--muted); }
+.day-local [lang="ta"] { font-family: var(--tamil); }
+.day-events > li { padding-block: 14px; border-bottom: 1px solid var(--rule); font-size: 17px; line-height: 1.45; }
+.day-events .cal-tags { margin-top: 8px; }
+.day-events .cal-tags a { font-size: 11.5px; }
+.day-none { margin-top: 16px; font-style: italic; color: var(--muted); }
 .cal-moon { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; color: var(--ink-2); }
 .cal-moon [lang="ta"] { font-family: var(--tamil); }
 .cal-moon .dot { width: 11px; height: 11px; border-radius: 50%; border: 1.5px solid var(--ink); flex: none; }
 .cal-moon.new .dot { background: var(--ink); }
 .cal-moon.full .dot { background: #fff; }
+/* in a day's box: the disc only, beside the date number */
+.cal-moon.in-box { margin-left: 7px; vertical-align: 0.3em; }
 /* In a day's box: words may break, and each entry is at most three lines */
 .cal-evs { hyphens: manual; overflow-wrap: anywhere; }
 .cal-evs > li { font-size: 13.5px; line-height: 1.3; padding-top: 2px; }
 .cal-evs > li + li { margin-top: 4px; }
-.cal-line { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; }
-.cal-more a { font-style: italic; color: var(--muted); font-size: 13px; border-bottom: 1px solid var(--rule); }
+.cal-line { display: block; }
+/* In a box: the temple on one line, then its tags on up to two (one on a
+   shorter screen, where the boxes are shorter) */
+.cal-evs .cal-place { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cal-evs .cal-label { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
+.cal-evs:has(.cal-more) .cal-label { -webkit-line-clamp: 1; } /* room for "+ N more" */
+/* Each box shows what its own height allows (it is a size container where
+   the boxes share the screen's height): so nothing spills, at any screen
+   size or zoom. The heights are of the space inside the box, its padding
+   and border (about 20px) left out. */
+@container day (max-height: 104px) {
+  .cal-evs .cal-label { -webkit-line-clamp: 1; }
+  .cal-num { font-size: 24px; }
+  .cal-more { line-height: 1.2; }
+  .cal-evs > li { padding-top: 0; }
+}
+@container day (max-height: 80px) {
+  .cal-num { font-size: 20px; }
+  .cal-ta { font-size: 11px; }
+  .cal-day .cal-top { line-height: 1.1; }
+  .cal-day .cal-evs > li.cal-more { line-height: 1.1; }
+}
+@container day (max-height: 56px) {
+  .cal-evs .cal-label { display: none; } /* the temple alone */
+  .cal-num { font-size: 20px; }
+  .cal-ta { font-size: 11px; }
+}
+/* "+ N more": the size of the festival names above it */
+.cal-more { font-style: italic; color: var(--muted); font-size: 10.5px; line-height: 1.3; }
+.cal-evs > li.cal-more { font-size: 10.5px; line-height: 1.25; margin-top: 1px; }
 .cal-evs a:hover,
 .cal-list a:hover { color: var(--m); }
 .cal-read {
@@ -1718,10 +1863,23 @@ a.temple-row:hover .temple-name { color: var(--ochre); }
 }
 .cal-tags a:hover { background: var(--m); color: #fff; }
 .cal-place { font-weight: 600; }
+/* In a day's box: the temple in the face of the date number above it
+   (Anek Latin condensed, bold capitals), so long names fit; under it, what
+   it was, in the face of the key below the calendar */
+.cal-evs .cal-place {
+  display: block;
+  font-family: var(--display);
+  font-weight: 700;
+  font-variation-settings: "wdth" 75;
+  font-size: 12.5px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  line-height: 1.25;
+}
+.cal-evs .cal-label { font-size: 10.5px; line-height: 1.3; color: var(--muted); margin-top: 2px; }
 
 /* The days in full, under the grid: shown when the boxes can't hold everything */
 .cal-list { display: none; margin-top: 16px; }
-.month-cal.overflows .cal-list { display: block; }
 .cal-list > li { padding-block: 8px; border-bottom: 1px solid var(--rule); scroll-margin-top: 90px; }
 .cal-list > li:target { background: color-mix(in srgb, var(--m) 10%, transparent); }
 .cal-list time {
@@ -1739,31 +1897,22 @@ a.temple-row:hover .temple-name { color: var(--ochre); }
   flex-wrap: wrap;
   gap: 6px 22px;
   margin-top: 12px;
-  font-size: 13.5px;
+  font-size: 12px; /* the size of the moons beside it */
   color: var(--muted);
 }
 
 /* The boxes show less as they narrow — measured by the calendar's own
    width, not the screen's. Wide (a laptop): everything. */
 .month-cal { container: cal / inline-size; }
-@container cal (min-width: 1000px) {
-  .month-cal:not(.overflows) a.cal-num { pointer-events: none; } /* the words are right there in the box */
-}
 /* Medium (a tablet, a small window): the temple and its festivals; what
    happened is in the list below */
-@container cal (max-width: 999px) {
-  .cal-evs .cal-label,
+@container cal (max-width: 899px) {
   .cal-moon [lang="ta"] { display: none; }
-  /* the whole box goes to the day in the list below; its own links stay on top */
-  .cal-day.has { position: relative; cursor: pointer; }
-  .cal-day.has a.cal-num::after { content: ""; position: absolute; inset: 0; }
-  .cal-evs a { position: relative; z-index: 1; }
   .cal-day { min-height: 92px; padding: 6px 6px 8px; }
   .cal-num { font-size: 22px; }
   .cal-ta { font-size: 11.5px; }
   .cal-evs > li { font-size: 12.5px; }
   .cal-tags a { font-size: 10px; letter-spacing: 0.03em; padding: 1px 4px; }
-  .cal-list { display: block; }
 }
 /* On a phone only: the dot under a marked day, and the chosen day under the grid */
 .cal-dot,
@@ -1835,5 +1984,6 @@ a.temple-row:hover .temple-name { color: var(--ochre); }
   .cal-evs { display: none; }
   .cal-moon .dot { width: 9px; height: 9px; }
 }
+
 
 

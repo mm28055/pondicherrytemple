@@ -3,10 +3,11 @@ import type { NoteRowData, ObservanceRowData } from "@/lib/view";
 import type { Temple } from "@/content/types";
 import { DEITY_GROUP_LABELS } from "@/content/labels";
 
-/** A field note, interview, video… or an article: date stamp, then what it is. */
-export function NoteRow({ row }: { row: NoteRowData }) {
+/** A field note, interview, video… or an article: date stamp, then what it is.
+    `withPicture` adds its photograph at the right, or a placeholder. */
+export function NoteRow({ row, withPicture = false }: { row: NoteRowData; withPicture?: boolean }) {
   return (
-    <Link className="note-row reveal" href={row.href}>
+    <Link className={withPicture ? "note-row with-picture reveal" : "note-row reveal"} href={row.href}>
       <div className="date-stamp" aria-hidden="true">
         <span className="d">{row.day}</span>
         <span className="m">{row.shortMonth}</span>
@@ -18,9 +19,24 @@ export function NoteRow({ row }: { row: NoteRowData }) {
           {row.where}
         </div>
         <h3 className="row-title">{row.title}</h3>
-        {row.excerpt && <p className="row-excerpt">{row.excerpt}</p>}
-        <p className="row-by">{row.by}</p>
+        {withPicture && row.longExcerpt ? (
+          <>
+            <p className="row-excerpt fill">{row.longExcerpt}</p>
+            <span className="row-more">Read more</span>
+          </>
+        ) : (
+          row.excerpt && <p className="row-excerpt">{row.excerpt}</p>
+        )}
+        {row.by && <p className="row-by">{row.by}</p>}
       </div>
+      {withPicture &&
+        (row.picture ? (
+          <img className="row-picture" src={row.picture.src} alt={row.picture.alt} loading="lazy" />
+        ) : (
+          <span className="row-picture empty" aria-hidden="true">
+            <span className="caps">Photograph to come</span>
+          </span>
+        ))}
     </Link>
   );
 }

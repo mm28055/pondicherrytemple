@@ -46,6 +46,8 @@ export interface Temple {
   name: string;
   /** What the temple is called in town, if different. */
   knownAs?: string;
+  /** The common name for the month calendars' boxes: "Lawspet Murugan". */
+  shortName?: string;
   deity: string;
   group: DeityGroup;
   street?: string;
@@ -113,6 +115,10 @@ export interface FieldNote {
   /** Videos and audio recordings, played on the page. */
   videos?: FieldVideo[];
   photos?: Picture[];
+  /** The words, one line, cut at 1500 characters: for the Field Notes page. */
+  summary?: string;
+  /** The first photograph, for lists. */
+  lead?: Picture;
 }
 
 /** A video or audio recording, with the still shown before it plays. */

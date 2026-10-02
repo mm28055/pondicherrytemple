@@ -80,9 +80,8 @@ export const FieldNotes: CollectionConfig = {
       name: 'authors',
       type: 'text',
       hasMany: true,
-      required: true,
       label: 'Written by',
-      admin: { description: 'Type a name and press Enter. Add as many as needed.' },
+      admin: { description: 'Optional. Type a name and press Enter; add as many as needed.' },
     },
     {
       type: 'row',

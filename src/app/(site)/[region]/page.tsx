@@ -51,7 +51,7 @@ export default async function RegionPage({ params }: Props) {
   );
 
   return (
-    <div className="wrap temples-page">
+    <div className="wrap">
       <header className="page-head">
         <div className="kicker">{region.name}</div>
         <h1 className="page-title">Temples</h1>

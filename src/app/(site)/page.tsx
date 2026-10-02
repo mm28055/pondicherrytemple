@@ -5,6 +5,7 @@ import {
   getHomePage,
   getLatest,
   getObservances,
+  getOccasions,
   getOccasionsForObservance,
   getOccasionsForTemple,
   getRegion,
@@ -14,6 +15,7 @@ import {
 import { articleRow, filmRow, noteRow, observanceRow } from "@/lib/view";
 import { ObservanceRow, TempleRow } from "@/components/Rows";
 import { TodayTamil } from "@/components/TodayTamil";
+import { calendarEvents } from "@/lib/calendarEvents";
 import { Html } from "@/components/Prose";
 import { plainWithScripts } from "@/lib/richtext";
 
@@ -48,6 +50,9 @@ export default async function HomePage() {
   );
   const topObservances = observances.sort((a, b) => b.seen - a.seen).slice(0, 6);
 
+  // for the pop-up behind "Today": every day recorded, as the calendar shows it
+  const todayEvents = await calendarEvents(await getOccasions());
+
   return (
     <>
       <div className="wrap">
@@ -61,7 +66,7 @@ export default async function HomePage() {
               <span className="home-gloss">a sacred site</span>
             </p>
           </div>
-          <TodayTamil />
+          <TodayTamil events={todayEvents} />
         </section>
 
         {/* Why the temple matters to a town; the rest of the story is on the About page. */}

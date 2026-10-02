@@ -181,11 +181,12 @@ const idOf = (ref: Ref) => (ref && typeof ref === "object" ? ref.id : (ref ?? un
 /** Web addresses of everything visible, by database id. Anything not visible
     (unpublished, or deleted) is missing here, so tags pointing at it drop out. */
 const lookups = cache(async () => {
-  const [regions, temples, observances, notes] = await Promise.all([
+  const [regions, temples, observances, notes, photos] = await Promise.all([
     rawRegions(),
     rawTemples(),
     rawObservances(),
     rawNotes(),
+    rawPhotos(),
   ]);
   const regionSlug = new Map(regions.map((r) => [r.id, r.slug ?? ""]));
   const regionOf = (ref: Ref) => regionSlug.get(idOf(ref) ?? -1) ?? "";
@@ -200,6 +201,7 @@ const lookups = cache(async () => {
     templeKey: new Map(temples.filter((t) => t.slug).map((t) => [t.id, `${regionOf(t.region)}/${t.slug}`])),
     observanceSlug: new Map(observances.filter((o) => o.slug).map((o) => [o.id, o.slug!])),
     noteSlug: new Map(notes.filter((n) => n.slug).map((n) => [n.id, n.slug!])),
+    photoById: new Map(photos.map((m) => [m.id, m])),
     paths,
   };
 });
@@ -241,6 +243,7 @@ const toTemple = (t: P.Temple, L: Lookups): Temple => ({
   name: t.name,
   // A box cleared in the admin is saved as "", which would hide the name.
   knownAs: t.knownAs?.trim() || undefined,
+  shortName: t.shortName?.trim() || undefined,
   deity: t.deity,
   group: t.deityGroup,
   street: t.street?.trim() || undefined,
@@ -285,6 +288,13 @@ function toFieldNote(n: P.FieldNote, L: Lookups, full: boolean): FieldNote {
     title: n.title,
     authors: n.authors ?? [],
     excerpt: openingText(n.body),
+    // For the Field Notes page, which shows as much as fits beside the photograph.
+    summary: plainText(n.body).slice(0, 1500),
+    // For lists: its first photograph (if any can be shown).
+    lead: (n.photos ?? [])
+      .map((ref) => (typeof ref === "object" ? ref : L.photoById.get(ref)))
+      .map(toPicture)
+      .find((p): p is Picture => Boolean(p)),
   };
   if (!full) return note;
   // An older single recording, if any, comes first.
@@ -576,6 +586,11 @@ export async function getRitualYear(): Promise<{
     );
   }
   return { months, throughYear: all.filter((o) => o.throughYear) };
+}
+
+/** Every date the team was present, oldest first. */
+export async function getOccasions(): Promise<Occasion[]> {
+  return [...(await occasions())].sort(byDateAsc);
 }
 
 /** Every date the team was present that falls in a Tamil month, in any year. */

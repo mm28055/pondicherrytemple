@@ -11,9 +11,9 @@ import {
   type MonthEntry,
 } from "@/lib/data";
 import { dateParts, monthDates, monthYearOf, TAMIL_MONTHS } from "@/lib/calendar";
-import { MonthCalendar, type CalendarEvent } from "@/components/MonthCalendar";
+import { calendarEvents } from "@/lib/calendarEvents";
+import { MonthCalendar } from "@/components/MonthCalendar";
 import { MonthMotif } from "@/components/MonthMotif";
-import { shortTempleName } from "@/lib/view";
 
 type Props = { params: Promise<{ month: string }> };
 
@@ -53,25 +53,10 @@ export default async function MonthPage({ params }: Props) {
   // The calendar: the days the team was present this month, a grid for each
   // year recorded, newest first; with none yet, the month as it next comes.
   const today = new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Kolkata" });
-  const events: (CalendarEvent & { year: number })[] = await Promise.all(
-    (await getOccasionsInMonth(month.slug)).map(async (o) => {
-      const t = await getTemple(o.region, o.temple);
-      return {
-        date: o.date,
-        year: monthYearOf(o.date),
-        place: t ? (t.knownAs ?? t.name) : "",
-        // the name the town uses stays whole ("Chetty Koil"); a formal one loses its "Koil"
-        short: t ? (t.knownAs ?? shortTempleName(t)) : "",
-        placeHref: t && hasPage(t) ? `/${t.region}/${t.id}` : undefined,
-        label: o.label,
-        noteHref: o.note ? `/field-notes/${o.note}` : undefined,
-        observances: (await getObservancesById(o.observances)).map((x) => ({
-          label: x.name,
-          href: `/festivals-and-rituals/${x.id}`,
-        })),
-      };
-    }),
-  );
+  const events = (await calendarEvents(await getOccasionsInMonth(month.slug))).map((e) => ({
+    ...e,
+    year: monthYearOf(e.date),
+  }));
   let upcoming = Number(today.slice(0, 4)) - 1;
   while (monthDates(month.slug, upcoming).last < today) upcoming++;
   const years = events.length ? [...new Set(events.map((e) => e.year))].sort((a, b) => b - a) : [upcoming];
@@ -98,14 +83,24 @@ export default async function MonthPage({ params }: Props) {
         <MonthMotif month={month.slug} className="month-head-motif" />
       </header>
 
+      {/* The months either side again, beside the calendar: no need to go back up */}
       {years.map((y) => (
-        <MonthCalendar
-          key={y}
-          month={month}
-          year={y}
-          events={events.filter((e) => e.year === y)}
-          today={today}
-        />
+        <div key={y} className="cal-with-steps">
+          {/* scroll={false}: the next month opens where you are, the calendar in view */}
+          <Link className="cal-step prev" href={`/festivals-and-rituals/month/${prev.slug}`} scroll={false}>
+            <span className="cal-step-arrow" aria-hidden="true">
+              ←
+            </span>
+            <span className="cal-step-name">{prev.name}</span>
+          </Link>
+          <MonthCalendar month={month} year={y} events={events.filter((e) => e.year === y)} today={today} />
+          <Link className="cal-step next" href={`/festivals-and-rituals/month/${next.slug}`} scroll={false}>
+            <span className="cal-step-arrow" aria-hidden="true">
+              →
+            </span>
+            <span className="cal-step-name">{next.name}</span>
+          </Link>
+        </div>
       ))}
 
       {entries.length === 0 && (

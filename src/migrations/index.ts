@@ -8,6 +8,7 @@ import * as migration_20260928_105405_photo_festival_tags from './20260928_10540
 import * as migration_20260928_110504_festival_months from './20260928_110504_festival_months';
 import * as migration_20260930_102837_photo_show_first_taken_on from './20260930_102837_photo_show_first_taken_on';
 import * as migration_20261001_131421_temple_stories from './20261001_131421_temple_stories';
+import * as migration_20261002_122418_temple_short_name from './20261002_122418_temple_short_name';
 
 export const migrations = [
   {
@@ -58,6 +59,11 @@ export const migrations = [
   {
     up: migration_20261001_131421_temple_stories.up,
     down: migration_20261001_131421_temple_stories.down,
-    name: '20261001_131421_temple_stories'
+    name: '20261001_131421_temple_stories',
+  },
+  {
+    up: migration_20261002_122418_temple_short_name.up,
+    down: migration_20261002_122418_temple_short_name.down,
+    name: '20261002_122418_temple_short_name'
   },
 ];

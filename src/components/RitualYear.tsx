@@ -4,7 +4,8 @@ import type { Observance } from "@/content/types";
 import type { MonthEntry } from "@/lib/data";
 import type { TamilMonth } from "@/lib/calendar";
 
-const SHOWN = 4;
+// Two per month, so the whole chart fits on one screen; each month's page has them all.
+const SHOWN = 2;
 
 /** The ritual year as a South Indian chart (the rasi kattam): the twelve
     Tamil months round the edge of a square, Chithirai at the top, going

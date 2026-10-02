@@ -78,7 +78,7 @@ export default async function FieldNotePage({ params }: Props) {
                 {o.name}
               </Link>
             ))}
-            <span>By {note.authors.join(" and ")}</span>
+            {note.authors.length > 0 && <span>By {note.authors.join(" and ")}</span>}
           </div>
         </header>
       </div>
