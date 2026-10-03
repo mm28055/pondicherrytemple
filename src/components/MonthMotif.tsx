@@ -323,39 +323,76 @@ const kolam = (
   </>
 );
 
-// Thai: the pongal pot boiling over, and sugarcane
+// Thai: the pongal pot boiling over, and a stalk of sugarcane beside it.
+// The pongal is one shape, its outline in three states: heaped in the pot's
+// mouth (at rest); swelling up out of it; and pouring over, the same pongal
+// spreading over the rim and down the shoulders, unevenly, a little further
+// on one side. Pointed at, it moves from one to the next (site.css, m-boil,
+// by the CSS "d" property), so what overflows is the heap that was there.
+type Seg = [number, number, number, number]; // a curve: control, then end point
+const foamPath = (start: [number, number], segs: Seg[]) =>
+  `M${start.join(" ")} ${segs.map((s) => `Q${s.map(r1).join(" ")}`).join(" ")} Z`;
+// the heap's crown, from the rim's left end to its right
+const CROWN: Seg[] = [
+  [34, 31, 39, 32],
+  [42, 25, 47, 28],
+  [51, 22, 56, 28],
+  [61, 26, 62, 31],
+  [66, 31, 66, 38],
+];
+// at rest the rest of its outline lies along the rim, back to its left end
+const ALONG_RIM: Seg[] = Array.from({ length: 12 }, (_, k) => {
+  const x = 66 - ((k + 1) * 32) / 12;
+  return [x + 32 / 24, 38, x, 38];
+});
+const FOAM_REST = foamPath([34, 38], [...CROWN, ...ALONG_RIM]);
+const FOAM_RISE = foamPath(
+  [34, 38],
+  [...CROWN.map(([cx, cy, x, y]): Seg => [cx, 38 - (38 - cy) * 1.5, x, 38 - (38 - y) * 1.5]), ...ALONG_RIM],
+);
+const FOAM_OVER = foamPath(
+  [30, 40],
+  [
+    [29, 30, 36, 31],
+    [39, 21, 47, 25],
+    [52, 17, 58, 24],
+    [66, 21, 66, 30],
+    [73, 31, 71, 39],
+    [78, 43, 76, 49],
+    [76, 53, 73, 52],
+    [71, 51, 69, 54],
+    [66, 56, 64, 52],
+    [61, 51, 58, 54],
+    [55, 58, 52, 55],
+    [49, 52, 46, 54],
+    [43, 56, 41, 52],
+    [38, 50, 35, 53],
+    [31, 57, 28, 54],
+    [24, 53, 24, 48],
+    [22, 43, 30, 40],
+  ],
+);
 const pongal = (
   <>
     <path d="M32 44 Q16 58 25 76 Q33 90 50 90 Q67 90 75 76 Q84 58 68 44 Z" />
-    <path d="M33 38 L67 38 L66 44 L34 44 Z" />
-    {/* it boils over: the froth rises, and runs down the pot */}
-    <path
-      className="m-froth"
-      d="M34 38 Q35 28 42 32 Q46 22 52 30 Q58 22 62 32 Q68 28 66 38"
-    />
-    <path
-      className="m-spill"
-      pathLength={100}
-      d="M35 40 Q27 46 28 56 Q28 60 25 62"
-    />
-    <path
-      className="m-spill"
-      pathLength={100}
-      style={n(1)}
-      d="M65 40 Q72 46 71 54"
-    />
-    <path
-      className="m-spill"
-      pathLength={100}
-      style={n(2)}
-      d="M45 42 Q42 48 43 52"
-    />
     <path d="M25 62 Q50 72 75 62" />
+    <path d="M33 38 L67 38 L66 44 L34 44 Z" />
+    {/* the pongal: its fill hides the pot behind it as it pours over */}
     <path
-      d="M86 94 L77 10 M79 72 L86 71 M81 52 L88 51 M79 32 L86 31"
-      strokeWidth={2}
+      className="foam m-boil"
+      d={FOAM_REST}
+      style={
+        {
+          "--rest": `path("${FOAM_REST}")`,
+          "--rise": `path("${FOAM_RISE}")`,
+          "--over": `path("${FOAM_OVER}")`,
+        } as CSSProperties
+      }
     />
-    <path d="M77 12 Q66 6 58 14 M77 12 Q88 4 95 10" />
+    {/* the sugarcane: a jointed stalk, its long leaves arching from the top */}
+    <path d="M84 95 L86 22 M90 95 L92 22" />
+    <path d="M84.4 80 Q87 82 90.4 80 M84.8 64 Q87.5 66 90.8 64 M85.2 48 Q88 50 91.2 48 M85.6 33 Q88.5 35 91.6 33" strokeWidth={1.6} />
+    <path d="M89 23 Q78 6 63 10 M89 23 Q90 6 99 2 M89 23 Q98 16 98.5 30" strokeWidth={2} />
   </>
 );
 
@@ -377,7 +414,9 @@ const sea = (
   </>
 );
 
-// Panguni: a thoranam of mango leaves, for the weddings of Panguni Uthiram
+// Panguni: a thoranam of mango leaves, for the weddings of Panguni Uthiram.
+// Pointed at, it is strung out wider: the string stretches, and the leaves
+// spread apart along it, each staying hung on it.
 const thoranam = (() => {
   const y = (x: number) => {
     const t = (x - 6) / 88;
@@ -385,16 +424,15 @@ const thoranam = (() => {
   };
   return (
     <>
-      <path d="M6 20 Q50 34 94 20" />
+      <path className="m-string" d="M6 20 Q50 34 94 20" />
       {[14, 26, 38, 50, 62, 74, 86].map((x, i) => {
         const y0 = y(x);
         const len = i % 2 ? 26 : 36;
-        // the leaves lengthen, as the thoranam is hung for the wedding
         return (
           <path
             key={x}
-            className="m-leaf"
-            style={n(Math.abs(i - 3))}
+            className="m-spread"
+            style={{ "--dx": (x - 50) * 0.22 } as CSSProperties}
             d={`M${x} ${y0} C${x - 7} ${y0 + len * 0.3} ${x - 4} ${y0 + len * 0.75} ${x} ${y0 + len} C${x + 4} ${y0 + len * 0.75} ${x + 7} ${y0 + len * 0.3} ${x} ${y0} Z M${x} ${y0 + 4} L${x} ${y0 + len - 4}`}
           />
         );
@@ -403,34 +441,42 @@ const thoranam = (() => {
   );
 })();
 
-const MOTIFS: Record<string, { art: ReactNode; label: string }> = {
-  chithirai: { art: artemisia, label: "Artemisia" },
-  vaikasi: { art: vel, label: "Murugan's vel" },
-  aani: { art: prabha, label: "Nataraja's ring of fire" },
-  aadi: { art: ammanEyes, label: "The eyes of the Amman, and her trident" },
-  aavani: { art: kozhukattai, label: "A kozhukattai" },
-  purattasi: { art: namam, label: "Perumal's namam" },
-  aippasi: { art: rain, label: "The first rains" },
-  karthigai: { art: lamps, label: "Karthigai lamps" },
-  margazhi: { art: kolam, label: "A kolam" },
-  thai: { art: pongal, label: "The pongal pot" },
-  masi: { art: sea, label: "The full moon over the sea" },
-  panguni: { art: thoranam, label: "A thoranam of mango leaves" },
+/* Each drawing, and the frame (a viewBox) that holds just it and the reach
+   of its movement: where the drawings sit side by side, as in the year
+   chart, they are fitted by these so all stand on the same line, with room
+   to move. */
+const MOTIFS: Record<string, { art: ReactNode; label: string; box: string }> = {
+  chithirai: { art: artemisia, label: "Artemisia", box: "13 3 73 97" },
+  vaikasi: { art: vel, label: "Murugan's vel", box: "27 -10 46 108" },
+  aani: { art: prabha, label: "Nataraja's ring of fire", box: "5 9 90 82" },
+  aadi: { art: ammanEyes, label: "The eyes of the Amman, and her trident", box: "3 8 94 69" },
+  aavani: { art: kozhukattai, label: "A kozhukattai", box: "11 -8 78 103" },
+  purattasi: { art: namam, label: "Perumal's namam", box: "29 11 42 86" },
+  aippasi: { art: rain, label: "The first rains", box: "10 15 79 76" },
+  karthigai: { art: lamps, label: "Karthigai lamps", box: "5 27 96 66" },
+  margazhi: { art: kolam, label: "A kolam", box: "11 11 78 78" },
+  thai: { art: pongal, label: "The pongal pot, and sugarcane", box: "16 0 88 97" },
+  masi: { art: sea, label: "The full moon over the sea", box: "5 11 88 86" },
+  panguni: { art: thoranam, label: "A thoranam of mango leaves", box: "-7 17 114 49" },
 };
 
 export function MonthMotif({
   month,
   className,
+  fit,
 }: {
   month: string;
   className?: string;
+  /** fitted to the drawing and its movement, standing on the frame's foot */
+  fit?: boolean;
 }) {
   const m = MOTIFS[month];
   if (!m) return null;
   return (
     <svg
       className={`motif${className ? ` ${className}` : ""}`}
-      viewBox="0 0 100 100"
+      viewBox={fit ? m.box : "0 0 100 100"}
+      preserveAspectRatio={fit ? "xMidYMax meet" : undefined}
       role="img"
       aria-label={m.label}
     >

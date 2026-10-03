@@ -29,7 +29,7 @@ export function RitualYear({
           style={{ "--r": m.rasi[0], "--c": m.rasi[1], "--m": m.colour } as CSSProperties}
         >
           {/* the month's drawing, as at the top of its page */}
-          <MonthMotif month={m.slug} className={`rasi-motif rasi-motif-${m.slug}`} />
+          <MonthMotif month={m.slug} className="rasi-motif" fit />
           <span className="rasi-ta" lang="ta">
             {m.tamil}
           </span>
@@ -43,7 +43,7 @@ export function RitualYear({
 
       <div className="rasi-centre">
         <div className="kicker">The ritual year</div>
-        <p>Twelve Tamil months, from Chithirai. Open a month to see what the temples keep in it.</p>
+        <p>Open a month to see what the temples keep in it.</p>
         {throughYear.length > 0 && (
           <>
             <h3 className="caps">All through the year</h3>

@@ -1523,7 +1523,7 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
   text-align: center;
   padding: 28px clamp(20px, 4vw, 56px);
 }
-.rasi-centre p { font-style: italic; font-size: 18px; line-height: 1.5; color: var(--ink-2); max-width: 24em; margin-top: 8px; }
+.rasi-centre p { font-style: italic; font-size: 18px; line-height: 1.5; color: var(--ink-2); max-width: 14em; margin-top: 8px; }
 .rasi-centre h3 { margin-top: 22px; color: var(--ochre); }
 .rasi-centre ul { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 16px; margin-top: 6px; }
 .rasi-centre a { font-size: 17px; border-bottom: 1px solid var(--rule); }
@@ -1987,20 +1987,25 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
 .calendar-anchor { scroll-margin-top: max(92px, calc(100svh - 660px)); }
 
 /* The month's drawing, small, above its name */
-.rasi-motif { color: var(--m); flex: none; width: 34px; height: 34px; margin-bottom: 2px; }
+/* each fitted to its drawing and its movement (MonthMotif's "fit"), all standing
+   on the same line above the Tamil name, in the same space */
+.rasi-motif { color: var(--m); flex: none; width: 48px; height: 34px; margin-bottom: 4px; }
 .rasi-month.now .rasi-motif { color: var(--lamp); }
 
 /* Each month's drawing comes alive when you point at its box: it grows a
    little, and does what it does. The parts that move are marked in
    MonthMotif.tsx; "--i" staggers a row of them. */
 .rasi-motif { overflow: visible; transform-origin: 50% 100%; transition: transform 0.3s ease; }
-.rasi-month:is(:hover, :focus-visible) .rasi-motif { transform: scale(1.35); }
+.rasi-month:is(:hover, :focus-visible) .rasi-motif { transform: scale(1.2); }
 .motif [class*="m-"] { transform-box: fill-box; transform-origin: center; }
-/* hidden until they happen: the vel's shine, the steam, the pongal running over */
+/* hidden until they happen: the vel's shine, the steam */
 .motif .m-ash,
 .motif .m-glint,
 .motif .m-steam { opacity: 0; }
-.motif .m-spill { stroke-dasharray: 100; stroke-dashoffset: 100; }
+/* the pongal: filled with the box's own colour, so it hides the pot behind it */
+.motif .foam { fill: var(--foam, var(--chalk)); }
+.rasi-month:hover { --foam: var(--chalk-2); }
+.rasi-month.now { --foam: var(--ink); }
 .rasi-month:is(:hover, :focus-visible) .motif {
   /* Chithirai: the artemisia burns down to ash, and grows again out of it */
   .m-regrow { transform-origin: 50% 100%; animation: m-regrow 2.2s ease-out both; }
@@ -2010,7 +2015,7 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
   .m-raise { animation: m-raise 2s ease-in-out infinite; }
   .m-glint { animation: m-glint 2s ease-in-out infinite; }
   /* Aani: the flames leap in turn round Nataraja's ring */
-  .m-ring-flame { transform-box: view-box; transform-origin: 50px 54px; animation: m-leap 1.2s ease-in-out infinite; animation-delay: calc(var(--i) * 0.1s); }
+  .m-ring-flame { animation: m-leap 1.2s ease-in-out infinite; animation-delay: calc(var(--i) * 0.1s); }
   /* Aadi: the Amman blinks, and looks about her; her tilakam glows */
   .m-blink { animation: m-blink 3.2s ease-in-out infinite; }
   .m-gaze { animation: m-gaze 3.2s ease-in-out infinite; }
@@ -2026,38 +2031,39 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
   /* Karthigai: the flames waver */
   .m-flame { transform-origin: 50% 100%; animation: m-waver 0.9s ease-in-out infinite alternate; animation-delay: calc(var(--i) * -0.3s); }
   /* Thai: the pongal boils over */
-  .m-froth { transform-origin: 50% 100%; animation: m-boil 2.4s ease-in-out infinite; }
-  .m-spill { animation: m-spill 2.4s ease-in infinite; animation-delay: calc(var(--i) * 0.15s); }
+  .m-boil { animation: m-boil 3s ease-in-out infinite; }
   /* Masi: the moon rises out of the sea; its light shimmers on the water */
   .m-rise { animation: m-rise 1.8s ease-out both; }
   .m-shimmer { animation: m-shimmer 1.2s ease-in-out infinite alternate; animation-delay: calc(var(--i) * 0.4s); }
-  /* Panguni: the thoranam's leaves lengthen */
-  .m-leaf { transform-origin: 50% 0; animation: m-grow 1.6s ease-out forwards; animation-delay: calc(var(--i) * 0.12s); }
+  /* Panguni: the thoranam is strung out wider; its leaves spread along it */
+  .m-string { animation: m-stretch 1.2s ease-out forwards; }
+  .m-spread { animation: m-spread 1.2s ease-out forwards; }
 }
 @keyframes m-regrow {  0% { opacity: 1; transform: none; }  8% { opacity: 0; transform: scale(0.8, 0.5); }  12% { opacity: 1; transform: scale(0.12, 0.04); }  75%, 100% { opacity: 1; transform: none; }}
 @keyframes m-ash { 0% { opacity: 0; } 8%, 45% { opacity: 1; } 80%, 100% { opacity: 0; } }
 @keyframes m-swell { 0% { transform: scale(0.4); } 60% { transform: scale(1.3); } 100% { transform: none; } }
 @keyframes m-raise { 40%, 70% { transform: translateY(-6px); } }
 @keyframes m-glint { 0%, 35% { opacity: 0; } 50% { opacity: 1; } 75%, 100% { opacity: 0; } }
-@keyframes m-leap { 50% { transform: scale(1.12); } }
-@keyframes m-blink { 0%, 30%, 40%, 100% { transform: none; } 35% { transform: scaleY(0.08); } }
-@keyframes m-gaze { 0%, 42%, 100% { transform: none; } 52%, 62% { transform: translateX(-3.5px); } 74%, 86% { transform: translateX(3.5px); } }
+@keyframes m-leap { 50% { transform: scale(1.3); } }
+@keyframes m-blink { 0%, 2%, 12%, 100% { transform: none; } 7% { transform: scaleY(0.08); } }
+@keyframes m-gaze { 0%, 16%, 100% { transform: none; } 28%, 42% { transform: translateX(-3.5px); } 58%, 72% { transform: translateX(3.5px); } 86% { transform: none; } }
 @keyframes m-glow { 50% { opacity: 0.45; transform: scale(1.12); } }
-@keyframes m-steam { 0% { opacity: 0; transform: translateY(6px); } 30% { opacity: 0.9; } 100% { opacity: 0; transform: translateY(-10px); } }
+@keyframes m-steam { 0% { opacity: 0; transform: translateY(6px); } 30% { opacity: 0.9; } 100% { opacity: 0; transform: translateY(-6px); } }
 @keyframes m-draw { from { stroke-dashoffset: 100; } to { stroke-dashoffset: 0; } }
 @keyframes m-drift { from { transform: translateX(-2px); } to { transform: translateX(2px); } }
-@keyframes m-fall { 0% { opacity: 0; transform: translateY(-6px); } 20% { opacity: 1; } 100% { opacity: 0; transform: translateY(10px); } }
+@keyframes m-fall { 0% { opacity: 0; transform: translateY(-6px); } 20% { opacity: 1; } 100% { opacity: 0; transform: translateY(5px); } }
 @keyframes m-waver {
   0% { transform: scale(1, 1) skewX(0); }
   33% { transform: scale(0.92, 1.14) skewX(-6deg); }
   66% { transform: scale(1.05, 0.94) skewX(5deg); }
   100% { transform: scale(0.97, 1.08) skewX(-3deg); }
 }
-@keyframes m-boil { 0%, 100% { transform: scale(1); } 30%, 75% { transform: scale(1.06, 1.45); } }
-@keyframes m-spill { 0%, 25% { stroke-dashoffset: 100; opacity: 1; } 60%, 85% { stroke-dashoffset: 0; opacity: 1; } 100% { stroke-dashoffset: 0; opacity: 0; } }
+/* the pongal's outline, heaped → swelling → pouring over → settling back */
+@keyframes m-boil { 0%, 8% { d: var(--rest); } 28% { d: var(--rise); } 52%, 80% { d: var(--over); } 100% { d: var(--rest); } }
 @keyframes m-rise { from { transform: translateY(30px); } to { transform: none; } }
 @keyframes m-shimmer { from { opacity: 0.25; transform: scaleX(0.7); } to { opacity: 1; transform: scaleX(1.15); } }
-@keyframes m-grow { to { transform: scaleY(1.4); } }
+@keyframes m-stretch { to { transform: scaleX(1.22); } }
+@keyframes m-spread { to { transform: translateX(calc(var(--dx) * 1px)); } }
 @media (prefers-reduced-motion: reduce) {
   .rasi-month .rasi-motif,
   .rasi-month .motif * { animation: none !important; transition: none !important; }
@@ -2065,7 +2071,4 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
 .motif .m-ash { color: #8d877e; } /* ash grey, whatever the month colour */
 /* Aadi's drawing is wide and low: a little larger, to hold its own beside the others */
 .month-head-motif-aadi { scale: 1.3; }
-/* in the chart: grown from the foot of the drawing (its lowest quarter is empty),
-   and set a little lower, so it clears the box's top as it grows on hover */
-.rasi-motif-aadi { scale: 1.3; transform-origin: 50% 74%; translate: 0 9px; }
 .month-head-motif-aadi { transform-origin: 100% 50%; } /* grows inwards, not past the page edge */
