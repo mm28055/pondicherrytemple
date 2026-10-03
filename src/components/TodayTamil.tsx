@@ -76,9 +76,9 @@ export function TodayTamil({ events }: { events: CalendarEvent[] }) {
         ) : (
           <div className="today-link is-plain">{words}</div>
         ))}
-      {/* the year's calendar, scrolled to, on the Festivals & rituals page */}
+      {/* the year's calendar, scrolled to, on the Calendar page */}
       {today && (
-        <Link className="arrow-link today-more" href="/festivals-and-rituals#calendar">
+        <Link className="arrow-link today-more" href="/calendar#calendar">
           Full calendar
         </Link>
       )}

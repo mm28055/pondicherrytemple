@@ -4,7 +4,16 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
-type Tab = { href: string; label: string; match: (p: string) => boolean };
+type Tab = {
+  href: string;
+  label: string;
+  match: (p: string) => boolean;
+  /** pages under it: a dropdown below its label (in the phone menu, beneath it) */
+  sub?: Tab[];
+};
+
+// the calendar, and the month pages it opens
+const inCalendar = (p: string) => p.startsWith("/calendar") || p.startsWith("/festivals-and-rituals/month");
 
 const TABS: Tab[] = [
   {
@@ -16,7 +25,8 @@ const TABS: Tab[] = [
   {
     href: "/festivals-and-rituals",
     label: "Festivals & Rituals",
-    match: (p) => p.startsWith("/festivals-and-rituals"),
+    match: (p) => p.startsWith("/festivals-and-rituals") || inCalendar(p),
+    sub: [{ href: "/calendar", label: "Calendar", match: inCalendar }],
   },
   { href: "/field-notes", label: "Field Notes", match: (p) => p.startsWith("/field-notes") },
   { href: "/articles", label: "Articles", match: (p) => p.startsWith("/articles") },
@@ -27,6 +37,8 @@ const TABS: Tab[] = [
 export function Nav() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  // a dropdown just clicked through stays shut until the pointer leaves it
+  const [shut, setShut] = useState<string | null>(null);
 
   // close the mobile menu whenever the route changes
   useEffect(() => setOpen(false), [pathname]);
@@ -48,14 +60,34 @@ export function Nav() {
             {TABS.map((t) => {
               const active = t.match(pathname);
               return (
-                <li key={t.href}>
+                <li
+                  key={t.href}
+                  className={t.sub ? `has-sub${shut === t.href ? " shut" : ""}` : undefined}
+                  onClick={t.sub ? () => setShut(t.href) : undefined}
+                  onMouseLeave={t.sub ? () => setShut(null) : undefined}
+                >
                   <Link
                     href={t.href}
                     className={active ? "active" : undefined}
-                    aria-current={active ? "page" : undefined}
+                    aria-current={active && !t.sub?.some((u) => u.match(pathname)) ? "page" : undefined}
                   >
                     {t.label}
                   </Link>
+                  {t.sub && (
+                    <ul className="nav-sub">
+                      {t.sub.map((u) => (
+                        <li key={u.href}>
+                          <Link
+                            href={u.href}
+                            className={u.match(pathname) ? "active" : undefined}
+                            aria-current={u.match(pathname) ? "page" : undefined}
+                          >
+                            {u.label}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                 </li>
               );
             })}

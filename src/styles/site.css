@@ -154,6 +154,35 @@ a:focus-visible, button:focus-visible {
 }
 .nav-links a:hover { color: var(--ochre); }
 .nav-links a.active { color: var(--ink); border-bottom-color: var(--ochre); }
+/* A dropdown under a label (Festivals & Rituals: the Calendar), dark against
+   the page, appearing straight below the label when it is pointed at. The
+   padding above bridges the gap, so the pointer can travel down to it. */
+.nav-links li.has-sub { position: relative; }
+.nav-sub {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  min-width: 100%;
+  padding-top: 10px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-4px);
+  transition: opacity 0.15s, transform 0.15s, visibility 0.15s;
+}
+/* open while pointed at, or reached with the keyboard; not after a click (shut) */
+.nav-links li.has-sub:not(.shut):is(:hover, :has(:focus-visible)) .nav-sub { opacity: 1; visibility: visible; transform: none; }
+.nav-sub li { background: var(--ink); }
+.nav-sub a {
+  display: block;
+  padding: 6px 14px 7px; /* a thin band */
+  font-size: 13px;
+  text-align: center;
+  color: var(--chalk);
+  border-bottom: 0;
+  white-space: nowrap;
+}
+.nav-sub a:hover,
+.nav-sub a.active { color: var(--lamp); }
 
 .nav-toggle {
   display: none;
@@ -182,6 +211,11 @@ a:focus-visible, button:focus-visible {
   }
   .nav-links.open li { width: 100%; border-bottom: 1px solid var(--rule); }
   .nav-links.open a { display: block; font-size: 19px; padding: 14px 0; border-bottom: none; }
+  /* in the phone menu, the Calendar sits beneath Festivals & Rituals, indented */
+  .nav-links.open .nav-sub { position: static; padding: 0 0 6px; opacity: 1; visibility: visible; transform: none; }
+  .nav-links.open .nav-sub li { background: none; border-bottom: 0; }
+  .nav-links.open .nav-sub a { color: var(--ink-2); font-size: 16px; padding: 4px 0 10px 18px; }
+  .nav-links.open .nav-sub a.active { color: var(--ochre); }
 }
 
 /* ---------- Page heads ---------- */
@@ -2149,3 +2183,80 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
 /* the months before the documentation began: shown, but quiet and closed */
 .rasi-month.before { opacity: 0.38; cursor: default; }
 .rasi-month.before:hover { background: none; }
+
+/* The Festivals & Rituals page, led by photographs: the most seen the full
+   width, its names over it; then the rest, A to Z, in a mosaic; a search above. */
+/* the search: small, at the right, a magnifying glass before it */
+/* in the header: the introduction at the left, the search beside it at the
+   right, level with its last line; the rule close beneath */
+.gallery-head { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 32px; align-items: end; padding-bottom: clamp(10px, 1.4vw, 16px); }
+.gallery-head > :not(.page-lede):not(.gallery-search) { grid-column: 1 / -1; }
+.gallery-head .page-lede { margin-bottom: 0; }
+.gallery-search { display: flex; justify-content: flex-end; align-items: center; gap: 14px; }
+@media (max-width: 700px) {
+  .gallery-head { grid-template-columns: minmax(0, 1fr); }
+  .gallery-search { margin-top: 10px; }
+}
+.gallery-find { display: flex; align-items: center; gap: 7px; width: min(220px, 100%); color: var(--muted); transition: color 0.15s; }
+.gallery-find:focus-within { color: var(--ochre); }
+.gallery-find svg { flex: none; }
+.gallery-find input { flex: 1; min-width: 0; padding: 4px 0 3px; border: 0; background: none; font: inherit; font-size: 14.5px; font-style: italic; color: var(--ink); outline: none; }
+.gallery-find input::placeholder { color: var(--muted); }
+.gallery-count { font-family: var(--display); font-weight: 600; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+
+.gallery { display: grid; gap: clamp(12px, 1.6vw, 22px); }
+.gallery-card { display: flex; flex-direction: column; color: inherit; }
+.gallery-pic { position: relative; display: block; overflow: hidden; background: var(--chalk-2); }
+.gallery-pic img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.5s ease; }
+.gallery-card:hover .gallery-pic img { transform: scale(1.04); }
+.gallery-stand-in {
+  position: absolute; inset: 0; display: grid; place-items: center; padding: 12px;
+  font-family: var(--tamil); font-weight: 700; font-size: clamp(30px, 3.4vw, 54px); line-height: 1.1; text-align: center;
+  color: var(--ochre); opacity: 0.22;
+}
+.gallery-to-come {
+  position: absolute; left: 12px; bottom: 10px;
+  font-family: var(--display); font-weight: 600; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted);
+}
+.gallery-text { display: flex; flex-direction: column; gap: 2px; padding-top: 12px; }
+/* the Tamil name and the English, side by side, a small red dot between */
+.gallery-names { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 9px; }
+.gallery-names.stacked { display: flex; flex-direction: column; }
+.gallery-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--ochre); align-self: center; flex: none; }
+.gallery-tamil { font-family: var(--tamil); font-weight: 700; font-size: 22px; line-height: 1.2; transition: color 0.15s; }
+.gallery-card:hover .gallery-tamil { color: var(--ochre); }
+.gallery-name { font-weight: 600; font-size: 21px; line-height: 1.2; } /* as tall as the Tamil beside it */
+.gallery-gloss { font-style: italic; color: var(--ink-2); font-size: 15.5px; line-height: 1.4; }
+/* festival or ritual: small red letters under every entry */
+.gallery-kind { margin-bottom: 4px; font-family: var(--display); font-weight: 700; font-size: 11.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ochre); }
+.gallery-seen { color: var(--muted); margin-top: 6px; }
+
+/* the lead: the full width, a wide photograph, its words over a dark fade */
+.gallery-card.lead { position: relative; margin-bottom: clamp(12px, 1.6vw, 22px); }
+.lead .gallery-pic { aspect-ratio: 21 / 9; }
+.lead .gallery-text {
+  position: absolute; left: 0; right: 0; bottom: 0; padding: 60px 28px 24px;
+  background: linear-gradient(transparent, rgba(22, 17, 14, 0.78)); color: var(--chalk);
+}
+.lead .gallery-tamil { font-size: clamp(30px, 3.6vw, 52px); }
+.lead .gallery-name { font-size: 22px; }
+.lead .gallery-gloss,
+.lead .gallery-seen { color: rgba(244, 241, 234, 0.85); }
+.lead .gallery-kind { color: #f0a98f; }
+.gallery-card.lead:hover .gallery-tamil { color: #f0a98f; } /* as its "festival", over the photograph */
+.lead.no-photo .gallery-text { position: static; background: none; color: inherit; padding: 12px 0 0; }
+
+/* The mosaic: two columns of photographs, each at its own shape, but none
+   smaller than a square (a wide one is cropped to one) and none taller than
+   1.3 times its width */
+.mosaic { display: block; columns: 2; column-gap: clamp(12px, 1.6vw, 22px); }
+.mosaic .gallery-card { break-inside: avoid; margin-bottom: clamp(18px, 2vw, 28px); }
+.mosaic .gallery-pic { container-type: inline-size; }
+.mosaic .gallery-pic img { height: auto; min-height: 100cqw; max-height: 130cqw; }
+
+@media (max-width: 700px) {
+  .gallery-tamil { font-size: 19px; }
+  .gallery-name { font-size: 18px; }
+  .lead .gallery-pic { aspect-ratio: 4 / 3; }
+  .gallery-gloss { font-size: 14px; }
+}

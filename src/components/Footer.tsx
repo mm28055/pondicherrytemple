@@ -21,6 +21,7 @@ export function Footer() {
             <ul>
               <li><Link href="/pondicherry">Temples</Link></li>
               <li><Link href="/festivals-and-rituals">Festivals &amp; Rituals</Link></li>
+              <li><Link href="/calendar">Calendar</Link></li>
               <li><Link href="/field-notes">Field Notes</Link></li>
               <li><Link href="/articles">Articles</Link></li>
               <li><Link href="/films">Films</Link></li>

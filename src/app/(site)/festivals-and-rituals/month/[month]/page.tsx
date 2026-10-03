@@ -79,8 +79,9 @@ export default async function MonthPage({ params }: Props) {
     <div className="wrap month-page" style={{ "--mt": month.colour } as CSSProperties}>
       <header className="page-head month-head">
         <div className="month-topline">
-          <Link className="crumb" href="/festivals-and-rituals">
-            ← Festivals &amp; rituals
+          {/* back to the year's chart, which the month belongs to */}
+          <Link className="crumb" href="/calendar">
+            ← Calendar
           </Link>
           <nav className="month-steps" aria-label="Other months">
             {prev && <Link href={href(prev)}>← {prev.month.name}</Link>}

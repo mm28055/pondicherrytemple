@@ -3,13 +3,11 @@ import {
   countTemplesForObservance,
   getObservances,
   getOccasionsForObservance,
-  getLineBegins,
-  getRitualYear,
+  getPhotosForObservance,
   getSectionIntro,
 } from "@/lib/data";
 import { observanceRow } from "@/lib/view";
-import { ObservanceRow } from "@/components/Rows";
-import { RitualYear } from "@/components/RitualYear";
+import { ObservanceGallery } from "@/components/ObservanceGallery";
 
 export const metadata: Metadata = {
   title: "Festivals & Rituals",
@@ -17,64 +15,46 @@ export const metadata: Metadata = {
     "The festivals and rituals of the temples — each explained once, with every field note and article about it.",
 };
 
-// Rebuilt once a day, so the month marked "Now" moves on by itself.
+// Rebuilt once a day.
 export const revalidate = 86400;
 
+/** The festivals and rituals, led by their photographs: the most seen the
+    full width, then the rest, festivals and rituals together, A to Z. */
 export default async function ObservancesPage() {
-  const year = await getRitualYear();
-  const today = new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Kolkata" });
-
   const all = await Promise.all(
-    (await getObservances()).map(async (o) => ({
-      o,
-      row: observanceRow(o, await countTemplesForObservance(o.id)),
-      seen: (await getOccasionsForObservance(o.id)).length,
-    }))
+    (await getObservances()).map(async (o) => {
+      // its photograph: one marked featured, if any; else the first
+      const photos = await getPhotosForObservance(o.id);
+      const p = photos.find((x) => x.featured) ?? photos[0];
+      return {
+        o,
+        row: observanceRow(o, await countTemplesForObservance(o.id)),
+        seen: (await getOccasionsForObservance(o.id)).length,
+        photo: p ? { src: p.medium, alt: p.alt, focus: p.focus } : undefined,
+      };
+    })
   );
   // most often seen first, within each kind
   const sorted = all.sort((a, b) => b.seen - a.seen || a.o.name.localeCompare(b.o.name));
-  const festivals = sorted.filter((x) => x.o.kind === "festival");
-  const rituals = sorted.filter((x) => x.o.kind === "ritual");
+
+  // the most seen leads; the rest, festivals and rituals together, A to Z
+  const items = sorted.map(({ o, row, photo }) => ({ row, kind: o.kind, photo }));
+  const [lead, ...rest] = items;
+  rest.sort((x, y) => x.row.name.localeCompare(y.row.name));
 
   return (
     <div className="wrap">
-      <header className="page-head">
-        <div className="kicker">The ritual year</div>
-        <h1 className="page-title">Festivals &amp; Rituals</h1>
-        <p className="page-lede">{await getSectionIntro("observances")}</p>
-      </header>
-
-      <section className="section">
-        <div className="section-head">
-          <h2>By month</h2>
-        </div>
-        {/* the home page's "Full calendar" opens here, the chart filling the screen */}
-        <div id="calendar" className="calendar-anchor">
-          <RitualYear
-            throughYear={year.throughYear.map((o) => ({ id: o.id, name: o.name }))}
-            today={today}
-            begins={await getLineBegins()}
-          />
-        </div>
-      </section>
-
-      <section className="section">
-        <div className="section-head">
-          <h2>All festivals</h2>
-        </div>
-        {festivals.map(({ row }) => (
-          <ObservanceRow key={row.id} row={row} />
-        ))}
-      </section>
-
-      <section className="section tight">
-        <div className="section-head">
-          <h2>All rituals</h2>
-        </div>
-        {rituals.map(({ row }) => (
-          <ObservanceRow key={row.id} row={row} />
-        ))}
-      </section>
+      <ObservanceGallery
+        lead={lead}
+        items={rest}
+        head={
+          <>
+            <div className="kicker">The ritual year</div>
+            <h1 className="page-title">Festivals &amp; Rituals</h1>
+            <p className="page-lede">{await getSectionIntro("observances")}</p>
+          </>
+        }
+      />
     </div>
   );
 }
