@@ -14,6 +14,7 @@ import { dateParts, monthDates, monthYearOf, TAMIL_MONTHS } from "@/lib/calendar
 import { calendarEvents } from "@/lib/calendarEvents";
 import { MonthCalendar } from "@/components/MonthCalendar";
 import { MonthMotif } from "@/components/MonthMotif";
+import { MonthSwipe } from "@/components/MonthSwipe";
 
 type Props = { params: Promise<{ month: string }> };
 
@@ -93,7 +94,10 @@ export default async function MonthPage({ params }: Props) {
             </span>
             <span className="cal-step-name">{prev.name}</span>
           </Link>
-          <MonthCalendar month={month} year={y} events={events.filter((e) => e.year === y)} today={today} />
+          {/* on a phone, swiped to the months either side (the arrows are for a computer) */}
+          <MonthSwipe prev={`/festivals-and-rituals/month/${prev.slug}`} next={`/festivals-and-rituals/month/${next.slug}`}>
+            <MonthCalendar month={month} year={y} events={events.filter((e) => e.year === y)} today={today} />
+          </MonthSwipe>
           <Link className="cal-step next" href={`/festivals-and-rituals/month/${next.slug}`} scroll={false}>
             <span className="cal-step-arrow" aria-hidden="true">
               →

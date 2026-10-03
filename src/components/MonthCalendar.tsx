@@ -324,13 +324,12 @@ export function MonthCalendar({
               </ul>
             </>
           )}
-          <p className="cal-hint">Tap a marked day to see what happened.</p>
           <button className="cal-all" onClick={() => setShowAll((v) => !v)} aria-expanded={showAll}>
             {showAll
               ? "Hide the list"
               : marked.length === 1
-                ? "See the day we were there, as a list"
-                : `See the ${marked.length} days we were there, as a list`}
+                ? "See 1 recorded day as a list"
+                : `See ${marked.length} recorded days as a list`}
           </button>
         </div>
       )}
@@ -358,14 +357,6 @@ export function MonthCalendar({
       {/* A day, large, over the page */}
       <DayDialog day={open} events={events} onClose={() => setOpen(null)} />
 
-      <p className="month-cal-key">
-        <span className="cal-moon full">
-          <span className="dot" aria-hidden="true" /> pournami, full moon
-        </span>
-        <span className="cal-moon new">
-          <span className="dot" aria-hidden="true" /> amavasya, new moon
-        </span>
-      </p>
     </section>
   );
 }

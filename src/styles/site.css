@@ -1686,13 +1686,21 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
 .cal-step.next:hover { transform: translateX(3px); }
 @media (max-width: 900px) {
   .cal-with-steps { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
-  .cal-with-steps .month-cal { grid-column: 1 / -1; order: -1; }
+  .cal-with-steps .month-swipe { grid-column: 1 / -1; order: -1; }
   .cal-step { flex-direction: row; gap: 10px; padding-block: 8px 0; }
   .cal-step.prev { justify-content: flex-start; }
   .cal-step.next { justify-content: flex-end; flex-direction: row-reverse; }
   .cal-step-arrow { font-size: 26px; }
 }
-.month-cal { padding-block: 8px clamp(40px, 5vw, 64px); }
+/* a phone: the calendar is swiped to the months either side (MonthSwipe), so
+   no arrows; the browser keeps the up-and-down scrolling, the swipe is ours */
+.month-swipe { touch-action: pan-y; }
+@media (max-width: 700px) {
+  .cal-step { display: none; }
+}
+.month-cal { padding-block: 8px; }
+/* the same room after the calendar (and, on a phone, the month links under it) as between sections */
+.cal-with-steps { margin-bottom: clamp(28px, 3.5vw, 44px); }
 .month-cal-head {
   display: flex;
   flex-wrap: wrap;
@@ -1886,14 +1894,6 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
 }
 .cal-list li li { font-size: 16px; line-height: 1.4; }
 .month-cal-none { margin-top: 14px; }
-.month-cal-key {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px 22px;
-  margin-top: 12px;
-  font-size: 12px; /* the size of the moons beside it */
-  color: var(--muted);
-}
 
 /* The boxes show less as they narrow — measured by the calendar's own
    width, not the screen's. Wide (a laptop): everything. */
@@ -1953,18 +1953,31 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
   .cal-panel li { font-size: 16.5px; line-height: 1.4; padding-block: 4px; }
   .cal-panel li + li { border-top: 1px solid var(--rule); }
   .cal-panel .cal-tags a { font-size: 11px; }
-  .cal-hint { font-size: 13.5px; font-style: italic; color: var(--muted); margin-top: 10px; }
+  /* the whole month as a list: plainly a button, but a quiet one */
   .cal-all {
-    margin-top: 6px;
-    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    margin-top: 12px;
+    padding: 8px 12px;
     background: none;
-    border: none;
-    border-bottom: 1px solid var(--rule);
-    font: inherit;
-    font-size: 14.5px;
-    color: var(--ink-2);
+    border: 1px solid var(--rule);
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--m, var(--ochre));
     cursor: pointer;
+    transition: background 0.15s, color 0.15s;
   }
+  .cal-all::after { content: "▾"; font-size: 13px; line-height: 1; }
+  .cal-all[aria-expanded="true"]::after { content: "▴"; }
+  .cal-all:hover,
+  .cal-all:active { border-color: var(--m, var(--ochre)); }
+  .cal-all[aria-expanded="true"] { background: var(--chalk-2); }
   .cal-list { display: none; }
   .cal-list.open { display: block; }
 
