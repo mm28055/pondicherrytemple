@@ -18,6 +18,44 @@ import { useEffect, useLayoutEffect, useRef, type ReactNode, type TouchEvent } f
    month's is put in the same place when it arrives. */
 let swipedFrom: { top: number } | null = null;
 
+/* After a trackpad swipe, the trackpad goes on sending a glide of sideways
+   movement for a moment after the fingers lift. It belongs to the swipe just
+   made, and is let go of (across the change to the new month, which it would
+   otherwise nudge). A glide only ever slows; so once the movement has fallen
+   away and then picks up again, or turns the other way, it is a new swipe,
+   and counts, however soon it comes. */
+let glide: { peak: number; low: number; sign: number } | null = null;
+let glideEnds: number | undefined;
+export function startGlide(dx: number) {
+  glide = { peak: Math.abs(dx), low: Math.abs(dx), sign: Math.sign(dx) };
+  window.clearTimeout(glideEnds);
+  glideEnds = window.setTimeout(() => (glide = null), 250);
+}
+/** Whether this sideways movement is the glide after a swipe (and to be let go of). */
+export function inGlide(dx: number): boolean {
+  if (!glide) return false;
+  const m = Math.abs(dx);
+  const fresh = (m > glide.low + 3 && glide.low < glide.peak * 0.5) || (Math.sign(dx) !== glide.sign && m > 3);
+  if (fresh) {
+    glide = null;
+    return false;
+  }
+  glide.peak = Math.max(glide.peak, m);
+  glide.low = Math.min(glide.low, m);
+  window.clearTimeout(glideEnds);
+  glideEnds = window.setTimeout(() => (glide = null), 250);
+  return true;
+}
+
+/* A swipe made while the month before it is still opening: carried out as
+   soon as that month arrives, so two quick swipes go two months. */
+let queued: -1 | 1 | null = null;
+
+/* How far the trackpad swipe under way has gone. Kept here, not in the page,
+   so that a swipe begun while one month gives way to the next is counted in
+   full by the new one. */
+const wheel: { dx: number; rest?: number } = { dx: 0 };
+
 export function MonthSwipe({
   prev,
   next,
@@ -69,6 +107,15 @@ export function MonthSwipe({
     requestAnimationFrame(() => requestAnimationFrame(() => page.classList.remove("month-arriving")));
   }, [prev, next]);
 
+  // a swipe that came while this month was on its way
+  useEffect(() => {
+    if (!queued) return;
+    const way = queued;
+    queued = null;
+    const t = window.setTimeout(() => latest.current(way), 60);
+    return () => window.clearTimeout(t);
+  }, [prev, next]);
+
   const slide = (x: string, settle: boolean) => {
     const el = track.current;
     if (!el) return;
@@ -77,6 +124,7 @@ export function MonthSwipe({
   };
 
   // On to the month beside: -1 the one before, 1 the one after.
+  const latest = useRef<(way: -1 | 1) => void>(() => {});
   const go = (way: -1 | 1) => {
     if (going.current) return;
     const to = way > 0 ? next : prev;
@@ -91,6 +139,7 @@ export function MonthSwipe({
     }
     window.setTimeout(() => router.push(to, { scroll: false }), 300);
   };
+  latest.current = go;
 
   // A two-finger swipe on a trackpad arrives as sideways scrolling. It follows
   // the fingers; past a fifth of the width it goes on by itself (whatever the
@@ -99,34 +148,36 @@ export function MonthSwipe({
   useEffect(() => {
     const el = outer.current;
     if (!el) return;
-    let dx = 0;
-    let quietUntil = 0;
-    let rest: number | undefined;
     const onWheel = (e: WheelEvent) => {
       const across = Math.abs(e.deltaX) > Math.abs(e.deltaY);
-      if (!dx && !across) return; // up and down: the page scrolls
+      if (!wheel.dx && !across) return; // up and down: the page scrolls
       e.preventDefault(); // and not the browser's own back and forward
-      if (going.current || Date.now() < quietUntil) return;
+      if (inGlide(e.deltaX)) return; // the glide after a swipe
       const width = track.current?.offsetWidth ?? 600;
-      dx = Math.max(-width, Math.min(width, dx - e.deltaX));
-      window.clearTimeout(rest);
-      if (Math.abs(dx) > width / 5) {
-        const way = dx < 0 ? 1 : -1;
-        dx = 0;
-        go(way);
+      wheel.dx = Math.max(-width, Math.min(width, wheel.dx - e.deltaX));
+      window.clearTimeout(wheel.rest);
+      if (Math.abs(wheel.dx) > width / 5) {
+        const way = wheel.dx < 0 ? 1 : -1;
+        wheel.dx = 0;
+        startGlide(e.deltaX);
+        if (going.current) queued = way; // the month before is still opening
+        else go(way);
         return;
       }
-      slide(`${follow(dx)}px`, false);
-      rest = window.setTimeout(() => {
-        dx = 0;
-        quietUntil = Date.now() + 300;
+      if (going.current) {
+        // gathering a swipe for when it arrives; one that stops short is dropped
+        wheel.rest = window.setTimeout(() => (wheel.dx = 0), 220);
+        return;
+      }
+      slide(`${follow(wheel.dx)}px`, false);
+      wheel.rest = window.setTimeout(() => {
+        wheel.dx = 0;
         slide("", true);
       }, 220);
     };
     el.addEventListener("wheel", onWheel, { passive: false });
     return () => {
       el.removeEventListener("wheel", onWheel);
-      window.clearTimeout(rest);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [prev, next]);

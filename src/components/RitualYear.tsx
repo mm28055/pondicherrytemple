@@ -5,6 +5,7 @@ import { useEffect, useRef, useState, type CSSProperties, type TouchEvent } from
 import { monthDates, TAMIL_MONTHS } from "@/lib/calendar";
 import { tamilYearName } from "@/lib/tamilDate";
 import { MonthMotif } from "@/components/MonthMotif";
+import { inGlide, startGlide } from "@/components/MonthSwipe";
 
 /** The ritual year as a South Indian chart (the rasi kattam): the twelve
     Tamil months round the edge of a square, Chithirai at the top, going
@@ -59,18 +60,17 @@ export function RitualYear({
     const el = grid.current?.parentElement;
     if (!el) return;
     let dx = 0;
-    let quietUntil = 0;
     let rest: number | undefined;
     const onWheel = (e: WheelEvent) => {
       if (!dx && Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return;
       e.preventDefault();
-      if (Date.now() < quietUntil) return;
+      if (inGlide(e.deltaX)) return; // the glide after a swipe
       dx -= e.deltaX;
       window.clearTimeout(rest);
       if (Math.abs(dx) > 140) {
         const way = dx < 0 ? 1 : -1;
         dx = 0;
-        quietUntil = Date.now() + 700;
+        startGlide(e.deltaX);
         latest.current.drag(0);
         latest.current.go(way);
         return;
@@ -78,7 +78,6 @@ export function RitualYear({
       latest.current.drag(dx * 0.4);
       rest = window.setTimeout(() => {
         dx = 0;
-        quietUntil = Date.now() + 300;
         latest.current.drag(0, true);
       }, 220);
     };
