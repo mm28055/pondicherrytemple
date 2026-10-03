@@ -1636,6 +1636,8 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
   gap: 24px;
   align-items: center;
 }
+/* its rule, and the calendar's heading below it, in the month's colour */
+.month-head { border-bottom-color: var(--m); padding-bottom: clamp(8px, 1.2vw, 14px); } /* close above its rule */
 /* the way back, and the months either side, on one line above the name */
 .month-topline {
   grid-column: 1 / -1;
@@ -1654,9 +1656,12 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
   .month-head-text,
   .month-head-motif { grid-row: 2; grid-column: 1; }
   .month-topline { margin-bottom: 22px; }
+  /* the way back and the months either side stay on one line, even for the
+     longest pair of names (Aippasi's: Purattasi, Karthigai): a little narrower */
+  .month-topline { flex-wrap: nowrap; gap: 12px; }
   .month-topline .crumb,
-  .month-steps a { font-size: 12px; letter-spacing: 0.08em; }
-  .month-steps { gap: 16px; }
+  .month-steps a { font-size: 12px; letter-spacing: 0.05em; font-variation-settings: "wdth" 85; white-space: nowrap; }
+  .month-steps { gap: 12px; flex: none; }
   .month-head-motif { width: 76px; justify-self: end; align-self: start; }
 }
 
@@ -1694,38 +1699,38 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
 }
 /* a phone: the calendar is swiped to the months either side (MonthSwipe), so
    no arrows; the browser keeps the up-and-down scrolling, the swipe is ours */
-.month-swipe { touch-action: pan-y; overflow-x: clip; }
+.month-swipe { touch-action: pan-y; overflow-x: clip; overscroll-behavior-x: contain; }
 .swipe-track { position: relative; }
-/* the months either side, waiting just off the screen; only on a phone */
-.swipe-beside { display: none; position: absolute; top: 0; width: 100%; pointer-events: none; }
+/* the months either side, waiting just out of sight (swiped in on a phone, or
+   with two fingers on a trackpad) */
+.swipe-beside { position: absolute; top: 0; width: 100%; pointer-events: none; }
 .swipe-beside.before { right: calc(100% + 24px); }
 .swipe-beside.after { left: calc(100% + 24px); }
 @media (max-width: 700px) {
   .cal-step { display: none; }
-  .swipe-beside { display: block; }
 }
-.month-cal { padding-block: 8px; }
+.month-cal { padding-block: 10px 8px; }
 /* the same room after the calendar (and, on a phone, the month links under it) as between sections */
 .cal-with-steps { margin-bottom: clamp(28px, 3.5vw, 44px); }
 .month-cal-head {
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-between;
+  justify-content: center; /* the month and year, in the middle of its band */
   align-items: baseline;
   gap: 4px 24px;
-  border-bottom: 2px solid var(--ink);
-  padding-bottom: 8px;
+  border-bottom: 2px solid var(--m, var(--ink));
+  padding-bottom: 3px;
   margin-bottom: 14px;
 }
 .month-cal-head h2 {
   font-family: var(--display);
   font-weight: 800;
   font-variation-settings: "wdth" 75;
-  font-size: 24px;
-  letter-spacing: 0.02em;
+  font-size: 17px; /* a thin band */
+  line-height: 1.2;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
-.month-cal-dates { font-style: italic; color: var(--muted); font-size: 16px; }
 .cal {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
@@ -2091,3 +2096,56 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
 /* Aadi's drawing is wide and low: a little larger, to hold its own beside the others */
 .month-head-motif-aadi { scale: 1.3; }
 .month-head-motif-aadi { transform-origin: 100% 50%; } /* grows inwards, not past the page edge */
+
+/* A month's page: its colour is --mt, registered as a colour so that, as the
+   next month is swiped in, it glides from one month's to the next (bands,
+   title, drawing, all that use --m). While the new month loads, the rest of
+   the page dims a little, then comes back. */
+@property --mt {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #a87a0c;
+}
+.month-page { --m: var(--mt); transition: --mt 0.45s ease; }
+.month-page > :not(.cal-with-steps) { transition: opacity 0.3s ease; }
+.month-page.month-leaving > :not(.cal-with-steps) { opacity: 0.35; }
+.month-page.month-arriving > :not(.cal-with-steps) { opacity: 0.35; transition: none; }
+
+
+/* The year, in the middle of the chart: large, with the arrows either side,
+   and its name in the sixty-year cycle beneath */
+.rasi-years { touch-action: pan-y; overflow-x: clip; }
+.rasi { transition: transform 0.3s ease; }
+.rasi.from-right { animation: rasi-in-right 0.4s ease-out; }
+.rasi.from-left { animation: rasi-in-left 0.4s ease-out; }
+@keyframes rasi-in-right { from { opacity: 0; transform: translateX(48px); } }
+@keyframes rasi-in-left { from { opacity: 0; transform: translateX(-48px); } }
+.rasi-year { display: flex; align-items: center; justify-content: center; gap: clamp(10px, 2vw, 22px); margin-top: 6px; }
+.rasi-year-num {
+  font-family: var(--display);
+  font-weight: 800;
+  font-variation-settings: "wdth" 75;
+  font-size: clamp(48px, 6.5vw, 88px);
+  line-height: 0.95;
+  letter-spacing: 0.01em;
+  color: var(--ink);
+}
+.rasi-year-step {
+  border: 0;
+  background: none;
+  padding: 4px 8px;
+  font-family: var(--display);
+  font-size: clamp(30px, 3.4vw, 44px);
+  line-height: 1;
+  color: var(--ochre);
+  cursor: pointer;
+  transition: transform 0.15s, color 0.15s;
+}
+.rasi-year-step:first-child:hover { transform: translateX(-3px); }
+.rasi-year-step:last-child:hover { transform: translateX(3px); }
+.rasi-year-step:disabled { color: var(--rule); cursor: default; transform: none; }
+.rasi-centre .rasi-year-name { font-style: normal; font-size: 15px; margin-top: 6px; color: var(--muted); letter-spacing: 0.04em; }
+.rasi-year-name [lang="ta"] { font-family: var(--tamil); font-weight: 600; color: var(--ochre); }
+/* the months before the documentation began: shown, but quiet and closed */
+.rasi-month.before { opacity: 0.38; cursor: default; }
+.rasi-month.before:hover { background: none; }

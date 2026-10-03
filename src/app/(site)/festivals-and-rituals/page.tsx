@@ -3,10 +3,10 @@ import {
   countTemplesForObservance,
   getObservances,
   getOccasionsForObservance,
+  getLineBegins,
   getRitualYear,
   getSectionIntro,
 } from "@/lib/data";
-import { tamilMonthOf } from "@/lib/calendar";
 import { observanceRow } from "@/lib/view";
 import { ObservanceRow } from "@/components/Rows";
 import { RitualYear } from "@/components/RitualYear";
@@ -50,7 +50,11 @@ export default async function ObservancesPage() {
         </div>
         {/* the home page's "Full calendar" opens here, the chart filling the screen */}
         <div id="calendar" className="calendar-anchor">
-          <RitualYear months={year.months} throughYear={year.throughYear} now={tamilMonthOf(today)} />
+          <RitualYear
+            throughYear={year.throughYear.map((o) => ({ id: o.id, name: o.name }))}
+            today={today}
+            begins={await getLineBegins()}
+          />
         </div>
       </section>
 

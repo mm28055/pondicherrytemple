@@ -35,6 +35,24 @@ const YEAR_NAMES = [
   "Rakshasa", "Nala", "Pingala", "Kalayukti", "Siddharthi", "Raudri", "Durmati", "Dundubhi",
   "Rudhirodgari", "Raktakshi", "Krodhana", "Akshaya",
 ];
+// the same sixty, in Tamil
+const YEAR_NAMES_TA = [
+  "பிரபவ", "விபவ", "சுக்ல", "பிரமோதூத", "பிரசோற்பத்தி", "ஆங்கீரச", "ஸ்ரீமுக", "பவ",
+  "யுவ", "தாது", "ஈஸ்வர", "வெகுதானிய", "பிரமாதி", "விக்கிரம", "விஷு", "சித்திரபானு",
+  "சுபானு", "தாரண", "பார்த்திப", "விய", "சர்வசித்து", "சர்வதாரி", "விரோதி", "விக்ருதி",
+  "கர", "நந்தன", "விஜய", "ஜய", "மன்மத", "துன்முகி", "ஹேவிளம்பி", "விளம்பி",
+  "விகாரி", "சார்வரி", "பிலவ", "சுபகிருது", "சோபகிருது", "குரோதி", "விசுவாவசு", "பராபவ",
+  "பிலவங்க", "கீலக", "சௌமிய", "சாதாரண", "விரோதகிருது", "பரிதாபி", "பிரமாதீச", "ஆனந்த",
+  "ராட்சச", "நள", "பிங்கள", "காளயுக்தி", "சித்தார்த்தி", "ரௌத்திரி", "துன்மதி", "துந்துபி",
+  "ருத்ரோத்காரி", "ரக்தாட்சி", "குரோதன", "அட்சய",
+];
+
+/** The name of the Tamil year that begins at Chithirai in a given year, in
+    English and Tamil: 2026 is Parabhava, பராபவ. */
+export function tamilYearName(startYear: number): { en: string; ta: string } {
+  const i = (((startYear - 1987) % 60) + 60) % 60;
+  return { en: YEAR_NAMES[i], ta: YEAR_NAMES_TA[i] };
+}
 
 const rad = (d: number) => (d * Math.PI) / 180;
 const DAY = 86_400_000;

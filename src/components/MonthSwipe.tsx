@@ -1,55 +1,135 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, type ReactNode, type TouchEvent } from "react";
+import { useEffect, useLayoutEffect, useRef, type ReactNode, type TouchEvent } from "react";
 
-/** On a phone, a month's calendar is swiped to the month either side: left
-    for the next, right for the one before. The months either side wait just
-    off the screen (`before`, `after`), and the three move together with the
-    finger, so the next month slides in as this one slides out. Let go past a
-    third of the way, or with a flick, and it carries on and the new month
-    opens, where you are on the page; otherwise it springs back. Up-and-down
-    movements are left to the page's own scrolling. (On a computer the
-    neighbours are hidden, and the arrows beside the calendar do this.) */
+/** A month's calendar is swiped to the month either side: left for the
+    next, right for the one before — with a finger on a phone, or two fingers
+    across a computer's trackpad. The months either side wait just out of
+    sight (`before`, `after`), and the three move together, so the next month
+    slides in as this one slides out. Once it has gone far enough it carries
+    on by itself: the page's colour glides to the new month's (`colours`, the
+    months before and after), the rest of the page dims a little, and the new
+    month opens where you are on the page. Short of that, it springs back.
+    Up-and-down movement is left to the page's own scrolling. At either end of
+    the cycle shown there is no month beyond (prev or next is null): the
+    calendar gives a little, like a held elastic, and springs back. */
+/* Where the calendar stood on the screen as it was swiped away: the new
+   month's is put in the same place when it arrives. */
+let swipedFrom: { top: number } | null = null;
+
 export function MonthSwipe({
   prev,
   next,
   before,
   after,
+  colours,
   children,
 }: {
-  prev: string;
-  next: string;
+  prev: string | null;
+  next: string | null;
   before: ReactNode;
   after: ReactNode;
+  colours: [string, string];
   children: ReactNode;
 }) {
   const router = useRouter();
+  const outer = useRef<HTMLDivElement>(null);
   const track = useRef<HTMLDivElement>(null);
   const start = useRef<{ x: number; y: number; t: number; along: boolean | null } | null>(null);
   const going = useRef(false);
 
   useEffect(() => {
-    router.prefetch(prev);
-    router.prefetch(next);
+    if (prev) router.prefetch(prev);
+    if (next) router.prefetch(next);
   }, [router, prev, next]);
 
-  // the new month has arrived in the middle: put the track back, unseen
-  useEffect(() => {
+  // how far the calendar follows: all the way towards a month that is there;
+  // towards the end of the cycle, only a little, harder the further you pull
+  const follow = (dx: number) => ((dx > 0 ? prev : next) ? dx : Math.sign(dx) * 40 * (1 - Math.exp(-Math.abs(dx) / 120)));
+
+  // The new month has arrived in the middle. Before it is drawn: the track
+  // back, unseen; the calendar where the last one stood (whatever the height
+  // of the new month's heading above it); and the rest of the page starting as
+  // dim as it was left, to come back up gently, not all at once.
+  useLayoutEffect(() => {
     going.current = false;
     const el = track.current;
     if (el) {
       el.style.transition = "none";
       el.style.transform = "";
     }
+    const page = outer.current?.closest(".month-page");
+    page?.classList.remove("month-leaving");
+    if (!swipedFrom || !outer.current || !page) return;
+    const dy = outer.current.getBoundingClientRect().top - swipedFrom.top;
+    if (Math.abs(dy) > 0.5) window.scrollBy({ top: dy, behavior: "instant" });
+    swipedFrom = null;
+    page.classList.add("month-arriving");
+    requestAnimationFrame(() => requestAnimationFrame(() => page.classList.remove("month-arriving")));
   }, [prev, next]);
 
   const slide = (x: string, settle: boolean) => {
     const el = track.current;
     if (!el) return;
-    el.style.transition = settle ? "transform 0.3s cubic-bezier(0.2, 0.7, 0.3, 1)" : "none";
+    el.style.transition = settle ? "transform 0.32s cubic-bezier(0.2, 0.7, 0.3, 1)" : "none";
     el.style.transform = x ? `translateX(${x})` : "";
   };
+
+  // On to the month beside: -1 the one before, 1 the one after.
+  const go = (way: -1 | 1) => {
+    if (going.current) return;
+    const to = way > 0 ? next : prev;
+    if (!to) return slide("", true); // the end of the cycle: back into place
+    going.current = true;
+    swipedFrom = { top: outer.current?.getBoundingClientRect().top ?? 0 };
+    slide(way > 0 ? "calc(-100% - 24px)" : "calc(100% + 24px)", true);
+    const page = outer.current?.closest<HTMLElement>(".month-page");
+    if (page) {
+      page.style.setProperty("--mt", way > 0 ? colours[1] : colours[0]);
+      page.classList.add("month-leaving");
+    }
+    window.setTimeout(() => router.push(to, { scroll: false }), 300);
+  };
+
+  // A two-finger swipe on a trackpad arrives as sideways scrolling. It follows
+  // the fingers; past a fifth of the width it goes on by itself (whatever the
+  // fingers do after); if it stops short, it springs back. The glide a
+  // trackpad adds after the fingers lift is let go of, so one swipe is one month.
+  useEffect(() => {
+    const el = outer.current;
+    if (!el) return;
+    let dx = 0;
+    let quietUntil = 0;
+    let rest: number | undefined;
+    const onWheel = (e: WheelEvent) => {
+      const across = Math.abs(e.deltaX) > Math.abs(e.deltaY);
+      if (!dx && !across) return; // up and down: the page scrolls
+      e.preventDefault(); // and not the browser's own back and forward
+      if (going.current || Date.now() < quietUntil) return;
+      const width = track.current?.offsetWidth ?? 600;
+      dx = Math.max(-width, Math.min(width, dx - e.deltaX));
+      window.clearTimeout(rest);
+      if (Math.abs(dx) > width / 5) {
+        const way = dx < 0 ? 1 : -1;
+        dx = 0;
+        go(way);
+        return;
+      }
+      slide(`${follow(dx)}px`, false);
+      rest = window.setTimeout(() => {
+        dx = 0;
+        quietUntil = Date.now() + 300;
+        slide("", true);
+      }, 220);
+    };
+    el.addEventListener("wheel", onWheel, { passive: false });
+    return () => {
+      el.removeEventListener("wheel", onWheel);
+      window.clearTimeout(rest);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [prev, next]);
 
   const onTouchStart = (e: TouchEvent) => {
     if (going.current) return;
@@ -63,7 +143,7 @@ export function MonthSwipe({
     const dx = t.clientX - s.x, dy = t.clientY - s.y;
     // decide once, after a little movement: a swipe across, or a scroll
     if (s.along === null && Math.hypot(dx, dy) > 8) s.along = Math.abs(dx) > Math.abs(dy) * 1.2;
-    if (s.along) slide(`${dx}px`, false); // with the finger, one to one
+    if (s.along) slide(`${follow(dx)}px`, false); // with the finger, one to one
   };
   const onTouchEnd = (e: TouchEvent) => {
     const s = start.current;
@@ -73,14 +153,11 @@ export function MonthSwipe({
     const width = track.current?.offsetWidth ?? 360;
     const flick = Math.abs(dx) / Math.max(1, Date.now() - s.t) > 0.5 && Math.abs(dx) > 30;
     if (Math.abs(dx) < width / 3 && !flick) return slide("", true); // back into place
-    going.current = true;
-    // carry on to the month beside (a gap of 24px between them), then open it
-    slide(dx < 0 ? "calc(-100% - 24px)" : "calc(100% + 24px)", true);
-    window.setTimeout(() => router.push(dx < 0 ? next : prev, { scroll: false }), 280);
+    go(dx < 0 ? 1 : -1);
   };
 
   return (
-    <div className="month-swipe">
+    <div ref={outer} className="month-swipe">
       <div
         ref={track}
         className="swipe-track"
@@ -92,13 +169,17 @@ export function MonthSwipe({
           if (!going.current) slide("", true);
         }}
       >
-        <div className="swipe-beside before" aria-hidden="true" inert>
-          {before}
-        </div>
+        {before && (
+          <div className="swipe-beside before" aria-hidden="true" inert>
+            {before}
+          </div>
+        )}
         {children}
-        <div className="swipe-beside after" aria-hidden="true" inert>
-          {after}
-        </div>
+        {after && (
+          <div className="swipe-beside after" aria-hidden="true" inert>
+            {after}
+          </div>
+        )}
       </div>
     </div>
   );

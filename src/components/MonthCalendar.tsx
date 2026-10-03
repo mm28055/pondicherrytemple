@@ -238,14 +238,6 @@ export function MonthCalendar({
 
   return (
     <section className="month-cal">
-      <div className="month-cal-head">
-        <h2>
-          {month.name} {year}
-        </h2>
-        <span className="month-cal-dates">
-          {formatDate(first)} – {formatDate(last)}
-        </span>
-      </div>
 
       <div
         className="cal"

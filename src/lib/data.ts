@@ -41,7 +41,7 @@ import type {
 import { openingText, plainText, toHTML, type LinkPaths } from "./richtext";
 import { DEITY_GROUP_LABELS } from "@/content/labels";
 import { SECTION_INTROS, type SectionName } from "@/payload/sectionIntros";
-import { TAMIL_MONTHS, tamilMonthOf, type TamilMonth } from "./calendar";
+import { monthDates, monthYearOf, TAMIL_MONTHS, tamilMonthOf, type TamilMonth } from "./calendar";
 
 const byDateDesc = <T extends { date: string }>(a: T, b: T) => b.date.localeCompare(a.date);
 const byDateAsc = <T extends { date: string }>(a: T, b: T) => a.date.localeCompare(b.date);
@@ -586,6 +586,16 @@ export async function getRitualYear(): Promise<{
     );
   }
   return { months, throughYear: all.filter((o) => o.throughYear) };
+}
+
+/** Where the line of months shown begins (as the first day of a month):
+    Masi 2026, the month before the team's first day (in Panguni 2026); or,
+    should anything ever be recorded before then, the month it falls in. */
+export async function getLineBegins(): Promise<string> {
+  const set = monthDates("masi", 2026).first;
+  const first = (await occasions()).map((o) => o.date).sort()[0];
+  const recorded = first ? monthDates(tamilMonthOf(first), monthYearOf(first)).first : set;
+  return recorded < set ? recorded : set;
 }
 
 /** Every date the team was present, oldest first. */
