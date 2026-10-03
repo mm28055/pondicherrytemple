@@ -10,7 +10,7 @@ import {
   hasPage,
   type MonthEntry,
 } from "@/lib/data";
-import { dateParts, monthDates, monthYearOf, TAMIL_MONTHS } from "@/lib/calendar";
+import { dateParts, monthDates, monthYearOf, TAMIL_MONTHS, type TamilMonth } from "@/lib/calendar";
 import { calendarEvents } from "@/lib/calendarEvents";
 import { MonthCalendar } from "@/components/MonthCalendar";
 import { MonthMotif } from "@/components/MonthMotif";
@@ -54,13 +54,19 @@ export default async function MonthPage({ params }: Props) {
   // The calendar: the days the team was present this month, a grid for each
   // year recorded, newest first; with none yet, the month as it next comes.
   const today = new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Kolkata" });
-  const events = (await calendarEvents(await getOccasionsInMonth(month.slug))).map((e) => ({
-    ...e,
-    year: monthYearOf(e.date),
-  }));
-  let upcoming = Number(today.slice(0, 4)) - 1;
-  while (monthDates(month.slug, upcoming).last < today) upcoming++;
-  const years = events.length ? [...new Set(events.map((e) => e.year))].sort((a, b) => b - a) : [upcoming];
+  const { events, years } = await calendarYears(month.slug, today);
+  // the months either side, ready beside the calendar to be swiped in on a
+  // phone: each as it opens, its newest year
+  const beside = async (m: TamilMonth) => {
+    const c = await calendarYears(m.slug, today);
+    const y = c.years[0];
+    return (
+      <div style={{ "--m": m.colour } as CSSProperties}>
+        <MonthCalendar month={m} year={y} events={c.events.filter((e) => e.year === y)} today={today} />
+      </div>
+    );
+  };
+  const [before, after] = await Promise.all([beside(prev), beside(next)]);
 
   return (
     <div className="wrap" style={{ "--m": month.colour } as CSSProperties}>
@@ -95,7 +101,12 @@ export default async function MonthPage({ params }: Props) {
             <span className="cal-step-name">{prev.name}</span>
           </Link>
           {/* on a phone, swiped to the months either side (the arrows are for a computer) */}
-          <MonthSwipe prev={`/festivals-and-rituals/month/${prev.slug}`} next={`/festivals-and-rituals/month/${next.slug}`}>
+          <MonthSwipe
+            prev={`/festivals-and-rituals/month/${prev.slug}`}
+            next={`/festivals-and-rituals/month/${next.slug}`}
+            before={before}
+            after={after}
+          >
             <MonthCalendar month={month} year={y} events={events.filter((e) => e.year === y)} today={today} />
           </MonthSwipe>
           <Link className="cal-step next" href={`/festivals-and-rituals/month/${next.slug}`} scroll={false}>
@@ -137,6 +148,20 @@ export default async function MonthPage({ params }: Props) {
       )}
     </div>
   );
+}
+
+/** A month's calendar: its recorded days, each with the year of the grid it
+    falls in, and those years, newest first; with none yet, the month as it
+    next comes. */
+async function calendarYears(slug: string, today: string) {
+  const events = (await calendarEvents(await getOccasionsInMonth(slug))).map((e) => ({
+    ...e,
+    year: monthYearOf(e.date),
+  }));
+  let upcoming = Number(today.slice(0, 4)) - 1;
+  while (monthDates(slug, upcoming).last < today) upcoming++;
+  const years = events.length ? [...new Set(events.map((e) => e.year))].sort((a, b) => b - a) : [upcoming];
+  return { events, years };
 }
 
 /** A day's description without the festival's name at its start, where the

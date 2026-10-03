@@ -1694,9 +1694,15 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
 }
 /* a phone: the calendar is swiped to the months either side (MonthSwipe), so
    no arrows; the browser keeps the up-and-down scrolling, the swipe is ours */
-.month-swipe { touch-action: pan-y; }
+.month-swipe { touch-action: pan-y; overflow-x: clip; }
+.swipe-track { position: relative; }
+/* the months either side, waiting just off the screen; only on a phone */
+.swipe-beside { display: none; position: absolute; top: 0; width: 100%; pointer-events: none; }
+.swipe-beside.before { right: calc(100% + 24px); }
+.swipe-beside.after { left: calc(100% + 24px); }
 @media (max-width: 700px) {
   .cal-step { display: none; }
+  .swipe-beside { display: block; }
 }
 .month-cal { padding-block: 8px; }
 /* the same room after the calendar (and, on a phone, the month links under it) as between sections */
