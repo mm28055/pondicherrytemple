@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type Tab = {
   href: string;
@@ -43,8 +43,25 @@ export function Nav() {
   // close the mobile menu whenever the route changes
   useEffect(() => setOpen(false), [pathname]);
 
+  // and when the page is tapped outside it, or scrolled
+  const bar = useRef<HTMLElement>(null);
+  useEffect(() => {
+    if (!open) return;
+    const from = window.scrollY;
+    const away = (e: PointerEvent) => {
+      if (!bar.current?.contains(e.target as Node)) setOpen(false);
+    };
+    const scrolled = () => Math.abs(window.scrollY - from) > 10 && setOpen(false);
+    document.addEventListener("pointerdown", away);
+    window.addEventListener("scroll", scrolled, { passive: true });
+    return () => {
+      document.removeEventListener("pointerdown", away);
+      window.removeEventListener("scroll", scrolled);
+    };
+  }, [open]);
+
   return (
-    <header className="nav">
+    <header className="nav" ref={bar}>
       <div className="stripes" aria-hidden="true" />
       <div className="wrap nav-inner">
         <Link className="brand" href="/" aria-label="Sthalam — home">

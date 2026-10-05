@@ -209,12 +209,12 @@ a:focus-visible, button:focus-visible {
     border-bottom: 2px solid var(--ink);
     padding: 8px var(--gutter) 20px;
   }
-  .nav-links.open li { width: 100%; border-bottom: 1px solid var(--rule); }
-  .nav-links.open a { display: block; font-size: 19px; padding: 14px 0; border-bottom: none; }
+  .nav-links.open li { width: 100%; }
+  .nav-links.open a { display: block; font-size: 19px; padding: 7px 0; border-bottom: none; }
   /* in the phone menu, the Calendar sits beneath Festivals & Rituals, indented */
-  .nav-links.open .nav-sub { position: static; padding: 0 0 6px; opacity: 1; visibility: visible; transform: none; }
+  .nav-links.open .nav-sub { position: static; padding: 0 0 4px; opacity: 1; visibility: visible; transform: none; }
   .nav-links.open .nav-sub li { background: none; border-bottom: 0; }
-  .nav-links.open .nav-sub a { color: var(--ink-2); font-size: 16px; padding: 4px 0 10px 18px; }
+  .nav-links.open .nav-sub a { color: var(--ink-2); font-size: 16px; text-align: left; padding: 0 0 4px 18px; }
   .nav-links.open .nav-sub a.active { color: var(--ochre); }
 }
 
@@ -1692,6 +1692,16 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
   .rasi-centre { grid-row: auto; grid-column: auto; }
   .rasi-centre { align-items: flex-start; text-align: left; }
   .rasi-centre ul { justify-content: flex-start; }
+  /* the year first, above the months, in three lines: the year and its
+     arrows; its name; what to do */
+  .rasi .rasi-centre { order: -1; padding: 12px 16px 14px; }
+  .rasi .rasi-centre > .kicker { display: none; }
+  .rasi .rasi-year { margin-top: 0; justify-content: flex-start; gap: 6px; }
+  .rasi .rasi-year-num { font-size: 40px; }
+  .rasi .rasi-year-step { font-size: 30px; padding: 2px 4px; }
+  .rasi .rasi-year-step:first-child { margin-left: -4px; }
+  .rasi .rasi-centre .rasi-year-name { margin-top: 2px; }
+  .rasi .rasi-centre p:not(.rasi-year-name) { font-size: 15.5px; margin-top: 2px; max-width: none; }
 }
 
 /* One month of the ritual year */
@@ -2304,8 +2314,10 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
 .rasi-year-step:disabled { color: var(--rule); cursor: default; transform: none; }
 .rasi-centre .rasi-year-name { font-style: normal; font-size: 15px; margin-top: 6px; color: var(--muted); letter-spacing: 0.04em; }
 .rasi-year-name [lang="ta"] { font-family: var(--tamil); font-weight: 600; color: var(--ochre); }
-/* the months before the documentation began: shown, but quiet and closed */
-.rasi-month.before { opacity: 0.38; cursor: default; }
+/* the months before the documentation began: shown, but faint and closed;
+   on a phone, where the months are a list, left out */
+.rasi-month.before { opacity: 0.16; cursor: default; }
+@media (max-width: 860px) { .rasi-month.before { display: none; } }
 .rasi-month.before:hover { background: none; }
 
 /* The Festivals & Rituals page, led by photographs: the most seen the full
