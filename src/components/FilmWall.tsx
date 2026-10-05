@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { FilmTile } from "@/lib/view";
 import { Html } from "./Prose";
+import { FilterBar } from "./FilterBar";
 
 type Filter = {
   key: "temples" | "observances";
@@ -27,17 +28,20 @@ export function FilmWall({
   tiles: FilmTile[];
   filters?: Filter[];
 }) {
-  const [filter, setFilter] = useState<Filter | null>(null);
+  // a temple, a festival or ritual, or both; and the order
+  const [chosen, setChosen] = useState<Partial<Record<Filter["key"], string>>>({});
+  const [oldestFirst, setOldestFirst] = useState(false);
   const [open, setOpen] = useState<number | null>(null);
   const [limit, setLimit] = useState(PAGE);
   const more = useRef<HTMLDivElement>(null);
   const dialog = useRef<HTMLDialogElement>(null);
 
-  const shown = useMemo(
-    () =>
-      filter ? tiles.filter((t) => t[filter.key].includes(filter.id)) : tiles,
-    [tiles, filter],
-  );
+  const shown = useMemo(() => {
+    const list = tiles.filter((t) =>
+      (["temples", "observances"] as const).every((key) => !chosen[key] || t[key].includes(chosen[key]!)),
+    );
+    return oldestFirst ? [...list].reverse() : list;
+  }, [tiles, chosen, oldestFirst]);
 
   // load the next batch as the end of the grid comes into view
   useEffect(() => {
@@ -79,54 +83,35 @@ export function FilmWall({
     [shown.length],
   );
 
-  const choose = (f: Filter | null) => {
-    setFilter(f);
+  const choose = (key: Filter["key"], id: string | null) => {
+    setChosen((c) => ({ ...c, [key]: id ?? undefined }));
     setLimit(PAGE);
   };
 
   const film = open !== null ? shown[open] : null;
   const withFilters = filters.length > 1;
-  const groups = [
-    { title: "Temples", list: filters.filter((f) => f.key === "temples") },
-    {
-      title: "Festivals & rituals",
-      list: filters.filter((f) => f.key === "observances"),
-    },
+  // a dropdown for temples, one for festivals and rituals (if there are any)
+  const bar = [
+    { key: "temples", label: "Temple" },
+    { key: "observances", label: "Festival/Ritual" },
   ]
-    .map((g) => ({ ...g, list: [...g.list].sort((a, b) => a.label.localeCompare(b.label)) })) // A to Z
-    .filter((g) => g.list.length > 0);
-  const pressed = (f: Filter) => filter?.key === f.key && filter.id === f.id;
+    .map((b) => ({ ...b, options: filters.filter((f) => f.key === b.key).map(({ id, label }) => ({ id, label })) }))
+    .filter((b) => b.options.length > 0);
 
   return (
     <>
-      {/* With filters (the Films tab): the films in three columns, the
-          filters a column of their own at the right, grouped, staying in
-          view as you scroll; on a phone, a row above to swipe along. */}
+      {/* With filters (the Films tab): the filter bar, as on the
+          Photographs page, and the films in three columns below it */}
+      {withFilters && (
+        <FilterBar
+          filters={bar}
+          chosen={chosen}
+          onPick={(key, id) => choose(key as Filter["key"], id)}
+          oldestFirst={oldestFirst}
+          onOrder={() => setOldestFirst(!oldestFirst)}
+        />
+      )}
       <div className={withFilters ? "film-browse" : undefined}>
-        {withFilters && (
-          <aside className="film-filters" role="group" aria-label="Show">
-            {/* every film: one line, in red, at the head of the column */}
-            <button className="film-filters-all" aria-pressed={!filter} onClick={() => choose(null)}>
-              <span>Show all</span>
-              <span className="count">{tiles.length}</span>
-            </button>
-            {groups.map((g) => (
-              <div key={g.title} className="film-filters-group">
-                <div className="film-filters-head">{g.title}</div>
-                {g.list.map((f) => (
-                  <button
-                    key={`${f.key}-${f.id}`}
-                    aria-pressed={pressed(f)}
-                    onClick={() => choose(f)}
-                  >
-                    <span>{f.label}</span>
-                    <span className="count">{f.count}</span>
-                  </button>
-                ))}
-              </div>
-            ))}
-          </aside>
-        )}
 
         <div className="video-wall">
           {shown.slice(0, limit).map((t, i) => (

@@ -8,15 +8,14 @@ export const metadata: Metadata = {
 };
 
 /** Every photograph, newest first, which can be narrowed by temple,
-    festival, deity and year. (To be designed.) */
+    festival and year. (To be designed.) */
 export default async function PhotographsPage() {
   const photos = [...(await getPhotos())].sort((a, b) => b.date.localeCompare(a.date));
-  const filters = await getPhotoFilters(photos, ["temples", "observances", "deities", "years"]);
+  const filters = await getPhotoFilters(photos, ["temples", "observances", "years"]);
 
   return (
     <div className="wrap">
       <header className="page-head">
-        <div className="kicker">Photographs · {photos.length}</div>
         <h1 className="page-title">Photographs</h1>
       </header>
       <section className="section">

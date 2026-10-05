@@ -35,7 +35,7 @@ export default async function FilmsPage() {
         <h1 className="page-title">Films</h1>
         <p className="page-lede">{await getSectionIntro("films")}</p>
       </header>
-      <section className="section" style={{ paddingTop: 12 }}>
+      <section className="section">
         {tiles.length ? <FilmWall tiles={tiles} filters={filters} /> : <p className="empty">No films yet.</p>}
       </section>
     </div>

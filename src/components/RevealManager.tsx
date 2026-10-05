@@ -7,26 +7,23 @@ import { useEffect } from "react";
    Order matters: whatever is already on screen is marked visible FIRST,
    and only then does <html> get .reveal-ready (which hides the rest).
    So loaded content never blinks out; only offscreen content waits.
+   Elements that appear later are taken in too, the same way: a festival's
+   name, plain words at first, becomes a link once the visitor is known to be
+   signed in (components/FestivalLink), and the link is a new element.
    Re-runs on every client-side navigation. */
 export function RevealManager() {
   const pathname = usePathname();
 
   useEffect(() => {
-    const els = Array.from(document.querySelectorAll<HTMLElement>(".reveal:not(.visible)"));
+    const all = () => Array.from(document.querySelectorAll<HTMLElement>(".reveal:not(.visible)"));
 
     if (!("IntersectionObserver" in window)) {
-      els.forEach((el) => el.classList.add("visible"));
-      return;
+      const show = () => all().forEach((el) => el.classList.add("visible"));
+      show();
+      const mo = new MutationObserver(show);
+      mo.observe(document.body, { childList: true, subtree: true });
+      return () => mo.disconnect();
     }
-
-    const vh = window.innerHeight;
-    const pending: HTMLElement[] = [];
-    for (const el of els) {
-      const r = el.getBoundingClientRect();
-      if (r.top < vh && r.bottom > 0) el.classList.add("visible");
-      else pending.push(el);
-    }
-    document.documentElement.classList.add("reveal-ready");
 
     const io = new IntersectionObserver(
       (entries) => {
@@ -39,8 +36,30 @@ export function RevealManager() {
       },
       { threshold: 0.08 }
     );
-    pending.forEach((el) => io.observe(el));
-    return () => io.disconnect();
+
+    // on screen: shown at once; below: shown as it scrolls into view
+    const take = (els: HTMLElement[]) => {
+      const vh = window.innerHeight;
+      for (const el of els) {
+        const r = el.getBoundingClientRect();
+        if (r.top < vh && r.bottom > 0) el.classList.add("visible");
+        else io.observe(el);
+      }
+    };
+    take(all());
+    document.documentElement.classList.add("reveal-ready");
+
+    // (a mutation is seen before the page is next painted, so a new element
+    // on screen never shows hidden)
+    const mo = new MutationObserver((records) => {
+      const added = records.some((r) => Array.from(r.addedNodes).some((n) => n.nodeType === 1));
+      if (added) take(all());
+    });
+    mo.observe(document.body, { childList: true, subtree: true });
+    return () => {
+      io.disconnect();
+      mo.disconnect();
+    };
   }, [pathname]);
 
   return null;

@@ -5,6 +5,8 @@ import { FestivalLink } from "@/components/FestivalLink";
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Photo, PhotoFilter } from "@/content/types";
 import { formatDate } from "@/lib/calendar";
+import { stripeRows, stripeWidth, useStripeFit } from "@/lib/stripes";
+import { FilterBar } from "@/components/FilterBar";
 
 const PAGE = 30;
 /** How many the "lead" layout shows: one large, five small. */
@@ -33,7 +35,12 @@ export function PhotoWall({ photos, layout, seeAll, filters = [] }: Props) {
   const [oldestFirst, setOldestFirst] = useState(false);
   const [open, setOpen] = useState<number | null>(null);
   const [limit, setLimit] = useState(PAGE);
+
   const more = useRef<HTMLDivElement>(null);
+  // the page of all of them: rows hung from the stripes at the top of the
+  // page, each photo as wide as suits it (lib/stripes)
+  const wall = useRef<HTMLDivElement>(null);
+  const fit = useStripeFit(wall);
   const dialog = useRef<HTMLDialogElement>(null);
   const touch = useRef<{ x: number; y: number } | null>(null);
 
@@ -131,15 +138,16 @@ export function PhotoWall({ photos, layout, seeAll, filters = [] }: Props) {
     return () => io.disconnect();
   }, [limit, order.length]);
 
-  const tile = (p: Photo, i: number, big = false) => (
+  const tile = (p: Photo, i: number, big = false, width?: number) => (
     <button
       key={p.id}
       className={`photo-tile${big ? " big" : ""}`}
       onClick={() => show(i)}
       aria-label={p.alt || p.caption || "Photograph"}
+      style={width ? { width } : undefined}
     >
       <img
-        src={big ? p.medium : p.small}
+        src={big || (width && width > 240) ? p.medium : p.small}
         alt=""
         loading={i < LEAD ? "eager" : "lazy"}
         style={{ objectPosition: `${p.focus[0]}% ${p.focus[1]}%` }}
@@ -152,31 +160,14 @@ export function PhotoWall({ photos, layout, seeAll, filters = [] }: Props) {
   return (
     <>
       {layout === "all" && (
-        <div className="photo-controls">
-          {filters.map((f) => (
-            <div key={f.key} className="filters photo-filter" role="group" aria-label={f.label}>
-              <span className="photo-filter-label caps">{f.label}</span>
-              <button aria-pressed={!chosen[f.key]} onClick={() => choose(f.key, null)}>
-                All
-              </button>
-              {f.options.map((o) => (
-                <button key={o.id} aria-pressed={chosen[f.key] === o.id} onClick={() => choose(f.key, o.id)}>
-                  {o.label}
-                  <span className="count">{o.count}</span>
-                </button>
-              ))}
-            </div>
-          ))}
-          <div className="filters photo-filter photo-sort" role="group" aria-label="Order">
-            <span className="photo-filter-label caps">Order</span>
-            <button aria-pressed={!oldestFirst} onClick={() => setOldestFirst(false)}>
-              Newest first
-            </button>
-            <button aria-pressed={oldestFirst} onClick={() => setOldestFirst(true)}>
-              Oldest first
-            </button>
-          </div>
-        </div>
+        <FilterBar
+          filters={filters}
+          chosen={chosen}
+          onPick={(key, id) => choose(key as PhotoFilter["key"], id)}
+          oldestFirst={oldestFirst}
+          onOrder={() => setOldestFirst(!oldestFirst)}
+          stripes
+        />
       )}
 
       {layout === "strip" ? (
@@ -196,7 +187,20 @@ export function PhotoWall({ photos, layout, seeAll, filters = [] }: Props) {
         </>
       ) : (
         <>
-          <div className="photo-wall">{order.slice(0, limit).map((p, i) => tile(p, i))}</div>
+          <div ref={wall} className="photo-rows">
+            {fit && (
+              <div style={{ width: stripeWidth(fit.units), marginLeft: -fit.back }}>
+                {(() => {
+                  let i = 0;
+                  return stripeRows(order.slice(0, limit), fit.units, fit.h).map((row) => (
+                    <div key={row[0].p.id} className="photo-row">
+                      {row.map(({ p, units }) => tile(p, i++, false, stripeWidth(units)))}
+                    </div>
+                  ));
+                })()}
+              </div>
+            )}
+          </div>
           {order.length === 0 && <p className="note-line">No photographs match.</p>}
           {limit < order.length && <div ref={more} aria-hidden="true" style={{ height: 1 }} />}
         </>

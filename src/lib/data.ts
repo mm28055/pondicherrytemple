@@ -756,7 +756,7 @@ export async function getPhotoFilters(list: Photo[], keys: PhotoFilter["key"][])
       of: (p) => p.temples,
       name: (id) => templeByKey.get(id)?.knownAs ?? templeByKey.get(id)?.name ?? id,
     },
-    observances: { label: "Festival", of: (p) => p.observances, name: (id) => observanceById.get(id)?.name ?? id },
+    observances: { label: "Festival/Ritual", of: (p) => p.observances, name: (id) => observanceById.get(id)?.name ?? id },
     deities: { label: "Deity", of: (p) => p.deities, name: (id) => DEITY_GROUP_LABELS[id as DeityGroup] ?? id },
     years: { label: "Year", of: (p) => [p.date.slice(0, 4)], name: (id) => id },
   };
