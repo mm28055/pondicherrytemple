@@ -15,6 +15,7 @@ import {
   type HTMLConvertersFunction,
 } from "@payloadcms/richtext-lexical/html";
 import type { SerializedEditorState } from "@payloadcms/richtext-lexical/lexical";
+import { FESTIVALS_PUBLISHED, festivalPath } from "./festivals";
 
 /** Editor content as stored. */
 export type RichText = { root: { children: unknown[] } } | null | undefined;
@@ -80,7 +81,8 @@ function hrefFor(relationTo: string, value: unknown, paths: LinkPaths): string {
     case "articles":
       return `/articles/${doc.slug}`;
     case "observances":
-      return `/festivals-and-rituals/${doc.slug}`;
+      // until the festivals' pages are published, to the Festivals & Rituals page
+      return FESTIVALS_PUBLISHED ? festivalPath(doc.slug) : "/festivals-and-rituals";
     case "temples":
       return (doc.id !== undefined && paths.temple(doc.id)) || "#";
     default:

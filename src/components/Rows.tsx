@@ -1,13 +1,25 @@
 import Link from "next/link";
+import { FestivalLink } from "@/components/FestivalLink";
 import type { NoteRowData, ObservanceRowData } from "@/lib/view";
 import type { Temple } from "@/content/types";
 import { DEITY_GROUP_LABELS } from "@/content/labels";
 
 /** A field note, interview, video… or an article: date stamp, then what it is.
     `withPicture` adds its photograph at the right, or a placeholder. */
-export function NoteRow({ row, withPicture = false }: { row: NoteRowData; withPicture?: boolean }) {
+export function NoteRow({
+  row,
+  withPicture = false,
+}: {
+  row: NoteRowData;
+  withPicture?: boolean;
+}) {
   return (
-    <Link className={withPicture ? "note-row with-picture reveal" : "note-row reveal"} href={row.href}>
+    <Link
+      className={
+        withPicture ? "note-row with-picture reveal" : "note-row reveal"
+      }
+      href={row.href}
+    >
       <div className="date-stamp" aria-hidden="true">
         <span className="d">{row.day}</span>
         <span className="m">{row.shortMonth}</span>
@@ -15,7 +27,9 @@ export function NoteRow({ row, withPicture = false }: { row: NoteRowData; withPi
       </div>
       <div>
         <div className="row-meta caps">
-          {row.kind !== "note" && <span className="kind">{row.kindLabel} · </span>}
+          {row.kind !== "note" && (
+            <span className="kind">{row.kindLabel} · </span>
+          )}
           {row.where}
         </div>
         <h3 className="row-title">{row.title}</h3>
@@ -31,7 +45,12 @@ export function NoteRow({ row, withPicture = false }: { row: NoteRowData; withPi
       </div>
       {withPicture &&
         (row.picture ? (
-          <img className="row-picture" src={row.picture.src} alt={row.picture.alt} loading="lazy" />
+          <img
+            className="row-picture"
+            src={row.picture.src}
+            alt={row.picture.alt}
+            loading="lazy"
+          />
         ) : (
           <span className="row-picture empty" aria-hidden="true">
             <span className="caps">Photograph to come</span>
@@ -42,9 +61,16 @@ export function NoteRow({ row, withPicture = false }: { row: NoteRowData; withPi
 }
 
 /** A festival or ritual: its Tamil name, its English name and gloss. */
-export function ObservanceRow({ row, compact = false }: { row: ObservanceRowData; compact?: boolean }) {
-  return (
-    <Link className={`obs-row reveal${compact ? " compact" : ""}`} href={row.href}>
+export function ObservanceRow({
+  row,
+  compact = false,
+}: {
+  row: ObservanceRowData;
+  compact?: boolean;
+}) {
+  const className = `obs-row reveal${compact ? " compact" : ""}`;
+  const inside = (
+    <>
       <span className="obs-tamil" lang="ta">
         {row.tamil ?? row.name}
       </span>
@@ -62,12 +88,25 @@ export function ObservanceRow({ row, compact = false }: { row: ObservanceRowData
           </span>
         </>
       )}
-    </Link>
+    </>
+  );
+  // a link to its page for everyone once the festivals' pages are published;
+  // until then, for someone signed in to the admin only
+  return (
+    <FestivalLink className={className} href={row.href}>
+      {inside}
+    </FestivalLink>
   );
 }
 
 /** A temple with a page. */
-export function TempleRow({ temple: t, meta }: { temple: Temple; meta: string }) {
+export function TempleRow({
+  temple: t,
+  meta,
+}: {
+  temple: Temple;
+  meta: string;
+}) {
   return (
     <Link className="temple-row reveal" href={`/${t.region}/${t.id}`}>
       <div>

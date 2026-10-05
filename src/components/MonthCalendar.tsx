@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { FestivalLink } from "@/components/FestivalLink";
 import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent, type MouseEvent } from "react";
 import {
   daysBetween,
@@ -23,7 +24,7 @@ export interface CalendarEvent {
   label: string;
   noteHref?: string;
   /** The festivals and rituals it was part of, each with its page. */
-  observances: { label: string; href: string }[];
+  observances: { label: string; href?: string }[];
 }
 
 const WEEK = [
@@ -103,9 +104,9 @@ function item(e: CalendarEvent, inBox: boolean) {
       {!inBox && e.observances.length > 0 && (
         <span className="cal-tags">
           {e.observances.map((o) => (
-            <Link key={o.href} href={o.href} title={o.label}>
+            <FestivalLink key={o.label} href={o.href} title={o.label}>
               {fit(o.label)}
-            </Link>
+            </FestivalLink>
           ))}
         </span>
       )}

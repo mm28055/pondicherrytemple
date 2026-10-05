@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { FestivalLink } from "@/components/FestivalLink";
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Photo, PhotoFilter } from "@/content/types";
 import { formatDate } from "@/lib/calendar";
@@ -13,8 +14,9 @@ type Props = {
   photos: Photo[];
   /** "lead": on a temple's or festival's page, one photo large and five
       small, with a link to see them all. "all": the page of all of them,
-      which can be narrowed and sorted. */
-  layout: "lead" | "all";
+      which can be narrowed and sorted. "strip": a contact strip, rows of
+      small photos, under the name of a rite. */
+  layout: "lead" | "all" | "strip";
   seeAll?: string;
   /** Rows of buttons to narrow the photos: by temple, festival, deity, year. */
   filters?: PhotoFilter[];
@@ -37,6 +39,7 @@ export function PhotoWall({ photos, layout, seeAll, filters = [] }: Props) {
 
   // the photos in the order they are shown, and stepped through
   const order = useMemo(() => {
+    if (layout === "strip") return photos;
     if (layout === "lead") return [...photos.filter((p) => p.featured), ...photos.filter((p) => !p.featured)];
     const shown = photos.filter((p) =>
       Object.entries(chosen).every(([key, id]) => !id || valuesOf(p, key as PhotoFilter["key"]).includes(id))
@@ -176,7 +179,9 @@ export function PhotoWall({ photos, layout, seeAll, filters = [] }: Props) {
         </div>
       )}
 
-      {layout === "lead" ? (
+      {layout === "strip" ? (
+        <div className="photo-strip">{order.map((p, i) => tile(p, i))}</div>
+      ) : layout === "lead" ? (
         <>
           {order.length >= 4 ? (
             <div className="photo-wall lead">{order.slice(0, LEAD).map((p, i) => tile(p, i, i === 0))}</div>
@@ -237,7 +242,7 @@ export function PhotoWall({ photos, layout, seeAll, filters = [] }: Props) {
                   {photo.tags.map((t, i) => (
                     <Fragment key={t.label}>
                       {i > 0 && " · "}
-                      {t.href ? <Link href={t.href}>{t.label}</Link> : t.label}
+                      {t.href ? <FestivalLink href={t.href}>{t.label}</FestivalLink> : t.label}
                     </Fragment>
                   ))}
                 </span>

@@ -6,6 +6,7 @@ import { monthDates, TAMIL_MONTHS } from "@/lib/calendar";
 import { tamilYearName } from "@/lib/tamilDate";
 import { MonthMotif } from "@/components/MonthMotif";
 import { inGlide, startGlide } from "@/components/MonthSwipe";
+import { FestivalLink } from "@/components/FestivalLink";
 
 /** The ritual year as a South Indian chart (the rasi kattam): the twelve
     Tamil months round the edge of a square, Chithirai at the top, going
@@ -183,7 +184,7 @@ export function RitualYear({
               <ul>
                 {throughYear.map((o) => (
                   <li key={o.id}>
-                    <Link href={`/festivals-and-rituals/${o.id}`}>{o.name}</Link>
+                    <FestivalLink id={o.id}>{o.name}</FestivalLink>
                   </li>
                 ))}
               </ul>

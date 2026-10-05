@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { getArticle, getArticles, getObservancesById, getTemple } from "@/lib/data";
 import { formatDate } from "@/lib/calendar";
 import { Html } from "@/components/Prose";
+import { FestivalLink } from "@/components/FestivalLink";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -47,9 +48,9 @@ export default async function ArticlePage({ params }: Props) {
               </Link>
             ))}
             {observances.map((o) => (
-              <Link key={o.id} href={`/festivals-and-rituals/${o.id}`}>
+              <FestivalLink key={o.id} id={o.id}>
                 {o.name}
-              </Link>
+              </FestivalLink>
             ))}
           </div>
         </header>

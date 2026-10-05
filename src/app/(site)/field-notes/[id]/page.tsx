@@ -16,6 +16,7 @@ import { formatDate, localMonth } from "@/lib/calendar";
 import { noteRow } from "@/lib/view";
 import { Html } from "@/components/Prose";
 import { NoteRow } from "@/components/Rows";
+import { FestivalLink } from "@/components/FestivalLink";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -74,9 +75,9 @@ export default async function FieldNotePage({ params }: Props) {
               )
             )}
             {observances.map((o) => (
-              <Link key={o.id} href={`/festivals-and-rituals/${o.id}`}>
+              <FestivalLink key={o.id} id={o.id}>
                 {o.name}
-              </Link>
+              </FestivalLink>
             ))}
             {note.authors.length > 0 && <span>By {note.authors.join(" and ")}</span>}
           </div>

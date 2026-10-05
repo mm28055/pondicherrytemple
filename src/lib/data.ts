@@ -42,6 +42,7 @@ import { openingText, plainText, toHTML, type LinkPaths } from "./richtext";
 import { DEITY_GROUP_LABELS } from "@/content/labels";
 import { SECTION_INTROS, type SectionName } from "@/payload/sectionIntros";
 import { monthDates, monthYearOf, TAMIL_MONTHS, tamilMonthOf, type TamilMonth } from "./calendar";
+import { festivalPath } from "./festivals";
 
 const byDateDesc = <T extends { date: string }>(a: T, b: T) => b.date.localeCompare(a.date);
 const byDateAsc = <T extends { date: string }>(a: T, b: T) => a.date.localeCompare(b.date);
@@ -472,7 +473,7 @@ const photos = cache(async () => {
         }),
         ...[...observances].flatMap((id) => {
           const o = observanceById.get(id);
-          return o ? [{ label: o.name, href: `/festivals-and-rituals/${o.id}` }] : [];
+          return o ? [{ label: o.name, href: festivalPath(o.id) }] : [];
         }),
       ],
       date: dayOf(taken ?? m.createdAt),
@@ -728,6 +729,16 @@ export async function getFilmsForObservance(observanceId: string): Promise<Film[
 
 export async function getPhotosForTemple(regionId: string, templeId: string): Promise<Photo[]> {
   return (await photos()).filter((p) => p.temples.includes(`${regionId}/${templeId}`));
+}
+
+/** Every photograph that may be shown. */
+export async function getPhotos(): Promise<Photo[]> {
+  return photos();
+}
+
+/** Every photograph of the festivals and rituals (any tagged with one). */
+export async function getObservancePhotos(): Promise<Photo[]> {
+  return (await photos()).filter((p) => p.observances.length > 0);
 }
 
 export async function getPhotosForObservance(observanceId: string): Promise<Photo[]> {

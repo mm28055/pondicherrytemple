@@ -16,6 +16,7 @@ import { calendarEvents } from "@/lib/calendarEvents";
 import { MonthCalendar } from "@/components/MonthCalendar";
 import { MonthMotif } from "@/components/MonthMotif";
 import { MonthSwipe } from "@/components/MonthSwipe";
+import { FestivalLink } from "@/components/FestivalLink";
 
 type Props = { params: Promise<{ month: string; year?: string }> };
 
@@ -146,9 +147,9 @@ export default async function MonthPage({ params }: Props) {
             {ritualYear.throughYear.map((o, i) => (
               <span key={o.id}>
                 {i > 0 && ", "}
-                <Link className="month-link" href={`/festivals-and-rituals/${o.id}`}>
+                <FestivalLink className="month-link" id={o.id}>
                   {o.name}
-                </Link>
+                </FestivalLink>
               </span>
             ))}
             .
@@ -219,14 +220,15 @@ async function MonthSection({ title, entries }: { title: string; entries: MonthE
         {await Promise.all(
           entries.map(async ({ observance: o, seen }) => (
             <li key={o.id} className="reveal">
-              <Link className="month-obs" href={`/festivals-and-rituals/${o.id}`}>
+              <FestivalLink className="month-obs" id={o.id}>
                 <span className="obs-tamil" lang="ta">
                   {o.tamil ?? o.name}
                 </span>
                 <span className="obs-name">{o.name}</span>
                 <span className="obs-gloss">{o.gloss}</span>
+                {/* shown only where the name is a link (see site.css) */}
                 <span className="month-obs-more">About {o.name}</span>
-              </Link>
+              </FestivalLink>
               {seen.length > 0 ? (
                 <ul className="month-seen">
                   {await Promise.all(
@@ -246,9 +248,9 @@ async function MonthSection({ title, entries }: { title: string; entries: MonthE
                             <span className="month-seen-label"> · {withoutName(s.label, o.name)}</span>
                           )}
                           {also.map((x) => (
-                            <Link key={x.id} className="month-seen-tag" href={`/festivals-and-rituals/${x.id}`}>
+                            <FestivalLink key={x.id} className="month-seen-tag" id={x.id}>
                               {x.name}
-                            </Link>
+                            </FestivalLink>
                           ))}
                           {s.note && (
                             <Link className="cal-read short arrow-link" href={`/field-notes/${s.note}`}>

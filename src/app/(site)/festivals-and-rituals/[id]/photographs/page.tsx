@@ -1,14 +1,15 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getObservance, getObservances, getPhotoFilters, getPhotosForObservance } from "@/lib/data";
+import { getObservance, getPhotoFilters, getPhotosForObservance } from "@/lib/data";
 import { PhotoWall } from "@/components/PhotoWall";
+import { seesFestivalPages } from "@/lib/festivals-access";
 
 type Props = { params: Promise<{ id: string }> };
 
-export async function generateStaticParams() {
-  return (await getObservances()).map((o) => ({ id: o.id }));
-}
+// Held in reserve until published (lib/festivals): shown only to someone
+// signed in to the admin, so decided on each visit, not built ahead.
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const o = await getObservance((await params).id);
@@ -19,6 +20,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     temple, deity and year. */
 export default async function ObservancePhotosPage({ params }: Props) {
   const o = await getObservance((await params).id);
+  if (!(await seesFestivalPages())) notFound();
   if (!o) notFound();
   const photos = await getPhotosForObservance(o.id);
   if (!photos.length) notFound();

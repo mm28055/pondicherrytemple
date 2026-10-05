@@ -2,6 +2,7 @@ import type { CalendarEvent } from "@/components/MonthCalendar";
 import type { Occasion } from "@/content/types";
 import { getObservancesById, getTemple, hasPage } from "@/lib/data";
 import { shortTempleName } from "@/lib/view";
+import { festivalPath } from "@/lib/festivals";
 
 /** Recorded days as the calendar and its pop-up show them: the temple (its
     full name, and its short one for a day's box), what happened, its field
@@ -21,7 +22,7 @@ export async function calendarEvents(occasions: Occasion[]): Promise<CalendarEve
         noteHref: o.note ? `/field-notes/${o.note}` : undefined,
         observances: (await getObservancesById(o.observances)).map((x) => ({
           label: x.name,
-          href: `/festivals-and-rituals/${x.id}`,
+          href: festivalPath(x.id),
         })),
       };
     }),

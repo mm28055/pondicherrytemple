@@ -4,6 +4,7 @@
 import type { Article, CalendarSystem, FieldNote, Film, Observance, Temple } from "@/content/types";
 import { FIELD_KIND_LABELS } from "@/content/labels";
 import { dateParts, formatDate, localMonth } from "./calendar";
+import { festivalPath } from "@/lib/festivals";
 
 export interface NoteRowData {
   id: string;
@@ -88,7 +89,8 @@ export function articleRow(a: Article, calendar: CalendarSystem): NoteRowData {
 
 export interface ObservanceRowData {
   id: string;
-  href: string;
+  /** its page, once the festivals' pages are published */
+  href?: string;
   tamil?: string;
   name: string;
   gloss: string;
@@ -98,7 +100,7 @@ export interface ObservanceRowData {
 export function observanceRow(o: Observance, seenAt: number): ObservanceRowData {
   return {
     id: o.id,
-    href: `/festivals-and-rituals/${o.id}`,
+    href: festivalPath(o.id),
     tamil: o.tamil,
     name: o.name,
     gloss: o.gloss,

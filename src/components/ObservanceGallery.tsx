@@ -97,7 +97,7 @@ function Card({ it, lead = false }: { it: GalleryItem; lead?: boolean }) {
   const { row, photo, kind } = it;
   return (
     <Link
-      href={row.href}
+      href={row.href ?? `/festivals-and-rituals/${row.id}`}
       className={`gallery-card${lead ? " lead" : ""}${photo ? "" : " no-photo"}`}
     >
       <span className="gallery-pic">

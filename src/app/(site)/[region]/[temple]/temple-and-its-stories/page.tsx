@@ -1,22 +1,17 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getRegion, getRegions, getTemple, getTempleStories, getTemplesWithPages, hasPage } from "@/lib/data";
+import { getRegion, getTemple, getTempleStories, hasPage } from "@/lib/data";
 import { ENTRY_TOPIC_LABELS } from "@/content/labels";
 import { dateParts, localMonth } from "@/lib/calendar";
 import { Html } from "@/components/Prose";
+import { seesTempleStories } from "@/lib/festivals-access";
 
 type Props = { params: Promise<{ region: string; temple: string }> };
 
-export async function generateStaticParams() {
-  const out: { region: string; temple: string }[] = [];
-  for (const r of await getRegions()) {
-    for (const t of await getTemplesWithPages(r.id)) {
-      if ((await getTempleStories(r.id, t.id)).length) out.push({ region: r.id, temple: t.id });
-    }
-  }
-  return out;
-}
+// Held in reserve until published (lib/festivals): shown only to someone
+// signed in to the admin, so decided on each visit, not built ahead.
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { region, temple } = await params;
@@ -33,6 +28,7 @@ export default async function TempleStoriesPage({ params }: Props) {
   const { region: regionId, temple: templeId } = await params;
   const region = await getRegion(regionId);
   const t = await getTemple(regionId, templeId);
+  if (!(await seesTempleStories())) notFound();
   if (!region || !t || !hasPage(t)) notFound();
   const pieces = await getTempleStories(region.id, t.id);
   if (!pieces.length) notFound();

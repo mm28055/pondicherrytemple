@@ -25,6 +25,9 @@ import { PhotoWall } from "@/components/PhotoWall";
 import { NoteRow } from "@/components/Rows";
 import { YearSoFar } from "@/components/YearSoFar";
 import { TempleLayout } from "@/components/TempleLayout";
+import { FestivalLink } from "@/components/FestivalLink";
+import { ReservedLink } from "@/components/ReservedLink";
+import { TEMPLE_STORIES_PUBLISHED } from "@/lib/festivals";
 
 type Props = { params: Promise<{ region: string; temple: string }> };
 
@@ -96,9 +99,14 @@ export default async function TemplePage({ params }: Props) {
           <Html className="prose" html={t.intro} />
 
           {hasStories && (
-            <Link className="arrow-link" href={`/${region.id}/${t.id}/temple-and-its-stories`}>
+            // held in reserve until published: plain words, "(coming soon)", to the public
+            <ReservedLink
+              className="arrow-link"
+              href={`/${region.id}/${t.id}/temple-and-its-stories`}
+              published={TEMPLE_STORIES_PUBLISHED}
+            >
               Explore the temple&apos;s history and stories
-            </Link>
+            </ReservedLink>
           )}
 
           {notes.length > 0 && (
@@ -143,12 +151,12 @@ export default async function TemplePage({ params }: Props) {
               <h2 className="sub-head">Festivals &amp; rituals seen here</h2>
               <div className="tag-grid">
                 {observances.map((o) => (
-                  <Link key={o.id} href={`/festivals-and-rituals/${o.id}`}>
+                  <FestivalLink key={o.id} id={o.id}>
                     <span className="t" lang="ta">
                       {o.tamil ?? o.name}
                     </span>
                     <span className="caps">{o.name}</span>
-                  </Link>
+                  </FestivalLink>
                 ))}
               </div>
             </section>

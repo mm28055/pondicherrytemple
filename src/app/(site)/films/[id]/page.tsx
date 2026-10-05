@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { getFilm, getFilms, getObservancesById, getRegion, getTemple, hasPage } from "@/lib/data";
 import { formatDate, localMonth } from "@/lib/calendar";
 import { Html } from "@/components/Prose";
+import { FestivalLink } from "@/components/FestivalLink";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -52,9 +53,9 @@ export default async function FilmPage({ params }: Props) {
             )
           )}
           {observances.map((o) => (
-            <Link key={o.id} href={`/festivals-and-rituals/${o.id}`}>
+            <FestivalLink key={o.id} id={o.id}>
               {o.name}
-            </Link>
+            </FestivalLink>
           ))}
           {film.madeBy && <span>By {film.madeBy}</span>}
         </div>
