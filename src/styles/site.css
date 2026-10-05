@@ -679,6 +679,40 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
 
 
 /* The opening paragraph, with the latest field notes beside it */
+/* The strip of photographs under the masthead, hung from the stripes at the
+   top of the page: each photo spans whole red stripes, the gaps fall under
+   white ones (components/HomeStrip). Every so often it blinks, slowly, to the
+   next photos. */
+.home-strip { --h: 120px; padding-top: clamp(18px, 2.5vw, 28px); }
+.home-strip-track { display: flex; gap: 20px; height: var(--h); overflow: hidden; transition: opacity 1.2s ease-in-out; }
+.home-strip-track.faded { opacity: 0; }
+.home-strip-photo { flex: none; display: block; height: 100%; background: var(--rule); }
+.home-strip-photo img { width: 100%; height: 100%; object-fit: cover; display: block; transition: opacity 0.2s; }
+.home-strip-photo:hover img { opacity: 0.85; }
+/* the last photo, blurred and dimmed, with "See all photos" across it, as
+   large as its width allows; hovered, dimmer still and the words larger */
+.home-strip-all { position: relative; overflow: hidden; container-type: inline-size; }
+.home-strip-all img { filter: blur(2px) grayscale(0.5) brightness(0.65); transform: scale(1.06); transition: filter 0.3s, transform 0.3s; }
+.home-strip-all:hover img { opacity: 1; filter: blur(5px) grayscale(0.8) brightness(0.45); }
+.home-strip-all > span {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  padding: 0 12%;
+  text-align: center;
+  text-wrap: balance;
+  color: var(--chalk);
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: clamp(15px, 12cqi, 26px);
+  line-height: 1.1;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  transition: transform 0.3s;
+}
+.home-strip-all span span::after { content: "\00a0\2192"; }
+.home-strip-all:hover > span { transform: scale(1.08); }
+@media (max-width: 640px) { .home-strip { --h: 96px; } }
+
 .home-opening {
   display: grid;
   grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);

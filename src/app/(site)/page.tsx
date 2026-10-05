@@ -8,6 +8,7 @@ import {
   getOccasions,
   getOccasionsForObservance,
   getOccasionsForTemple,
+  getPhotos,
   getRegion,
   getTemples,
   hasPage,
@@ -17,6 +18,7 @@ import { ObservanceRow, TempleRow } from "@/components/Rows";
 import { TodayTamil } from "@/components/TodayTamil";
 import { calendarEvents } from "@/lib/calendarEvents";
 import { Html } from "@/components/Prose";
+import { HomeStrip } from "@/components/HomeStrip";
 import { plainWithScripts } from "@/lib/richtext";
 
 export default async function HomePage() {
@@ -53,6 +55,12 @@ export default async function HomePage() {
   // for the pop-up behind "Today": every day recorded, as the calendar shows it
   const todayEvents = await calendarEvents(await getOccasions());
 
+  // the strip of photographs under the masthead: the newest first, all of
+  // them in turn
+  const stripPhotos = [...(await getPhotos())]
+    .sort((a, b) => b.date.localeCompare(a.date))
+    .map(({ id, small, alt, focus, width, height }) => ({ id, small, alt, focus, width, height }));
+
   return (
     <>
       <div className="wrap">
@@ -68,6 +76,8 @@ export default async function HomePage() {
           </div>
           <TodayTamil events={todayEvents} />
         </section>
+
+        {stripPhotos.length > 0 && <HomeStrip photos={stripPhotos} />}
 
         {/* Why the temple matters to a town; the rest of the story is on the About page. */}
         {/* The words are written in the admin: Settings → Home page. */}
