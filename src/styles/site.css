@@ -1077,6 +1077,35 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
 }
 
 /* ---------- A field note ---------- */
+/* The text in a column at the right, two thirds of the page, ending where
+   the line under the heading ends; the photographs down the left beside it
+   (components/NotePhotos). On a narrow screen, the photographs under the
+   text. */
+.note-layout { display: grid; grid-template-columns: minmax(0, 1fr) 67%; }
+.note-layout .note-body,
+.note-layout .note-foot { max-width: none; margin: 0; padding-inline: 0; }
+/* the step to the note before or after: the older at the left, the newer
+   at the right */
+.note-step { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; border-top: 2px solid var(--ink); padding-block: 22px clamp(48px, 6vw, 80px); }
+.note-step-link { display: flex; flex-direction: column; gap: 6px; }
+.note-step-link.next { text-align: right; align-items: flex-end; }
+.note-step-label { font-family: var(--display); font-weight: 700; font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ochre); }
+.note-step-title { font-size: 21px; line-height: 1.25; font-weight: 500; color: var(--ink); text-wrap: balance; transition: color 0.15s; }
+.note-step-date { font-family: var(--display); font-weight: 600; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.note-step-link:hover .note-step-title { color: var(--ochre); }
+.note-photos { position: relative; }
+.note-photos-col,
+.note-photos-frame { position: absolute; top: clamp(18px, 2.5vw, 32px); bottom: clamp(36px, 5vw, 64px); left: 0; }
+.note-photos-frame { right: 0; visibility: hidden; }
+.note-photos-col { display: flex; flex-direction: column; gap: 20px; }
+.note-photos-row { display: flex; gap: 20px; flex: none; }
+.note-photos-row img { height: 100%; flex: none; object-fit: cover; background: var(--rule); display: block; }
+@media (max-width: 900px) {
+  .note-layout { grid-template-columns: minmax(0, 1fr); }
+  .note-photos { order: 2; margin-bottom: 48px; }
+  .note-photos-col { position: static; }
+  .note-photos-frame { display: none; }
+}
 .note-head { padding-block: clamp(18px, 3vw, 36px) clamp(16px, 2.5vw, 28px); border-bottom: 2px solid var(--ink); }
 
 .note-dateline {
