@@ -2260,3 +2260,55 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
   .lead .gallery-pic { aspect-ratio: 4 / 3; }
   .gallery-gloss { font-size: 14px; }
 }
+
+/* The Films tab: the films in three columns, the filters in a fourth of
+   their own at the right, grouped (temples; festivals & rituals), staying in
+   view as you scroll. On a phone, the filters are a row above, to swipe along. */
+.film-browse { display: grid; grid-template-columns: minmax(0, 1fr) clamp(190px, 18vw, 250px); column-gap: clamp(24px, 3vw, 44px); align-items: start; }
+.film-browse .video-wall { grid-column: 1; grid-row: 1; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.film-filters {
+  grid-column: 2; grid-row: 1;
+  position: sticky; top: 96px;
+  max-height: calc(100vh - 120px); overflow-y: auto;
+  padding: 24px 0 8px clamp(16px, 1.8vw, 24px);
+  border-left: 1px solid var(--rule);
+}
+
+.film-filters-group { margin-top: 18px; display: flex; flex-wrap: wrap; gap: 6px; }
+.film-filters-group .film-filters-head { flex-basis: 100%; }
+.film-filters-head { font-family: var(--display); font-weight: 700; font-size: 11.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); padding-bottom: 4px; margin-bottom: 4px; border-bottom: 1px solid var(--rule); }
+/* each temple or festival a tag, its count beside it; the one chosen filled */
+.film-filters .film-filters-group button {
+  width: auto; margin: 0; padding: 3px 9px 4px; gap: 6px;
+  border: 0; border-radius: 999px;
+  font-size: 14px; line-height: 1.25;
+}
+.film-filters .film-filters-group button[aria-pressed="true"] { background: var(--ochre); color: var(--chalk); font-weight: 600; }
+.film-filters .film-filters-group button[aria-pressed="true"] .count { color: rgba(244, 241, 234, 0.8); }
+.film-filters button {
+  display: flex; justify-content: space-between; align-items: baseline; gap: 10px;
+  width: 100%; padding: 6px 0 6px 10px; margin-left: -10px;
+  background: none; border: 0; border-left: 2px solid transparent;
+  font: inherit; font-size: 15.5px; line-height: 1.3; text-align: left; color: var(--ink-2); cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+}
+.film-filters button:hover { color: var(--ochre); }
+.film-filters button[aria-pressed="true"] { color: var(--ink); font-weight: 600; border-left-color: var(--ochre); }
+.film-filters .count { font-family: var(--display); font-weight: 600; font-size: 12px; color: var(--muted); }
+/* Show all: the head of the column, in red capitals */
+.film-filters button.film-filters-all { font-family: var(--display); font-weight: 700; font-size: 12.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ochre); }
+.film-filters button.film-filters-all[aria-pressed="true"] { color: var(--ochre); }
+.film-filters button.film-filters-all:hover { color: var(--ochre-deep); }
+@media (max-width: 900px) {
+  .film-browse { grid-template-columns: minmax(0, 1fr); }
+  .film-browse .video-wall { grid-row: 2; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .film-filters {
+    grid-column: 1; grid-row: 1; position: static; max-height: none;
+    display: flex; gap: 6px 20px; overflow-x: auto; padding: 14px 0 6px; border-left: 0; border-bottom: 1px solid var(--rule);
+    scrollbar-width: none;
+  }
+  .film-filters-head { display: none; }
+  .film-filters-group { display: contents; }
+  .film-filters button { width: auto; flex: none; margin: 0; padding: 6px 0; border-left: 0; border-bottom: 2px solid transparent; white-space: nowrap; }
+  .film-filters button[aria-pressed="true"] { border-bottom-color: var(--ochre); }
+}
