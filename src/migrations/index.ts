@@ -9,6 +9,8 @@ import * as migration_20260928_110504_festival_months from './20260928_110504_fe
 import * as migration_20260930_102837_photo_show_first_taken_on from './20260930_102837_photo_show_first_taken_on';
 import * as migration_20261001_131421_temple_stories from './20261001_131421_temple_stories';
 import * as migration_20261002_122418_temple_short_name from './20261002_122418_temple_short_name';
+import * as migration_20261009_133056_occasion_town_wide_tbc from './20261009_133056_occasion_town_wide_tbc';
+import * as migration_20261009_140000_database_log_import from './20261009_140000_database_log_import';
 
 export const migrations = [
   {
@@ -64,6 +66,16 @@ export const migrations = [
   {
     up: migration_20261002_122418_temple_short_name.up,
     down: migration_20261002_122418_temple_short_name.down,
-    name: '20261002_122418_temple_short_name'
+    name: '20261002_122418_temple_short_name',
+  },
+  {
+    up: migration_20261009_133056_occasion_town_wide_tbc.up,
+    down: migration_20261009_133056_occasion_town_wide_tbc.down,
+    name: '20261009_133056_occasion_town_wide_tbc',
+  },
+  {
+    up: migration_20261009_140000_database_log_import.up,
+    down: migration_20261009_140000_database_log_import.down,
+    name: '20261009_140000_database_log_import',
   },
 ];

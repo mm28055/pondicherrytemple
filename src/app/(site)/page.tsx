@@ -11,7 +11,6 @@ import {
   getPhotos,
   getRegion,
   getTemples,
-  hasPage,
 } from "@/lib/data";
 import { articleRow, filmRow, noteRow, observanceRow } from "@/lib/view";
 import { ObservanceRow, TempleRow } from "@/components/Rows";
@@ -36,7 +35,8 @@ export default async function HomePage() {
   );
 
   const templeRows = await Promise.all(
-    temples.filter(hasPage).map(async (t) => {
+    // the temples with an introduction written; the rest are on the Temples page
+    temples.filter((t) => t.introText).map(async (t) => {
       const occ = (await getOccasionsForTemple(region.id, t.id)).length;
       const notes = (await getFieldNotesForTemple(region.id, t.id)).length;
       return { t, meta: `${occ} occasions · ${notes} field note${notes === 1 ? "" : "s"}` };

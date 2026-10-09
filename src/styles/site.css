@@ -1025,17 +1025,37 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
 
 .year-what { font-size: 17px; line-height: 1.45; }
 
-.year-note {
+/* a day's name, when it has a field note: the link to it */
+.year-note { color: var(--ink); border-bottom: 1px solid var(--ochre); transition: color 0.15s; }
+.year-note:hover { color: var(--ochre); }
+
+/* A date still to be confirmed (TBC): fainter, in italics, marked. In the
+   temples' Ritual Year, the calendar and its day pop-up, and the festival
+   pages' "where we've seen it". */
+.tbc-mark {
   display: inline-block;
-  margin-top: 3px;
+  margin-right: 6px;
+  padding: 0 4px;
+  border: 1px solid currentColor;
+  border-radius: 3px;
   font-family: var(--display);
+  font-style: normal;
   font-weight: 700;
-  font-size: 12.5px;
+  font-size: 10px;
+  line-height: 1.5;
   letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--ochre);
+  text-decoration: none;
+  color: var(--muted);
+  vertical-align: 2px;
+  cursor: help;
 }
-.year-note::after { content: " →"; }
+.year-items li.tbc .year-what,
+.cal-line.tbc,
+.when li:has(.tbc-mark) { font-style: italic; color: var(--muted); }
+.cal-line.tbc .cal-place { color: var(--muted); }
+.cal-evs .tbc-mark { font-size: 8px; padding: 0 2px; margin-right: 3px; vertical-align: 1px; }
+.tbc-key { font-size: 14px; font-style: italic; color: var(--muted); margin-top: 10px; }
+.tbc-key .tbc-mark { font-style: normal; }
 
 /* the explainer: plain questions and answers */
 .qa > div { padding-block: 20px; border-bottom: 1px solid var(--rule); }

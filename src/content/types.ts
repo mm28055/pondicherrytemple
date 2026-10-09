@@ -86,10 +86,14 @@ export interface Observance {
 export interface Occasion {
   date: string; // yyyy-mm-dd
   region: RegionId;
+  /** The temple; "" for an event of the whole town (townWide). */
   temple: string;
+  townWide: boolean;
   label: string;
   observances: string[];
   note?: string; // the field note written about it, if any
+  /** Recorded, but the date or the event still to be confirmed. */
+  tbc: boolean;
 }
 
 /* ---------- Content ---------- */

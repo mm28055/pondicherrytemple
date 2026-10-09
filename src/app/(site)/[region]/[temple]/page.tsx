@@ -15,7 +15,9 @@ import {
   getTempleStories,
   getTemples,
   getTemplesWithPages,
+  getDummyPhotos,
   hasPage,
+  isAround,
 } from "@/lib/data";
 import { Html } from "@/components/Prose";
 import { articleRow, filmTile, noteRow, templesOf } from "@/lib/view";
@@ -31,8 +33,8 @@ import { TEMPLE_STORIES_PUBLISHED } from "@/lib/festivals";
 
 type Props = { params: Promise<{ region: string; temple: string }> };
 
-// Temples with pages are built ahead; one given an introduction later gets
-// its page on the first visit. The rest are listed on the region page.
+// Every temple's page is built ahead; a temple added later gets its page on
+// the first visit.
 export async function generateStaticParams() {
   const out: { region: string; temple: string }[] = [];
   for (const r of await getRegions()) {
@@ -56,7 +58,8 @@ export default async function TemplePage({ params }: Props) {
   const { region: regionId, temple: templeId } = await params;
   const region = await getRegion(regionId);
   const t = await getTemple(regionId, templeId);
-  if (!region || !t || !t.intro || !hasPage(t)) notFound();
+  if (!region || !t || !hasPage(t)) notFound();
+  if (isAround(t)) return <AroundTemplePage regionId={region.id} regionName={region.name} templeId={t.id} />;
 
   const allTemples = await getTemples(region.id);
   const occasions = await getOccasionsForTemple(region.id, t.id);
@@ -67,7 +70,9 @@ export default async function TemplePage({ params }: Props) {
   const articles = (await getArticlesForTemple(t.id)).map((a) => articleRow(a, region.calendar));
   const films = (await getFilmsForTemple(region.id, t.id)).map((f) => filmTile(f, allTemples));
   const drawings = await getIllustrationsForTemple(region.id, t.id);
-  const photos = await getPhotosForTemple(region.id, t.id);
+  const own = await getPhotosForTemple(region.id, t.id);
+  // stand-ins until it has photographs of its own
+  const photos = own.length ? own : await getDummyPhotos(t.id, 6);
   // Its histories, the place, its people, its stories and songs: on a page of their own.
   const hasStories = (await getTempleStories(region.id, t.id)).length > 0;
   const [plan, ...otherDrawings] = drawings;
@@ -96,7 +101,12 @@ export default async function TemplePage({ params }: Props) {
 
       <div className={plan ? "two-col temple-body below-layout" : "two-col temple-body"}>
         <div className="stack">
-          <Html className="prose" html={t.intro} />
+          {/* its introduction (Admin → Temples); a note in its place until it is written */}
+          {t.intro ? (
+            <Html className="prose" html={t.intro} />
+          ) : (
+            <p className="note-line">An introduction to the temple is being written.</p>
+          )}
 
           {hasStories && (
             // held in reserve until published: plain words, "(coming soon)", to the public
@@ -121,7 +131,7 @@ export default async function TemplePage({ params }: Props) {
           {photos.length > 0 && (
             <section>
               <h2 className="sub-head">Photographs</h2>
-              <PhotoWall photos={photos} layout="lead" seeAll={`/${region.id}/${t.id}/photographs`} />
+              <PhotoWall photos={photos} layout="lead" seeAll={own.length ? `/${region.id}/${t.id}/photographs` : undefined} />
             </section>
           )}
 
@@ -171,6 +181,59 @@ export default async function TemplePage({ params }: Props) {
             <YearSoFar occasions={occasions} calendar={region.calendar} newestFirst />
           </section>
         </aside>
+      </div>
+    </div>
+  );
+}
+
+/** A temple in and around the town: part of the story, not at the centre of
+    the documentation. A simpler page, for now just its field notes,
+    photographs and films (stand-in photographs until it has its own). To be
+    designed. */
+async function AroundTemplePage({ regionId, regionName, templeId }: { regionId: string; regionName: string; templeId: string }) {
+  const t = (await getTemple(regionId, templeId))!;
+  // the town these temples are around: its temples, for the notes' tags
+  const town = regionId.replace(/^in-and-around-/, "");
+  const townRegion = await getRegion(town);
+  const allTemples = [...(await getTemples(town)), ...(await getTemples(regionId))];
+  const notes = (await getFieldNotesForTemple(regionId, t.id)).map((n) =>
+    noteRow(n, allTemples, townRegion?.calendar ?? "tamil")
+  );
+  const films = (await getFilmsForTemple(regionId, t.id)).map((f) => filmTile(f, allTemples));
+  const own = await getPhotosForTemple(regionId, t.id);
+  const photos = own.length ? own : await getDummyPhotos(t.id, 6);
+
+  return (
+    <div className="wrap">
+      <header className="page-head">
+        <Link className="crumb" href={`/${town}#${regionId}`}>
+          ← {regionName}
+        </Link>
+        <h1 className="temple-title">{t.knownAs ?? t.name}</h1>
+        <div className="temple-facts caps">
+          {t.knownAs && <span>{t.name}</span>}
+          {t.street && <span>{t.street}</span>}
+        </div>
+      </header>
+      <div className="stack around-temple">
+        {notes.length > 0 && (
+          <section>
+            <h2 className="sub-head">Field notes</h2>
+            {notes.map((r) => (
+              <NoteRow key={r.id} row={r} />
+            ))}
+          </section>
+        )}
+        <section>
+          <h2 className="sub-head">Photographs</h2>
+          <PhotoWall photos={photos} layout="lead" seeAll={own.length ? `/${regionId}/${t.id}/photographs` : undefined} />
+        </section>
+        {films.length > 0 && (
+          <section>
+            <h2 className="sub-head">Films</h2>
+            <FilmWall tiles={films} />
+          </section>
+        )}
       </div>
     </div>
   );

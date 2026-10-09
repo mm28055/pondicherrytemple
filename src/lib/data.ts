@@ -41,6 +41,7 @@ import type {
 import { openingText, plainText, toHTML, type LinkPaths } from "./richtext";
 import { DEITY_GROUP_LABELS } from "@/content/labels";
 import { SECTION_INTROS, type SectionName } from "@/payload/sectionIntros";
+import { seeded } from "./mahotsavam";
 import { monthDates, monthYearOf, TAMIL_MONTHS, tamilMonthOf, type TamilMonth } from "./calendar";
 import { festivalPath } from "./festivals";
 
@@ -272,9 +273,11 @@ const toOccasion = (o: P.Occasion, L: Lookups): Occasion => ({
   date: dayOf(o.date),
   region: L.regionOf(o.region),
   temple: L.templeSlug.get(idOf(o.temple) ?? -1) ?? "",
+  townWide: !o.temple,
   label: o.label,
   observances: slugs(o.observances, L.observanceSlug),
   note: L.noteSlug.get(idOf(o.fieldNote) ?? -1),
+  tbc: Boolean(o.tbc),
 });
 
 function toFieldNote(n: P.FieldNote, L: Lookups, full: boolean): FieldNote {
@@ -402,10 +405,10 @@ const observances = cache(async () => {
   return (await rawObservances()).filter((o) => o.slug).map((o) => toObservance(o, L));
 });
 
-// Only occasions at a visible temple.
+// Only occasions at a visible temple, and those of the whole town.
 const occasions = cache(async () => {
   const L = await lookups();
-  return (await rawOccasions()).map((o) => toOccasion(o, L)).filter((o) => o.temple);
+  return (await rawOccasions()).map((o) => toOccasion(o, L)).filter((o) => o.temple || o.townWide);
 });
 
 const fieldNotes = cache(async () => {
@@ -503,8 +506,18 @@ export async function getRegion(id: string): Promise<Region | null> {
 /* ---------- Temples ---------- */
 
 /** In the order set in the admin. */
+/** A region's temples, the one with the newest field note first; those with
+    none yet after them, in the order they are arranged in the admin. */
 export async function getTemples(regionId: string): Promise<Temple[]> {
-  return (await temples()).filter((t) => t.region === regionId);
+  const latest = new Map<string, string>();
+  for (const n of await fieldNotes()) {
+    for (const t of n.temples) if ((latest.get(t) ?? "") < n.date) latest.set(t, n.date);
+  }
+  return (await temples())
+    .filter((t) => t.region === regionId)
+    .map((t, i) => ({ t, i, d: latest.get(t.id) ?? "" }))
+    .sort((a, b) => b.d.localeCompare(a.d) || a.i - b.i)
+    .map(({ t }) => t);
 }
 
 export async function getTemple(regionId: string, id: string): Promise<Temple | null> {
@@ -512,8 +525,17 @@ export async function getTemple(regionId: string, id: string): Promise<Temple | 
 }
 
 /** A temple gets its own page once it has an introduction. */
-export function hasPage(t: Temple): boolean {
-  return Boolean(t.introText);
+/** Every temple has a page: one of the town's, its full page (with a note
+    in place of its introduction until that is written); one in and around
+    the town, a simpler one (its field notes, photographs and films). */
+export function hasPage(_t: Temple): boolean {
+  return true;
+}
+
+/** Whether a temple is one "in and around" the town: part of the story, not
+    at the centre of the documentation. */
+export function isAround(t: Temple): boolean {
+  return t.region.startsWith("in-and-around-");
 }
 
 export async function getTemplesWithPages(regionId: string): Promise<Temple[]> {
@@ -624,7 +646,9 @@ export async function getObservancesForTemple(regionId: string, templeId: string
 /** How many temples a festival or ritual has been seen at. */
 export async function countTemplesForObservance(observanceId: string): Promise<number> {
   const seen = new Set(
-    (await occasions()).filter((o) => o.observances.includes(observanceId)).map((o) => `${o.region}/${o.temple}`)
+    (await occasions())
+      .filter((o) => o.observances.includes(observanceId) && !o.townWide)
+      .map((o) => `${o.region}/${o.temple}`)
   );
   return seen.size;
 }
@@ -642,8 +666,9 @@ export async function getFieldNote(id: string): Promise<FieldNote | null> {
   return doc ? toFieldNote(doc, await lookups(), true) : null;
 }
 
-export async function getFieldNotesForTemple(regionId: string, templeId: string): Promise<FieldNote[]> {
-  return (await getFieldNotes(regionId)).filter((n) => n.temples.includes(templeId));
+export async function getFieldNotesForTemple(_regionId: string, templeId: string): Promise<FieldNote[]> {
+  // by the temple alone: a note may be about temples in town and around it
+  return (await getFieldNotes()).filter((n) => n.temples.includes(templeId));
 }
 
 export async function getFieldNotesForObservance(observanceId: string): Promise<FieldNote[]> {
@@ -734,6 +759,17 @@ export async function getPhotosForTemple(regionId: string, templeId: string): Pr
 /** Every photograph that may be shown. */
 export async function getPhotos(): Promise<Photo[]> {
   return photos();
+}
+
+/** Stand-ins, for a page with no photographs of its own yet: `n` of the
+    site's photographs, picked at random but always the same for `seed`. */
+export async function getDummyPhotos(seed: string, n: number): Promise<Photo[]> {
+  const r = seeded(seed);
+  return (await photos())
+    .map((p) => ({ p, k: r() }))
+    .sort((a, b) => a.k - b.k)
+    .slice(0, n)
+    .map(({ p }) => p);
 }
 
 /** Every photograph of the festivals and rituals (any tagged with one). */

@@ -44,9 +44,9 @@ export default async function RegionPage({ params }: Props) {
   const aroundRows = await Promise.all(
     aroundTemples.map(async (t) => {
       if (!hasPage(t)) return { t };
-      const occ = (await getOccasionsForTemple(around!.id, t.id)).length;
+      // not in the calendars: their field notes alone
       const notes = (await getFieldNotesForTemple(around!.id, t.id)).length;
-      return { t, meta: `${occ} occasions · ${notes} field note${notes === 1 ? "" : "s"}` };
+      return { t, meta: `${notes} field note${notes === 1 ? "" : "s"}` };
     })
   );
 

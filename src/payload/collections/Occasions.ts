@@ -29,7 +29,12 @@ export const Occasions: CollectionConfig = {
             date: { pickerAppearance: 'dayOnly', displayFormat: 'd MMMM yyyy' },
           },
         },
-        { name: 'temple', type: 'relationship', relationTo: 'temples', required: true, admin: { width: '65%' } },
+        {
+          name: 'temple',
+          type: 'relationship',
+          relationTo: 'temples',
+          admin: { width: '65%', description: 'Leave empty for an event of the whole town, like the Masi Maham Theerthavari.' },
+        },
       ],
     },
     {
@@ -38,6 +43,12 @@ export const Occasions: CollectionConfig = {
       required: true,
       label: 'What happened',
       admin: { placeholder: 'e.g. Brahmotsavam begins: the flag is hoisted' },
+    },
+    {
+      name: 'tbc',
+      type: 'checkbox',
+      label: 'To be confirmed',
+      admin: { description: 'Shown in the calendars marked "to be confirmed" until this is unticked.' },
     },
     observancesField({ description: 'The festivals and rituals it involved.' }),
     {

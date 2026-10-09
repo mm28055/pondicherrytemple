@@ -25,6 +25,8 @@ export interface CalendarEvent {
   noteHref?: string;
   /** The festivals and rituals it was part of, each with its page. */
   observances: { label: string; href?: string }[];
+  /** Still to be confirmed: shown fainter, marked "TBC". */
+  tbc?: boolean;
 }
 
 const WEEK = [
@@ -83,7 +85,12 @@ function item(e: CalendarEvent, inBox: boolean) {
   const place = fit(inBox ? e.short : e.place);
   return (
     <>
-      <span className="cal-line">
+      <span className={e.tbc ? "cal-line tbc" : "cal-line"}>
+        {e.tbc && (
+          <abbr className="tbc-mark" title="To be confirmed">
+            TBC
+          </abbr>
+        )}
         {e.placeHref && !inBox ? (
           <Link className="cal-place" href={e.placeHref} title={e.place}>
             {place}
@@ -344,6 +351,16 @@ export function MonthCalendar({
       ) : (
         <p className="note-line month-cal-none">
           No days recorded yet in {month.name} {year}.
+        </p>
+      )}
+
+      {/* what "TBC" means, when there is one */}
+      {events.some((e) => e.tbc) && (
+        <p className="tbc-key">
+          <abbr className="tbc-mark" title="To be confirmed">
+            TBC
+          </abbr>
+          to be confirmed
         </p>
       )}
 

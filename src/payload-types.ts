@@ -630,8 +630,15 @@ export interface Region {
 export interface Occasion {
   id: number;
   date: string;
-  temple: number | Temple;
+  /**
+   * Leave empty for an event of the whole town, like the Masi Maham Theerthavari.
+   */
+  temple?: (number | null) | Temple;
   label: string;
+  /**
+   * Shown in the calendars marked "to be confirmed" until this is unticked.
+   */
+  tbc?: boolean | null;
   /**
    * The festivals and rituals it involved.
    */
@@ -1184,6 +1191,7 @@ export interface OccasionsSelect<T extends boolean = true> {
   date?: T;
   temple?: T;
   label?: T;
+  tbc?: T;
   observances?: T;
   fieldNote?: T;
   region?: T;

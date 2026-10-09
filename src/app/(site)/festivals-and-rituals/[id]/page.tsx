@@ -111,6 +111,11 @@ export default async function ObservancePage({ params }: Props) {
                     <time dateTime={i.date}>
                       {d.day} {d.shortMonth} {d.year}
                     </time>
+                    {i.tbc && (
+                      <abbr className="tbc-mark" title="To be confirmed">
+                        TBC
+                      </abbr>
+                    )}
                     {i.label}
                   </li>
                 );

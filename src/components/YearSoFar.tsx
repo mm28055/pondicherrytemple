@@ -3,7 +3,9 @@ import type { CalendarSystem, Occasion } from "@/content/types";
 import { dateParts, localMonth } from "@/lib/calendar";
 
 /** A temple's ritual year as witnessed, grouped by local month. It grows
-    only as the team records what they attend — no dates to keep up.
+    only as the team records what they attend — no dates to keep up. Each
+    day's name leads to its field note, when there is one; a day still to be
+    confirmed is marked TBC.
     `newestFirst` turns the months, and the dates within them, latest first. */
 export function YearSoFar({
   occasions,
@@ -32,19 +34,23 @@ export function YearSoFar({
             {g.items.map((o) => {
               const d = dateParts(o.date);
               return (
-                <li key={o.date + o.label}>
+                <li key={o.date + o.label} className={o.tbc ? "tbc" : undefined}>
                   <time dateTime={o.date} className="year-date">
                     {d.day} {d.shortMonth}
                   </time>
                   <span className="year-what">
-                    {o.label}
-                    {o.note && (
-                      <>
-                        <br />
-                        <Link href={`/field-notes/${o.note}`} className="year-note">
-                          Field note
-                        </Link>
-                      </>
+                    {o.tbc && (
+                      <abbr className="tbc-mark" title="To be confirmed">
+                        TBC
+                      </abbr>
+                    )}
+                    {/* the name of the day, a link to its field note if there is one */}
+                    {o.note ? (
+                      <Link href={`/field-notes/${o.note}`} className="year-note">
+                        {o.label}
+                      </Link>
+                    ) : (
+                      o.label
                     )}
                   </span>
                 </li>
@@ -53,6 +59,15 @@ export function YearSoFar({
           </ol>
         </section>
       ))}
+      {/* what "TBC" means, when there is one */}
+      {occasions.some((o) => o.tbc) && (
+        <p className="tbc-key">
+          <abbr className="tbc-mark" title="To be confirmed">
+            TBC
+          </abbr>
+          to be confirmed
+        </p>
+      )}
     </div>
   );
 }
