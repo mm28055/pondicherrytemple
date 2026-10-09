@@ -71,3 +71,10 @@
     margin: 4px 0;
   }
 }
+
+/* Back on a list from an entry: that entry, marked for a moment
+   (components/admin/ListMemory) */
+.sthalam-list-last td {
+  background: color-mix(in srgb, var(--sthalam-ochre) 14%, transparent);
+  transition: background 1.5s ease;
+}

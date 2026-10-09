@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload'
 import { canUpdateOwn, isEditor, isLoggedIn } from '../access'
 import { createdByField, observancesField, regionField } from '../fields'
+import { listMemory } from '../preview'
 import { refreshHooks } from '../revalidate'
 
 export const Occasions: CollectionConfig = {
@@ -11,6 +12,7 @@ export const Occasions: CollectionConfig = {
     group: 'Temple pages',
     useAsTitle: 'label',
     defaultColumns: ['date', 'label', 'temple'],
+    components: listMemory,
     description:
       "Every occasion the team was present for. These make each temple's 'year so far', and the 'where we've seen it' list on festival pages.",
   },

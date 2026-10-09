@@ -11,6 +11,7 @@ import * as migration_20261001_131421_temple_stories from './20261001_131421_tem
 import * as migration_20261002_122418_temple_short_name from './20261002_122418_temple_short_name';
 import * as migration_20261009_133056_occasion_town_wide_tbc from './20261009_133056_occasion_town_wide_tbc';
 import * as migration_20261009_140000_database_log_import from './20261009_140000_database_log_import';
+import * as migration_20261010_090000_field_note_edits from './20261010_090000_field_note_edits';
 
 export const migrations = [
   {
@@ -77,5 +78,10 @@ export const migrations = [
     up: migration_20261009_140000_database_log_import.up,
     down: migration_20261009_140000_database_log_import.down,
     name: '20261009_140000_database_log_import',
+  },
+  {
+    up: migration_20261010_090000_field_note_edits.up,
+    down: migration_20261010_090000_field_note_edits.down,
+    name: '20261010_090000_field_note_edits',
   },
 ];
