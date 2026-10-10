@@ -39,8 +39,9 @@ export function localMonth(calendar: CalendarSystem, isoDate: string): string | 
 /* The ritual year: the twelve Tamil solar months, one timeless year. Each
    begins when the sun enters a sign, on much the same day every year, so a
    date in any year can be placed in its month. `rasi` is where the month
-   sits in the South Indian chart (the rasi kattam): row and column in a
-   4 × 4 square, Meenam top-left, going round clockwise. */
+   sits in the chart of the year (after the South Indian rasi kattam): row
+   and column in a 4 × 4 square, Chithirai, the year's first month, in the
+   top-left box, going round clockwise. */
 
 export interface TamilMonth {
   slug: string;
@@ -57,18 +58,18 @@ export interface TamilMonth {
 }
 
 export const TAMIL_MONTHS: TamilMonth[] = [
-  { slug: "chithirai", name: "Chithirai", tamil: "சித்திரை", span: "mid-April to mid-May", starts: "04-14", rasi: [1, 2], colour: "#a87a0c" },
-  { slug: "vaikasi", name: "Vaikasi", tamil: "வைகாசி", span: "mid-May to mid-June", starts: "05-15", rasi: [1, 3], colour: "#b5412b" },
-  { slug: "aani", name: "Aani", tamil: "ஆனி", span: "mid-June to mid-July", starts: "06-15", rasi: [1, 4], colour: "#8a5a2b" },
-  { slug: "aadi", name: "Aadi", tamil: "ஆடி", span: "mid-July to mid-August", starts: "07-17", rasi: [2, 4], colour: "#b3202e" },
-  { slug: "aavani", name: "Aavani", tamil: "ஆவணி", span: "mid-August to mid-September", starts: "08-17", rasi: [3, 4], colour: "#9b2d3f" },
-  { slug: "purattasi", name: "Purattasi", tamil: "புரட்டாசி", span: "mid-September to mid-October", starts: "09-17", rasi: [4, 4], colour: "#3b4f8c" },
-  { slug: "aippasi", name: "Aippasi", tamil: "ஐப்பசி", span: "mid-October to mid-November", starts: "10-17", rasi: [4, 3], colour: "#4d6878" },
-  { slug: "karthigai", name: "Karthigai", tamil: "கார்த்திகை", span: "mid-November to mid-December", starts: "11-16", rasi: [4, 2], colour: "#c0561b" },
-  { slug: "margazhi", name: "Margazhi", tamil: "மார்கழி", span: "mid-December to mid-January", starts: "12-16", rasi: [4, 1], colour: "#9a4a68" },
-  { slug: "thai", name: "Thai", tamil: "தை", span: "mid-January to mid-February", starts: "01-14", rasi: [3, 1], colour: "#4e7d34" },
-  { slug: "masi", name: "Masi", tamil: "மாசி", span: "mid-February to mid-March", starts: "02-13", rasi: [2, 1], colour: "#1f5d7f" },
-  { slug: "panguni", name: "Panguni", tamil: "பங்குனி", span: "mid-March to mid-April", starts: "03-15", rasi: [1, 1], colour: "#5f7a2e" },
+  { slug: "chithirai", name: "Chithirai", tamil: "சித்திரை", span: "mid-April to mid-May", starts: "04-14", rasi: [1, 1], colour: "#a87a0c" },
+  { slug: "vaikasi", name: "Vaikasi", tamil: "வைகாசி", span: "mid-May to mid-June", starts: "05-15", rasi: [1, 2], colour: "#b5412b" },
+  { slug: "aani", name: "Aani", tamil: "ஆனி", span: "mid-June to mid-July", starts: "06-15", rasi: [1, 3], colour: "#8a5a2b" },
+  { slug: "aadi", name: "Aadi", tamil: "ஆடி", span: "mid-July to mid-August", starts: "07-17", rasi: [1, 4], colour: "#b3202e" },
+  { slug: "aavani", name: "Aavani", tamil: "ஆவணி", span: "mid-August to mid-September", starts: "08-17", rasi: [2, 4], colour: "#9b2d3f" },
+  { slug: "purattasi", name: "Purattasi", tamil: "புரட்டாசி", span: "mid-September to mid-October", starts: "09-17", rasi: [3, 4], colour: "#3b4f8c" },
+  { slug: "aippasi", name: "Aippasi", tamil: "ஐப்பசி", span: "mid-October to mid-November", starts: "10-17", rasi: [4, 4], colour: "#4d6878" },
+  { slug: "karthigai", name: "Karthigai", tamil: "கார்த்திகை", span: "mid-November to mid-December", starts: "11-16", rasi: [4, 3], colour: "#c0561b" },
+  { slug: "margazhi", name: "Margazhi", tamil: "மார்கழி", span: "mid-December to mid-January", starts: "12-16", rasi: [4, 2], colour: "#9a4a68" },
+  { slug: "thai", name: "Thai", tamil: "தை", span: "mid-January to mid-February", starts: "01-14", rasi: [4, 1], colour: "#4e7d34" },
+  { slug: "masi", name: "Masi", tamil: "மாசி", span: "mid-February to mid-March", starts: "02-13", rasi: [3, 1], colour: "#1f5d7f" },
+  { slug: "panguni", name: "Panguni", tamil: "பங்குனி", span: "mid-March to mid-April", starts: "03-15", rasi: [2, 1], colour: "#5f7a2e" },
 ];
 
 /** The Tamil month (its slug) a date in any year falls in. */

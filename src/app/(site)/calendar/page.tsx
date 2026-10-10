@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 export const revalidate = 86400;
 
 /** The calendar: the ritual year as a chart of its twelve months, each
-    opening its own page; its year in the middle, with the years either side.
+    opening its own page; its year in the middle, the Year dropdown above it.
     In the menu, under Festivals & Rituals. */
 export default async function CalendarPage() {
   const year = await getRitualYear();
@@ -27,7 +27,7 @@ export default async function CalendarPage() {
         <h1 className="page-title">Calendar</h1>
       </header>
 
-      <section className="section">
+      <section className="section tight">
         {/* the home page's "Full calendar" opens here, the chart filling the screen */}
         <div id="calendar" className="calendar-anchor">
           <RitualYear

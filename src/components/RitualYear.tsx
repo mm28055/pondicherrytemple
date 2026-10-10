@@ -7,17 +7,20 @@ import { tamilYearName } from "@/lib/tamilDate";
 import { MonthMotif } from "@/components/MonthMotif";
 import { inGlide, startGlide } from "@/components/MonthSwipe";
 import { FestivalLink } from "@/components/FestivalLink";
+import { DropBand } from "@/components/DropBand";
 
-/** The ritual year as a South Indian chart (the rasi kattam): the twelve
-    Tamil months round the edge of a square, Chithirai at the top, going
-    clockwise; in the middle, the year itself — "2026–27", and its name in the
-    sixty-year cycle, Parabhava — with what is done all through the year.
+/** The ritual year as a chart after the South Indian rasi kattam: the twelve
+    Tamil months round the edge of a square, Chithirai in the top-left box,
+    going clockwise; in the middle, the year itself — "2026–27", and its name
+    in the sixty-year cycle, Parabhava — with what is done all through the year.
 
     A year runs from Chithirai to Panguni, as the temples keep it. It opens
-    on the year we are in; the arrows either side of it, or a swipe across
-    the chart (a finger, or two on a trackpad), go to the years before and
-    after: back as far as the year the documentation began in (where the
-    months before it are shown, but cannot be opened), forward without end.
+    on the year we are in; the years listed in the band above the chart (on
+    a computer), the arrows either side of the year (on a phone, in the box
+    at the top of the list), or a swipe across the chart (a finger, or two on
+    a trackpad), go to other years: back as far as the year the documentation began in (where
+    the months before it are shown, but cannot be opened), forward without
+    end; the band offers up to two years on.
     Each month opens its own page, in that year. On a phone the months are a
     plain list, in order. */
 export function RitualYear({
@@ -45,6 +48,15 @@ export function RitualYear({
     setCame(way > 0 ? "from-right" : "from-left");
     setYear(year + way);
   };
+  // straight to a year, from the dropdown
+  const goTo = (to: number) => {
+    if (to === year) return;
+    setCame(to > year ? "from-right" : "from-left");
+    setYear(to);
+  };
+  const labelOf = (y: number) => `${y}–${String(y + 1).slice(2)}`;
+  const last = Math.max(yearOf(today) + 2, year);
+  const years = Array.from({ length: last - first + 1 }, (_, i) => first + i);
   const drag = (dx: number, settle = false) => {
     const el = grid.current;
     if (!el) return;
@@ -109,9 +121,24 @@ export function RitualYear({
   };
 
   const name = tamilYearName(year);
-  const label = `${year}–${String(year + 1).slice(2)}`;
+  const label = labelOf(year);
 
   return (
+    <>
+    <DropBand
+      className="year-band"
+      drops={[
+        {
+          key: "year",
+          label: "Year",
+          value: label,
+          chosen: String(year),
+          choices: years.map((y) => ({ id: String(y), label: labelOf(y) })),
+          onPick: (y) => goTo(Number(y)),
+          inline: true,
+        },
+      ]}
+    />
     <div className="rasi-years" onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}>
       <div ref={grid} key={year} className={`rasi${came ? ` ${came}` : ""}`}>
         {TAMIL_MONTHS.map((m) => {
@@ -153,24 +180,19 @@ export function RitualYear({
 
         <div className="rasi-centre">
           <div className="kicker">The ritual year</div>
-          {/* the year, and its name in the sixty-year cycle; the years either side */}
+          {/* the year, and its name in the sixty-year cycle; on a phone, the years either side */}
           <div className="rasi-year">
             <button
               type="button"
               className="rasi-year-step"
               onClick={() => go(-1)}
               disabled={year <= first}
-              aria-label={`The year before, ${year - 1}–${String(year).slice(2)}`}
+              aria-label={`The year before, ${labelOf(year - 1)}`}
             >
               ‹
             </button>
             <span className="rasi-year-num">{label}</span>
-            <button
-              type="button"
-              className="rasi-year-step"
-              onClick={() => go(1)}
-              aria-label={`The year after, ${year + 1}–${String(year + 2).slice(2)}`}
-            >
+            <button type="button" className="rasi-year-step" onClick={() => go(1)} aria-label={`The year after, ${labelOf(year + 1)}`}>
               ›
             </button>
           </div>
@@ -193,5 +215,6 @@ export function RitualYear({
         </div>
       </div>
     </div>
+    </>
   );
 }

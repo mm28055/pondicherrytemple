@@ -219,12 +219,17 @@ a:focus-visible, button:focus-visible {
 }
 
 /* ---------- Page heads ---------- */
+/* Every page's header: close under the site's menu bar, and its rule close
+   under its last line, whatever that line is (nothing after it adds space) */
 .page-head {
-  padding-block: clamp(18px, 3vw, 36px) clamp(16px, 2.5vw, 28px);
+  padding-block: clamp(10px, 1.4vw, 16px) clamp(10px, 1.2vw, 14px);
   border-bottom: 2px solid var(--ink);
 }
+.page-head :last-child:not(svg *) { margin-bottom: 0; }
 
-.page-head .kicker { margin-bottom: 16px; }
+/* the small line above a header's title (a way back, or what the page is)
+   sits close over the title, as one block with it */
+.page-head .kicker { margin-bottom: 8px; }
 
 .page-title {
   font-family: var(--display);
@@ -256,7 +261,7 @@ a:focus-visible, button:focus-visible {
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--muted);
-  margin-bottom: 22px;
+  margin-bottom: 8px;
 }
 .crumb:hover { color: var(--ochre); }
 
@@ -642,10 +647,21 @@ a.temple-row:hover .temple-name { color: var(--ochre); }
   color: var(--ochre);
 }
 
+/* The site's red dot between a name and what goes with it: the shape of the
+   pulli, the dot over a Tamil letter, in the Tamil face of the names (a round
+   top, straight sides, a flat foot); it stands on the line of the words
+   beside it. On the home page, between STHALAM and "a sacred site"; on a
+   festival's page and in the galleries, between the Tamil and the English. */
+.home-gloss::before,
+.gallery-dot,
+.elements-dot { background: var(--ochre); border-radius: 50% 50% 16% 16% / 44% 44% 12% 12%; }
+
 .home-gloss { position: relative; font-style: italic; font-size: clamp(18px, 1.7vw, 21px); color: var(--muted); }
 /* a red dot between the name and the gloss, midway across the gap (the name
-   ends in its letter-spacing, so a little left of the gap's middle) */
-.home-gloss::before { content: ""; position: absolute; left: -20px; top: 52%; width: 6px; height: 6px; margin-top: -3px; border-radius: 50%; background: var(--ochre); }
+   ends in its letter-spacing, so a little left of the gap's middle), sitting
+   on the line STHALAM stands on: drawn in the flow at the gloss's start, so
+   its foot is on the baseline, and taking no room of its own */
+.home-gloss::before { content: ""; display: inline-block; position: relative; left: -20px; width: 7px; height: 8px; margin-right: -7px; vertical-align: baseline; }
 
 /* Filled in by the browser; the space is kept so nothing jumps when it appears.
    It sits level with the STHALAM line under the Tamil name. */
@@ -1718,22 +1734,15 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
   .rasi .rasi-centre > .kicker { display: none; }
   .rasi .rasi-year { margin-top: 0; justify-content: flex-start; gap: 6px; }
   .rasi .rasi-year-num { font-size: 40px; }
-  .rasi .rasi-year-step { font-size: 30px; padding: 2px 4px; }
+  /* on a phone, the years either side by the year itself, in the box at the top; no band */
+  .rasi .rasi-year-step { display: block; font-size: 30px; padding: 2px 4px; }
   .rasi .rasi-year-step:first-child { margin-left: -4px; }
+  .year-band { display: none; }
   .rasi .rasi-centre .rasi-year-name { margin-top: 2px; }
   .rasi .rasi-centre p:not(.rasi-year-name) { font-size: 15.5px; margin-top: 2px; max-width: none; }
 }
 
 /* One month of the ritual year */
-.month-steps { display: flex; gap: 12px 28px; }
-.month-steps a {
-  font-family: var(--display);
-  font-weight: 600;
-  font-size: 14px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-.month-steps a:hover { color: var(--ochre); }
 .month-entries > li {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
@@ -1820,12 +1829,12 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
 .month-head {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  gap: 24px;
+  gap: 8px 24px;
   align-items: center;
 }
 /* its rule, and the calendar's heading below it, in the month's colour */
-.month-head { border-bottom-color: var(--m); padding-bottom: clamp(8px, 1.2vw, 14px); } /* close above its rule */
-/* the way back, and the months either side, on one line above the name */
+.month-head { border-bottom-color: var(--m); }
+/* the way back to the year's chart, on a line above the name */
 .month-topline {
   grid-column: 1 / -1;
   display: flex;
@@ -1842,13 +1851,6 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
   .month-head { grid-template-columns: minmax(0, 1fr); row-gap: 0; }
   .month-head-text,
   .month-head-motif { grid-row: 2; grid-column: 1; }
-  .month-topline { margin-bottom: 22px; }
-  /* the way back and the months either side stay on one line, even for the
-     longest pair of names (Aippasi's: Purattasi, Karthigai): a little narrower */
-  .month-topline { flex-wrap: nowrap; gap: 12px; }
-  .month-topline .crumb,
-  .month-steps a { font-size: 12px; letter-spacing: 0.05em; font-variation-settings: "wdth" 85; white-space: nowrap; }
-  .month-steps { gap: 12px; flex: none; }
   .month-head-motif { width: 76px; justify-self: end; align-self: start; }
 }
 
@@ -2411,7 +2413,9 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
   letter-spacing: 0.01em;
   color: var(--ink);
 }
+/* the years either side, by the year: on a phone only (on a computer, the band above lists the years) */
 .rasi-year-step {
+  display: none;
   border: 0;
   background: none;
   padding: 4px 8px;
@@ -2420,11 +2424,8 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
   line-height: 1;
   color: var(--ochre);
   cursor: pointer;
-  transition: transform 0.15s, color 0.15s;
 }
-.rasi-year-step:first-child:hover { transform: translateX(-3px); }
-.rasi-year-step:last-child:hover { transform: translateX(3px); }
-.rasi-year-step:disabled { color: var(--rule); cursor: default; transform: none; }
+.rasi-year-step:disabled { color: var(--rule); cursor: default; }
 .rasi-centre .rasi-year-name { font-style: normal; font-size: 15px; margin-top: 6px; color: var(--muted); letter-spacing: 0.04em; }
 .rasi-year-name [lang="ta"] { font-family: var(--tamil); font-weight: 600; color: var(--ochre); }
 /* the months before the documentation began: shown, but faint and closed;
@@ -2471,7 +2472,7 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
 /* the Tamil name and the English, side by side, a small red dot between */
 .gallery-names { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 9px; }
 .gallery-names.stacked { display: flex; flex-direction: column; }
-.gallery-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--ochre); align-self: center; flex: none; }
+.gallery-dot { width: 5px; height: 6px; align-self: baseline; flex: none; }
 .gallery-tamil { font-family: var(--tamil); font-weight: 700; font-size: 22px; line-height: 1.2; transition: color 0.15s; }
 .gallery-card:hover .gallery-tamil { color: var(--ochre); }
 .gallery-name { font-weight: 600; font-size: 21px; line-height: 1.2; } /* as tall as the Tamil beside it */
@@ -2531,7 +2532,7 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
 /* the name in English letters and what it means, side by side, a red dot between, of a height */
 .elements-line { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 12px; margin-top: 2px; padding-bottom: 12px; border-bottom: 2px solid var(--ink); }
 .elements-en { font-style: italic; font-weight: 500; font-size: clamp(21px, 2vw, 26px); line-height: 1.2; }
-.elements-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--ochre); align-self: center; flex: none; }
+.elements-dot { width: 6px; height: 7px; align-self: baseline; flex: none; }
 .elements-gloss { font-family: var(--display); font-weight: 400; font-size: clamp(15px, 1.45vw, 19px); letter-spacing: 0.09em; text-transform: uppercase; line-height: 1.2; color: var(--ochre); }
 /* bookmarks to the three parts */
 .elements-marks { display: flex; flex-wrap: wrap; gap: 8px 22px; margin-top: 14px; }
@@ -2694,17 +2695,33 @@ span.month-obs .month-obs-more { display: none; }
 .day-head .cal-tithi-line .cal-tithi { width: 18px; text-align: center; font-size: 15px; }
 .day-head .cal-nak-line .nak-icon { width: 18px; height: 18px; font-size: inherit; }
 
-/* Going to any month (MonthJump): the band of dropdowns of Photographs and
-   Films, in the month's colour; the years' row begins under the year */
-.month-jump { margin-bottom: 14px; }
-.month-jump .filter-bar-btn b,
-.month-jump .filter-bar-btn i,
-.month-jump .filter-bar-btn:hover,
-.month-jump .filter-bar-btn.open { color: var(--mt); }
-.month-jump .filter-bar-btn b { margin-left: 8px; }
-.month-jump .filters button[aria-pressed="true"] { color: var(--ink); border-bottom-color: var(--mt); }
-.month-jump .filters button:disabled { opacity: 0.3; cursor: default; }
-.month-jump .filters button:not(:disabled):hover { color: var(--mt); }
+/* A band of dropdowns that goes elsewhere (DropBand: the Calendar's year, a
+   month's month and year): the band of Photographs and Films, in the page's
+   colour (a month's; the ochre elsewhere); each one's choices begin under it */
+.drop-band { margin-bottom: 14px; }
+.drop-band .filter-bar-btn b,
+.drop-band .filter-bar-btn i,
+.drop-band .filter-bar-btn:hover,
+.drop-band .filter-bar-btn.open { color: var(--mt, var(--ochre)); }
+.drop-band .filter-bar-btn b { margin-left: 8px; }
+.drop-band .filters button[aria-pressed="true"] { color: var(--ink); border-bottom-color: var(--mt, var(--ochre)); }
+.drop-band .filters button:disabled { opacity: 0.3; cursor: default; }
+.drop-band .filters button:not(:disabled):hover { color: var(--mt, var(--ochre)); }
 /* its dropdowns shallower than on Photographs and Films, so the calendar under them shows */
-.month-jump .filters.filter-bar-panel { padding-block: 0 6px; }
-.month-jump .filters.filter-bar-panel button { padding-block: 3px; }
+/* a word on what to do, at the band's right: as the Calendar's "Open a
+   month…"; "Click" with a mouse, "Tap" on a touch screen */
+.drop-band-note { margin-left: auto; font-style: italic; font-size: 15px; color: var(--muted); text-align: right; }
+.drop-band-note .on-touch { display: none; }
+@media (hover: none) {
+  .drop-band-note .on-mouse { display: none; }
+  .drop-band-note .on-touch { display: inline; }
+}
+/* a few choices listed in the band (on a computer), in place of their dropdown */
+.drop-band .drop-inline { display: none; padding: 0; gap: 4px 22px; align-items: center; }
+.drop-band .drop-inline-label { font-family: var(--display); font-weight: 600; font-size: 14px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-2); }
+@media (min-width: 701px) {
+  .drop-band .drop-inline { display: flex; }
+  .drop-band .drop-inline-item > .filter-bar-btn { display: none; }
+}
+.drop-band .filters.filter-bar-panel { padding-block: 0 6px; }
+.drop-band .filters.filter-bar-panel button { padding-block: 3px; }

@@ -97,10 +97,6 @@ export default async function MonthPage({ params }: Props) {
           <Link className="crumb" href="/calendar">
             ← Calendar
           </Link>
-          <nav className="month-steps" aria-label="Other months">
-            {prev && <Link href={href(prev)}>← {prev.month.name}</Link>}
-            {next && <Link href={href(next)}>{next.month.name} →</Link>}
-          </nav>
         </div>
         <div className="month-head-text">
           <p className="tamil-title" lang="ta">
