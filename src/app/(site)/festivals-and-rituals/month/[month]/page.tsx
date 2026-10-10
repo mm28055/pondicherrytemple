@@ -13,6 +13,7 @@ import {
 } from "@/lib/data";
 import { dateParts, monthDates, monthYearOf, TAMIL_MONTHS, tamilMonthOf, type TamilMonth } from "@/lib/calendar";
 import { calendarEvents } from "@/lib/calendarEvents";
+import { nakshatrasBetween, tithisBetween } from "@/lib/tithi";
 import { MonthCalendar } from "@/components/MonthCalendar";
 import { MonthMotif } from "@/components/MonthMotif";
 import { MonthSwipe } from "@/components/MonthSwipe";
@@ -70,7 +71,14 @@ export default async function MonthPage({ params }: Props) {
   const beside = async (s: Step | null) =>
     s && (
       <div style={{ "--m": s.month.colour } as CSSProperties}>
-        <MonthCalendar month={s.month} year={s.year} events={await daysIn(s.month.slug, s.year)} today={today} />
+        <MonthCalendar
+          month={s.month}
+          year={s.year}
+          events={await daysIn(s.month.slug, s.year)}
+          tithis={tithisIn(s.month.slug, s.year)}
+          nakshatras={nakshatrasIn(s.month.slug, s.year)}
+          today={today}
+        />
       </div>
     );
   const [before, after] = await Promise.all([beside(prev), beside(next)]);
@@ -123,7 +131,10 @@ export default async function MonthPage({ params }: Props) {
           after={after}
           colours={[prev?.month.colour ?? "", next?.month.colour ?? ""]}
         >
-          <MonthCalendar month={month} year={y} events={events} today={today} />
+          <MonthCalendar month={month} year={y} events={events} tithis={tithisIn(slug, y)}
+            nakshatras={nakshatrasIn(slug, y)}
+            today={today}
+          />
         </MonthSwipe>
         {next ? (
           <Link className="cal-step next" href={href(next)} scroll={false}>
@@ -197,6 +208,18 @@ function step(at: number, year: number, way: -1 | 1, begins: string): Step | nul
 /** The days the team was present in a month, in one year. */
 async function daysIn(slug: string, year: number) {
   return (await calendarEvents(await getOccasionsInMonth(slug))).filter((e) => monthYearOf(e.date) === year);
+}
+
+/** The tithis kept in a month, in a year: day → its tithis. */
+function tithisIn(slug: string, year: number) {
+  const { first, last } = monthDates(slug, year);
+  return Object.fromEntries(tithisBetween(first, last));
+}
+
+/** Each day's nakshatras in a month, in a year. */
+function nakshatrasIn(slug: string, year: number) {
+  const { first, last } = monthDates(slug, year);
+  return nakshatrasBetween(first, last);
 }
 
 /** A day's description without the festival's name at its start, where the
