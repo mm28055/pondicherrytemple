@@ -2193,97 +2193,40 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
   .cal-evs > li { font-size: 12.5px; }
   .cal-tags :is(a, .fl) { font-size: 10px; letter-spacing: 0.03em; padding: 1px 4px; }
 }
-/* On a phone only: the dot under a marked day, and the chosen day under the grid */
-.cal-dot,
-.cal-panel { display: none; }
+/* On a phone only: the row of icons and the dots under the dates */
+.cal-foot { display: none; }
 
-/* Narrow (a phone), like a phone's own calendar: plain boxes, a dot under the
-   days the team was there, and a tap shows that day under the grid */
+/* Narrow (a phone): plain boxes, all from one left edge. At the top the
+   English date, and the Tamil date across from it, on one line; under them
+   one row of icons (the full or new moon, a special nakshatram's disc, the
+   tithis); at the foot a dot for each thing recorded that day, overlapping,
+   up to four, in shades of the month's colour. The nakshatras, and everything else, are
+   in the pop-up a tap opens. */
 @container cal (max-width: 619px) {
-  .cal-day.has { background: #fff; border-color: var(--rule); box-shadow: none; }
-  .cal-day { position: relative; }
-  .cal-top { justify-content: center; }
-  .cal-top .cal-ta { position: absolute; top: 3px; right: 4px; }
-  .cal-day .cal-num {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 28px;
-    height: 28px;
-    margin-top: 4px;
-    border-radius: 50%;
-  }
-  .cal-day.selected .cal-num { background: var(--m); color: #fff !important; }
-  .cal-dot { display: block; width: 7px; height: 7px; margin: 3px auto 0; border-radius: 50%; background: var(--m); }
-  .cal-moon { justify-content: center; margin-top: 3px; }
-  .cal-moon .dot { width: 7px; height: 7px; border-color: var(--muted); }
-  .cal-moon.new .dot { background: var(--muted); }
-  .cal-panel {
-    display: block;
-    margin-top: 14px;
-    padding: 14px 16px 12px;
-    background: #fff;
-    border: 1px solid var(--rule);
-    border-top: 3px solid var(--m);
-  }
-  .cal-panel-date {
-    font-family: var(--display);
-    font-weight: 700;
-    font-size: 13.5px;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-    color: var(--m);
-    margin-bottom: 6px;
-  }
-  .cal-panel li { font-size: 16.5px; line-height: 1.4; padding-block: 4px; }
-  .cal-panel li + li { border-top: 1px solid var(--rule); }
-  .cal-panel .cal-tags :is(a, .fl) { font-size: 11px; }
-  /* the whole month as a list: plainly a button, but a quiet one */
-  .cal-all {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 8px;
-    width: 100%;
-    margin-top: 12px;
-    padding: 8px 12px;
-    background: none;
-    border: 1px solid var(--rule);
-    font-family: var(--display);
-    font-weight: 700;
-    font-size: 12px;
-    letter-spacing: 0.07em;
-    text-transform: uppercase;
-    color: var(--m, var(--ochre));
-    cursor: pointer;
-    transition: background 0.15s, color 0.15s;
-  }
-  .cal-all::after { content: "▾"; font-size: 13px; line-height: 1; }
-  .cal-all[aria-expanded="true"]::after { content: "▴"; }
-  .cal-all:hover,
-  .cal-all:active { border-color: var(--m, var(--ochre)); }
-  .cal-all[aria-expanded="true"] { background: var(--chalk-2); }
-  .cal-list { display: none; }
-  .cal-list.open { display: block; }
-
   .cal { gap: 2px; }
   .cal-wd [lang="ta"] { display: none; }
-  .cal-day { min-height: 54px; padding: 4px 5px; }
-  .cal-num { font-size: 19px; }
-  .cal-day.has { position: relative; }
-  .cal-day.has a.cal-num::after { content: ""; position: absolute; inset: 0; } /* the whole box is the link */
-  .cal-ta { font-size: 10.5px; }
-  .cal-evs { display: none; }
-  .cal-moon .dot { width: 9px; height: 9px; }
-  .cal-date { justify-content: center; gap: 0; flex-wrap: nowrap; }
-  .cal-date .cal-tithi { font-size: 10px; }
-  .cal-date .cal-num + .cal-tithi { margin-left: 0; }
-  /* on a phone, the nakshatras' icons alone; their names are in the pop-up */
-  .cal-naks { flex-direction: row; justify-content: center; gap: 3px; margin-top: 2px; }
-  .cal-naks .cal-nak-name { display: none; }
-  .cal-naks li { display: block; height: auto; }
-  .cal-naks .nak-icon { width: 10px; height: 10px; }
-  .cal-dot { margin-top: 2px; }
+  .cal-day,
+  .cal-day.has { min-height: 58px; padding: 4px 4px 4px 5px; gap: 3px; background: #fff; border-color: var(--rule); box-shadow: none; }
+  .cal-top { justify-content: space-between; align-items: baseline; }
+  .cal-num { font-size: 19px; line-height: 1; }
+  .cal-ta { font-size: 10px; line-height: 1; }
+  /* only the date beside the date: the moon and the tithis go in the row under it */
+  .cal-date .cal-tithi,
+  .cal-moon.in-box,
+  .cal-naks { display: none; }
+  .cal-foot { display: flex; flex-direction: column; align-items: flex-start; gap: 3px; margin-top: auto; }
+  .cal-icons { display: flex; align-items: center; gap: 2px; min-height: 12px; font-size: 11px; line-height: 1; }
+  .cal-icons .nak-icon { display: block; width: 11px; height: 11px; }
+  .cal-icons .cal-moon .dot { width: 9px; height: 9px; border-color: var(--ink-2); }
+  .cal-icons .cal-moon.new .dot { background: var(--ink-2); }
+  .cal-dots { display: flex; }
+  .cal-dots i { width: 8px; height: 8px; border-radius: 50%; box-shadow: 0 0 0 1.5px #fff; }
+  .cal-dots i + i { margin-left: -3px; }
+  /* the first in the month colour, the others paler shades of it */
+  .cal-dots i:nth-child(1) { background: var(--m); }
+  .cal-dots i:nth-child(2) { background: color-mix(in srgb, var(--m) 72%, #fff); }
+  .cal-dots i:nth-child(3) { background: color-mix(in srgb, var(--m) 50%, #fff); }
+  .cal-dots i:nth-child(4) { background: color-mix(in srgb, var(--m) 32%, #fff); }
 }
 
 

@@ -497,7 +497,36 @@ export function MonthCalendar({
                   </li>
                 ))}
               </ul>
-              {n > 0 && <span className="cal-dot" aria-hidden="true" />}
+              {/* On a phone, under the dates, from the box's left edge: the full or new
+                  moon, a special nakshatram's disc and the tithis' icons in one row (the
+                  nakshatras left to the pop-up); then a dot for each thing recorded on the
+                  day, overlapping, up to four */}
+              <span className="cal-foot" aria-hidden="true">
+                <span className="cal-icons">
+                  {moon && (
+                    <span className={`cal-moon ${moon}`} title={MOON[moon].en}>
+                      <span className="dot" />
+                    </span>
+                  )}
+                  {(special[day] ?? []).map((k) => (
+                    <span key={`n${k}`} title={NAKSHATRAS[k].name}>
+                      <NakshatraIcon n={k} ringed />
+                    </span>
+                  ))}
+                  {others.map((k) => (
+                    <span key={k} className="cal-tithi" title={TITHI_NAMES[k].name}>
+                      {TITHI_NAMES[k].icon}
+                    </span>
+                  ))}
+                </span>
+                {n > 0 && (
+                  <span className="cal-dots">
+                    {Array.from({ length: Math.min(n, 4) }, (_, i) => (
+                      <i key={i} />
+                    ))}
+                  </span>
+                )}
+              </span>
             </div>
           );
         })}
