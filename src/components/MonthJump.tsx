@@ -5,7 +5,8 @@ import { DropBand } from "@/components/DropBand";
 import { TAMIL_MONTHS } from "@/lib/calendar";
 
 /** Any month, not only the one before or after: a band of dropdowns, a
-    month and a year, in the month's colour. A choice goes to that month,
+    year and a month, in the month's colour, and a link down the page to
+    Varam, what is done every week. A choice goes to that month,
     the calendar staying where it was on the screen. A month's year is the
     year it falls in (Thai 2027 is January 2027); the months before the
     calendar begins are not offered. */
@@ -28,14 +29,6 @@ export function MonthJump({ month, year, begins, years }: { month: string; year:
       }
       drops={[
         {
-          key: "month",
-          label: "Month",
-          value: TAMIL_MONTHS.find((m) => m.slug === month)!.name,
-          chosen: month,
-          choices: TAMIL_MONTHS.map((m) => ({ id: m.slug, label: m.name, disabled: !open(m.slug, year) })),
-          onPick: (slug) => go(slug, year),
-        },
-        {
           key: "year",
           label: "Year",
           value: String(year),
@@ -43,7 +36,16 @@ export function MonthJump({ month, year, begins, years }: { month: string; year:
           choices: years.map((y) => ({ id: String(y), label: String(y) })),
           onPick: (y) => toYear(Number(y)),
         },
+        {
+          key: "month",
+          label: "Month",
+          value: TAMIL_MONTHS.find((m) => m.slug === month)!.name,
+          chosen: month,
+          choices: TAMIL_MONTHS.map((m) => ({ id: m.slug, label: m.name, disabled: !open(m.slug, year) })),
+          onPick: (slug) => go(slug, year),
+        },
       ]}
+      links={[{ label: "Varam · Every week", href: "#varam" }]}
     />
   );
 }

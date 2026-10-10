@@ -15,6 +15,7 @@ import { Observances } from './payload/collections/Observances'
 import { Occasions } from './payload/collections/Occasions'
 import { Regions } from './payload/collections/Regions'
 import { SpecialNakshatras } from './payload/collections/SpecialNakshatras'
+import { WeeklyRituals } from './payload/collections/WeeklyRituals'
 import { TemplePieces } from './payload/collections/TemplePieces'
 import { Temples } from './payload/collections/Temples'
 import { Users } from './payload/collections/Users'
@@ -23,6 +24,7 @@ import { AboutPage } from './payload/globals/AboutPage'
 import { HomePage } from './payload/globals/HomePage'
 import { Instagram } from './payload/globals/Instagram'
 import { SectionDescriptions } from './payload/globals/SectionDescriptions'
+import { Varam } from './payload/globals/Varam'
 
 /* The admin at /admin, where the team writes and uploads everything the
    site shows. The site reads the same database through src/lib/data.ts. */
@@ -70,11 +72,12 @@ export default buildConfig({
     Drawings,
     Observances,
     SpecialNakshatras,
+    WeeklyRituals,
     Books,
     Users,
     Regions,
   ],
-  globals: [HomePage, AboutPage, Instagram, SectionDescriptions],
+  globals: [HomePage, AboutPage, Instagram, SectionDescriptions, Varam],
   editor: fullEditor,
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: { outputFile: path.resolve(dirname, 'payload-types.ts') },

@@ -629,6 +629,41 @@ export const getSpecialNakshatras = cache(async (): Promise<Record<string, { nam
   return out;
 });
 
+/** What the temples do every week (Varam), as set in the admin: each with
+    its days of the week (sun…sat), when in the day, and its temples (named,
+    with their pages) and festivals. */
+export type WeeklyRitual = {
+  id: string;
+  what: string;
+  days: string[];
+  time: string;
+  temples: { key: string; name: string; href: string | null }[];
+  observances: { id: string; name: string }[];
+};
+export const getWeeklyRituals = cache(async (): Promise<WeeklyRitual[]> => {
+  const [docs, temples, L, obs] = await Promise.all([
+    (async () => (await (await db()).find({ ...base, collection: "weekly-rituals", depth: 0 })).docs)(),
+    rawTemples(),
+    lookups(),
+    observances(),
+  ]);
+  const byId = new Map(temples.map((t) => [t.id, t]));
+  return docs.map((d) => ({
+    id: String(d.id),
+    what: d.what,
+    days: d.days ?? [],
+    time: d.time ?? "",
+    temples: (d.temples ?? [])
+      .map((ref) => byId.get(idOf(ref) ?? -1))
+      .filter((t) => t !== undefined)
+      .map((t) => ({ key: L.templeKey.get(t.id) ?? "", name: t.knownAs || t.name, href: L.paths.temple(t.id) })),
+    observances: (d.observances ?? [])
+      .map((ref) => obs.find((o) => o.id === L.observanceSlug.get(idOf(ref) ?? -1)))
+      .filter((o) => o !== undefined)
+      .map((o) => ({ id: o.id, name: o.name })),
+  }));
+});
+
 /** Every date the team was present, oldest first. */
 export async function getOccasions(): Promise<Occasion[]> {
   return [...(await occasions())].sort(byDateAsc);
@@ -859,6 +894,21 @@ export async function getSectionIntro(name: SectionName): Promise<string> {
     return g[name]?.trim() || original;
   } catch {
     return original;
+  }
+}
+
+/** Varam: what each day of the week is like (sun…sat), as written in the
+    admin; a day not yet written is left out. */
+export async function getVaramDays(): Promise<Record<string, string>> {
+  try {
+    const g = (await (await db()).findGlobal({ slug: "varam", depth: 0, overrideAccess: true })) as unknown as Record<string, unknown>;
+    return Object.fromEntries(
+      ["sun", "mon", "tue", "wed", "thu", "fri", "sat"]
+        .map((d) => [d, typeof g[d] === "string" ? (g[d] as string).trim() : ""])
+        .filter(([, t]) => t)
+    );
+  } catch {
+    return {};
   }
 }
 

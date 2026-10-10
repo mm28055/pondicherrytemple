@@ -77,6 +77,7 @@ export interface Config {
     drawings: Drawing;
     observances: Observance;
     'special-nakshatras': SpecialNakshatra;
+    'weekly-rituals': WeeklyRitual;
     books: Book;
     users: User;
     regions: Region;
@@ -109,6 +110,7 @@ export interface Config {
     drawings: DrawingsSelect<false> | DrawingsSelect<true>;
     observances: ObservancesSelect<false> | ObservancesSelect<true>;
     'special-nakshatras': SpecialNakshatrasSelect<false> | SpecialNakshatrasSelect<true>;
+    'weekly-rituals': WeeklyRitualsSelect<false> | WeeklyRitualsSelect<true>;
     books: BooksSelect<false> | BooksSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
     regions: RegionsSelect<false> | RegionsSelect<true>;
@@ -126,12 +128,14 @@ export interface Config {
     'about-page': AboutPage;
     instagram: Instagram;
     'section-descriptions': SectionDescription;
+    varam: Varam;
   };
   globalsSelect: {
     'home-page': HomePageSelect<false> | HomePageSelect<true>;
     'about-page': AboutPageSelect<false> | AboutPageSelect<true>;
     instagram: InstagramSelect<false> | InstagramSelect<true>;
     'section-descriptions': SectionDescriptionsSelect<false> | SectionDescriptionsSelect<true>;
+    varam: VaramSelect<false> | VaramSelect<true>;
   };
   locale: null;
   widgets: {
@@ -864,6 +868,28 @@ export interface SpecialNakshatra {
   createdAt: string;
 }
 /**
+ * What the temples do every week, like the Durga puja on Tuesday afternoons. Shown under every month’s calendar, under its day of the week.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "weekly-rituals".
+ */
+export interface WeeklyRitual {
+  id: number;
+  what: string;
+  /**
+   * One or more.
+   */
+  days: ('sun' | 'mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat')[];
+  time?: string | null;
+  temples: (number | Temple)[];
+  /**
+   * Optional: the festival or ritual it is, linked to its page.
+   */
+  observances?: (number | Observance)[] | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * The outline shown on The Book page. It will change as the writing does.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -964,6 +990,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'special-nakshatras';
         value: number | SpecialNakshatra;
+      } | null)
+    | ({
+        relationTo: 'weekly-rituals';
+        value: number | WeeklyRitual;
       } | null)
     | ({
         relationTo: 'books';
@@ -1326,6 +1356,19 @@ export interface SpecialNakshatrasSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "weekly-rituals_select".
+ */
+export interface WeeklyRitualsSelect<T extends boolean = true> {
+  what?: T;
+  days?: T;
+  time?: T;
+  temples?: T;
+  observances?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "books_select".
  */
 export interface BooksSelect<T extends boolean = true> {
@@ -1584,6 +1627,24 @@ export interface SectionDescription {
   createdAt?: string | null;
 }
 /**
+ * What each day of the week is like: what the town’s people do on it, how they make its character. Shown under every month’s calendar, with that day’s weekly rituals. Leave a blank line between paragraphs. An empty box shows placeholder text.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "varam".
+ */
+export interface Varam {
+  id: number;
+  sun?: string | null;
+  mon?: string | null;
+  tue?: string | null;
+  wed?: string | null;
+  thu?: string | null;
+  fri?: string | null;
+  sat?: string | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "home-page_select".
  */
@@ -1656,6 +1717,22 @@ export interface SectionDescriptionsSelect<T extends boolean = true> {
   films?: T;
   articles?: T;
   books?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "varam_select".
+ */
+export interface VaramSelect<T extends boolean = true> {
+  sun?: T;
+  mon?: T;
+  tue?: T;
+  wed?: T;
+  thu?: T;
+  fri?: T;
+  sat?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

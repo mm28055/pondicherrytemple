@@ -3,23 +3,22 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { CSSProperties } from "react";
 import {
-  getObservancesById,
+  getDummyPhotos,
   getLineBegins,
   getOccasionsInMonth,
-  getRitualYear,
   getSpecialNakshatras,
-  getTemple,
-  hasPage,
-  type MonthEntry,
+  getVaramDays,
+  getWeeklyRituals,
 } from "@/lib/data";
-import { dateParts, monthDates, monthYearOf, TAMIL_MONTHS, tamilMonthOf, type TamilMonth } from "@/lib/calendar";
+import type { Photo } from "@/content/types";
+import { monthDates, monthYearOf, TAMIL_MONTHS, tamilMonthOf, type TamilMonth } from "@/lib/calendar";
 import { calendarEvents } from "@/lib/calendarEvents";
 import { nakshatrasBetween, specialDays, tithisBetween } from "@/lib/tithi";
 import { MonthCalendar } from "@/components/MonthCalendar";
 import { MonthMotif } from "@/components/MonthMotif";
 import { MonthSwipe } from "@/components/MonthSwipe";
 import { MonthJump } from "@/components/MonthJump";
-import { FestivalLink } from "@/components/FestivalLink";
+import { WeeklyRituals } from "@/components/WeeklyRituals";
 
 type Props = { params: Promise<{ month: string; year?: string }> };
 
@@ -41,8 +40,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     : {};
 }
 
-/** One Tamil month, in one year: its calendar, and every festival and ritual
-    that falls in it, with the days the team saw each one. The months run on
+/** One Tamil month, in one year: its calendar, and under it Varam, what the
+    temples do every week, with the photographs of each day. The months run on
     in a line from Masi 2026 (the month before the team began), with no end:
     /month/panguni/2027 is the next Panguni. /month/panguni, without a year,
     is the month in the cycle of twelve we are in now. */
@@ -62,10 +61,13 @@ export default async function MonthPage({ params }: Props) {
   const next = step(at, y, 1, begins);
   const href = (s: Step) => `/festivals-and-rituals/month/${s.month.slug}/${s.year}`;
 
-  const ritualYear = await getRitualYear();
-  const entries = ritualYear.months[at].entries;
-  const festivals = entries.filter((e) => e.observance.kind === "festival");
-  const rituals = entries.filter((e) => e.observance.kind === "ritual");
+  // Varam: what is done every week, and stand-in photographs for each day's temples
+  const weekly = await getWeeklyRituals();
+  const character = await getVaramDays();
+  const weeklyPhotos: Record<string, Photo[]> = {};
+  for (const r of weekly)
+    for (const d of r.days)
+      for (const t of r.temples) weeklyPhotos[`${d}|${t.key}`] ??= await getDummyPhotos(`varam-${d}-${t.key}`, 6);
 
   // the nakshatrams kept specially, by month (rules set in the admin)
   const special = await getSpecialNakshatras();
@@ -158,25 +160,15 @@ export default async function MonthPage({ params }: Props) {
         )}
       </div>
 
-      {festivals.length > 0 && <MonthSection title="Festivals" entries={festivals} />}
-      {rituals.length > 0 && <MonthSection title="Rituals" entries={rituals} />}
-
-      {ritualYear.throughYear.length > 0 && (
-        <section className="section tight">
-          <p className="note-line">
-            Done all through the year, in {month.name} as in every month:{" "}
-            {ritualYear.throughYear.map((o, i) => (
-              <span key={o.id}>
-                {i > 0 && ", "}
-                <FestivalLink className="month-link" id={o.id}>
-                  {o.name}
-                </FestivalLink>
-              </span>
-            ))}
-            .
-          </p>
-        </section>
-      )}
+      {/* Varam: what the temples do every week */}
+      <section className="section tight varam-section" id="varam">
+        <div className="section-head">
+          <h2>
+            <span lang="ta">வாரம்</span> Varam · Every week
+          </h2>
+        </div>
+        <WeeklyRituals rituals={weekly} photos={weeklyPhotos} character={character} />
+      </section>
     </div>
   );
 }
@@ -238,76 +230,3 @@ function nakshatrasIn(slug: string, year: number) {
   return nakshatrasBetween(first, last);
 }
 
-/** A day's description without the festival's name at its start, where the
-    festival is already the heading: under Davana utsavam, "Davana utsavam:
-    homam and the closing veethi ula" is just "Homam and the closing veethi ula". */
-function withoutName(label: string, name: string): string {
-  if (!label.toLowerCase().startsWith(name.toLowerCase())) return label;
-  const rest = label.slice(name.length);
-  if (rest && !/^[\s:;,.–—-]/.test(rest)) return label; // "Purappadu" is not the start of "Purappadus"
-  const trimmed = rest.replace(/^[\s:;,.–—-]+/, "");
-  return trimmed.charAt(0).toUpperCase() + trimmed.slice(1);
-}
-
-async function MonthSection({ title, entries }: { title: string; entries: MonthEntry[] }) {
-  return (
-    <section className="section tight">
-      <div className="section-head">
-        <h2>{title}</h2>
-      </div>
-      <ul className="month-entries">
-        {await Promise.all(
-          entries.map(async ({ observance: o, seen }) => (
-            <li key={o.id} className="reveal">
-              <FestivalLink className="month-obs" id={o.id}>
-                <span className="obs-tamil" lang="ta">
-                  {o.tamil ?? o.name}
-                </span>
-                <span className="obs-name">{o.name}</span>
-                <span className="obs-gloss">{o.gloss}</span>
-                {/* shown only where the name is a link (see site.css) */}
-                <span className="month-obs-more">About {o.name}</span>
-              </FestivalLink>
-              {seen.length > 0 ? (
-                <ul className="month-seen">
-                  {await Promise.all(
-                    seen.map(async (s) => {
-                      const t = await getTemple(s.region, s.temple);
-                      const d = dateParts(s.date);
-                      const place = t ? (t.knownAs ?? t.name) : "";
-                      // the day's other festivals and rituals (this one is the heading)
-                      const also = await getObservancesById(s.observances.filter((id) => id !== o.id));
-                      return (
-                        <li key={s.date + s.temple + s.label}>
-                          <time dateTime={s.date}>
-                            {d.day} {d.shortMonth} {d.year}
-                          </time>
-                          {t && hasPage(t) ? <Link href={`/${t.region}/${t.id}`}>{place}</Link> : place}
-                          {withoutName(s.label, o.name) && (
-                            <span className="month-seen-label"> · {withoutName(s.label, o.name)}</span>
-                          )}
-                          {also.map((x) => (
-                            <FestivalLink key={x.id} className="month-seen-tag" id={x.id}>
-                              {x.name}
-                            </FestivalLink>
-                          ))}
-                          {s.note && (
-                            <Link className="cal-read short arrow-link" href={`/field-notes/${s.note}`}>
-                              Note
-                            </Link>
-                          )}
-                        </li>
-                      );
-                    }),
-                  )}
-                </ul>
-              ) : (
-                <p className="month-unseen">Not yet seen by the team in this month.</p>
-              )}
-            </li>
-          )),
-        )}
-      </ul>
-    </section>
-  );
-}

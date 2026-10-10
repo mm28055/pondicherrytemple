@@ -24,8 +24,19 @@ export type Drop = {
     computer, where there is room. In the page's
     colour (--mt) where it has one. Used on the Calendar (the year) and on a
     month's page (the month and the year). A `note`, a word on what to do
-    on the page, sits at the band's right. */
-export function DropBand({ drops, note, className = "" }: { drops: Drop[]; note?: ReactNode; className?: string }) {
+    on the page, sits at the band's right; `links`, to places further down
+    the page, come after the dropdowns, in their face, underlined. */
+export function DropBand({
+  drops,
+  links = [],
+  note,
+  className = "",
+}: {
+  drops: Drop[];
+  links?: { label: string; href: string }[];
+  note?: ReactNode;
+  className?: string;
+}) {
   const [menu, setMenu] = useState<string | null>(null);
   const box = useRef<HTMLDivElement>(null);
   const buttons = useRef<Record<string, HTMLButtonElement | null>>({});
@@ -73,6 +84,13 @@ export function DropBand({ drops, note, className = "" }: { drops: Drop[]; note?
               {d.label} <b>{d.value}</b>
               <i aria-hidden="true">▾</i>
             </button>
+          </span>
+        ))}
+        {links.map((l) => (
+          <span key={l.href} className="filter-bar-item">
+            <a className="filter-bar-btn drop-band-link" href={l.href}>
+              {l.label}
+            </a>
           </span>
         ))}
         {note && <p className="drop-band-note">{note}</p>}
