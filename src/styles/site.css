@@ -2048,6 +2048,14 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
 .nak-icon { width: 1.4em; height: 1.4em; flex: none; overflow: visible; }
 .nak-icon line { stroke: currentColor; stroke-width: 5; stroke-linecap: round; }
 .nak-icon circle { fill: currentColor; }
+/* a special nakshatram (a rule set in the admin): its icon in a ring, a
+   little larger, and its name in black, where the others' are muted */
+/* the disc one kumkum magenta in every month, brighter than any month
+   colour around it, so a special day stands out; its stars in white */
+.nak-icon .nak-ring { fill: #c8176f; stroke: #c8176f; stroke-width: 6; }
+.nak-icon.ringed { transform: scale(1.3); }
+.nak-icon.ringed line { stroke: #fff; stroke-width: 7; }
+.nak-icon.ringed circle:not(.nak-ring) { fill: #fff; }
 /* In a box: one size and one line height for every name, each its icon in
    a column of its own, in the date's condensed face so the longest
    (Mrigashirsham, Uthirattadhi) fit; three of them, if a day has three,
@@ -2065,8 +2073,9 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
   font-size: 12px;
   letter-spacing: 0.02em;
   line-height: 15px;
-  color: var(--ink-2);
+  color: var(--muted);
 }
+.cal-naks li.special { color: var(--ink); }
 .cal-naks .cal-nak-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .cal-naks .nak-icon { width: 14px; height: 14px; color: var(--m); }
 .cal-nak-line { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; font-size: 13px; color: var(--ink-2); }
@@ -2661,3 +2670,41 @@ body { container: page / inline-size; }
 .reserved-soon { font-weight: 500; letter-spacing: 0.04em; color: var(--ochre); }
 /* "About Brahmotsavam" on a month's page: only where the name is a link */
 span.month-obs .month-obs-more { display: none; }
+
+/* In the pop-up, under the date and the month: the moon, the tithis and the
+   nakshatras alike, one size and face, each icon in a slot of the same
+   width at the left, so their names line up (and none of the day box's
+   own sizes for the moon, at any width) */
+.day-head :is(.cal-moon, .cal-tithi-line, .cal-nak-line) {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 4px 7px;
+  margin-top: 0;
+  font-family: var(--text);
+  font-size: 14px;
+  line-height: 1.35;
+  color: var(--ink-2);
+}
+.day-head .cal-nak-line > span { gap: 7px; }
+.day-head .cal-nak-line .cal-nak-name { color: var(--muted); }
+.day-head .cal-nak-line .special .cal-nak-name { color: var(--ink); }
+.day-head .cal-moon .dot { width: 12px; height: 12px; margin-inline: 3px; border-color: var(--ink); }
+.day-head .cal-moon.new .dot { background: var(--ink); }
+.day-head .cal-tithi-line .cal-tithi { width: 18px; text-align: center; font-size: 15px; }
+.day-head .cal-nak-line .nak-icon { width: 18px; height: 18px; font-size: inherit; }
+
+/* Going to any month (MonthJump): the band of dropdowns of Photographs and
+   Films, in the month's colour; the years' row begins under the year */
+.month-jump { margin-bottom: 14px; }
+.month-jump .filter-bar-btn b,
+.month-jump .filter-bar-btn i,
+.month-jump .filter-bar-btn:hover,
+.month-jump .filter-bar-btn.open { color: var(--mt); }
+.month-jump .filter-bar-btn b { margin-left: 8px; }
+.month-jump .filters button[aria-pressed="true"] { color: var(--ink); border-bottom-color: var(--mt); }
+.month-jump .filters button:disabled { opacity: 0.3; cursor: default; }
+.month-jump .filters button:not(:disabled):hover { color: var(--mt); }
+/* its dropdowns shallower than on Photographs and Films, so the calendar under them shows */
+.month-jump .filters.filter-bar-panel { padding-block: 0 6px; }
+.month-jump .filters.filter-bar-panel button { padding-block: 3px; }

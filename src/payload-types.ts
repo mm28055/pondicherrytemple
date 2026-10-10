@@ -76,6 +76,7 @@ export interface Config {
     occasions: Occasion;
     drawings: Drawing;
     observances: Observance;
+    'special-nakshatras': SpecialNakshatra;
     books: Book;
     users: User;
     regions: Region;
@@ -107,6 +108,7 @@ export interface Config {
     occasions: OccasionsSelect<false> | OccasionsSelect<true>;
     drawings: DrawingsSelect<false> | DrawingsSelect<true>;
     observances: ObservancesSelect<false> | ObservancesSelect<true>;
+    'special-nakshatras': SpecialNakshatrasSelect<false> | SpecialNakshatrasSelect<true>;
     books: BooksSelect<false> | BooksSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
     regions: RegionsSelect<false> | RegionsSelect<true>;
@@ -809,6 +811,59 @@ export interface Film {
   _status?: ('draft' | 'published') | null;
 }
 /**
+ * A nakshatram kept specially in a Tamil month, like Purattasi Thiruvonam. Set once, it is marked on the month calendars every year: on the day the nakshatram holds at sunrise.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "special-nakshatras".
+ */
+export interface SpecialNakshatra {
+  id: number;
+  name: string;
+  month:
+    | 'chithirai'
+    | 'vaikasi'
+    | 'aani'
+    | 'aadi'
+    | 'aavani'
+    | 'purattasi'
+    | 'aippasi'
+    | 'karthigai'
+    | 'margazhi'
+    | 'thai'
+    | 'masi'
+    | 'panguni';
+  nakshatram:
+    | 'Asvini'
+    | 'Bharani'
+    | 'Karthikai'
+    | 'Rohini'
+    | 'Mrigashirsham'
+    | 'Thiruvathirai'
+    | 'Punarpoosam'
+    | 'Poosam'
+    | 'Ayilyam'
+    | 'Makam'
+    | 'Pooram'
+    | 'Uthiram'
+    | 'Hastham'
+    | 'Chithirai'
+    | 'Swathi'
+    | 'Visakam'
+    | 'Anusham'
+    | 'Kettai'
+    | 'Moolam'
+    | 'Pooradam'
+    | 'Uthiradam'
+    | 'Tiruvonam'
+    | 'Avittam'
+    | 'Sadhayam'
+    | 'Poorattadhi'
+    | 'Uthirattadhi'
+    | 'Revathi';
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * The outline shown on The Book page. It will change as the writing does.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -905,6 +960,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'observances';
         value: number | Observance;
+      } | null)
+    | ({
+        relationTo: 'special-nakshatras';
+        value: number | SpecialNakshatra;
       } | null)
     | ({
         relationTo: 'books';
@@ -1253,6 +1312,17 @@ export interface ObservancesSelect<T extends boolean = true> {
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "special-nakshatras_select".
+ */
+export interface SpecialNakshatrasSelect<T extends boolean = true> {
+  name?: T;
+  month?: T;
+  nakshatram?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

@@ -13,6 +13,7 @@ import * as migration_20261009_133056_occasion_town_wide_tbc from './20261009_13
 import * as migration_20261009_140000_database_log_import from './20261009_140000_database_log_import';
 import * as migration_20261010_090000_field_note_edits from './20261010_090000_field_note_edits';
 import * as migration_20261010_150000_field_note_edits_2 from './20261010_150000_field_note_edits_2';
+import * as migration_20261010_160000_special_nakshatras from './20261010_160000_special_nakshatras';
 
 export const migrations = [
   {
@@ -89,5 +90,10 @@ export const migrations = [
     up: migration_20261010_150000_field_note_edits_2.up,
     down: migration_20261010_150000_field_note_edits_2.down,
     name: '20261010_150000_field_note_edits_2',
+  },
+  {
+    up: migration_20261010_160000_special_nakshatras.up,
+    down: migration_20261010_160000_special_nakshatras.down,
+    name: '20261010_160000_special_nakshatras',
   },
 ];

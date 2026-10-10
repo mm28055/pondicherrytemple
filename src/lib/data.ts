@@ -621,6 +621,14 @@ export async function getLineBegins(): Promise<string> {
   return recorded < set ? recorded : set;
 }
 
+/** The nakshatrams kept specially in a Tamil month (set in the admin as rules): month → nakshatram names. */
+export const getSpecialNakshatras = cache(async (): Promise<Record<string, { name: string; nakshatram: string }[]>> => {
+  const docs = (await (await db()).find({ ...base, collection: "special-nakshatras", depth: 0 })).docs;
+  const out: Record<string, { name: string; nakshatram: string }[]> = {};
+  for (const d of docs) (out[d.month] ??= []).push({ name: d.name, nakshatram: d.nakshatram });
+  return out;
+});
+
 /** Every date the team was present, oldest first. */
 export async function getOccasions(): Promise<Occasion[]> {
   return [...(await occasions())].sort(byDateAsc);

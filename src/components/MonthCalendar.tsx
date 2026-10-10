@@ -115,6 +115,7 @@ export function DayDialog({
   onDay,
   tithis,
   nakshatras,
+  special,
   className,
   style,
 }: {
@@ -125,6 +126,7 @@ export function DayDialog({
   /** the month's tithis; without them (the home page's "Today"), the full and new moons alone */
   tithis?: Tithis;
   nakshatras?: Record<string, number[]>;
+  special?: Record<string, number[]>;
   onDay?: (day: string) => void;
   /** where it sits, when not in the middle of the screen (the home page's "Today") */
   className?: string;
@@ -362,10 +364,10 @@ export function DayDialog({
                   {nakshatras?.[day] && (
                     <span className="cal-nak-line">
                       {nakshatras[day].map((k, i) => (
-                        <span key={k}>
+                        <span key={k} className={special?.[day]?.includes(k) ? "special" : undefined}>
                           {i > 0 && <span className="cal-nak-then">then</span>}
-                          <NakshatraIcon n={k} />
-                          {NAKSHATRAS[k].name}
+                          <NakshatraIcon n={k} ringed={special?.[day]?.includes(k)} />
+                          <span className="cal-nak-name">{NAKSHATRAS[k].name}</span>
                         </span>
                       ))}
                     </span>
@@ -408,6 +410,7 @@ export function MonthCalendar({
   events,
   tithis,
   nakshatras,
+  special,
   today,
 }: {
   month: TamilMonth;
@@ -416,6 +419,8 @@ export function MonthCalendar({
   tithis: Tithis;
   /** day → its nakshatras, 0–26 */
   nakshatras: Record<string, number[]>;
+  /** day → the nakshatrams kept specially on it (rules set in the admin) */
+  special: Record<string, number[]>;
   today: string;
 }) {
   const { first, last } = monthDates(month.slug, year);
@@ -486,8 +491,8 @@ export function MonthCalendar({
               {/* the day's nakshatras: the one at sunrise, then any that begin before the next */}
               <ul className="cal-naks">
                 {(nakshatras[day] ?? []).map((k) => (
-                  <li key={k} title={NAKSHATRAS[k].name}>
-                    <NakshatraIcon n={k} />
+                  <li key={k} title={NAKSHATRAS[k].name} className={special[day]?.includes(k) ? "special" : undefined}>
+                    <NakshatraIcon n={k} ringed={special[day]?.includes(k)} />
                     <span className="cal-nak-name">{NAKSHATRAS[k].name}</span>
                   </li>
                 ))}
@@ -505,7 +510,7 @@ export function MonthCalendar({
       )}
 
       {/* A day, large, over the page; from it, the days either side */}
-      <DayDialog day={open} events={events} days={days} tithis={tithis} nakshatras={nakshatras} onDay={setOpen} onClose={() => setOpen(null)} />
+      <DayDialog day={open} events={events} days={days} tithis={tithis} nakshatras={nakshatras} special={special} onDay={setOpen} onClose={() => setOpen(null)} />
     </section>
   );
 }

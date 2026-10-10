@@ -14,6 +14,7 @@ import { Media } from './payload/collections/Media'
 import { Observances } from './payload/collections/Observances'
 import { Occasions } from './payload/collections/Occasions'
 import { Regions } from './payload/collections/Regions'
+import { SpecialNakshatras } from './payload/collections/SpecialNakshatras'
 import { TemplePieces } from './payload/collections/TemplePieces'
 import { Temples } from './payload/collections/Temples'
 import { Users } from './payload/collections/Users'
@@ -68,6 +69,7 @@ export default buildConfig({
     Occasions,
     Drawings,
     Observances,
+    SpecialNakshatras,
     Books,
     Users,
     Regions,

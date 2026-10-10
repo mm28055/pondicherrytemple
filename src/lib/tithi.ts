@@ -11,7 +11,10 @@
    lists of dates, agree (scripts/check-tithis.ts). */
 
 import type { TithiKey } from "@/lib/tithiNames";
+import { NAKSHATRAS } from "@/lib/nakshatraNames";
 import { Body, EclipticGeoMoon, Observer, SearchRiseSet, SunPosition, type AstroTime } from "astronomy-engine";
+
+const NAKSHATRA_NAMES = NAKSHATRAS.map((n) => n.name);
 
 /** Each kept tithi: its number among the thirty
     (1–15 waxing, to the full moon; 16–30 waning, to the new moon), and the
@@ -122,6 +125,28 @@ export function nakshatrasBetween(first: string, last: string, where: Observer =
     const list = [from];
     for (let n = from; n !== to; ) list.push((n = (n + 1) % 27));
     out[day] = list;
+  }
+  return out;
+}
+
+/** The days in a month that its special nakshatrams fall on (the rules set
+    in the admin: a nakshatram's name): day → the nakshatrams kept specially
+    on it, 0–26. A nakshatram is kept on the day it holds at sunrise (the
+    first such day, if it holds at two); one that holds at no sunrise at
+    all, beginning and ending between two, on the day it falls in. */
+export function specialDays(first: string, last: string, names: string[], where: Observer = PONDICHERRY): Record<string, number[]> {
+  const out: Record<string, number[]> = {};
+  if (!names.length) return out;
+  const wanted = new Set(names.map((n) => NAKSHATRA_NAMES.indexOf(n)).filter((n) => n >= 0));
+  const shift = (iso: string, by: number) => new Date(Date.parse(`${iso}T00:00:00Z`) + by * DAY).toISOString().slice(0, 10);
+  const all = nakshatrasBetween(shift(first, -1), shift(last, 1), where);
+  for (let t = Date.parse(`${first}T00:00:00Z`); t <= Date.parse(`${last}T00:00:00Z`); t += DAY) {
+    const day = new Date(t).toISOString().slice(0, 10);
+    const [today, before, after] = [all[day], all[shift(day, -1)], all[shift(day, 1)]];
+    const kept = today.filter(
+      (n, i) => wanted.has(n) && (i === 0 ? before[0] !== n : i < today.length - 1 || after[0] !== n)
+    );
+    if (kept.length) out[day] = kept;
   }
   return out;
 }

@@ -7,16 +7,18 @@ import {
   getLineBegins,
   getOccasionsInMonth,
   getRitualYear,
+  getSpecialNakshatras,
   getTemple,
   hasPage,
   type MonthEntry,
 } from "@/lib/data";
 import { dateParts, monthDates, monthYearOf, TAMIL_MONTHS, tamilMonthOf, type TamilMonth } from "@/lib/calendar";
 import { calendarEvents } from "@/lib/calendarEvents";
-import { nakshatrasBetween, tithisBetween } from "@/lib/tithi";
+import { nakshatrasBetween, specialDays, tithisBetween } from "@/lib/tithi";
 import { MonthCalendar } from "@/components/MonthCalendar";
 import { MonthMotif } from "@/components/MonthMotif";
 import { MonthSwipe } from "@/components/MonthSwipe";
+import { MonthJump } from "@/components/MonthJump";
 import { FestivalLink } from "@/components/FestivalLink";
 
 type Props = { params: Promise<{ month: string; year?: string }> };
@@ -65,6 +67,8 @@ export default async function MonthPage({ params }: Props) {
   const festivals = entries.filter((e) => e.observance.kind === "festival");
   const rituals = entries.filter((e) => e.observance.kind === "ritual");
 
+  // the nakshatrams kept specially, by month (rules set in the admin)
+  const special = await getSpecialNakshatras();
   // the calendar: the days the team was present this month, this year
   const events = await daysIn(slug, y);
   // the months either side, ready beside the calendar to be swiped in
@@ -77,6 +81,7 @@ export default async function MonthPage({ params }: Props) {
           events={await daysIn(s.month.slug, s.year)}
           tithis={tithisIn(s.month.slug, s.year)}
           nakshatras={nakshatrasIn(s.month.slug, s.year)}
+          special={specialIn(s.month.slug, s.year, special)}
           today={today}
         />
       </div>
@@ -110,6 +115,14 @@ export default async function MonthPage({ params }: Props) {
         <MonthMotif month={slug} className={`month-head-motif month-head-motif-${slug}`} />
       </header>
 
+      {/* Any month, not only those either side: a month and a year, from the calendar's first month to two years on */}
+      <MonthJump
+        month={slug}
+        year={y}
+        begins={begins}
+        years={Array.from({ length: Number(today.slice(0, 4)) + 3 - Number(begins.slice(0, 4)) }, (_, i) => Number(begins.slice(0, 4)) + i)}
+      />
+
       {/* The months either side again, beside the calendar: no need to go back up */}
       <div className="cal-with-steps">
         {/* scroll={false}: the next month opens where you are, the calendar in view */}
@@ -133,6 +146,7 @@ export default async function MonthPage({ params }: Props) {
         >
           <MonthCalendar month={month} year={y} events={events} tithis={tithisIn(slug, y)}
             nakshatras={nakshatrasIn(slug, y)}
+            special={specialIn(slug, y, special)}
             today={today}
           />
         </MonthSwipe>
@@ -214,6 +228,12 @@ async function daysIn(slug: string, year: number) {
 function tithisIn(slug: string, year: number) {
   const { first, last } = monthDates(slug, year);
   return Object.fromEntries(tithisBetween(first, last));
+}
+
+/** The days a month's special nakshatrams fall on, in a year. */
+function specialIn(slug: string, year: number, rules: Record<string, { nakshatram: string }[]>) {
+  const { first, last } = monthDates(slug, year);
+  return specialDays(first, last, (rules[slug] ?? []).map((r) => r.nakshatram));
 }
 
 /** Each day's nakshatras in a month, in a year. */
