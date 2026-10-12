@@ -2215,11 +2215,11 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
   .cal-moon.in-box,
   .cal-naks { display: none; }
   .cal-foot { display: flex; flex-direction: column; align-items: flex-start; gap: 3px; margin-top: auto; }
-  .cal-icons { display: flex; align-items: center; gap: 2px; min-height: 12px; font-size: 11px; line-height: 1; }
+  .cal-icons { display: flex; align-items: center; gap: 2px; height: 14px; font-size: 11px; line-height: 1; }
   .cal-icons .nak-icon { display: block; width: 11px; height: 11px; }
   .cal-icons .cal-moon .dot { width: 9px; height: 9px; border-color: var(--ink-2); }
   .cal-icons .cal-moon.new .dot { background: var(--ink-2); }
-  .cal-dots { display: flex; }
+  .cal-dots { display: flex; height: 8px; }
   .cal-dots i { width: 8px; height: 8px; border-radius: 50%; box-shadow: 0 0 0 1.5px #fff; }
   .cal-dots i + i { margin-left: -3px; }
   /* the first in the month colour, the others paler shades of it */
@@ -2526,6 +2526,13 @@ html:has(.elements-marks) { scroll-behavior: smooth; }
 .photo-strip .photo-tile img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.3s ease, filter 0.3s ease; }
 .photo-strip .photo-tile:hover img { transform: scale(1.06); }
 @media (max-width: 700px) { .photo-strip { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 3px; } }
+/* one row only (seven across: six photos, then the last tile, dimmed, the way to all of them) */
+.photo-strip-all { position: relative; display: block; overflow: hidden; container-type: inline-size; }
+.photo-strip-all img { width: 100%; height: 100%; object-fit: cover; display: block; filter: blur(2px) grayscale(0.5) brightness(0.65); transform: scale(1.06); transition: filter 0.3s; }
+.photo-strip-all:hover img { filter: blur(5px) grayscale(0.8) brightness(0.45); }
+.photo-strip-all > span { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 0 8%; text-align: center; text-wrap: balance; color: var(--chalk); font-family: var(--display); font-weight: 700; font-size: clamp(9px, 13cqi, 15px); line-height: 1.1; letter-spacing: 0.06em; text-transform: uppercase; }
+/* five across on a phone: four photos and the link */
+@media (max-width: 700px) { .photo-strip.one-row .photo-tile:not(.photo-strip-all):nth-child(n + 5) { display: none; } }
 
 /* A band of photographs under a festival's heading, the whole width of the
    page (out past the margins), fading from one to the next */
@@ -2713,7 +2720,7 @@ span.month-obs .month-obs-more { display: none; }
 .varam-character p { font-size: 18px; line-height: 1.6; color: var(--ink-2); }
 .varam-character p + p { margin-top: 14px; }
 /* then its photographs, temple by temple */
-.varam-photos h3 { margin: 26px 0 8px; font-size: 13px; color: var(--ink-2); }
+.varam-photos h3 { margin: 22px 0 8px; font-size: 13px; color: var(--ink-2); }
 @media (max-width: 700px) {
   .varam-days { gap: 2px; }
   .varam-day { padding: 8px 2px 7px; }

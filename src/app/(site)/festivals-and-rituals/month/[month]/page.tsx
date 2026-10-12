@@ -67,7 +67,7 @@ export default async function MonthPage({ params }: Props) {
   const weeklyPhotos: Record<string, Photo[]> = {};
   for (const r of weekly)
     for (const d of r.days)
-      for (const t of r.temples) weeklyPhotos[`${d}|${t.key}`] ??= await getDummyPhotos(`varam-${d}-${t.key}`, 6);
+      for (const t of r.temples) weeklyPhotos[`${d}|${t.key}`] ??= await getDummyPhotos(`varam-${d}-${t.key}`, 12);
 
   // the nakshatrams kept specially, by month (rules set in the admin)
   const special = await getSpecialNakshatras();

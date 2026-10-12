@@ -11,13 +11,16 @@ import { FilterBar } from "@/components/FilterBar";
 const PAGE = 30;
 /** How many the "lead" layout shows: one large, five small. */
 const LEAD = 6;
+/** How many photos a one-row strip shows before its link to the rest. */
+const STRIP = 6;
 
 type Props = {
   photos: Photo[];
   /** "lead": on a temple's or festival's page, one photo large and five
       small, with a link to see them all. "all": the page of all of them,
       which can be narrowed and sorted. "strip": a contact strip, rows of
-      small photos, under the name of a rite. */
+      small photos, under the name of a rite; given seeAll, one row only, its
+      last tile (the next photo, dimmed) a link to all of them. */
   layout: "lead" | "all" | "strip";
   seeAll?: string;
   /** Rows of buttons to narrow the photos: by temple, festival, deity, year. */
@@ -171,7 +174,23 @@ export function PhotoWall({ photos, layout, seeAll, filters = [] }: Props) {
       )}
 
       {layout === "strip" ? (
-        <div className="photo-strip">{order.map((p, i) => tile(p, i))}</div>
+        seeAll ? (
+          // one row: six photos (four on a phone), then the way to the rest
+          <div className="photo-strip one-row">
+            {order.slice(0, STRIP).map((p, i) => tile(p, i))}
+            {order.length > 0 && (
+              <Link className="photo-tile photo-strip-all" href={seeAll}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={order[Math.min(order.length - 1, STRIP)].small} alt="" loading="lazy" />
+                <span>
+                  <span>See more images</span>
+                </span>
+              </Link>
+            )}
+          </div>
+        ) : (
+          <div className="photo-strip">{order.map((p, i) => tile(p, i))}</div>
+        )
       ) : layout === "lead" ? (
         <>
           {order.length >= 4 ? (

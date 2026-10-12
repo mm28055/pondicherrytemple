@@ -50,8 +50,8 @@ function minutesOf(time: string): number {
 
 /** Varam: what the temples do every week. The seven days in a strip, the
     day it is today marked; one day open at a time, today to begin with:
-    its rituals in the order of the day, then what the day is like (what
-    the town's people do on it), then its photographs, temple by temple. (The photographs are stand-ins until each day's own are added.) */
+    its rituals in the order of the day, then its photographs, temple by
+    temple, then what the day is like (what the town's people do on it). (The photographs are stand-ins until each day's own are added.) */
 export function WeeklyRituals({
   rituals,
   photos,
@@ -130,6 +130,16 @@ export function WeeklyRituals({
           <p className="varam-none">Nothing recorded yet for {day.en}s.</p>
         )}
 
+        {/* the day's photographs, temple by temple: one row each, the last a link to all of them */}
+        {temples.map((t) =>
+          (photos[`${shown}|${t.key}`] ?? []).length > 0 ? (
+            <div key={t.key} className="varam-photos">
+              <h3 className="caps">{t.name}</h3>
+              <PhotoWall photos={photos[`${shown}|${t.key}`]} layout="strip" seeAll={t.href ? `${t.href}/photographs` : "/photographs"} />
+            </div>
+          ) : null
+        )}
+
         {/* what the day is like: what the town's people do on it */}
         <div className="varam-character">
           <h3 className="caps">{day.en}s</h3>
@@ -137,16 +147,6 @@ export function WeeklyRituals({
             <p key={i}>{p.trim()}</p>
           ))}
         </div>
-
-        {/* the day's photographs, temple by temple */}
-        {temples.map((t) =>
-          (photos[`${shown}|${t.key}`] ?? []).length > 0 ? (
-            <div key={t.key} className="varam-photos">
-              <h3 className="caps">{t.name}</h3>
-              <PhotoWall photos={photos[`${shown}|${t.key}`]} layout="strip" />
-            </div>
-          ) : null
-        )}
       </div>
     </div>
   );

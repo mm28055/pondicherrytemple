@@ -520,13 +520,12 @@ export function MonthCalendar({
                     </span>
                   ))}
                 </span>
-                {n > 0 && (
-                  <span className="cal-dots">
-                    {Array.from({ length: Math.min(n, 4) }, (_, i) => (
-                      <i key={i} />
-                    ))}
-                  </span>
-                )}
+                {/* kept even when empty, so the icons sit at the same height on every day */}
+                <span className="cal-dots">
+                  {Array.from({ length: Math.min(n, 4) }, (_, i) => (
+                    <i key={i} />
+                  ))}
+                </span>
               </span>
             </div>
           );
