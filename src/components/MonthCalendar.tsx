@@ -25,6 +25,7 @@ import {
 import { TITHI_NAMES, type TithiKey } from "@/lib/tithiNames";
 import { NAKSHATRAS } from "@/lib/nakshatraNames";
 import { NakshatraIcon } from "@/components/NakshatraIcon";
+import { TithiIcon } from "@/components/TithiIcon";
 
 export interface CalendarEvent {
   date: string;
@@ -355,7 +356,7 @@ export function DayDialog({
                   {others.map((k) => (
                     <span key={k} className="cal-tithi-line">
                       <span className="cal-tithi" aria-hidden="true">
-                        {TITHI_NAMES[k].icon}
+                        <TithiIcon k={k} />
                       </span>
                       {TITHI_NAMES[k].name} · <span lang="ta">{TITHI_NAMES[k].tamil}</span>
                     </span>
@@ -480,7 +481,7 @@ export function MonthCalendar({
                   {/* the tithis kept on the day: an icon each, named on hover */}
                   {others.map((k) => (
                     <span key={k} className="cal-tithi" title={TITHI_NAMES[k].name} aria-label={TITHI_NAMES[k].name} role="img">
-                      {TITHI_NAMES[k].icon}
+                      <TithiIcon k={k} />
                     </span>
                   ))}
                 </span>
@@ -515,7 +516,7 @@ export function MonthCalendar({
                   ))}
                   {others.map((k) => (
                     <span key={k} className="cal-tithi" title={TITHI_NAMES[k].name}>
-                      {TITHI_NAMES[k].icon}
+                      <TithiIcon k={k} />
                     </span>
                   ))}
                 </span>

@@ -2724,3 +2724,15 @@ span.month-obs .month-obs-more { display: none; }
   .varam-what { font-size: 16.5px; }
   .varam-character p { font-size: 16.5px; }
 }
+
+/* A tithi's own drawing (TithiIcon), where it has one: as tall as the text,
+   and as wide as its own proportions make it (never squeezed by the box it is in) */
+.tithi-img { display: inline-block; flex: none; height: 0.95em; width: auto; max-width: none; aspect-ratio: 468 / 335; object-fit: contain; vertical-align: -0.1em; }
+/* the others, drawn in the same spirit, of the same proportions, in ink */
+.tithi-art { display: inline-block; flex: none; height: 0.95em; width: auto; aspect-ratio: 140 / 100; vertical-align: -0.1em; color: var(--ink); overflow: visible; }
+/* a drawing taller than it is wide (Panchami's naga), as tall as the free figures */
+.tithi-art.tall { height: 1.2em; vertical-align: -0.22em; }
+/* an image as tall as a figure free of a pedestal (Shashti's ஓம் and Vel) */
+.tithi-img.tall { height: 1.2em; vertical-align: -0.22em; }
+/* a figure free of a pedestal (Vinayaka's face): drawn a quarter larger, as tall as the others with their pedestals look */
+.tithi-art.free { height: 1.2em; vertical-align: -0.22em; }
