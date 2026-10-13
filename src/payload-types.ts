@@ -259,13 +259,22 @@ export interface FieldNote {
 export interface Temple {
   id: number;
   _order?: string | null;
-  name: string;
-  knownAs?: string | null;
   /**
-   * The common name shown in the boxes of the month calendars, where there is little room. Everywhere else, including the calendar's pop-up, the name above is used.
+   * What it is called: its name in large letters, everywhere on the site. The same as the formal name, if it has no other.
    */
-  shortName?: string | null;
-  deity: string;
+  knownAs: string;
+  /**
+   * Its full, formal name: in smaller letters under its name on the Temples page and on its own page (when the two differ).
+   */
+  name: string;
+  /**
+   * For where there is very little room: the boxes of the month calendars, and the temples above field notes on a phone.
+   */
+  shortName: string;
+  deity?: string | null;
+  /**
+   * Recorded, not shown on the site: for sorting and filtering (as in the Photographs page’s “Deity” filter).
+   */
   deityGroup: 'shiva' | 'vishnu' | 'amman' | 'vinayaka' | 'murugan';
   street?: string | null;
   /**
@@ -328,6 +337,10 @@ export interface Temple {
    */
   slug?: string | null;
   region: number | Region;
+  /**
+   * Untick to leave the temple off the Temples page (its own page, and everything tagged with it, stay).
+   */
+  listed?: boolean | null;
   createdBy?: (number | null) | User;
   updatedAt: string;
   createdAt: string;
@@ -673,6 +686,10 @@ export interface Drawing {
    * A temple's plan is its layout, in the stack at the top of its page.
    */
   kind: 'plan' | 'scene';
+  /**
+   * The way its main entrance faces: recorded, not shown. Upload the drawing with north at the top: it is shown just so, never turned.
+   */
+  faces?: ('north' | 'north-east' | 'east' | 'south-east' | 'south' | 'south-west' | 'west' | 'north-west') | null;
   /**
    * Where this layout sits in its temple's stack: 1 on top, then 2, 3… Layouts without a number come after, oldest first.
    */
@@ -1309,8 +1326,8 @@ export interface MediaSelect<T extends boolean = true> {
  */
 export interface TemplesSelect<T extends boolean = true> {
   _order?: T;
-  name?: T;
   knownAs?: T;
+  name?: T;
   shortName?: T;
   deity?: T;
   deityGroup?: T;
@@ -1330,6 +1347,7 @@ export interface TemplesSelect<T extends boolean = true> {
   articles?: T;
   slug?: T;
   region?: T;
+  listed?: T;
   createdBy?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -1388,6 +1406,7 @@ export interface OccasionsSelect<T extends boolean = true> {
 export interface DrawingsSelect<T extends boolean = true> {
   title?: T;
   kind?: T;
+  faces?: T;
   layoutOrder?: T;
   image?: T;
   caption?: T;

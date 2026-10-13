@@ -2,7 +2,6 @@ import Link from "next/link";
 import { FestivalLink } from "@/components/FestivalLink";
 import type { NoteRowData, ObservanceRowData } from "@/lib/view";
 import type { Temple } from "@/content/types";
-import { DEITY_GROUP_LABELS } from "@/content/labels";
 
 /** A field note, interview, video… or an article: date stamp, then what it is.
     `withPicture` adds its photograph at the right, or a placeholder. */
@@ -30,7 +29,7 @@ export function NoteRow({
           {row.kind !== "note" && (
             <span className="kind">{row.kindLabel} · </span>
           )}
-          {row.where}
+          <Where row={row} />
         </div>
         <h3 className="row-title">{row.title}</h3>
         {withPicture && row.longExcerpt ? (
@@ -99,39 +98,44 @@ export function ObservanceRow({
   );
 }
 
-/** A temple with a page. */
-export function TempleRow({
-  temple: t,
-  meta,
-}: {
-  temple: Temple;
-  meta: string;
-}) {
+/** Where a field note was written: its temples by their names; on a phone, by
+    their shortest names. */
+export function Where({ row }: { row: { where: string; whereShort?: string } }) {
+  return row.whereShort && row.whereShort !== row.where ? (
+    <>
+      <span className="where-full">{row.where}</span>
+      <span className="where-short">{row.whereShort}</span>
+    </>
+  ) : (
+    <>{row.where}</>
+  );
+}
+
+/** A temple with a page: its name (the semi-formal one) large, then (given
+    `formal`, on the Temples page) its formal name when the two differ, and its
+    street; at the right, `meta` (how much has been recorded), if given. Its
+    deity is recorded, not shown. */
+export function TempleRow({ temple: t, meta, formal = false }: { temple: Temple; meta?: string; formal?: boolean }) {
   return (
     <Link className="temple-row reveal" href={`/${t.region}/${t.id}`}>
       <div>
         <div className="temple-name">{t.knownAs ?? t.name}</div>
         <div className="temple-sub">
-          {t.knownAs ? `${t.name} · ` : ""}
-          {DEITY_GROUP_LABELS[t.group]}
-          {t.street ? ` · ${t.street}` : ""}
+          {[formal && t.knownAs && t.knownAs !== t.name ? t.name : null, t.street].filter(Boolean).join(" · ")}
         </div>
       </div>
-      <span className="caps">{meta}</span>
+      {meta && <span className="caps">{meta}</span>}
     </Link>
   );
 }
 
-/** A temple still being documented: listed, not yet linked. */
+/** A temple still being documented: listed, not yet linked; its name and street. */
 export function TempleRowPlain({ temple: t }: { temple: Temple }) {
   return (
     <div className="temple-row plain">
       <div>
         <div className="temple-name">{t.knownAs ?? t.name}</div>
-        <div className="temple-sub">
-          {t.deity}
-          {t.street ? ` · ${t.street}` : ""}
-        </div>
+        <div className="temple-sub">{t.street}</div>
       </div>
     </div>
   );

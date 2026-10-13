@@ -242,9 +242,12 @@ a:focus-visible, button:focus-visible {
   text-wrap: balance;
 }
 
+/* the opening words of each menu page (Temples, Festivals & Rituals, Field
+   Notes, Articles, Films, About, the Book): the size of the home page's
+   ("A lamp at the centre"), so every opening reads alike */
 .page-lede {
-  font-size: clamp(19px, 2vw, 23px);
-  line-height: 1.5;
+  font-size: clamp(18px, 1.5vw, 20px);
+  line-height: 1.6;
   color: var(--ink-2);
   max-width: 38em;
   margin-top: 24px;
@@ -475,6 +478,9 @@ a:focus-visible, button:focus-visible {
 .section { padding-block: clamp(24px, 3.5vw, 48px); }
 .wrap > .section:last-child { padding-bottom: clamp(48px, 7vw, 96px); }
 .section.tight { padding-top: 0; }
+/* the Temples page: the list straight under the header's line, the first temple
+   as far below it as each temple is below the one before */
+.page-head + .section.temple-list { padding-top: 0; }
 
 .section-head {
   display: flex;
@@ -621,6 +627,40 @@ a.temple-row:hover .temple-name { color: var(--ochre); }
 .temple-row .temple-sub { font-size: 16.5px; color: var(--muted); margin-top: 4px; }
 
 .temple-row.plain { padding-block: 14px; }
+/* The Temples page: each temple an entry, its name and street at the left
+   and a row of its latest photographs in line with them, filling the rest of
+   the width. Every temple's name in one column shared by the whole list (as
+   wide as it needs to be, up to a limit, and never narrower than the longest
+   word in any name), so every row of photographs starts at the same place.
+   The entry carries the space and the rule between temples. On a phone, too
+   narrow for both, the photographs go under the name. */
+.temple-list {
+  display: grid;
+  grid-template-columns: fit-content(clamp(200px, 26vw, 340px)) minmax(0, 1fr);
+  column-gap: clamp(20px, 3vw, 40px);
+}
+.temple-entry {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: subgrid;
+  align-items: center;
+  padding-block: 22px;
+  border-bottom: 1px solid var(--rule);
+}
+.temple-entry > .temple-row { display: block; padding-block: 0; border-bottom: 0; } /* its width its words', so the column fits the longest */
+@media (max-width: 640px) {
+  .temple-list { grid-template-columns: minmax(0, 1fr); }
+  .temple-entry > .photo-line { margin-top: 12px; }
+}
+/* a row of photos, each its own shape at one height, the width filled (PhotoWall's "row") */
+.photo-line { display: flex; gap: 6px; height: clamp(84px, 9vw, 128px); overflow: hidden; }
+.photo-line .photo-tile { flex: none; height: 100%; aspect-ratio: auto; }
+/* its last photo, dimmed, a link to all of them, counting the rest ("+46") */
+.photo-line-more { position: relative; display: block; container-type: inline-size; }
+.photo-line-more img { filter: brightness(0.45) saturate(0.7); transition: filter 0.2s; }
+.photo-line-more:hover img { filter: brightness(0.3) saturate(0.6); transform: none; }
+/* the count as large as suits the photo, and never wider than it, however many there are */
+.photo-line-more > span { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: var(--chalk); font-family: var(--display); font-weight: 700; font-size: clamp(13px, 26cqi, 30px); letter-spacing: 0.02em; white-space: nowrap; }
 .temple-row.plain .temple-name { font-size: 20px; font-weight: 500; color: var(--ink-2); }
 
 /* ---------- Home ---------- */
@@ -1513,6 +1553,8 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
 }
 .photo-viewer-inner .caps { color: var(--on-night-dim); }
 .photo-viewer-caption { font-size: 17px; }
+/* a line over the photo's own details: where these photos are from ("Latest from this temple") */
+.photo-viewer-note { font-family: var(--display); font-weight: 700; font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ochre); }
 .photo-viewer-credit { font-style: italic; color: var(--on-night-dim); font-size: 15px; }
 .photo-viewer-tags { font-size: 15px; color: var(--on-night-dim); }
 .photo-viewer-tags a,
@@ -1661,7 +1703,8 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
   /* the stack, standing in the page: room above and to the right for the cards under the top one */
   .layout-stack { margin: var(--stack-drop, 0px) var(--stack-drop, 0px) 0 0; }
   .temple-head-drawing { justify-content: flex-start; }
-  .layout-turned { height: auto; width: min(calc(100vw - 2 * var(--gutter) - 32px - var(--stack-drop, 0px)), 360px); } /* 32px: the frame and mount; and the step the cards under it take */
+  /* one height, as tall as it can be and still never wider than the page (the frame and mount take 32px across, the cards under it their step) */
+  .layout-turned { height: min(260px, calc((100vw - 2 * var(--gutter) - 32px - var(--stack-drop, 0px)) / var(--ratio, 1))); }
   .below-layout > aside { padding-top: 0; }
   .footer-inner { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
   .footer-inner > :first-child { grid-column: 1 / -1; }
@@ -2824,3 +2867,34 @@ span.month-obs .month-obs-more { display: none; }
 .day-head { --moon-dot: 12px; }
 :is(.cal, .day-head) .halo:has(> .dot) { --halo-h: var(--moon-dot); --halo-d: calc(var(--moon-dot) + 6px); }
 @media (max-width: 560px) { .layout-dialog.stepped { padding-inline: 34px; } }
+/* a link to a temple's photographs lands with the heading clear of the menu bar */
+#photographs { scroll-margin-top: calc(var(--nav-h, 64px) + 16px); }
+
+/* The Temples page, beyond the town: "In and around …" (சுற்றுவட்டாரம், the
+   country round about) past a band of the wall's stripes across the whole
+   window, so it reads as a different list; its temples as cards, each a short
+   row of its latest photographs over its name and place, three to a line
+   (two on a tablet, one on a phone). */
+.around { padding-bottom: clamp(48px, 7vw, 96px); }
+.around-wall { height: clamp(36px, 3.6vw, 48px); } /* taller than its stripes are wide: upright bands, as painted on a temple wall */
+/* the town list ends closer when the wall follows it (rather than the foot of the page) */
+.wrap:has(+ .around) > .section:last-child { padding-bottom: clamp(28px, 3.5vw, 44px); }
+.around-head { padding-top: clamp(22px, 3vw, 32px); }
+.around-head h2 { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 14px; margin: 0; font-family: var(--display); font-weight: 700; font-size: 15px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ochre); }
+.around-head h2 [lang="ta"] { font-family: var(--tamil); font-weight: 600; font-size: 20px; letter-spacing: 0; text-transform: none; }
+.around-head .note-line { margin-top: 6px; }
+.temple-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px 22px; margin-top: 20px; }
+.temple-card { padding: 10px 10px 14px; background: #fff; border: 1px solid var(--rule); }
+.temple-card .photo-line { height: clamp(84px, 7.5vw, 104px); }
+.temple-card > .temple-row { display: block; padding: 12px 2px 0; border: 0; }
+.temple-card .temple-name { font-size: clamp(20px, 1.8vw, 24px); }
+@media (max-width: 900px) { .temple-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 560px) { .temple-cards { grid-template-columns: minmax(0, 1fr); } }
+
+/* a field note's temples: by their names, and on a phone by their shortest */
+.where-short { display: none; }
+@media (max-width: 640px) {
+  .where-full { display: none; }
+  .where-short { display: inline; }
+}
+

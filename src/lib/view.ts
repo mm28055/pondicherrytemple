@@ -16,6 +16,8 @@ export interface NoteRowData {
   shortMonth: string;
   local: string | null;
   where: string;
+  /** `where` with each temple by its shortest name: on a phone, in place of `where` */
+  whereShort?: string;
   title: string;
   excerpt: string;
   by: string;
@@ -47,10 +49,9 @@ function excerpt(text: string, max = 180) {
 
 export function noteRow(n: FieldNote, temples: Temple[], calendar: CalendarSystem): NoteRowData {
   const d = dateParts(n.date);
-  const places = n.temples
-    .map((id) => temples.find((t) => t.id === id))
-    .filter((t) => t !== undefined)
-    .map((t) => t.knownAs ?? t.name);
+  const tagged = n.temples.map((id) => temples.find((t) => t.id === id)).filter((t) => t !== undefined);
+  const places = tagged.map((t) => t.knownAs ?? t.name);
+  const placesShort = tagged.map((t) => t.shortName ?? t.knownAs ?? t.name);
   return {
     id: n.id,
     href: `/field-notes/${n.id}`,
@@ -61,6 +62,7 @@ export function noteRow(n: FieldNote, temples: Temple[], calendar: CalendarSyste
     shortMonth: `${d.shortMonth} ${d.year}`,
     local: localMonth(calendar, n.date),
     where: [places.join(", "), n.occasion].filter(Boolean).join(" · "),
+    whereShort: [placesShort.join(", "), n.occasion].filter(Boolean).join(" · "),
     title: n.title,
     excerpt: excerpt(n.excerpt),
     by: "", // always Deepa or Arun: lists of field notes leave out who wrote each one

@@ -91,7 +91,7 @@ export default async function TemplePage({ params }: Props) {
           </Link>
           <h1 className="temple-title">{t.knownAs ?? t.name}</h1>
           <div className="temple-facts caps">
-            {t.knownAs && <span>{t.name}</span>}
+            {t.knownAs && t.knownAs !== t.name && <span>{t.name}</span>}
             {t.street && <span>{t.street}</span>}
           </div>
         </div>
@@ -137,7 +137,7 @@ export default async function TemplePage({ params }: Props) {
           )}
 
           {photos.length > 0 && (
-            <section>
+            <section id="photographs">
               <h2 className="sub-head">Photographs</h2>
               <PhotoWall photos={photos} layout="lead" seeAll={own.length ? `/${region.id}/${t.id}/photographs` : undefined} />
             </section>
@@ -219,7 +219,7 @@ async function AroundTemplePage({ regionId, regionName, templeId }: { regionId: 
         </Link>
         <h1 className="temple-title">{t.knownAs ?? t.name}</h1>
         <div className="temple-facts caps">
-          {t.knownAs && <span>{t.name}</span>}
+          {t.knownAs && t.knownAs !== t.name && <span>{t.name}</span>}
           {t.street && <span>{t.street}</span>}
         </div>
       </header>
@@ -232,7 +232,7 @@ async function AroundTemplePage({ regionId, regionName, templeId }: { regionId: 
             ))}
           </section>
         )}
-        <section>
+        <section id="photographs">
           <h2 className="sub-head">Photographs</h2>
           <PhotoWall photos={photos} layout="lead" seeAll={own.length ? `/${regionId}/${t.id}/photographs` : undefined} />
         </section>

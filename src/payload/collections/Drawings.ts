@@ -49,6 +49,26 @@ export const Drawings: CollectionConfig = {
       ],
     },
     {
+      name: 'faces',
+      type: 'select',
+      label: 'The temple faces',
+      defaultValue: 'east',
+      options: [
+        { label: 'North', value: 'north' },
+        { label: 'North-east', value: 'north-east' },
+        { label: 'East', value: 'east' },
+        { label: 'South-east', value: 'south-east' },
+        { label: 'South', value: 'south' },
+        { label: 'South-west', value: 'south-west' },
+        { label: 'West', value: 'west' },
+        { label: 'North-west', value: 'north-west' },
+      ],
+      admin: {
+        condition: (data) => data?.kind === 'plan',
+        description: 'The way its main entrance faces: recorded, not shown. Upload the drawing with north at the top: it is shown just so, never turned.',
+      },
+    },
+    {
       name: 'layoutOrder',
       type: 'number',
       label: 'Order in the stack of layouts',

@@ -34,6 +34,7 @@ import type {
   Picture,
   Region,
   RegionId,
+  Facing,
   Temple,
   TempleEntry,
   HomePageText,
@@ -249,7 +250,7 @@ const toTemple = (t: P.Temple, L: Lookups): Temple => ({
   // A box cleared in the admin is saved as "", which would hide the name.
   knownAs: t.knownAs?.trim() || undefined,
   shortName: t.shortName?.trim() || undefined,
-  deity: t.deity,
+  deity: t.deity ?? undefined,
   group: t.deityGroup,
   street: t.street?.trim() || undefined,
   intro: toHTML(t.intro, L.paths) || undefined,
@@ -258,6 +259,7 @@ const toTemple = (t: P.Temple, L: Lookups): Temple => ({
     t.coordinates?.lat != null && t.coordinates?.lng != null
       ? [t.coordinates.lat, t.coordinates.lng]
       : undefined,
+  listed: t.listed !== false,
 });
 
 const toObservance = (o: P.Observance, L: Lookups): Observance => ({
@@ -359,6 +361,7 @@ function toIllustration(d: P.Drawing, L: Lookups): Illustration | null {
     region: L.regionOf(d.region),
     kind: d.kind,
     layoutOrder: d.layoutOrder ?? undefined,
+    faces: (d.faces as Facing | null | undefined) ?? undefined,
     title: d.title,
     caption: d.caption ?? undefined,
     credit: d.credit ?? undefined,

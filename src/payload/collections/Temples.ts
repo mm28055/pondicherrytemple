@@ -18,7 +18,7 @@ export const Temples: CollectionConfig = {
   admin: {
     group: 'Temple pages',
     useAsTitle: 'name',
-    defaultColumns: ['name', 'knownAs', 'deityGroup', 'street', '_status'],
+    defaultColumns: ['knownAs', 'name', 'shortName', 'deityGroup', 'street', '_status'],
     description:
       'The temples being documented, in the order the site shows them — drag to reorder. Open a temple to edit everything on its page.',
     preview: previewURL('temples'),
@@ -33,48 +33,65 @@ export const Temples: CollectionConfig = {
       tabs: [
         {
           label: 'The temple',
-          description: 'Its name, deity, street and introduction. A temple gets its own page once it has an introduction.',
+          description: 'Its three names, its deity, its street and its introduction. A temple gets its own page once it has an introduction.',
           fields: [
+            // Its three names: the one it is called by (shown large, as its name),
+            // the formal one, and the shortest, for where there is little room.
             {
               type: 'row',
               fields: [
-                { name: 'name', type: 'text', required: true, admin: { width: '50%' } },
                 {
                   name: 'knownAs',
                   type: 'text',
-                  label: 'Known in town as',
-                  admin: { width: '50%', placeholder: 'e.g. Chetty Koil' },
+                  label: 'Name (semi-formal)',
+                  required: true,
+                  admin: {
+                    width: '34%',
+                    placeholder: 'e.g. Chetty Koyil',
+                    description: 'What it is called: its name in large letters, everywhere on the site. The same as the formal name, if it has no other.',
+                  },
+                },
+                {
+                  name: 'name',
+                  type: 'text',
+                  label: 'Formal name',
+                  required: true,
+                  admin: {
+                    width: '33%',
+                    placeholder: 'e.g. Kalatthiswara Koyil',
+                    description: 'Its full, formal name: in smaller letters under its name on the Temples page and on its own page (when the two differ).',
+                  },
+                },
+                {
+                  name: 'shortName',
+                  type: 'text',
+                  label: 'Shortest name',
+                  required: true,
+                  admin: {
+                    width: '33%',
+                    placeholder: 'e.g. Chetty Koil',
+                    description: 'For where there is very little room: the boxes of the month calendars, and the temples above field notes on a phone.',
+                  },
                 },
               ],
             },
             {
-              name: 'shortName',
-              type: 'text',
-              label: 'Short name (for the calendar)',
-              admin: {
-                placeholder: 'e.g. Lawspet Murugan',
-                description:
-                  'The common name shown in the boxes of the month calendars, where there is little room. Everywhere else, including the calendar\'s pop-up, the name above is used.',
-              },
-            },
-            {
               type: 'row',
               fields: [
-                {
-                  name: 'deity',
-                  type: 'text',
-                  required: true,
-                  admin: { width: '50%', placeholder: 'e.g. Vishnu as Varadaraja Perumal' },
-                },
+                // the deity as it used to be written out (no longer asked for; what was written is kept)
+                { name: 'deity', type: 'text', admin: { hidden: true } },
                 {
                   name: 'deityGroup',
                   label: 'Deity',
                   type: 'select',
                   required: true,
                   options: Object.entries(DEITY_GROUP_LABELS).map(([value, label]) => ({ value, label })),
-                  admin: { width: '25%' },
+                  admin: {
+                    width: '50%',
+                    description: 'Recorded, not shown on the site: for sorting and filtering (as in the Photographs page’s “Deity” filter).',
+                  },
                 },
-                { name: 'street', type: 'text', admin: { width: '25%' } },
+                { name: 'street', type: 'text', admin: { width: '50%' } },
               ],
             },
             {
@@ -195,6 +212,16 @@ export const Temples: CollectionConfig = {
     },
     slugField('name'),
     regionField,
+    {
+      name: 'listed',
+      type: 'checkbox',
+      label: 'Listed on the Temples page',
+      defaultValue: true,
+      admin: {
+        position: 'sidebar',
+        description: 'Untick to leave the temple off the Temples page (its own page, and everything tagged with it, stay).',
+      },
+    },
     createdByField,
   ],
 }

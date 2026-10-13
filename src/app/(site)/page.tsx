@@ -13,7 +13,7 @@ import {
   getTemples,
 } from "@/lib/data";
 import { articleRow, filmRow, noteRow, observanceRow } from "@/lib/view";
-import { ObservanceRow, TempleRow } from "@/components/Rows";
+import { ObservanceRow, TempleRow, Where } from "@/components/Rows";
 import { TodayTamil } from "@/components/TodayTamil";
 import { calendarEvents } from "@/lib/calendarEvents";
 import { Html } from "@/components/Prose";
@@ -106,7 +106,12 @@ export default async function HomePage() {
                       {/* what it is — a film, an article — unless it is a plain field note */}
                       {r.kind !== "note" && <span className="kind">{r.kindLabel} · </span>}
                       {r.day} {r.shortMonth}
-                      {r.where && <span className="where"> · {r.where}</span>}
+                      {r.where && (
+                        <span className="where">
+                          {" · "}
+                          <Where row={r} />
+                        </span>
+                      )}
                     </span>
                     <span className="latest-title">{r.title}</span>
                   </Link>

@@ -44,6 +44,9 @@ export async function up({ payload, req }: MigrateUpArgs): Promise<void> {
       collection: 'temples',
       data: {
         name: t.name,
+        // (all three names are required now; on a database this has already run on, it does not run again)
+        knownAs: t.name,
+        shortName: t.name,
         deity: t.deity,
         deityGroup: t.deityGroup as 'shiva' | 'vishnu' | 'amman' | 'vinayaka' | 'murugan',
         slug: t.slug,

@@ -48,7 +48,9 @@ export interface Temple {
   knownAs?: string;
   /** The common name for the month calendars' boxes: "Lawspet Murugan". */
   shortName?: string;
-  deity: string;
+  /** the deity as once written out (no longer asked for in the admin) */
+  deity?: string;
+  /** its deity: recorded, not shown, for sorting and filtering */
   group: DeityGroup;
   street?: string;
   /** Short introduction (HTML). Temples without one have no page yet. */
@@ -56,6 +58,8 @@ export interface Temple {
   introText?: string;
   /** For a future town map; unused until every temple has one. */
   coordinates?: [lat: number, lng: number];
+  /** Whether it is listed on the Temples page (set in the admin). */
+  listed: boolean;
 }
 
 /* ---------- Festivals & rituals ---------- */
@@ -219,12 +223,18 @@ export interface PhotoFilter {
     that photographs cannot capture. A drawing appears at the top of every
     temple page and festival/ritual page it is tagged with; on a temple's own
     page its plan comes first, shown largest. */
+/** A direction, as a temple faces it. */
+export type Facing = "north" | "north-east" | "east" | "south-east" | "south" | "south-west" | "west" | "north-west";
+
 export interface Illustration extends Picture {
   id: string;
   region: RegionId;
   kind: "plan" | "scene";
   /** a layout's place in its temple's stack (1 on top), if set */
   layoutOrder?: number;
+  /** the way the temple's main entrance faces: recorded, not shown (a layout
+      is always drawn with north at the top, and shown so) */
+  faces?: Facing;
   title: string;
   temples: string[];
   observances: string[];

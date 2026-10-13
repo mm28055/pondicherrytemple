@@ -4,13 +4,13 @@ import { useCallback, useEffect, useRef, useState, type CSSProperties } from "re
 import type { Illustration } from "@/content/types";
 import { LAYOUT_STEP, LAYOUT_UNDER } from "@/lib/layoutStack";
 
-
-/** The temple's layouts in the header of its page: turned on their sides, in
-    the site's striped frame, as a stack of cards, the top one hanging over
-    the line below the header (every temple's layout is shown this way; see
-    site.css). The cards under it (two at most) show at its edges, each a step up and to the right, fainter the deeper it is. Clicking
-    opens the layouts upright and large over the page; with more than one, the
-    arrows (or the arrow keys, or a swipe) go through them. */
+/** The temple's layouts in the header of its page: each as drawn, north at the
+    top (never turned), at one height, as wide as its own shape makes it, in the
+    site's striped frame; as a stack of cards, the top one hanging over the line below the header (every
+    temple's layout is shown this way; see site.css). The cards under it (two at
+    most) show at its edges, each a step up and to the right, fainter the
+    deeper it is. Clicking opens the layouts large over the page; with more than
+    one, the arrows (or the arrow keys, or a swipe) go through them. */
 export function TempleLayout({ layouts }: { layouts: Illustration[] }) {
   const dialog = useRef<HTMLDialogElement>(null);
   const touch = useRef<number | null>(null);
@@ -18,8 +18,6 @@ export function TempleLayout({ layouts }: { layouts: Illustration[] }) {
   const n = layouts.length;
   const d = layouts[0];
   const shown = layouts[at] ?? d;
-  // Only a tall drawing (most plans) is turned; a wide one is shown as it is.
-  const turn = d.height > d.width;
   const under = layouts.slice(1, 1 + LAYOUT_UNDER);
 
   const step = useCallback((by: number) => setAt((i) => (i + by + n) % n), [n]);
@@ -68,12 +66,11 @@ export function TempleLayout({ layouts }: { layouts: Illustration[] }) {
         >
           <span className="layout-mount">
             <span
-              className={turn ? "layout-turned" : "layout-turned upright"}
-              style={{ aspectRatio: turn ? `${d.height} / ${d.width}` : `${d.width} / ${d.height}` }}
+              className="layout-turned upright"
+              style={{ aspectRatio: `${d.width} / ${d.height}`, "--ratio": d.width / d.height } as CSSProperties}
             >
-              {/* Before turning it is as wide as the box is tall, so once turned it fills the box. */}
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={d.src} alt={d.alt} style={turn ? { width: `${(d.width / d.height) * 100}%` } : undefined} />
+              <img src={d.src} alt={d.alt} />
             </span>
           </span>
         </button>

@@ -73,7 +73,9 @@ async function seed(payload: Payload) {
       collection: 'temples',
       data: {
         name: t.name,
-        knownAs: t.knownAs,
+        // all three names are required
+        knownAs: t.knownAs ?? t.name,
+        shortName: t.knownAs ?? t.name,
         deity: t.deity,
         deityGroup: t.group,
         street: t.street,

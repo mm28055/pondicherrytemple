@@ -18,6 +18,9 @@ import * as migration_20261010_170000_weekly_rituals from './20261010_170000_wee
 import * as migration_20261010_180000_varam_days from './20261010_180000_varam_days';
 import * as migration_20261012_095753_special_tithis from './20261012_095753_special_tithis';
 import * as migration_20261013_093604_layout_order from './20261013_093604_layout_order';
+import * as migration_20261013_123338_temple_listed from './20261013_123338_temple_listed';
+import * as migration_20261013_125633_temple_names from './20261013_125633_temple_names';
+import * as migration_20261013_155723_layout_faces from './20261013_155723_layout_faces';
 
 export const migrations = [
   {
@@ -118,6 +121,21 @@ export const migrations = [
   {
     up: migration_20261013_093604_layout_order.up,
     down: migration_20261013_093604_layout_order.down,
-    name: '20261013_093604_layout_order'
+    name: '20261013_093604_layout_order',
+  },
+  {
+    up: migration_20261013_123338_temple_listed.up,
+    down: migration_20261013_123338_temple_listed.down,
+    name: '20261013_123338_temple_listed',
+  },
+  {
+    up: migration_20261013_125633_temple_names.up,
+    down: migration_20261013_125633_temple_names.down,
+    name: '20261013_125633_temple_names',
+  },
+  {
+    up: migration_20261013_155723_layout_faces.up,
+    down: migration_20261013_155723_layout_faces.down,
+    name: '20261013_155723_layout_faces'
   },
 ];
