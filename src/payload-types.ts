@@ -661,7 +661,7 @@ export interface Occasion {
   createdAt: string;
 }
 /**
- * Abishek's drawings: each temple's illustrated plan, and scenes photographs can't capture. A drawing appears at the top of every temple and festival page it is tagged with.
+ * Abishek's drawings: each temple's illustrated plan (its layout), and scenes photographs can't capture. A temple can have several layouts: each drawing of the temple's plan tagged with it joins the stack in the header of its page, in the order set below. Scenes appear on every temple and festival page they are tagged with.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "drawings".
@@ -670,9 +670,13 @@ export interface Drawing {
   id: number;
   title: string;
   /**
-   * A temple's plan is shown first on its page.
+   * A temple's plan is its layout, in the stack at the top of its page.
    */
   kind: 'plan' | 'scene';
+  /**
+   * Where this layout sits in its temple's stack: 1 on top, then 2, 3… Layouts without a number come after, oldest first.
+   */
+  layoutOrder?: number | null;
   /**
    * Upload the drawing as a large JPG or PNG.
    */
@@ -1384,6 +1388,7 @@ export interface OccasionsSelect<T extends boolean = true> {
 export interface DrawingsSelect<T extends boolean = true> {
   title?: T;
   kind?: T;
+  layoutOrder?: T;
   image?: T;
   caption?: T;
   credit?: T;

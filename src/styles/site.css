@@ -348,12 +348,36 @@ a:focus-visible, button:focus-visible {
   transform: translate(-50%, -50%) rotate(-90deg);
 }
 .layout-turned.upright img { position: static; width: 100%; transform: none; }
+/* A temple with several layouts: a stack of cards. The top one is the card
+   above, exactly where it would be alone; each under it is the same card
+   (frame, mount, drawing) set a step up and to the right, and fainter the
+   deeper it is (45%, then 25%), so its striped edges show quietly; two at most. */
+.layout-stack { position: relative; display: block; }
+.layout-stack > .layout-frame { position: relative; z-index: 1; }
+.layout-under {
+  position: absolute; inset: 0; z-index: 0;
+  display: block; padding: 6px;
+  background: repeating-linear-gradient(90deg, var(--ochre) 0 10px, var(--chalk) 10px 20px);
+  box-shadow: 0 8px 22px rgba(25, 21, 18, 0.14);
+  transform: translate(calc(var(--depth) * 7px), calc(var(--depth) * -7px)); /* the step: LAYOUT_STEP in lib/layoutStack.ts */
+  opacity: calc(0.65 - var(--depth) * 0.2);
+}
+.layout-under .layout-mount { height: 100%; }
+.layout-under img { display: block; width: 100%; height: 100%; object-fit: cover; opacity: 0.45; }
+/* in the pop-up: the arrows either side, and which of them it is */
+.layout-dialog.stepped { padding-inline: 56px; }
+.layout-dialog .day-step { color: var(--ink); }
+.layout-count { margin-left: 12px; font-size: 13px; letter-spacing: 0.08em; color: var(--muted); }
 .layout-card .kicker { margin: 0; }
+/* (said again, more firmly, over the page headers' rule that their last
+   line adds no space below it: the card is the header's last thing, and its
+   hang is what takes it over the line) */
+@media (min-width: 901px) { .page-head .temple-head-drawing > .layout-card { margin-bottom: calc(-1 * var(--layout-hang)); } } /* on a narrow screen it stands in the page, not hanging */
 /* The right-hand column starts 30px below the card's foot: the card hangs
    (--layout-hang − the header's bottom padding) below the line, and the
    columns already start (two-col's top padding) below it. */
 .below-layout > aside {
-  padding-top: max(0px, calc(var(--layout-hang) - clamp(16px, 2.5vw, 28px) - clamp(24px, 3vw, 40px) + 30px));
+  padding-top: max(0px, calc(var(--layout-hang) - clamp(10px, 1.2vw, 14px) - clamp(24px, 3vw, 40px) + 30px));
 }
 
 /* The full plan, upright, over the page */
@@ -1634,8 +1658,10 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
   .note-row.with-picture .row-picture { grid-column: 2; max-width: 420px; }
   .temple-head-drawing { position: static; }
   .layout-card { position: static; align-items: flex-start; margin-bottom: 0; }
+  /* the stack, standing in the page: room above and to the right for the cards under the top one */
+  .layout-stack { margin: var(--stack-drop, 0px) var(--stack-drop, 0px) 0 0; }
   .temple-head-drawing { justify-content: flex-start; }
-  .layout-turned { height: auto; width: min(calc(100vw - 2 * var(--gutter) - 32px), 360px); } /* 32px: the frame and mount */
+  .layout-turned { height: auto; width: min(calc(100vw - 2 * var(--gutter) - 32px - var(--stack-drop, 0px)), 360px); } /* 32px: the frame and mount; and the step the cards under it take */
   .below-layout > aside { padding-top: 0; }
   .footer-inner { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
   .footer-inner > :first-child { grid-column: 1 / -1; }
@@ -2797,3 +2823,4 @@ span.month-obs .month-obs-more { display: none; }
 @container cal (max-width: 619px) { .cal { --moon-dot: 9px; } }
 .day-head { --moon-dot: 12px; }
 :is(.cal, .day-head) .halo:has(> .dot) { --halo-h: var(--moon-dot); --halo-d: calc(var(--moon-dot) + 6px); }
+@media (max-width: 560px) { .layout-dialog.stepped { padding-inline: 34px; } }

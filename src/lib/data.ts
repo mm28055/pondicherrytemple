@@ -33,6 +33,7 @@ import type {
   PhotoFilter,
   Picture,
   Region,
+  RegionId,
   Temple,
   TempleEntry,
   HomePageText,
@@ -357,6 +358,7 @@ function toIllustration(d: P.Drawing, L: Lookups): Illustration | null {
     id: String(d.id),
     region: L.regionOf(d.region),
     kind: d.kind,
+    layoutOrder: d.layoutOrder ?? undefined,
     title: d.title,
     caption: d.caption ?? undefined,
     credit: d.credit ?? undefined,
@@ -737,6 +739,36 @@ export async function getIllustrationsForTemple(regionId: string, templeId: stri
   return (await illustrations())
     .filter((d) => d.region === regionId && d.temples.includes(templeId))
     .sort((a, b) => Number(b.kind === "plan") - Number(a.kind === "plan"));
+}
+
+/** Stand-ins until a temple's layouts are drawn: its own layouts, then the
+    placeholder plan, to make a stack of one to three (how many, chosen by the
+    temple, so it stays the same from one visit to the next). A temple with
+    three or more of its own shows only its own. */
+export function withPlaceholderLayouts(templeId: string, regionId: RegionId, own: Illustration[]): Illustration[] {
+  const n = Math.max(own.length, 1 + Math.floor(seeded(`layouts-${templeId}`)() * 3));
+  const stand = Array.from({ length: n - own.length }, (_, k): Illustration => ({
+    id: `placeholder-${templeId}-${k + 1}`,
+    src: "/placeholders/temple-layout.svg",
+    width: 1200,
+    height: 1500,
+    alt: "A placeholder: a generic temple plan, until this temple's layout is drawn",
+    region: regionId,
+    kind: "plan",
+    title: "Temple layout (a placeholder until it is drawn)",
+    temples: [templeId],
+    observances: [],
+  }));
+  return [...own, ...stand];
+}
+
+/** A temple's layouts (its drawings of the plan), for the stack in the header
+    of its page: in the order set in the admin (1 on top), then the rest,
+    oldest first. */
+export function layoutsOf(drawings: Illustration[]): Illustration[] {
+  return drawings
+    .filter((d) => d.kind === "plan")
+    .sort((a, b) => (a.layoutOrder ?? Infinity) - (b.layoutOrder ?? Infinity) || Number(a.id) - Number(b.id));
 }
 
 export async function getIllustrationsForObservance(observanceId: string): Promise<Illustration[]> {

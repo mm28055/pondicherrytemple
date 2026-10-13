@@ -223,6 +223,8 @@ export interface Illustration extends Picture {
   id: string;
   region: RegionId;
   kind: "plan" | "scene";
+  /** a layout's place in its temple's stack (1 on top), if set */
+  layoutOrder?: number;
   title: string;
   temples: string[];
   observances: string[];

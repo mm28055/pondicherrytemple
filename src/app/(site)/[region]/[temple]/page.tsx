@@ -18,6 +18,8 @@ import {
   getDummyPhotos,
   hasPage,
   isAround,
+  layoutsOf,
+  withPlaceholderLayouts,
 } from "@/lib/data";
 import { Html } from "@/components/Prose";
 import { articleRow, filmTile, noteRow, templesOf } from "@/lib/view";
@@ -75,7 +77,10 @@ export default async function TemplePage({ params }: Props) {
   const photos = own.length ? own : await getDummyPhotos(t.id, 6);
   // Its histories, the place, its people, its stories and songs: on a page of their own.
   const hasStories = (await getTempleStories(region.id, t.id)).length > 0;
-  const [plan, ...otherDrawings] = drawings;
+  // its layouts, as a stack in the header (the first on top; placeholders until they are drawn); its other drawings in the right-hand column
+  const layouts = withPlaceholderLayouts(t.id, region.id, layoutsOf(drawings));
+  const otherDrawings = drawings.filter((d) => d.kind !== "plan");
+  const plan = layouts[0];
 
   return (
     <div className="wrap">
@@ -90,16 +95,19 @@ export default async function TemplePage({ params }: Props) {
             {t.street && <span>{t.street}</span>}
           </div>
         </div>
-        {/* The temple's plan, turned on its side, hanging over the line below
-            the header at the right of the right-hand column. */}
+        {/* The temple's layouts, turned on their sides, stacked, the top one
+            hanging over the line below the header at the right of the
+            right-hand column. Every temple's layout is shown this way. */}
         {plan && (
           <div className="temple-head-drawing">
-            <TempleLayout d={plan} />
+            <TempleLayout layouts={layouts} />
           </div>
         )}
       </header>
 
-      <div className={plan ? "two-col temple-body below-layout" : "two-col temple-body"}>
+      <div
+        className={plan ? "two-col temple-body below-layout" : "two-col temple-body"}
+      >
         <div className="stack">
           {/* its introduction (Admin → Temples); a note in its place until it is written */}
           {t.intro ? (
