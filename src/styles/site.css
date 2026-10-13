@@ -2040,6 +2040,10 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
 .cal-moon.full .dot { background: #fff; }
 /* in a day's box: the disc only, beside the date number */
 .cal-moon.in-box { margin-left: 7px; vertical-align: 0.3em; }
+/* in the pop-up, after a great day's own name, the tithi or nakshatram it falls on */
+.great-plain { margin-left: 8px; color: var(--ink-2); font-size: 0.9em; }
+.great-plain::before { content: "("; }
+.great-plain::after { content: ")"; }
 /* The tithis kept on a day: an icon each, beside the date (named on hover);
    in the pop-up, each with its name, under the moon */
 .cal-date { display: inline-flex; align-items: center; flex-wrap: wrap; gap: 3px; }
@@ -2743,3 +2747,53 @@ span.month-obs .month-obs-more { display: none; }
 .tithi-img.tall { height: 1.2em; vertical-align: -0.22em; }
 /* a figure free of a pedestal (Vinayaka's face): drawn a quarter larger, as tall as the others with their pedestals look */
 .tithi-art.free { height: 1.2em; vertical-align: -0.22em; }
+
+/* HALOS: the neon yellow circle round a great day's moon or icon (special
+   tithis and special nakshatrams, set in the admin), on the calendar and in
+   the pop-up. Every halo, now and later, is this one box (class "halo"):
+   in each view one size (--halo-d), the icon in it one size (--halo-h) and
+   always in its middle, and one clear space round it (--halo-gap), so it
+   never crowds the date, the names, the dots or the icons beside it. The box
+   takes no more height in its line than the icon does. */
+.cal { --halo-h: 16px; --halo-d: 26px; --halo-gap: 5px; }
+@container cal (max-width: 899px) { .cal { --halo-h: 14px; --halo-d: 23px; --halo-gap: 4px; } }
+@container cal (max-width: 619px) { .cal { --halo-h: 11px; --halo-d: 16px; --halo-gap: 2px; } } /* 2px clear of the date above and the dots below */
+.day-head { --halo-h: 22px; --halo-d: 34px; --halo-gap: 6px; }
+:is(.cal, .day-head) :is(.cal-tithi, .cal-nak-mark, span).halo {
+  display: inline-flex; align-items: center; justify-content: center; flex: none; position: relative;
+  width: var(--halo-d); height: var(--halo-d);
+  margin: calc((var(--halo-h) - var(--halo-d)) / 2) var(--halo-gap);
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 2px #ffe500, 0 0 5px 1px rgba(255, 229, 0, 0.55);
+  vertical-align: middle; text-align: center;
+}
+/* the icon: as tall as every other haloed icon, never wider than leaves it inside the circle */
+:is(.cal, .day-head) .halo > :is(img, svg, .nak-icon, .tithi-img, .tithi-art) {
+  height: var(--halo-h); width: auto; max-width: calc(var(--halo-d) - 6px); object-fit: contain; vertical-align: 0;
+}
+:is(.cal, .day-head) .halo > .nak-icon { width: var(--halo-h); }
+/* the moon's disc keeps its own size, in the middle */
+:is(.cal, .day-head) .halo > .dot { margin: 0; }
+/* the same clear space whatever row it is in: less the gap the row already leaves */
+.cal .cal-date > .cal-tithi.halo { margin-inline: calc(var(--halo-gap) - 3px); }
+.cal .cal-icons > .halo, .cal .cal-icons > .cal-moon > .halo { margin-inline: calc(var(--halo-gap) - 2px); }
+.cal .cal-moon.in-box:has(> .halo) { margin-left: 0; }
+/* in a box's list of nakshatrams: the row as tall as the circle, the name after it */
+.cal .cal-naks li:has(> .halo) { grid-template-columns: var(--halo-d) minmax(0, 1fr); column-gap: var(--halo-gap); height: var(--halo-d); margin-block: calc(var(--halo-gap) - 1px); }
+.cal .cal-naks li > .halo.halo { margin: 0; }
+/* in the pop-up there is room: the line as tall as the circle (so a line that
+   wraps under it clears it), and the name the same distance after every halo */
+.day-head .halo.halo { margin-block: 0; }
+.day-head :is(.cal-moon, .cal-tithi-line, .cal-nak-line > span):has(> .halo) { gap: 14px; }
+.day-head :is(.cal-moon, .cal-tithi-line, .cal-nak-line):has(.halo) { margin-block: 7px; }
+/* on a phone the icons go in the row under the date, not beside it */
+@container cal (max-width: 619px) { .cal .cal-date > .cal-tithi.halo { display: none; } }
+/* where a phone's row is crowded: the icons beside a halo drawn over it */
+.cal-icons > :not(.halo) { position: relative; z-index: 1; }
+/* The one exception: Pournami and Amavasya. The moon's disc keeps its size,
+   so its halo is drawn tighter round it, in each view one size: the disc,
+   1px clear, then the ring. Centred and spaced like every other halo. */
+.cal { --moon-dot: 11px; }
+@container cal (max-width: 619px) { .cal { --moon-dot: 9px; } }
+.day-head { --moon-dot: 12px; }
+:is(.cal, .day-head) .halo:has(> .dot) { --halo-h: var(--moon-dot); --halo-d: calc(var(--moon-dot) + 6px); }

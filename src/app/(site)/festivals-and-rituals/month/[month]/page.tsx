@@ -7,14 +7,18 @@ import {
   getLineBegins,
   getOccasionsInMonth,
   getSpecialNakshatras,
+  getSpecialTithis,
+  type SpecialTithi,
   getVaramDays,
   getWeeklyRituals,
 } from "@/lib/data";
 import type { Photo } from "@/content/types";
 import { monthDates, monthYearOf, TAMIL_MONTHS, tamilMonthOf, type TamilMonth } from "@/lib/calendar";
 import { calendarEvents } from "@/lib/calendarEvents";
-import { nakshatrasBetween, specialDays, tithisBetween } from "@/lib/tithi";
-import { MonthCalendar } from "@/components/MonthCalendar";
+import { nakshatraInEvening, nakshatrasBetween, specialDays, tithisBetween } from "@/lib/tithi";
+import { NAKSHATRAS } from "@/lib/nakshatraNames";
+import type { SpecialIconKey } from "@/lib/specialIcons";
+import { MonthCalendar, type Great } from "@/components/MonthCalendar";
 import { MonthMotif } from "@/components/MonthMotif";
 import { MonthSwipe } from "@/components/MonthSwipe";
 import { MonthJump } from "@/components/MonthJump";
@@ -71,6 +75,8 @@ export default async function MonthPage({ params }: Props) {
 
   // the nakshatrams kept specially, by month (rules set in the admin)
   const special = await getSpecialNakshatras();
+  // and the tithis kept as the year's great days
+  const greatRules = await getSpecialTithis();
   // the calendar: the days the team was present this month, this year
   const events = await daysIn(slug, y);
   // the months either side, ready beside the calendar to be swiped in
@@ -84,6 +90,8 @@ export default async function MonthPage({ params }: Props) {
           tithis={tithisIn(s.month.slug, s.year)}
           nakshatras={nakshatrasIn(s.month.slug, s.year)}
           special={specialIn(s.month.slug, s.year, special)}
+          swap={swapIn(s.month.slug, s.year, special)}
+          great={greatIn(s.month.slug, s.year, greatRules)}
           today={today}
         />
       </div>
@@ -145,6 +153,8 @@ export default async function MonthPage({ params }: Props) {
           <MonthCalendar month={month} year={y} events={events} tithis={tithisIn(slug, y)}
             nakshatras={nakshatrasIn(slug, y)}
             special={specialIn(slug, y, special)}
+            swap={swapIn(slug, y, special)}
+            great={greatIn(slug, y, greatRules)}
             today={today}
           />
         </MonthSwipe>
@@ -222,6 +232,41 @@ function tithisIn(slug: string, year: number) {
 function specialIn(slug: string, year: number, rules: Record<string, { nakshatram: string }[]>) {
   const { first, last } = monthDates(slug, year);
   return specialDays(first, last, (rules[slug] ?? []).map((r) => r.nakshatram));
+}
+
+/** The icons chosen (in the admin) to show a month's special nakshatrams by,
+    in place of their own: day → nakshatra → icon. */
+function swapIn(slug: string, year: number, rules: Record<string, { nakshatram: string; icon: SpecialIconKey | null }[]>) {
+  const out: Record<string, Record<number, SpecialIconKey>> = {};
+  for (const [day, kept] of Object.entries(specialIn(slug, year, rules)))
+    for (const k of kept) {
+      const icon = (rules[slug] ?? []).find((r) => r.nakshatram === NAKSHATRAS[k].name)?.icon;
+      if (icon) (out[day] ??= {})[k] = icon;
+    }
+  return out;
+}
+
+/** The days a month's great tithis fall on, in a year: day → what is marked on
+    it. A rule with a nakshatram goes to the day, nearest the tithi (up to two
+    days either side, within the month), whose evening the nakshatram holds in
+    (sunset to midnight, as Karthigai Deepam is lit): on the tithi's own day
+    its moon or icon is marked; on another, the nakshatram. */
+function greatIn(slug: string, year: number, rules: Record<string, SpecialTithi[]>) {
+  const { first, last } = monthDates(slug, year);
+  const tithis = Object.entries(tithisIn(slug, year));
+  const out: Great = {};
+  const mark = (day: string, m: Great[string][number]) => (out[day] ??= []).push(m);
+  const shift = (iso: string, by: number) => new Date(Date.parse(`${iso}T00:00:00Z`) + by * 86_400_000).toISOString().slice(0, 10);
+  for (const r of rules[slug] ?? []) {
+    const n = r.nakshatram ? NAKSHATRAS.findIndex((x) => x.name === r.nakshatram) : -1;
+    for (const [day, keys] of tithis) {
+      if (!keys.includes(r.tithi)) continue;
+      const near = n < 0 ? undefined : [0, -1, 1, -2, 2].map((b) => shift(day, b)).find((d) => d >= first && d <= last && nakshatraInEvening(d, n));
+      if (near && near !== day) mark(near, { name: r.name, tamil: r.tamil, nakshatra: n, icon: r.icon ?? undefined });
+      else mark(day, { name: r.name, tamil: r.tamil, tithi: r.tithi, icon: r.icon ?? undefined });
+    }
+  }
+  return out;
 }
 
 /** Each day's nakshatras in a month, in a year. */

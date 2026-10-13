@@ -44,6 +44,8 @@ import { SECTION_INTROS, type SectionName } from "@/payload/sectionIntros";
 import { seeded } from "./mahotsavam";
 import { monthDates, monthYearOf, TAMIL_MONTHS, tamilMonthOf, type TamilMonth } from "./calendar";
 import { festivalPath } from "./festivals";
+import type { TithiKey } from "./tithiNames";
+import type { SpecialIconKey } from "./specialIcons";
 
 const byDateDesc = <T extends { date: string }>(a: T, b: T) => b.date.localeCompare(a.date);
 const byDateAsc = <T extends { date: string }>(a: T, b: T) => a.date.localeCompare(b.date);
@@ -622,10 +624,20 @@ export async function getLineBegins(): Promise<string> {
 }
 
 /** The nakshatrams kept specially in a Tamil month (set in the admin as rules): month → nakshatram names. */
-export const getSpecialNakshatras = cache(async (): Promise<Record<string, { name: string; nakshatram: string }[]>> => {
+export const getSpecialNakshatras = cache(async (): Promise<Record<string, { name: string; nakshatram: string; icon: SpecialIconKey | null }[]>> => {
   const docs = (await (await db()).find({ ...base, collection: "special-nakshatras", depth: 0 })).docs;
-  const out: Record<string, { name: string; nakshatram: string }[]> = {};
-  for (const d of docs) (out[d.month] ??= []).push({ name: d.name, nakshatram: d.nakshatram });
+  const out: Record<string, { name: string; nakshatram: string; icon: SpecialIconKey | null }[]> = {};
+  for (const d of docs) (out[d.month] ??= []).push({ name: d.name, nakshatram: d.nakshatram, icon: d.replaceIcon && d.icon ? (d.icon as SpecialIconKey) : null });
+  return out;
+});
+
+/** The tithis kept as great days, by Tamil month (rules set in the admin):
+    month → its rules, each a tithi and the day's name in English and Tamil. */
+export type SpecialTithi = { name: string; tamil: string; tithi: TithiKey; nakshatram: string | null; icon: SpecialIconKey | null };
+export const getSpecialTithis = cache(async (): Promise<Record<string, SpecialTithi[]>> => {
+  const docs = (await (await db()).find({ ...base, collection: "special-tithis", depth: 0 })).docs;
+  const out: Record<string, SpecialTithi[]> = {};
+  for (const d of docs) (out[d.month] ??= []).push({ name: d.name, tamil: d.tamil ?? "", tithi: d.tithi as TithiKey, nakshatram: d.nakshatram ?? null, icon: d.replaceIcon && d.icon ? (d.icon as SpecialIconKey) : null });
   return out;
 });
 

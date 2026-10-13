@@ -24,6 +24,7 @@ export const TITHIS: Record<TithiKey, { n: number; at: Hour }> = {
   "panchami-s": { n: 5, at: "sunrise" },
   shashti: { n: 6, at: "trimuhurta" },
   "pradosham-s": { n: 13, at: "sunset" },
+  "chaturdashi-s": { n: 14, at: "sunset" },
   pournami: { n: 15, at: "sunrise" },
   "sankatahara-chaturthi": { n: 19, at: "moonrise" },
   "panchami-k": { n: 20, at: "sunrise" },
@@ -64,6 +65,15 @@ function hoursOf(iso: string, where: Observer) {
     moonrise,
     midnight: new Date((set.getTime() + nextRise.getTime()) / 2),
   };
+}
+
+/** Whether a nakshatra (0–26) holds at any time in a day's evening, from
+    sunset to midnight, in Pondicherry: the hours a day kept on its nakshatram,
+    like Thai Pusam or Karthigai Deepam, is reckoned by. */
+export function nakshatraInEvening(iso: string, n: number, where: Observer = PONDICHERRY): boolean {
+  const { sunset, midnight } = hoursOf(iso, where);
+  for (let t = sunset.getTime(); t <= midnight.getTime(); t += 10 * 60_000) if (nakshatraAt(new Date(t)) === n) return true;
+  return false;
 }
 
 /** The kept tithis between two dates (ISO, inclusive): day → its tithis.

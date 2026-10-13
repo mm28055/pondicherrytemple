@@ -22,10 +22,11 @@ import {
   tamilMonthOf,
   type TamilMonth,
 } from "@/lib/calendar";
-import { TITHI_NAMES, type TithiKey } from "@/lib/tithiNames";
+import { HIDDEN_TITHIS, TITHI_NAMES, type TithiKey } from "@/lib/tithiNames";
+import type { SpecialIconKey } from "@/lib/specialIcons";
 import { NAKSHATRAS } from "@/lib/nakshatraNames";
 import { NakshatraIcon } from "@/components/NakshatraIcon";
-import { TithiIcon } from "@/components/TithiIcon";
+import { SpecialIcon, TithiIcon } from "@/components/TithiIcon";
 
 export interface CalendarEvent {
   date: string;
@@ -63,6 +64,57 @@ type Tithis = Record<string, TithiKey[]>;
 const moonOf = (keys: TithiKey[] = []) =>
   keys.includes("pournami") ? ("full" as const) : keys.includes("amavasya") ? ("new" as const) : undefined;
 const othersOf = (keys: TithiKey[] = []) => keys.filter((k) => k !== "pournami" && k !== "amavasya");
+const MOON_KEY = { full: "pournami", new: "amavasya" } as const;
+
+/** day → what is kept on it as the year's great days (rules set in the
+    admin), each with the day's name: a tithi, its moon or icon circled; or,
+    for a day kept on its nakshatram, the nakshatram, its icon circled. The
+    name is given in the pop-up. */
+export type Great = Record<string, { name: string; tamil: string; tithi?: TithiKey; nakshatra?: number; icon?: SpecialIconKey }[]>;
+/** day → nakshatra → the icon chosen (in the admin) to show a special nakshatram by, in place of its own */
+export type Swap = Record<string, Record<number, SpecialIconKey>>;
+const tithiMark = (great: Great | undefined, day: string, k: TithiKey) => great?.[day]?.find((m) => m.tithi === k);
+/** A tithi's icon on a day: the one a rule chose in its place, if any, or its own. */
+const tithiFace = (great: Great | undefined, day: string, k: TithiKey) => {
+  const icon = tithiMark(great, day, k)?.icon;
+  return icon ? <SpecialIcon k={icon} /> : <TithiIcon k={k} />;
+};
+/** A nakshatram's icon in a day's box: the one chosen in its place, if any, or its own. */
+const nakFace = (swap: Swap, great: Great, day: string, k: number) => {
+  const icon = swap[day]?.[k] ?? great[day]?.find((m) => m.nakshatra === k)?.icon;
+  return icon ? <SpecialIcon k={icon} /> : <NakshatraIcon n={k} />;
+};
+/** The tithis shown on a day: all but those kept only where a rule names them. */
+const shownOf = (keys: TithiKey[] | undefined, great: Great | undefined, day: string) =>
+  othersOf(keys).filter((k) => !HIDDEN_TITHIS.has(k) || tithiMark(great, day, k));
+const nakMarks = (great: Great | undefined, day: string) => (great?.[day] ?? []).filter((m) => m.nakshatra !== undefined);
+/** The full or new moon's disc; on a great day, in its halo. Every halo (the
+    circle round a great day's moon or icon) is one box, the same in each view
+    (site.css, .halo): the icon in its middle, the same space round it. */
+function MoonDot({ halo }: { halo: boolean }) {
+  return halo ? (
+    <span className="halo">
+      <span className="dot" aria-hidden="true" />
+    </span>
+  ) : (
+    <span className="dot" aria-hidden="true" />
+  );
+}
+/** A great day's name, then the tithi it is (when the name doesn't say it), for the pop-up. */
+function GreatName({ g, plain }: { g: { name: string; tamil: string }; plain: string }) {
+  return (
+    <>
+      {g.name}
+      {g.tamil && (
+        <>
+          {" · "}
+          <span lang="ta">{g.tamil}</span>
+        </>
+      )}
+      {!g.name.toLowerCase().includes(plain.toLowerCase()) && <span className="great-plain">{plain}</span>}
+    </>
+  );
+}
 
 /** The temple, what happened, and the festivals it was part of — each its own
     link — and the field note about it. */
@@ -117,6 +169,8 @@ export function DayDialog({
   tithis,
   nakshatras,
   special,
+  swap,
+  great,
   className,
   style,
 }: {
@@ -128,6 +182,8 @@ export function DayDialog({
   tithis?: Tithis;
   nakshatras?: Record<string, number[]>;
   special?: Record<string, number[]>;
+  swap?: Swap;
+  great?: Great;
   onDay?: (day: string) => void;
   /** where it sits, when not in the middle of the screen (the home page's "Today") */
   className?: string;
@@ -141,7 +197,7 @@ export function DayDialog({
   const month = day ? TAMIL_MONTHS.find((m) => m.slug === tamilMonthOf(day))! : null;
   const dayOfMonth = day && month ? daysBetween(monthDates(month.slug, monthYearOf(day)).first, day).length : 0;
   const moon = day ? (tithis ? moonOf(tithis[day]) : moonsBetween(day, day).get(day)) : undefined;
-  const others = day && tithis ? othersOf(tithis[day]) : [];
+  const others = day && tithis ? shownOf(tithis[day], great, day) : [];
   const on = day ? events.filter((e) => e.date === day) : [];
 
   // the day before and after, within the month
@@ -348,17 +404,37 @@ export function DayDialog({
                     </span>
                   </span>
                   {moon && (
-                    <span className={`cal-moon ${moon}`}>
-                      <span className="dot" aria-hidden="true" />
-                      {MOON[moon].en} · <span lang="ta">{MOON[moon].ta}</span>
+                    <span className={`cal-moon ${moon}${tithiMark(great, day, MOON_KEY[moon]) ? " great" : ""}`}>
+                      <MoonDot halo={Boolean(tithiMark(great, day, MOON_KEY[moon]))} />
+                      {tithiMark(great, day, MOON_KEY[moon]) ? (
+                        <GreatName g={tithiMark(great, day, MOON_KEY[moon])!} plain={MOON[moon].en} />
+                      ) : (
+                        <>
+                          {MOON[moon].en} · <span lang="ta">{MOON[moon].ta}</span>
+                        </>
+                      )}
                     </span>
                   )}
                   {others.map((k) => (
                     <span key={k} className="cal-tithi-line">
-                      <span className="cal-tithi" aria-hidden="true">
-                        <TithiIcon k={k} />
+                      <span className={`cal-tithi${tithiMark(great, day, k) ? " great halo" : ""}`} aria-hidden="true">
+                        {tithiFace(great, day, k)}
                       </span>
-                      {TITHI_NAMES[k].name} · <span lang="ta">{TITHI_NAMES[k].tamil}</span>
+                      {tithiMark(great, day, k) ? (
+                        <GreatName g={tithiMark(great, day, k)!} plain={TITHI_NAMES[k].name} />
+                      ) : (
+                        <>
+                          {TITHI_NAMES[k].name} · <span lang="ta">{TITHI_NAMES[k].tamil}</span>
+                        </>
+                      )}
+                    </span>
+                  ))}
+                  {nakMarks(great, day).map((m) => (
+                    <span key={m.name} className="cal-tithi-line">
+                      <span className="cal-nak-mark great halo" aria-hidden="true">
+                        {m.icon ? <SpecialIcon k={m.icon} /> : <NakshatraIcon n={m.nakshatra!} />}
+                      </span>
+                      <GreatName g={m} plain={NAKSHATRAS[m.nakshatra!].name} />
                     </span>
                   ))}
                   {/* the nakshatra at sunrise, then any that begin before the next */}
@@ -367,7 +443,13 @@ export function DayDialog({
                       {nakshatras[day].map((k, i) => (
                         <span key={k} className={special?.[day]?.includes(k) ? "special" : undefined}>
                           {i > 0 && <span className="cal-nak-then">then</span>}
-                          <NakshatraIcon n={k} ringed={special?.[day]?.includes(k)} />
+                          {special?.[day]?.includes(k) ? (
+                            <span className="cal-nak-mark great halo">
+                              {swap?.[day]?.[k] ? <SpecialIcon k={swap[day][k]} /> : <NakshatraIcon n={k} />}
+                            </span>
+                          ) : (
+                            <NakshatraIcon n={k} />
+                          )}
                           <span className="cal-nak-name">{NAKSHATRAS[k].name}</span>
                         </span>
                       ))}
@@ -412,6 +494,8 @@ export function MonthCalendar({
   tithis,
   nakshatras,
   special,
+  swap = {},
+  great = {},
   today,
 }: {
   month: TamilMonth;
@@ -422,6 +506,10 @@ export function MonthCalendar({
   nakshatras: Record<string, number[]>;
   /** day → the nakshatrams kept specially on it (rules set in the admin) */
   special: Record<string, number[]>;
+  /** day → nakshatra → the icon a special nakshatram is shown by in place of its own */
+  swap?: Swap;
+  /** day → the tithis kept on it as great days (rules set in the admin) */
+  great?: Great;
   today: string;
 }) {
   const { first, last } = monthDates(month.slug, year);
@@ -456,13 +544,13 @@ export function MonthCalendar({
         {days.map((day, i) => {
           const n = count(day);
           const moon = moonOf(tithis[day]);
-          const others = othersOf(tithis[day]);
+          const others = shownOf(tithis[day], great, day);
           return (
             <div
               key={day}
               role="gridcell"
               tabIndex={0}
-              aria-label={`${formatDate(day)}${others.length ? `, ${others.map((k) => TITHI_NAMES[k].name).join(", ")}` : ""}${n ? `: ${n} recorded` : ""}`}
+              aria-label={`${formatDate(day)}${others.length ? `, ${others.map((k) => tithiMark(great, day, k)?.name ?? TITHI_NAMES[k].name).join(", ")}` : ""}${n ? `: ${n} recorded` : ""}`}
               onClick={(e) => choose(e, day)}
               onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && choose(e, day)}
               className={`cal-day${n ? " has" : ""}${day === today ? " is-today" : ""}`}
@@ -473,15 +561,25 @@ export function MonthCalendar({
                     {Number(day.slice(8))}
                     {/* the full or new moon: just its white or black disc, beside the date */}
                     {moon && (
-                      <span className={`cal-moon in-box ${moon}`} title={MOON[moon].en} aria-label={MOON[moon].en}>
-                        <span className="dot" aria-hidden="true" />
+                      <span
+                        className={`cal-moon in-box ${moon}${tithiMark(great, day, MOON_KEY[moon]) ? " great" : ""}`}
+                        title={tithiMark(great, day, MOON_KEY[moon])?.name ?? MOON[moon].en}
+                        aria-label={tithiMark(great, day, MOON_KEY[moon])?.name ?? MOON[moon].en}
+                      >
+                        <MoonDot halo={Boolean(tithiMark(great, day, MOON_KEY[moon]))} />
                       </span>
                     )}
                   </span>
                   {/* the tithis kept on the day: an icon each, named on hover */}
                   {others.map((k) => (
-                    <span key={k} className="cal-tithi" title={TITHI_NAMES[k].name} aria-label={TITHI_NAMES[k].name} role="img">
-                      <TithiIcon k={k} />
+                    <span
+                      key={k}
+                      className={`cal-tithi${tithiMark(great, day, k) ? " great halo" : ""}`}
+                      title={tithiMark(great, day, k)?.name ?? TITHI_NAMES[k].name}
+                      aria-label={tithiMark(great, day, k)?.name ?? TITHI_NAMES[k].name}
+                      role="img"
+                    >
+                      {tithiFace(great, day, k)}
                     </span>
                   ))}
                 </span>
@@ -492,31 +590,42 @@ export function MonthCalendar({
               {/* the day's nakshatras: the one at sunrise, then any that begin before the next */}
               <ul className="cal-naks">
                 {(nakshatras[day] ?? []).map((k) => (
-                  <li key={k} title={NAKSHATRAS[k].name} className={special[day]?.includes(k) ? "special" : undefined}>
-                    <NakshatraIcon n={k} ringed={special[day]?.includes(k)} />
+                  <li key={k} title={NAKSHATRAS[k].name} className={special[day]?.includes(k) || nakMarks(great, day).some((m) => m.nakshatra === k) ? "special" : undefined}>
+                    {special[day]?.includes(k) || nakMarks(great, day).some((m) => m.nakshatra === k) ? (
+                      <span className="cal-nak-mark great halo">
+                        {nakFace(swap, great, day, k)}
+                      </span>
+                    ) : (
+                      <NakshatraIcon n={k} />
+                    )}
                     <span className="cal-nak-name">{NAKSHATRAS[k].name}</span>
                   </li>
                 ))}
               </ul>
               {/* On a phone, under the dates, from the box's left edge: the full or new
-                  moon, a special nakshatram's disc and the tithis' icons in one row (the
+                  moon, a special nakshatram's icon (circled) and the tithis' icons in one row (the
                   nakshatras left to the pop-up); then a dot for each thing recorded on the
                   day, overlapping, up to four */}
               <span className="cal-foot" aria-hidden="true">
                 <span className="cal-icons">
                   {moon && (
-                    <span className={`cal-moon ${moon}`} title={MOON[moon].en}>
-                      <span className="dot" />
+                    <span className={`cal-moon ${moon}${tithiMark(great, day, MOON_KEY[moon]) ? " great" : ""}`} title={tithiMark(great, day, MOON_KEY[moon])?.name ?? MOON[moon].en}>
+                      <MoonDot halo={Boolean(tithiMark(great, day, MOON_KEY[moon]))} />
                     </span>
                   )}
                   {(special[day] ?? []).map((k) => (
-                    <span key={`n${k}`} title={NAKSHATRAS[k].name}>
-                      <NakshatraIcon n={k} ringed />
+                    <span key={`n${k}`} className="cal-nak-mark great halo" title={NAKSHATRAS[k].name}>
+                      {swap[day]?.[k] ? <SpecialIcon k={swap[day][k]} /> : <NakshatraIcon n={k} />}
+                    </span>
+                  ))}
+                  {nakMarks(great, day).filter((m) => !special[day]?.includes(m.nakshatra!)).map((m) => (
+                    <span key={m.name} className="cal-nak-mark great halo" title={m.name}>
+                      {m.icon ? <SpecialIcon k={m.icon} /> : <NakshatraIcon n={m.nakshatra!} />}
                     </span>
                   ))}
                   {others.map((k) => (
-                    <span key={k} className="cal-tithi" title={TITHI_NAMES[k].name}>
-                      <TithiIcon k={k} />
+                    <span key={k} className={`cal-tithi${tithiMark(great, day, k) ? " great halo" : ""}`} title={tithiMark(great, day, k)?.name ?? TITHI_NAMES[k].name}>
+                      {tithiFace(great, day, k)}
                     </span>
                   ))}
                 </span>
@@ -539,7 +648,7 @@ export function MonthCalendar({
       )}
 
       {/* A day, large, over the page; from it, the days either side */}
-      <DayDialog day={open} events={events} days={days} tithis={tithis} nakshatras={nakshatras} special={special} onDay={setOpen} onClose={() => setOpen(null)} />
+      <DayDialog day={open} events={events} days={days} tithis={tithis} nakshatras={nakshatras} special={special} swap={swap} great={great} onDay={setOpen} onClose={() => setOpen(null)} />
     </section>
   );
 }

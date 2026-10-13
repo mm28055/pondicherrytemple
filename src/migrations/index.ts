@@ -16,6 +16,7 @@ import * as migration_20261010_150000_field_note_edits_2 from './20261010_150000
 import * as migration_20261010_160000_special_nakshatras from './20261010_160000_special_nakshatras';
 import * as migration_20261010_170000_weekly_rituals from './20261010_170000_weekly_rituals';
 import * as migration_20261010_180000_varam_days from './20261010_180000_varam_days';
+import * as migration_20261012_095753_special_tithis from './20261012_095753_special_tithis';
 
 export const migrations = [
   {
@@ -107,5 +108,10 @@ export const migrations = [
     up: migration_20261010_180000_varam_days.up,
     down: migration_20261010_180000_varam_days.down,
     name: '20261010_180000_varam_days',
+  },
+  {
+    up: migration_20261012_095753_special_tithis.up,
+    down: migration_20261012_095753_special_tithis.down,
+    name: '20261012_095753_special_tithis'
   },
 ];

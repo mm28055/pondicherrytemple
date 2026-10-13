@@ -77,6 +77,7 @@ export interface Config {
     drawings: Drawing;
     observances: Observance;
     'special-nakshatras': SpecialNakshatra;
+    'special-tithis': SpecialTithi;
     'weekly-rituals': WeeklyRitual;
     books: Book;
     users: User;
@@ -110,6 +111,7 @@ export interface Config {
     drawings: DrawingsSelect<false> | DrawingsSelect<true>;
     observances: ObservancesSelect<false> | ObservancesSelect<true>;
     'special-nakshatras': SpecialNakshatrasSelect<false> | SpecialNakshatrasSelect<true>;
+    'special-tithis': SpecialTithisSelect<false> | SpecialTithisSelect<true>;
     'weekly-rituals': WeeklyRitualsSelect<false> | WeeklyRitualsSelect<true>;
     books: BooksSelect<false> | BooksSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
@@ -864,6 +866,89 @@ export interface SpecialNakshatra {
     | 'Poorattadhi'
     | 'Uthirattadhi'
     | 'Revathi';
+  /**
+   * Show the day by another icon (below) in place of the nakshatram’s own.
+   */
+  replaceIcon?: boolean | null;
+  icon?: 'nataraja' | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * A tithi kept as a great day in a Tamil month, like Chithra Pournami (Chithirai, Pournami) or Mahashivaratri (Masi, Masa Shivaratri). Set once, it is circled on the month calendars every year, and named in the day’s pop-up.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "special-tithis".
+ */
+export interface SpecialTithi {
+  id: number;
+  name: string;
+  tamil?: string | null;
+  month:
+    | 'chithirai'
+    | 'vaikasi'
+    | 'aani'
+    | 'aadi'
+    | 'aavani'
+    | 'purattasi'
+    | 'aippasi'
+    | 'karthigai'
+    | 'margazhi'
+    | 'thai'
+    | 'masi'
+    | 'panguni';
+  tithi:
+    | 'vinayaka-chaturthi'
+    | 'panchami-s'
+    | 'shashti'
+    | 'pradosham-s'
+    | 'chaturdashi-s'
+    | 'pournami'
+    | 'sankatahara-chaturthi'
+    | 'panchami-k'
+    | 'ashtami-k'
+    | 'pradosham-k'
+    | 'shivaratri'
+    | 'amavasya';
+  /**
+   * For a day kept on its nakshatram, like Thai Pusam (Poosam) or Karthigai Deepam (Karthikai): the circle goes on the day nearest the tithi (up to two days either side) whose evening, from sunset to midnight, this nakshatram holds in. When that is the tithi’s own day, its moon or icon is circled; on another day, the nakshatram’s icon is.
+   */
+  nakshatram?:
+    | (
+        | 'Asvini'
+        | 'Bharani'
+        | 'Karthikai'
+        | 'Rohini'
+        | 'Mrigashirsham'
+        | 'Thiruvathirai'
+        | 'Punarpoosam'
+        | 'Poosam'
+        | 'Ayilyam'
+        | 'Makam'
+        | 'Pooram'
+        | 'Uthiram'
+        | 'Hastham'
+        | 'Chithirai'
+        | 'Swathi'
+        | 'Visakam'
+        | 'Anusham'
+        | 'Kettai'
+        | 'Moolam'
+        | 'Pooradam'
+        | 'Uthiradam'
+        | 'Tiruvonam'
+        | 'Avittam'
+        | 'Sadhayam'
+        | 'Poorattadhi'
+        | 'Uthirattadhi'
+        | 'Revathi'
+      )
+    | null;
+  /**
+   * Show the day by another icon (below) in place of the tithi’s own.
+   */
+  replaceIcon?: boolean | null;
+  icon?: 'nataraja' | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -990,6 +1075,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'special-nakshatras';
         value: number | SpecialNakshatra;
+      } | null)
+    | ({
+        relationTo: 'special-tithis';
+        value: number | SpecialTithi;
       } | null)
     | ({
         relationTo: 'weekly-rituals';
@@ -1351,6 +1440,23 @@ export interface SpecialNakshatrasSelect<T extends boolean = true> {
   name?: T;
   month?: T;
   nakshatram?: T;
+  replaceIcon?: T;
+  icon?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "special-tithis_select".
+ */
+export interface SpecialTithisSelect<T extends boolean = true> {
+  name?: T;
+  tamil?: T;
+  month?: T;
+  tithi?: T;
+  nakshatram?: T;
+  replaceIcon?: T;
+  icon?: T;
   updatedAt?: T;
   createdAt?: T;
 }

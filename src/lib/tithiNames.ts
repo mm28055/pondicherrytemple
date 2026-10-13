@@ -9,6 +9,7 @@ export type TithiKey =
   | "panchami-s"
   | "shashti"
   | "pradosham-s"
+  | "chaturdashi-s"
   | "pournami"
   | "sankatahara-chaturthi"
   | "panchami-k"
@@ -23,6 +24,8 @@ export const TITHI_NAMES: Record<TithiKey, { name: string; tamil: string; icon: 
   "panchami-s": { name: "Valarpirai Panchami", tamil: "வளர்பிறை பஞ்சமி", icon: "🐍" },
   shashti: { name: "Shashti", tamil: "சஷ்டி", icon: "🦚" },
   "pradosham-s": { name: "Pradosham", tamil: "பிரதோஷம்", icon: "🐂" },
+  // kept only where a rule names it (Special tithis), as for the Nataraja abhishekams
+  "chaturdashi-s": { name: "Valarpirai Chaturdashi", tamil: "வளர்பிறை சதுர்த்தசி", icon: "" },
   pournami: { name: "Pournami", tamil: "பௌர்ணமி", icon: "" },
   // theipirai (krishna paksha), to the new moon
   "sankatahara-chaturthi": { name: "Sankatahara Chaturthi", tamil: "சங்கடஹர சதுர்த்தி", icon: "🐀" },
@@ -32,3 +35,7 @@ export const TITHI_NAMES: Record<TithiKey, { name: string; tamil: string; icon: 
   shivaratri: { name: "Masa Shivaratri", tamil: "மாத சிவராத்திரி", icon: "🔱" },
   amavasya: { name: "Amavasya", tamil: "அமாவாசை", icon: "" },
 };
+
+/** The tithis not shown on every month's calendar: only on a day a rule in
+    the admin (Special tithis) names them, with the icon it gives. */
+export const HIDDEN_TITHIS = new Set<TithiKey>(["chaturdashi-s"]);

@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload'
 import { TAMIL_MONTHS } from '../../lib/calendar'
 import { NAKSHATRAS } from '../../lib/nakshatraNames'
+import { SPECIAL_ICONS, type SpecialIconKey } from '../../lib/specialIcons'
 import { isAdmin, isEditor } from '../access'
 import { listMemory } from '../preview'
 import { refreshHooks } from '../revalidate'
@@ -45,6 +46,27 @@ export const SpecialNakshatras: CollectionConfig = {
           required: true,
           options: NAKSHATRAS.map((n) => ({ label: n.name, value: n.name })),
           admin: { width: '50%' },
+        },
+      ],
+    },
+    {
+      type: 'row',
+      fields: [
+        {
+          name: 'replaceIcon',
+          type: 'checkbox',
+          label: 'Replace Nakshatram icon?',
+          admin: { width: '50%', description: 'Show the day by another icon (below) in place of the nakshatram’s own.' },
+        },
+        {
+          name: 'icon',
+          type: 'select',
+          label: 'New icon',
+          options: (Object.keys(SPECIAL_ICONS) as SpecialIconKey[]).map((k) => ({ label: SPECIAL_ICONS[k].label, value: k })),
+          // asked for only when the box is ticked, and then needed
+          validate: (value: unknown, { siblingData }: { siblingData: { replaceIcon?: boolean } }) =>
+            !siblingData?.replaceIcon || value ? true : 'Choose the icon to show in its place.',
+          admin: { width: '50%', condition: (_: unknown, sibling: { replaceIcon?: boolean }) => Boolean(sibling?.replaceIcon) },
         },
       ],
     },
