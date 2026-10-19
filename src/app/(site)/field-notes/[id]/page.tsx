@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { FilmVideo } from "@/components/FilmVideo";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
@@ -112,7 +113,7 @@ export default async function FieldNotePage({ params }: Props) {
             {note.videos?.map((v) => (
               <figure key={v.src} className="media">
                 {v.type === "video" ? (
-                  <video controls preload="metadata" src={v.src} poster={v.poster} />
+                  <FilmVideo controls preload="metadata" src={v.src} poster={v.poster} />
                 ) : (
                   <audio controls preload="metadata" src={v.src} />
                 )}

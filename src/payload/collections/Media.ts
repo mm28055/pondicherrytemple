@@ -1,11 +1,41 @@
+import fs from 'fs/promises'
 import path from 'path'
-import type { CollectionConfig } from 'payload'
+import { APIError, type CollectionBeforeChangeHook, type CollectionConfig } from 'payload'
+import { checkVideoAt, checkVideoBytes, HEVC_MESSAGE, isHevc } from '../../lib/videoCheck'
 import { fileURLToPath } from 'url'
 import { canUpdateOwn, isEditor, isLoggedIn } from '../access'
 import { createdByField } from '../fields'
 import { refreshHooks } from '../revalidate'
 
 const dirname = path.dirname(fileURLToPath(import.meta.url))
+
+/* A video in HEVC (H.265, an iPhone's usual format) plays in only some
+   browsers, so it is refused, with a note on how to export it as H.264. The
+   check reads only the video's header: from the upload itself, where the
+   server has it (on this laptop), or from storage (on the site, where uploads
+   go from the browser straight to R2 and the server never holds the file). */
+const refuseHevc: CollectionBeforeChangeHook = async ({ data, req, operation, originalDoc }) => {
+  const type: string = data?.mimeType ?? req.file?.mimetype ?? ''
+  if (!type.startsWith('video/')) return data
+  const file = req.file as { data?: Buffer; tempFilePath?: string } | undefined
+  let codecs: string[] = []
+  if (file?.data?.length) codecs = checkVideoBytes(file.data).codecs
+  else if (file?.tempFilePath) codecs = checkVideoBytes(await fs.readFile(file.tempFilePath)).codecs
+  else {
+    // a new file uploaded straight to R2: read its header there
+    const isNew = operation === 'create' || (data?.filename && data.filename !== originalDoc?.filename)
+    const base = (process.env.R2_PUBLIC_URL || '').replace(/\/$/, '')
+    if (!isNew || !base || !data?.filename) return data
+    const url = `${base}/${data.prefix ? `${data.prefix}/` : ''}${encodeURIComponent(data.filename)}`
+    try {
+      codecs = (await checkVideoAt(url)).codecs
+    } catch {
+      return data // storage could not be read just now: let it through rather than refuse a good file
+    }
+  }
+  if (isHevc(codecs)) throw new APIError(HEVC_MESSAGE, 400, undefined, true)
+  return data
+}
 
 export const Media: CollectionConfig = {
   slug: 'media',
@@ -23,7 +53,7 @@ export const Media: CollectionConfig = {
     update: canUpdateOwn,
     delete: isEditor,
   },
-  hooks: refreshHooks,
+  hooks: { ...refreshHooks, beforeChange: [refuseHevc] },
   upload: {
     // On this laptop: MEDIA_DIR (see .env). With R2 keys in .env: Cloudflare R2.
     staticDir: process.env.MEDIA_DIR || path.resolve(dirname, '../../../.data/media'),

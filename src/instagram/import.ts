@@ -1,4 +1,7 @@
+import { stat } from 'fs/promises'
+import path from 'path'
 import type { Payload } from 'payload'
+import { checkVideoAt } from '../lib/videoCheck'
 import { toLexical } from '../seed/lexical'
 
 /* Brings the Centre's Instagram videos into the admin as DRAFT films — one
@@ -84,6 +87,24 @@ async function guessTags(payload: Payload) {
   }
 }
 
+/** Whether a saved file is really in storage, whole: on the site, by reading
+    its size from R2; on this laptop, from the media folder. */
+async function stored(doc: { url?: string | null; filename?: string | null }, bytes: number): Promise<boolean> {
+  try {
+    if (doc.url?.startsWith('http')) {
+      const check = await checkVideoAt(doc.url)
+      return check.found && check.size === bytes
+    }
+    const dir = process.env.MEDIA_DIR || path.resolve(process.cwd(), '.data/media')
+    return (await stat(path.join(dir, doc.filename ?? ''))).size === bytes
+  } catch {
+    return false
+  }
+}
+
+/** Copies a file from Instagram into the media library, and makes sure it got
+    there: if it did not (a run cut short mid-copy, say), the half-made record
+    is taken out again and an error raised, so the post is tried again next time. */
 async function download(payload: Payload, url: string, name: string, data: Record<string, unknown>) {
   const res = await fetch(url)
   if (!res.ok) throw new Error(`Could not download ${name} (${res.status})`)
@@ -95,6 +116,10 @@ async function download(payload: Payload, url: string, name: string, data: Recor
     file: { data: buffer, mimetype, name, size: buffer.length },
     ...options,
   })
+  if (!(await stored(doc, buffer.length))) {
+    await payload.delete({ collection: 'media', id: doc.id, ...options }).catch(() => undefined)
+    throw new Error(`${name} did not reach storage whole`)
+  }
   return doc.id
 }
 
@@ -143,47 +168,60 @@ export async function importInstagram(payload: Payload, { max = Infinity } = {})
     const tagsFor = await guessTags(payload)
     const batch = fresh.slice(0, max)
     let added = 0
+    const failed: string[] = []
 
     for (const post of batch) {
-      const caption = post.caption ?? ''
-      const date = post.timestamp
-      const credit = `Instagram: @${me.username}`
-      const parts: Child[] =
-        post.media_type === 'CAROUSEL_ALBUM' ? (post.children?.data ?? []) : [{ ...post, media_type: post.media_type }]
-      // Films only: the first video in the post. Photo posts are passed over.
-      // (media_url is missing when Instagram won't share it, e.g. copyrighted music.)
-      const index = parts.findIndex((p) => p.media_type === 'VIDEO' && p.media_url)
-      if (index >= 0) {
-        const part = parts[index]
-        const name = `instagram-${post.id}${parts.length > 1 ? `-${index + 1}` : ''}`
-        const poster = part.thumbnail_url
-          ? await download(payload, part.thumbnail_url, `${name}-still.jpg`, { alt: 'Still from the film', credit })
-          : undefined
-        const video = await download(payload, part.media_url!, `${name}.mp4`, { caption: titleOf(caption, date), credit, poster })
+      // what this post has made so far, to be taken out again if it does not finish
+      const made: (string | number)[] = []
+      try {
+        const caption = post.caption ?? ''
+        const date = post.timestamp
+        const credit = `Instagram: @${me.username}`
+        const parts: Child[] =
+          post.media_type === 'CAROUSEL_ALBUM' ? (post.children?.data ?? []) : [{ ...post, media_type: post.media_type }]
+        // Films only: the first video in the post. Photo posts are passed over.
+        // (media_url is missing when Instagram won't share it, e.g. copyrighted music.)
+        const index = parts.findIndex((p) => p.media_type === 'VIDEO' && p.media_url)
+        if (index >= 0) {
+          const part = parts[index]
+          const name = `instagram-${post.id}${parts.length > 1 ? `-${index + 1}` : ''}`
+          const poster = part.thumbnail_url
+            ? await download(payload, part.thumbnail_url, `${name}-still.jpg`, { alt: 'Still from the film', credit })
+            : undefined
+          if (poster) made.push(poster)
+          const video = await download(payload, part.media_url!, `${name}.mp4`, { caption: titleOf(caption, date), credit, poster })
+          made.push(video)
 
-        const guess = tagsFor(caption)
-        const paragraphs = caption.split(/\n\s*\n|\n/).map((p) => p.trim()).filter(Boolean).map(escape)
-        await payload.create({
-          collection: 'films',
-          draft: true,
-          data: {
-            _status: 'draft',
-            title: titleOf(caption, date),
-            date,
-            madeBy: author,
-            video,
-            temples: guess.temples,
-            observances: guess.observances,
-            body: paragraphs.length ? (toLexical(paragraphs) as never) : undefined,
-            instagram: { postId: post.id, link: post.permalink },
-            review: {
-              status: 'awaiting',
-              note: 'From Instagram — check the title, temples, festivals and consent before publishing.',
+          const guess = tagsFor(caption)
+          const paragraphs = caption.split(/\n\s*\n|\n/).map((p) => p.trim()).filter(Boolean).map(escape)
+          await payload.create({
+            collection: 'films',
+            draft: true,
+            data: {
+              _status: 'draft',
+              title: titleOf(caption, date),
+              date,
+              madeBy: author,
+              video,
+              temples: guess.temples,
+              observances: guess.observances,
+              body: paragraphs.length ? (toLexical(paragraphs) as never) : undefined,
+              instagram: { postId: post.id, link: post.permalink },
+              review: {
+                status: 'awaiting',
+                note: 'From Instagram — check the title, temples, festivals and consent before publishing.',
+              },
             },
-          },
-          ...options,
-        })
-        added++
+            ...options,
+          })
+          added++
+        }
+      } catch (e) {
+        // not marked as brought in: tried again next time, from the start
+        for (const id of made) await payload.delete({ collection: 'media', id, ...options }).catch(() => undefined)
+        failed.push(post.permalink)
+        payload.logger.warn(`Instagram: ${post.permalink} not brought in (${(e as Error).message}); trying again next time`)
+        continue
       }
       imported.add(post.id)
       // Saved after each post, so an interrupted run never brings one in twice.
@@ -193,7 +231,8 @@ export async function importInstagram(payload: Payload, { max = Infinity } = {})
     const left = fresh.length - batch.length
     const message =
       `@${me.username}: ${posts.length} posts on Instagram; ${added} new films brought in as drafts` +
-      (left ? `, ${left} more next time.` : '.')
+      (left ? `, ${left} more next time` : '') +
+      (failed.length ? `; ${failed.length} could not be saved whole and will be tried again (${failed.join(', ')}).` : '.')
     return finish(message, { account: `@${me.username}` }, added, left)
   } catch (e) {
     return finish(`Stopped: ${(e as Error).message}`)

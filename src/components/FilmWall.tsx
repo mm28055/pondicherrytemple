@@ -1,5 +1,6 @@
 "use client";
 
+import { FilmVideo } from "@/components/FilmVideo";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { FilmTile } from "@/lib/view";
@@ -124,7 +125,8 @@ export function FilmWall({
                 {t.poster ? (
                   <img src={t.poster} alt="" loading="lazy" />
                 ) : (
-                  <video
+                  <FilmVideo
+                    tile
                     src={`${t.src}#t=0.5`}
                     preload="metadata"
                     muted
@@ -163,7 +165,7 @@ export function FilmWall({
       >
         {film && (
           <div className="film-viewer-inner">
-            <video
+            <FilmVideo
               key={film.key}
               controls
               autoPlay

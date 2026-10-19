@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { FilmVideo } from "@/components/FilmVideo";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getFilm, getFilms, getObservancesById, getRegion, getTemple, hasPage } from "@/lib/data";
@@ -62,7 +63,7 @@ export default async function FilmPage({ params }: Props) {
       </header>
 
       <div className="film">
-        <video controls playsInline preload="metadata" src={film.video.src} poster={film.video.poster} />
+        <FilmVideo controls playsInline preload="metadata" src={film.video.src} poster={film.video.poster} />
         <div>
           {film.body && <Html className="rich film-text" html={film.body} />}
           {film.instagram && (
