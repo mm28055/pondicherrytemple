@@ -21,6 +21,7 @@ import * as migration_20261013_093604_layout_order from './20261013_093604_layou
 import * as migration_20261013_123338_temple_listed from './20261013_123338_temple_listed';
 import * as migration_20261013_125633_temple_names from './20261013_125633_temple_names';
 import * as migration_20261013_155723_layout_faces from './20261013_155723_layout_faces';
+import * as migration_20261019_124443_film_files from './20261019_124443_film_files';
 
 export const migrations = [
   {
@@ -136,6 +137,11 @@ export const migrations = [
   {
     up: migration_20261013_155723_layout_faces.up,
     down: migration_20261013_155723_layout_faces.down,
-    name: '20261013_155723_layout_faces'
+    name: '20261013_155723_layout_faces',
+  },
+  {
+    up: migration_20261019_124443_film_files.up,
+    down: migration_20261019_124443_film_files.down,
+    name: '20261019_124443_film_files'
   },
 ];

@@ -422,6 +422,18 @@ export interface TemplePiece {
 export interface Media {
   id: number;
   /**
+   * Its details come from here: open it to change them. Nothing else to fill in on this file.
+   */
+  partOf?:
+    | ({
+        relationTo: 'films';
+        value: number | Film;
+      } | null)
+    | ({
+        relationTo: 'field-notes';
+        value: number | FieldNote;
+      } | null);
+  /**
    * A few words describing the photo, for people who cannot see it.
    */
   alt?: string | null;
@@ -442,7 +454,7 @@ export interface Media {
   /**
    * Photos, videos and recordings of people need their consent.
    */
-  consent: 'not-needed' | 'given' | 'withhold';
+  consent?: ('not-needed' | 'given' | 'withhold') | null;
   /**
    * A photo tagged here appears in the Photographs section of each temple’s page.
    */
@@ -491,6 +503,76 @@ export interface Media {
       filename?: string | null;
     };
   };
+}
+/**
+ * Finished short films, such as the Centre’s Instagram reels. New Instagram posts arrive here as drafts every morning.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "films".
+ */
+export interface Film {
+  id: number;
+  title: string;
+  date: string;
+  madeBy?: string | null;
+  /**
+   * The film itself: drop the video file here. Everything about it (caption, credit, date, consent) comes from this form.
+   */
+  video: number | Media;
+  /**
+   * The picture shown before the film plays. Drop one in, or take a frame from the video with the button below.
+   */
+  still?: (number | null) | Media;
+  /**
+   * Every temple this is about. It will appear on each of their pages.
+   */
+  temples?: (number | Temple)[] | null;
+  /**
+   * Every festival or ritual this is about. It will appear on each of their pages.
+   */
+  observances?: (number | Observance)[] | null;
+  /**
+   * Shown beside the film. For Instagram films, the original caption.
+   */
+  body?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  instagram?: {
+    postId?: string | null;
+    link?: string | null;
+  };
+  /**
+   * Films of people need their consent. Passed to the video and its still.
+   */
+  consent: 'not-needed' | 'given' | 'withhold';
+  /**
+   * Made from the title when left empty. Change it only before publishing.
+   */
+  slug?: string | null;
+  region: number | Region;
+  review?: {
+    /**
+     * For the team's tracking only. Never shown on the site.
+     */
+    status?: ('awaiting' | 'approved') | null;
+    note?: string | null;
+  };
+  createdBy?: (number | null) | User;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
 }
 /**
  * Each festival or ritual is explained once. Its page then gathers every temple, date, field note and article tagged with it.
@@ -763,68 +845,6 @@ export interface Article {
    * Made from the title when left empty. Change it only before publishing.
    */
   slug?: string | null;
-  review?: {
-    /**
-     * For the team's tracking only. Never shown on the site.
-     */
-    status?: ('awaiting' | 'approved') | null;
-    note?: string | null;
-  };
-  createdBy?: (number | null) | User;
-  updatedAt: string;
-  createdAt: string;
-  _status?: ('draft' | 'published') | null;
-}
-/**
- * Finished short films, such as the Centre’s Instagram reels. New Instagram posts arrive here as drafts every morning.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "films".
- */
-export interface Film {
-  id: number;
-  title: string;
-  date: string;
-  madeBy?: string | null;
-  /**
-   * The film itself. Give it a still frame in its own settings, if you like.
-   */
-  video: number | Media;
-  /**
-   * Every temple this is about. It will appear on each of their pages.
-   */
-  temples?: (number | Temple)[] | null;
-  /**
-   * Every festival or ritual this is about. It will appear on each of their pages.
-   */
-  observances?: (number | Observance)[] | null;
-  /**
-   * Shown beside the film. For Instagram films, the original caption.
-   */
-  body?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
-  instagram?: {
-    postId?: string | null;
-    link?: string | null;
-  };
-  /**
-   * Made from the title when left empty. Change it only before publishing.
-   */
-  slug?: string | null;
-  region: number | Region;
   review?: {
     /**
      * For the team's tracking only. Never shown on the site.
@@ -1211,6 +1231,7 @@ export interface FilmsSelect<T extends boolean = true> {
   date?: T;
   madeBy?: T;
   video?: T;
+  still?: T;
   temples?: T;
   observances?: T;
   body?: T;
@@ -1220,6 +1241,7 @@ export interface FilmsSelect<T extends boolean = true> {
         postId?: T;
         link?: T;
       };
+  consent?: T;
   slug?: T;
   region?: T;
   review?:
@@ -1262,6 +1284,7 @@ export interface ArticlesSelect<T extends boolean = true> {
  * via the `definition` "media_select".
  */
 export interface MediaSelect<T extends boolean = true> {
+  partOf?: T;
   alt?: T;
   caption?: T;
   credit?: T;

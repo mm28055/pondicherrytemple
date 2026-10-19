@@ -15,6 +15,8 @@ const dirname = path.dirname(fileURLToPath(import.meta.url))
    server has it (on this laptop), or from storage (on the site, where uploads
    go from the browser straight to R2 and the server never holds the file). */
 const refuseHevc: CollectionBeforeChangeHook = async ({ data, req, operation, originalDoc }) => {
+  // (a copy of the live site's own files, made on this laptop, is taken as it is)
+  if (req.context?.mirror) return data
   const type: string = data?.mimeType ?? req.file?.mimetype ?? ''
   if (!type.startsWith('video/')) return data
   const file = req.file as { data?: Buffer; tempFilePath?: string } | undefined
@@ -36,6 +38,17 @@ const refuseHevc: CollectionBeforeChangeHook = async ({ data, req, operation, or
   if (isHevc(codecs)) throw new APIError(HEVC_MESSAGE, 400, undefined, true)
   return data
 }
+
+/* A file that is part of a film (its video, its still) takes its details from
+   the film (its caption, credit, date, consent), filled in when the film is
+   saved (collections/Films.ts); so does a video or recording in a field note
+   take its place from the note. Their forms here show where they belong in
+   place of the fields that come from there. Videos' own temple and festival
+   tags are not asked for at all: the site never reads them. */
+type MediaData = { mimeType?: string | null; partOf?: { relationTo?: string; value?: unknown } | null }
+const inFilm = (d: MediaData) => d?.partOf?.relationTo === 'films'
+const partOfSomething = (d: MediaData) => Boolean(d?.partOf?.value)
+const isImage = (d: MediaData) => !d?.mimeType || d.mimeType.startsWith('image/')
 
 export const Media: CollectionConfig = {
   slug: 'media',
@@ -69,19 +82,34 @@ export const Media: CollectionConfig = {
   },
   fields: [
     {
+      name: 'partOf',
+      type: 'relationship',
+      relationTo: ['films', 'field-notes'],
+      label: 'Part of',
+      admin: {
+        readOnly: true,
+        position: 'sidebar',
+        condition: (data) => partOfSomething(data),
+        description: 'Its details come from here: open it to change them. Nothing else to fill in on this file.',
+      },
+    },
+    {
       name: 'alt',
       type: 'text',
       label: 'What it shows',
-      admin: { description: 'A few words describing the photo, for people who cannot see it.' },
+      admin: {
+        condition: (data) => !inFilm(data),
+        description: 'A few words describing the photo, for people who cannot see it.',
+      },
     },
-    { name: 'caption', type: 'text' },
-    { name: 'credit', type: 'text', admin: { placeholder: 'e.g. Photograph: Arunaditya' } },
+    { name: 'caption', type: 'text', admin: { condition: (data) => !inFilm(data) } },
+    { name: 'credit', type: 'text', admin: { condition: (data) => !inFilm(data), placeholder: 'e.g. Photograph: Arunaditya' } },
     {
       name: 'takenOn',
       type: 'date',
       label: 'Taken on',
       admin: {
-        condition: (data) => !data?.mimeType || Boolean(data.mimeType.startsWith('image/')),
+        condition: (data) => isImage(data) && !inFilm(data),
         date: { pickerAppearance: 'dayOnly', displayFormat: 'd MMMM yyyy' },
         description:
           'Optional. The day the photo was taken, so it is grouped under the right year. Photos in a field note take the note’s date.',
@@ -94,7 +122,7 @@ export const Media: CollectionConfig = {
       label: 'Still frame',
       filterOptions: { mimeType: { contains: 'image' } },
       admin: {
-        condition: (data) => Boolean(data?.mimeType?.startsWith('video/')),
+        condition: (data) => Boolean(data?.mimeType?.startsWith('video/')) && !inFilm(data),
         description: 'The picture shown before the video plays. Optional.',
       },
     },
@@ -105,7 +133,7 @@ export const Media: CollectionConfig = {
       defaultValue: false,
       admin: {
         position: 'sidebar',
-        condition: (data) => !data?.mimeType || Boolean(data.mimeType.startsWith('image/')),
+        condition: (data) => isImage(data) && !inFilm(data),
         description:
           'Put this photo first in the Photographs section of its temples and festivals. The very first is shown large.',
       },
@@ -122,6 +150,7 @@ export const Media: CollectionConfig = {
       ],
       admin: {
         position: 'sidebar',
+        condition: (data) => !inFilm(data),
         description: 'Photos, videos and recordings of people need their consent.',
       },
     },
@@ -132,6 +161,8 @@ export const Media: CollectionConfig = {
       hasMany: true,
       admin: {
         position: 'sidebar',
+        // photos only, and not a film's still (videos' tags are never read; a still stays out of Photographs)
+        condition: (data) => isImage(data) && !inFilm(data),
         description: 'A photo tagged here appears in the Photographs section of each temple’s page.',
       },
     },
@@ -143,6 +174,7 @@ export const Media: CollectionConfig = {
       hasMany: true,
       admin: {
         position: 'sidebar',
+        condition: (data) => isImage(data) && !inFilm(data),
         description:
           'A photo tagged here appears in the Photographs section of each festival’s or ritual’s page. Photos in a field note appear there by themselves.',
       },

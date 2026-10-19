@@ -16,6 +16,7 @@ import { HeadingFeatureClient as HeadingFeatureClient_e70f5e05f09f93e00b997edb1e
 import { ParagraphFeatureClient as ParagraphFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { ListMemory as ListMemory_fb2c77e6804535814322756672416b63 } from '../../../components/admin/ListMemory'
 import { PublishButton as PublishButton_85c066c9e85977a669a8719b5844b2d5 } from '../../../components/admin/PublishButton'
+import { FrameButton as FrameButton_da55e7d810ad53350e323c365df87b57 } from '../../../components/admin/FrameButton'
 import { Icon as Icon_81fda60f3e3709e861f40982a767707d } from '../../../components/admin/Brand'
 import { Logo as Logo_81fda60f3e3709e861f40982a767707d } from '../../../components/admin/Brand'
 import { Welcome as Welcome_72e830871eb26c77002633e2e2cc9dea } from '../../../components/admin/Welcome'
@@ -42,6 +43,7 @@ export const importMap = {
   "@payloadcms/richtext-lexical/client#ParagraphFeatureClient": ParagraphFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "/components/admin/ListMemory#ListMemory": ListMemory_fb2c77e6804535814322756672416b63,
   "/components/admin/PublishButton#PublishButton": PublishButton_85c066c9e85977a669a8719b5844b2d5,
+  "/components/admin/FrameButton#FrameButton": FrameButton_da55e7d810ad53350e323c365df87b57,
   "/components/admin/Brand#Icon": Icon_81fda60f3e3709e861f40982a767707d,
   "/components/admin/Brand#Logo": Logo_81fda60f3e3709e861f40982a767707d,
   "/components/admin/Welcome#Welcome": Welcome_72e830871eb26c77002633e2e2cc9dea,

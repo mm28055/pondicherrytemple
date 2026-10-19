@@ -203,6 +203,8 @@ export async function importInstagram(payload: Payload, { max = Infinity } = {})
               date,
               madeBy: author,
               video,
+              // its still on the film itself: saving the film passes it to the video
+              still: poster,
               temples: guess.temples,
               observances: guess.observances,
               body: paragraphs.length ? (toLexical(paragraphs) as never) : undefined,

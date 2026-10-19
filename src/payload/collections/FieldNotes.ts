@@ -1,4 +1,4 @@
-import type { CollectionConfig } from 'payload'
+import type { CollectionAfterChangeHook, CollectionConfig } from 'payload'
 import { canCreateContent, canUpdateContent, isEditor, publishedOrTeam } from '../access'
 import { fullEditor } from '../editor'
 import {
@@ -23,6 +23,24 @@ const hasWords = (body: unknown): boolean => {
   return walk(((body as { root?: Node } | null)?.root ?? {}) as Node)
 }
 const count = (v: unknown) => (Array.isArray(v) ? v.length : 0)
+const idOf = (v: unknown): number | undefined =>
+  typeof v === 'number' ? v : v && typeof v === 'object' && 'id' in v ? (v as { id: number }).id : undefined
+
+/* A note's videos and recordings are marked as part of it, so their own forms
+   show where they belong and ask nothing more (their temples and festivals are
+   the note's). Only a file not already marked is written; the note itself is
+   never changed. */
+const markFiles: CollectionAfterChangeHook = async ({ doc, req }) => {
+  const ids = [...(Array.isArray(doc.videos) ? doc.videos : []), doc.recording].map(idOf).filter((id): id is number => Boolean(id))
+  for (const id of ids) {
+    const m = (await req.payload.findByID({ collection: 'media', id, depth: 0, req, overrideAccess: true }).catch(() => null)) as {
+      partOf?: { relationTo?: string; value?: unknown } | null
+    } | null
+    if (!m || m.partOf?.value) continue // already part of this note, or of a film
+    await req.payload.update({ collection: 'media', id, data: { partOf: { relationTo: 'field-notes', value: doc.id } }, req, overrideAccess: true, depth: 0, context: { skipRevalidate: true } })
+  }
+  return doc
+}
 
 export const FieldNotes: CollectionConfig = {
   slug: 'field-notes',
@@ -46,6 +64,7 @@ export const FieldNotes: CollectionConfig = {
   },
   hooks: {
     ...refreshHooks,
+    afterChange: [...refreshHooks.afterChange, markFiles],
     beforeChange: [
       ({ data, originalDoc }) => {
         const videos = count(data.videos ?? originalDoc?.videos)
