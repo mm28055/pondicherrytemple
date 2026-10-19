@@ -11,6 +11,8 @@ type Filter = {
   key: "temples" | "observances";
   id: string;
   label: string;
+  /** a temple's shortest name, for the bar on a phone */
+  short?: string;
   count: number;
 };
 
@@ -96,7 +98,7 @@ export function FilmWall({
     { key: "temples", label: "Temple" },
     { key: "observances", label: "Festival/Ritual" },
   ]
-    .map((b) => ({ ...b, options: filters.filter((f) => f.key === b.key).map(({ id, label }) => ({ id, label })) }))
+    .map((b) => ({ ...b, options: filters.filter((f) => f.key === b.key).map(({ id, label, short }) => ({ id, label, short })) }))
     .filter((b) => b.options.length > 0);
 
   return (

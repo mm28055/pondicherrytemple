@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { stripeWidth, useStripeFit } from "@/lib/stripes";
 
 export type BarFilter = {
   key: string;
   label: string;
-  options: { id: string; label: string }[];
+  /** `short`: a shorter name (a temple's shortest), shown in the bar on a phone once chosen */
+  options: { id: string; label: string; short?: string }[];
 };
 
 /** The filters of a page of photographs or films: one line, a dropdown for
@@ -35,6 +36,33 @@ export function FilterBar({
   const box = useRef<HTMLDivElement>(null);
   const top = useRef<HTMLDivElement>(null);
   const fit = useStripeFit(top);
+  const line = useRef<HTMLDivElement>(null);
+
+  /* the line kept to one line: its spacing, then its letters, made smaller
+     until it fits (no smaller than two thirds), measured again whenever the
+     screen or a choice changes; past that, a long choice ends in … */
+  useLayoutEffect(() => {
+    const el = line.current;
+    if (!el) return;
+    let width = -1;
+    const size = () => {
+      width = el.clientWidth;
+      // measured at full length (nothing cut short), then let go
+      el.classList.add("measuring");
+      let s = 1;
+      el.style.setProperty("--fb", "1");
+      while (el.scrollWidth > el.clientWidth + 1 && s > 0.67) {
+        s = Math.round((s - 0.03) * 100) / 100;
+        el.style.setProperty("--fb", String(s));
+      }
+      el.classList.remove("measuring");
+    };
+    size();
+    const ro = new ResizeObserver(() => el.clientWidth !== width && size());
+    ro.observe(el);
+    document.fonts?.ready.then(size);
+    return () => ro.disconnect();
+  }, [chosen, oldestFirst, filters]);
 
   useEffect(() => {
     if (!menu) return;
@@ -54,7 +82,19 @@ export function FilterBar({
     };
   }, [menu]);
 
-  const nameOf = (fl: BarFilter) => fl.options.find((o) => o.id === chosen[fl.key])?.label;
+  const choiceOf = (fl: BarFilter) => fl.options.find((o) => o.id === chosen[fl.key]);
+  const nameOf = (fl: BarFilter) => choiceOf(fl)?.label;
+  // the choice in the bar: on a phone, by its shorter name where it has one
+  const shownAs = (fl: BarFilter) => {
+    const o = choiceOf(fl)!;
+    if (!o.short || o.short === o.label) return o.label;
+    return (
+      <>
+        <span className="filter-bar-full">{o.label}</span>
+        <span className="filter-bar-short">{o.short}</span>
+      </>
+    );
+  };
   const alphabetical = (fl: BarFilter) =>
     [...fl.options].sort((a, b) => (fl.key === "years" ? b.label.localeCompare(a.label) : a.label.localeCompare(b.label)));
 
@@ -78,7 +118,7 @@ export function FilterBar({
         ref={box}
         style={stripes && fit ? { width: stripeWidth(fit.units), marginLeft: -fit.back } : undefined}
       >
-        <div className="filter-bar-line">
+        <div className="filter-bar-line" ref={line}>
           {filters.map((fl) => (
             <span key={fl.key} className="filter-bar-item">
               <button
@@ -86,7 +126,7 @@ export function FilterBar({
                 aria-expanded={menu === fl.key}
                 onClick={() => setMenu(menu === fl.key ? null : fl.key)}
               >
-                {nameOf(fl) ? <b>{nameOf(fl)}</b> : fl.label}
+                {nameOf(fl) ? <b>{shownAs(fl)}</b> : fl.label}
                 <i aria-hidden="true">▾</i>
               </button>
               {chosen[fl.key] && (

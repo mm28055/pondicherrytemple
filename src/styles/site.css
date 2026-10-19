@@ -1496,12 +1496,28 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
    stays under the menu as the page scrolls; a dropdown opens over the page */
 .section:has(> .filter-bar) { padding-top: 6px; }
 .filter-bar { position: sticky; top: var(--nav-h); z-index: 30; background: var(--chalk); border-bottom: 1px solid var(--rule); margin-bottom: 8px; }
-.filter-bar-line { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 28px; min-height: 48px; padding-block: 4px; }
-.filter-bar-item { display: inline-flex; align-items: center; gap: 6px; }
+/* always one line: on a narrow screen the spacing and then the letters shrink
+   to fit (--fb, set by components/FilterBar), and a long choice ends in … */
+.filter-bar-line {
+  --fb: 1; display: flex; flex-wrap: nowrap; align-items: center; min-height: 48px; padding-block: 4px;
+  gap: 4px max(8px, calc(28px * var(--fb) * var(--fb) * var(--fb)));
+}
+.filter-bar-item { display: inline-flex; align-items: center; gap: calc(6px * var(--fb)); min-width: 0; }
 .filter-bar-btn, .filter-bar-clear {
   font-family: var(--display); font-weight: 600; font-size: 14px; letter-spacing: 0.08em; text-transform: uppercase;
   background: none; border: none; padding: 6px 0; color: var(--ink-2); cursor: pointer;
 }
+.filter-bar-line .filter-bar-btn { font-size: calc(14px * var(--fb)); letter-spacing: calc(0.08em * var(--fb)); white-space: nowrap; }
+.filter-bar-item > .filter-bar-btn { display: inline-flex; align-items: baseline; min-width: 0; }
+.filter-bar-item > .filter-bar-btn b { overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+/* a chosen temple: on a phone, by its shortest name */
+.filter-bar-short { display: none; }
+@media (max-width: 640px) {
+  .filter-bar-full { display: none; }
+  .filter-bar-short { display: inline; }
+}
+.filter-bar-line .filter-bar-sort,.filter-bar-line.measuring > * { flex-shrink: 0; }
+.filter-bar-line .filter-bar-clear { font-size: calc(17px * var(--fb)); flex-shrink: 0; }
 .filter-bar-btn i { font-style: normal; margin-left: 6px; color: var(--ochre); display: inline-block; transition: transform 0.2s; }
 .filter-bar-btn.open i { transform: rotate(180deg); }
 .filter-bar-btn b { color: var(--ochre); font-weight: 700; }

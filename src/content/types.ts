@@ -216,7 +216,8 @@ export interface Photo extends Picture {
 export interface PhotoFilter {
   key: "temples" | "observances" | "deities" | "years";
   label: string;
-  options: { id: string; label: string; count: number }[];
+  /** each choice; `short`, a temple's shortest name, shown in the bar on a phone once it is chosen */
+  options: { id: string; label: string; short?: string; count: number }[];
 }
 
 /** Abishek P.'s drawings: the illustrated plan of each temple, and scenes

@@ -876,11 +876,15 @@ export async function getPhotosForObservance(observanceId: string): Promise<Phot
 export async function getPhotoFilters(list: Photo[], keys: PhotoFilter["key"][]): Promise<PhotoFilter[]> {
   const templeByKey = new Map((await temples()).map((t) => [`${t.region}/${t.id}`, t]));
   const observanceById = new Map((await observances()).map((o) => [o.id, o]));
-  const rows: Record<PhotoFilter["key"], { label: string; of: (p: Photo) => string[]; name: (id: string) => string }> = {
+  const rows: Record<
+    PhotoFilter["key"],
+    { label: string; of: (p: Photo) => string[]; name: (id: string) => string; short?: (id: string) => string | undefined }
+  > = {
     temples: {
       label: "Temple",
       of: (p) => p.temples,
       name: (id) => templeByKey.get(id)?.knownAs ?? templeByKey.get(id)?.name ?? id,
+      short: (id) => templeByKey.get(id)?.shortName,
     },
     observances: { label: "Festival/Ritual", of: (p) => p.observances, name: (id) => observanceById.get(id)?.name ?? id },
     deities: { label: "Deity", of: (p) => p.deities, name: (id) => DEITY_GROUP_LABELS[id as DeityGroup] ?? id },
@@ -891,7 +895,7 @@ export async function getPhotoFilters(list: Photo[], keys: PhotoFilter["key"][])
       const counts = new Map<string, number>();
       for (const p of list) for (const id of rows[key].of(p)) counts.set(id, (counts.get(id) ?? 0) + 1);
       const options = [...counts]
-        .map(([id, count]) => ({ id, label: rows[key].name(id), count }))
+        .map(([id, count]) => ({ id, label: rows[key].name(id), short: rows[key].short?.(id), count }))
         .sort((a, b) => (key === "years" ? b.id.localeCompare(a.id) : b.count - a.count));
       return { key, label: rows[key].label, options };
     })

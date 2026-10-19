@@ -243,6 +243,7 @@ export function PhotoWall({ photos, layout, seeAll, filters = [], note, addressa
       <dialog
         ref={dialog}
         className="film-viewer photo-viewer"
+        data-own-history={addressable ? "" : undefined}
         aria-label={photo?.caption ?? "Photograph"}
         onCancel={(e) => {
           e.preventDefault();

@@ -22,6 +22,7 @@ import * as migration_20261013_123338_temple_listed from './20261013_123338_temp
 import * as migration_20261013_125633_temple_names from './20261013_125633_temple_names';
 import * as migration_20261013_155723_layout_faces from './20261013_155723_layout_faces';
 import * as migration_20261019_124443_film_files from './20261019_124443_film_files';
+import * as migration_20261019_183000_short_name_thiruvahindrapuram from './20261019_183000_short_name_thiruvahindrapuram';
 
 export const migrations = [
   {
@@ -142,6 +143,11 @@ export const migrations = [
   {
     up: migration_20261019_124443_film_files.up,
     down: migration_20261019_124443_film_files.down,
-    name: '20261019_124443_film_files'
+    name: '20261019_124443_film_files',
+  },
+  {
+    up: migration_20261019_183000_short_name_thiruvahindrapuram.up,
+    down: migration_20261019_183000_short_name_thiruvahindrapuram.down,
+    name: '20261019_183000_short_name_thiruvahindrapuram',
   },
 ];

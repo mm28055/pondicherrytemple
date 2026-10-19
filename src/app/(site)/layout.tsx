@@ -5,6 +5,7 @@ import "@/styles/site.css";
 import { Nav } from "@/components/Nav";
 import { Footer } from "@/components/Footer";
 import { RevealManager } from "@/components/RevealManager";
+import { DialogBack } from "@/components/DialogBack";
 
 /* The public site. (The admin, under /admin, has its own layout in (payload).) */
 
@@ -68,6 +69,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
         {children}
         <Footer />
         <RevealManager />
+        <DialogBack />
       </body>
     </html>
   );

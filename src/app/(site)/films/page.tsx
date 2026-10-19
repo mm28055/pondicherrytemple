@@ -22,7 +22,7 @@ export default async function FilmsPage() {
   // one filter per temple or festival that actually has a film
   const count = (key: "temples" | "observances", id: string) => tiles.filter((t) => t[key].includes(id)).length;
   const filters = [
-    ...temples.map((t) => ({ key: "temples" as const, id: t.id, label: shortTempleName(t) })),
+    ...temples.map((t) => ({ key: "temples" as const, id: t.id, label: shortTempleName(t), short: t.shortName })),
     ...observances.map((o) => ({ key: "observances" as const, id: o.id, label: o.name })),
   ]
     .map((f) => ({ ...f, count: count(f.key, f.id) }))
