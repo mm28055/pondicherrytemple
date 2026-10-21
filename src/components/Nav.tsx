@@ -14,6 +14,7 @@ type Tab = {
 
 // the calendar, and the month pages it opens
 const inCalendar = (p: string) => p.startsWith("/calendar") || p.startsWith("/festivals-and-rituals/month");
+const inPhotographs = (p: string) => p.startsWith("/photographs");
 
 const TABS: Tab[] = [
   {
@@ -28,7 +29,12 @@ const TABS: Tab[] = [
     match: (p) => p.startsWith("/festivals-and-rituals") || inCalendar(p),
     sub: [{ href: "/calendar", label: "Calendar", match: inCalendar }],
   },
-  { href: "/field-notes", label: "Field Notes", match: (p) => p.startsWith("/field-notes") },
+  {
+    href: "/field-notes",
+    label: "Field Notes",
+    match: (p) => p.startsWith("/field-notes") || inPhotographs(p),
+    sub: [{ href: "/photographs", label: "Photographs", match: inPhotographs }],
+  },
   { href: "/articles", label: "Articles", match: (p) => p.startsWith("/articles") },
   { href: "/films", label: "Films", match: (p) => p.startsWith("/films") },
   { href: "/about", label: "About", match: (p) => p.startsWith("/about") },

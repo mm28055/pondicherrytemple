@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useOneLine } from "@/lib/oneLine";
 
 export type DropChoice = { id: string; label: string; disabled?: boolean };
 export type Drop = {
@@ -40,6 +41,9 @@ export function DropBand({
   const [menu, setMenu] = useState<string | null>(null);
   const box = useRef<HTMLDivElement>(null);
   const buttons = useRef<Record<string, HTMLButtonElement | null>>({});
+  // one line, as the Photographs and Films bar (lib/oneLine)
+  const line = useRef<HTMLDivElement>(null);
+  useOneLine(line, drops.map((d) => d.value).join("|"));
   useEffect(() => {
     if (!menu) return;
     const from = window.scrollY;
@@ -59,7 +63,7 @@ export function DropBand({
   const open = drops.find((d) => d.key === menu);
   return (
     <div className={`filter-bar drop-band ${className}`} ref={box}>
-      <div className="filter-bar-line">
+      <div className="filter-bar-line" ref={line}>
         {drops.map((d) => (
           <span key={d.key} className={`filter-bar-item${d.inline ? " drop-inline-item" : ""}`}>
             {/* on a computer: the few choices in the band, the one in force underlined */}

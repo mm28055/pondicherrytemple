@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
 import { stripeWidth, useStripeFit } from "@/lib/stripes";
+import { useOneLine } from "@/lib/oneLine";
 
 export type BarFilter = {
   key: string;
@@ -16,7 +17,9 @@ export type BarFilter = {
     chosen the dropdown shows it in place of its name, with a × to clear it.
     A dropdown closes on a choice, a click elsewhere, Escape, or scrolling
     on. With `stripes`, the bar is as wide as rows of photos hung from the
-    stripes at the top of the page (lib/stripes). */
+    stripes at the top of the page (lib/stripes), so that stuck under the
+    menu it covers them; but its words and its line keep to the page's
+    margins, in line with the header above it. */
 export function FilterBar({
   filters,
   chosen,
@@ -36,33 +39,17 @@ export function FilterBar({
   const box = useRef<HTMLDivElement>(null);
   const top = useRef<HTMLDivElement>(null);
   const fit = useStripeFit(top);
-  const line = useRef<HTMLDivElement>(null);
-
-  /* the line kept to one line: its spacing, then its letters, made smaller
-     until it fits (no smaller than two thirds), measured again whenever the
-     screen or a choice changes; past that, a long choice ends in … */
+  // how far the bar reaches past the page's margins, left and right: as far
+  // as the photos do, and never short of the margins
+  const [past, setPast] = useState<{ l: number; r: number; w: number } | null>(null);
   useLayoutEffect(() => {
-    const el = line.current;
-    if (!el) return;
-    let width = -1;
-    const size = () => {
-      width = el.clientWidth;
-      // measured at full length (nothing cut short), then let go
-      el.classList.add("measuring");
-      let s = 1;
-      el.style.setProperty("--fb", "1");
-      while (el.scrollWidth > el.clientWidth + 1 && s > 0.67) {
-        s = Math.round((s - 0.03) * 100) / 100;
-        el.style.setProperty("--fb", String(s));
-      }
-      el.classList.remove("measuring");
-    };
-    size();
-    const ro = new ResizeObserver(() => el.clientWidth !== width && size());
-    ro.observe(el);
-    document.fonts?.ready.then(size);
-    return () => ro.disconnect();
-  }, [chosen, oldestFirst, filters]);
+    const w = top.current?.offsetWidth;
+    if (!stripes || !fit || !w) return setPast(null);
+    setPast({ l: Math.max(0, fit.back), r: Math.max(0, stripeWidth(fit.units) - fit.back - w), w });
+  }, [stripes, fit]);
+  const line = useRef<HTMLDivElement>(null);
+  // kept to one line, measured again whenever a choice changes
+  useOneLine(line, JSON.stringify([chosen, oldestFirst, filters.length]));
 
   useEffect(() => {
     if (!menu) return;
@@ -114,9 +101,13 @@ export function FilterBar({
     <>
       <div ref={top} aria-hidden="true" />
       <div
-        className="filter-bar"
+        className={`filter-bar${past ? " on-stripes" : ""}`}
         ref={box}
-        style={stripes && fit ? { width: stripeWidth(fit.units), marginLeft: -fit.back } : undefined}
+        style={
+          past
+            ? ({ width: past.w + past.l + past.r, marginLeft: -past.l, "--past-l": `${past.l}px`, "--past-r": `${past.r}px` } as CSSProperties)
+            : undefined
+        }
       >
         <div className="filter-bar-line" ref={line}>
           {filters.map((fl) => (

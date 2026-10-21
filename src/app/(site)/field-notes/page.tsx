@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
-import { getFieldNotes, getRegion, getSectionIntro, getTemples } from "@/lib/data";
+import { getFieldNotes, getPhotos, getRegion, getSectionIntro, getTemples } from "@/lib/data";
 import { FIELD_KIND_LABELS } from "@/content/labels";
 import type { FieldKind } from "@/content/types";
 import { noteRow } from "@/lib/view";
 import { FieldNotesBrowser } from "@/components/FieldNotesBrowser";
+import { HomeStrip } from "@/components/HomeStrip";
 
 export const metadata: Metadata = {
   title: "Field Notes",
@@ -26,6 +27,12 @@ export default async function FieldNotesPage() {
     .map((k) => ({ kind: k, label: FIELD_KIND_LABELS[k].many, count: notes.filter((n) => n.kind === k).length }))
     .filter((k) => k.count > 0);
 
+  // the home page's strip of photographs, the same in every way: the newest
+  // first, all of them in turn
+  const stripPhotos = [...(await getPhotos())]
+    .sort((a, b) => b.date.localeCompare(a.date))
+    .map(({ id, small, alt, focus, width, height }) => ({ id, small, alt, focus, width, height }));
+
   return (
     <div className="wrap">
       <header className="page-head tight-head">
@@ -33,6 +40,7 @@ export default async function FieldNotesPage() {
         <h1 className="page-title">Field Notes</h1>
         <p className="page-lede">{await getSectionIntro("fieldNotes")}</p>
       </header>
+      {stripPhotos.length > 0 && <HomeStrip photos={stripPhotos} />}
       <section className="section" style={{ paddingTop: 12 }}>
         <FieldNotesBrowser rows={rows} kinds={kinds} />
       </section>
