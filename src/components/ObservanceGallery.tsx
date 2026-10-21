@@ -18,14 +18,19 @@ export type GalleryItem = {
     (by name, in English or Tamil, by what it is, or by "festival" or
     "ritual"); while searching, every match takes its place in the mosaic.
     The mosaic is two columns of photographs, each at its own shape, none
-    smaller than a square. */
+    smaller than a square. Each card opens its festival's page; while those
+    pages are held back (`linked` false, the public), the cards are not
+    links (the page's introduction says "(coming soon)"). */
 export function ObservanceGallery({
   lead,
   items,
   head,
+  linked = true,
 }: {
   lead: GalleryItem;
   items: GalleryItem[];
+  /** whether the cards open their festivals' pages */
+  linked?: boolean;
   /** the page's heading and introduction: the search sits under them, on the right */
   head: ReactNode;
 }) {
@@ -44,7 +49,7 @@ export function ObservanceGallery({
 
   return (
     <>
-      <header className="page-head gallery-head">
+      <header className="page-head landing-head gallery-head">
         {head}
         <div className="gallery-search">
           {words && (
@@ -82,10 +87,10 @@ export function ObservanceGallery({
       </header>
 
       <section className="section">
-        {!words && <Card it={lead} lead />}
+        {!words && <Card it={lead} lead linked={linked} />}
         <div className="gallery mosaic">
           {shown.map((it) => (
-            <Card key={it.row.id} it={it} />
+            <Card key={it.row.id} it={it} linked={linked} />
           ))}
         </div>
       </section>
@@ -93,13 +98,11 @@ export function ObservanceGallery({
   );
 }
 
-function Card({ it, lead = false }: { it: GalleryItem; lead?: boolean }) {
+function Card({ it, lead = false, linked }: { it: GalleryItem; lead?: boolean; linked: boolean }) {
   const { row, photo, kind } = it;
-  return (
-    <Link
-      href={row.href ?? `/festivals-and-rituals/${row.id}`}
-      className={`gallery-card${lead ? " lead" : ""}${photo ? "" : " no-photo"}`}
-    >
+  const className = `gallery-card${lead ? " lead" : ""}${photo ? "" : " no-photo"}`;
+  const inside = (
+    <>
       <span className="gallery-pic">
         {photo ? (
           // eslint-disable-next-line @next/next/no-img-element
@@ -143,6 +146,13 @@ function Card({ it, lead = false }: { it: GalleryItem; lead?: boolean }) {
           {row.seenAt} temple{row.seenAt === 1 ? "" : "s"}
         </span>
       </span>
+    </>
+  );
+  return linked ? (
+    <Link href={row.href ?? `/festivals-and-rituals/${row.id}`} className={className}>
+      {inside}
     </Link>
+  ) : (
+    <div className={className}>{inside}</div>
   );
 }

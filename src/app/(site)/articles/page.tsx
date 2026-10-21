@@ -15,7 +15,7 @@ export default async function ArticlesPage() {
 
   return (
     <div className="wrap">
-      <header className="page-head">
+      <header className="page-head landing-head">
         <div className="kicker">Writing</div>
         <h1 className="page-title">Articles</h1>
         <p className="page-lede">{await getSectionIntro("articles")}</p>

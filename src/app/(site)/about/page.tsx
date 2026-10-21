@@ -16,7 +16,7 @@ export default async function AboutPage() {
 
   return (
     <div className="wrap">
-      <header className="page-head">
+      <header className="page-head landing-head">
         <div className="kicker">About</div>
         <h1 className="page-title">Sthalam</h1>
         {about?.lede && <p className="page-lede">{about.lede}</p>}

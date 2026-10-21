@@ -30,7 +30,7 @@ export default async function FilmsPage() {
 
   return (
     <div className="wrap">
-      <header className="page-head">
+      <header className="page-head landing-head">
         <div className="kicker">From the temples</div>
         <h1 className="page-title">Films</h1>
         <p className="page-lede">{await getSectionIntro("films")}</p>

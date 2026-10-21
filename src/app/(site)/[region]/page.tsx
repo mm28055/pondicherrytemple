@@ -74,7 +74,7 @@ export default async function RegionPage({ params }: Props) {
         {/* today's date and the way to the calendar, as on the home page: on a
             computer the same box, at the header's right; on a phone a small
             one beside the title */}
-        <header className="page-head with-today">
+        <header className="page-head landing-head with-today">
           <div className="kicker">{region.name}</div>
           <h1 className="page-title">Temples</h1>
           <TodayTamil events={todayEvents} />

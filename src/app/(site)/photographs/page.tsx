@@ -16,7 +16,7 @@ export default async function PhotographsPage() {
 
   return (
     <div className="wrap">
-      <header className="page-head">
+      <header className="page-head landing-head">
         <Link className="crumb" href="/field-notes">
           ← Field notes
         </Link>

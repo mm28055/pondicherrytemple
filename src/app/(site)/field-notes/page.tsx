@@ -35,7 +35,7 @@ export default async function FieldNotesPage() {
 
   return (
     <div className="wrap">
-      <header className="page-head tight-head">
+      <header className="page-head landing-head tight-head">
         <div className="kicker">From the temples</div>
         <h1 className="page-title">Field Notes</h1>
         <p className="page-lede">{await getSectionIntro("fieldNotes")}</p>

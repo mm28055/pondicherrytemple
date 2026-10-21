@@ -21,7 +21,7 @@ export default async function CalendarPage() {
 
   return (
     <div className="wrap">
-      <header className="page-head calendar-head">
+      <header className="page-head landing-head calendar-head">
         <Link className="crumb" href="/festivals-and-rituals">
           ← Festivals &amp; rituals
         </Link>

@@ -231,6 +231,26 @@ a:focus-visible, button:focus-visible {
   border-bottom: 2px solid var(--ink);
 }
 .page-head :last-child:not(svg *) { margin-bottom: 0; }
+/* The menu's own pages (Temples, Festivals & Rituals, Calendar, Field Notes,
+   Photographs, Articles, Films, About): the same white space between the
+   header's last line and its rule as on the home page, from that line's
+   foot to the rule: 46px on a computer, 24px on a phone. A header that ends
+   in its title (the Calendar, Photographs) needs a pixel less on a computer
+   and 5px more on a phone, the title's line leaving less room under its
+   letters than a paragraph's does. */
+.page-head.landing-head { padding-bottom: calc(clamp(18px, 2.5vw, 32px) + 3px); }
+.page-head.landing-head:has(> .page-title:last-child) { padding-bottom: calc(clamp(18px, 2.5vw, 32px) + 2px); }
+/* (a tablet: the home page's date under its name, its last line "Full calendar") */
+@media (min-width: 641px) and (max-width: 900px) {
+  .page-head.landing-head { padding-bottom: clamp(18px, 2.5vw, 32px); }
+  .page-head.landing-head:has(> .page-title:last-child) { padding-bottom: calc(clamp(18px, 2.5vw, 32px) + 3px); }
+}
+@media (max-width: 640px) {
+  .page-head.landing-head { padding-bottom: 14px; }
+  .page-head.landing-head:has(> .page-title:last-child) { padding-bottom: 19px; }
+  /* the Festivals & Rituals search, its own line at the foot on a phone */
+  .page-head.landing-head.gallery-head { padding-bottom: 13px; }
+}
 
 /* the small line above a header's title (a way back, or what the page is)
    sits close over the title, as one block with it */
@@ -731,9 +751,11 @@ a.temple-row:hover .temple-name { color: var(--ochre); }
 @media (max-width: 640px) { .home-gloss { font-size: 10.5px; } }
 /* the red mark between the name and the gloss, midway across the gap (the
    name ends in its letter-spacing, so a little left of the gap's middle): the
-   dot standing on the line STHALAM stands on, in the middle of the space, on
-   a short red line, its base, a little more than twice its width. A mark of no size at the gloss's
-   start, on its baseline, so it takes no room of its own; the dot and the line
+   dot in the middle of the space, standing on a hairline of red, its base,
+   which lies on the line the letters stand on (within their height, so it
+   does not read as an underline) and reaches 4px out on either side of the
+   dot. A mark of no size at the gloss's start, on its baseline, so it takes
+   no room of its own; the dot and the line
    are drawn from it. */
 .home-lingam {
   /* the clear space from STHALAM's last letter to the gloss: the gap, and the letter-spacing after the M */
@@ -742,8 +764,8 @@ a.temple-row:hover .temple-name { color: var(--ochre); }
 }
 .home-lingam::before,
 .home-lingam::after { content: ""; position: absolute; }
-.home-lingam::before { left: calc(var(--clear) / -2 - 3.5px); bottom: 0; width: 7px; height: 8px; }
-.home-lingam::after { left: calc(var(--clear) / -2 - 8px); top: 0; width: 16px; height: 2px; border-radius: 1px; background: var(--ochre); }
+.home-lingam::before { left: calc(var(--clear) / -2 - 3.5px); bottom: 1px; width: 7px; height: 8px; }
+.home-lingam::after { left: calc(var(--clear) / -2 - 7.5px); bottom: 0; width: 15px; height: 1px; background: var(--ochre); }
 
 /* Filled in by the browser; the space is kept so nothing jumps when it appears.
    It sits level with the STHALAM line under the Tamil name. */
@@ -886,7 +908,7 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
 .today-more-short { display: none; }
 
 /* A page's header with today's date in it (the Temples page): on a computer
-   the home page's box as it is, at the header's right, centred on its height; narrower, a small one beside the title (today's Tamil date and
+   the home page's box as it is, at the header's right, its foot level with the header's last line (as on the home page); narrower, a small one beside the title (today's Tamil date and
    "Calendar"), the words below running the whole width */
 .page-head.with-today {
   display: grid;
@@ -897,7 +919,7 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
 .with-today > .kicker { grid-area: kicker; }
 .with-today > .page-title { grid-area: title; }
 .with-today > .page-lede { grid-area: lede; }
-.with-today > .today { align-self: center; margin: 0; }
+.with-today > .today { align-self: end; margin: 0; }
 @media (max-width: 900px) {
   .page-head.with-today { grid-template-areas: "kicker kicker" "title today" "lede lede"; column-gap: 12px; }
   .with-today > .today { align-self: end; min-width: 0; min-height: 56px; margin-bottom: 6px; padding-left: 10px; }
@@ -2609,7 +2631,7 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
 .gallery-card { display: flex; flex-direction: column; color: inherit; }
 .gallery-pic { position: relative; display: block; overflow: hidden; background: var(--chalk-2); }
 .gallery-pic img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.5s ease; }
-.gallery-card:hover .gallery-pic img { transform: scale(1.04); }
+a.gallery-card:hover .gallery-pic img { transform: scale(1.04); } /* only a card that opens a page answers the pointer */
 .gallery-stand-in {
   position: absolute; inset: 0; display: grid; place-items: center; padding: 12px;
   font-family: var(--tamil); font-weight: 700; font-size: clamp(30px, 3.4vw, 54px); line-height: 1.1; text-align: center;
@@ -2625,7 +2647,7 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
 .gallery-names.stacked { display: flex; flex-direction: column; }
 .gallery-dot { width: 5px; height: 6px; align-self: baseline; flex: none; }
 .gallery-tamil { font-family: var(--tamil); font-weight: 700; font-size: 22px; line-height: 1.2; transition: color 0.15s; }
-.gallery-card:hover .gallery-tamil { color: var(--ochre); }
+a.gallery-card:hover .gallery-tamil { color: var(--ochre); }
 .gallery-name { font-weight: 600; font-size: 21px; line-height: 1.2; } /* as tall as the Tamil beside it */
 .gallery-gloss { font-style: italic; color: var(--ink-2); font-size: 15.5px; line-height: 1.4; }
 /* festival or ritual: small red letters under every entry */
@@ -2644,7 +2666,7 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
 .lead .gallery-gloss,
 .lead .gallery-seen { color: rgba(244, 241, 234, 0.85); }
 .lead .gallery-kind { color: #f0a98f; }
-.gallery-card.lead:hover .gallery-tamil { color: #f0a98f; } /* as its "festival", over the photograph */
+a.gallery-card.lead:hover .gallery-tamil { color: #f0a98f; } /* as its "festival", over the photograph */
 .lead.no-photo .gallery-text { position: static; background: none; color: inherit; padding: 12px 0 0; }
 
 /* The mosaic: two columns of photographs, each at its own shape, but none
@@ -2781,46 +2803,6 @@ body { container: page / inline-size; }
 .overview p,
 .rite-text p { max-width: none; }
 
-/* The public Festivals & Rituals page, until the festivals' own pages are
-   ready: a cloud of their names in Tamil, each with its English name small
-   beneath; the more often seen, the larger; rituals in red */
-.name-cloud {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: baseline;
-  gap: clamp(18px, 2.6vw, 34px) clamp(24px, 3.6vw, 52px);
-  padding-block: clamp(12px, 2vw, 28px);
-  max-width: 1080px;
-  margin-inline: auto;
-}
-.cloud-name { display: flex; flex-direction: column; align-items: center; text-align: center; }
-.cloud-ta {
-  font-family: var(--tamil);
-  font-weight: 700;
-  font-variation-settings: "wdth" 85;
-  font-size: calc(17px + var(--w) * var(--w) * clamp(34px, 5.6vw, 76px));
-  line-height: 1.15;
-}
-.cloud-name.ritual .cloud-ta { color: var(--ochre); }
-.cloud-en { font-style: italic; font-size: calc(12px + var(--w) * 6px); color: var(--muted); margin-top: 2px; }
-/* the link to the field notes, in the introduction */
-/* the way to the field notes meanwhile: bold, in red, a heavier underline and arrow */
-.lede-link {
-  font-weight: 600;
-  font-style: normal;
-  color: var(--ochre);
-  border-bottom: 2.5px solid var(--ochre);
-  padding-bottom: 1px;
-  white-space: nowrap;
-  transition: color 0.15s, border-color 0.15s;
-}
-.lede-link::after { content: "\00a0→"; display: inline-block; transition: transform 0.15s; }
-.lede-link:hover { color: var(--ochre-deep); border-bottom-color: var(--ochre-deep); }
-.lede-link:hover::after { transform: translateX(4px); }
-/* every other one set a little lower, so the cloud does not read as rows */
-.cloud-name:nth-child(3n + 2) { transform: translateY(10px); }
-.cloud-name:nth-child(5n + 1) { transform: translateY(-6px); }
 
 /* A link to a page held in reserve, as the public sees it: the same words,
    not a link, quieter, "(coming soon)" beside them */
