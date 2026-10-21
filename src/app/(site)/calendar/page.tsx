@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { getLineBegins, getRitualYear } from "@/lib/data";
+import { getLineBegins } from "@/lib/data";
 import { RitualYear } from "@/components/RitualYear";
 
 export const metadata: Metadata = {
@@ -16,7 +16,6 @@ export const revalidate = 86400;
     In the menu, under Festivals & Rituals. On a phone, its months turn as a
     wheel (components/MonthWheel: the "new calendar animation"). */
 export default async function CalendarPage() {
-  const year = await getRitualYear();
   const today = new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Kolkata" });
 
   return (
@@ -32,7 +31,6 @@ export default async function CalendarPage() {
         {/* the home page's "Full calendar" opens here, the chart filling the screen */}
         <div id="calendar" className="calendar-anchor">
           <RitualYear
-            throughYear={year.throughYear.map((o) => ({ id: o.id, name: o.name }))}
             today={today}
             begins={await getLineBegins()}
             wheel

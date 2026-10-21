@@ -167,7 +167,7 @@ export default async function TemplePage({ params }: Props) {
               What we have been present for, month by month. By the end of the year, this is the
               temple&apos;s ritual calendar.
             </p>
-            <TempleYear months={year} />
+            <TempleYear year={year} />
           </section>
         </aside>
       </div>

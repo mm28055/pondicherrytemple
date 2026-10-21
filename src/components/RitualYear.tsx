@@ -6,14 +6,13 @@ import { monthDates, TAMIL_MONTHS } from "@/lib/calendar";
 import { tamilYearName } from "@/lib/tamilDate";
 import { MonthMotif } from "@/components/MonthMotif";
 import { inGlide, startGlide } from "@/components/MonthSwipe";
-import { FestivalLink } from "@/components/FestivalLink";
 import { DropBand } from "@/components/DropBand";
 import { MonthWheel, type WheelMonth } from "@/components/MonthWheel";
 
 /** The ritual year as a chart after the South Indian rasi kattam: the twelve
     Tamil months round the edge of a square, Chithirai in the top-left box,
     going clockwise; in the middle, the year itself — "2026–27", and its name
-    in the sixty-year cycle, Parabhava — with what is done all through the year.
+    in the sixty-year cycle, Parabhava.
 
     A year runs from Chithirai to Panguni, as the temples keep it. It opens
     on the year we are in; the years listed in the band above the chart (on
@@ -26,12 +25,10 @@ import { MonthWheel, type WheelMonth } from "@/components/MonthWheel";
     plain list, in order; or, with `wheel` (as on the Calendar page), a
     wheel that turns, arriving on the month we are in (components/MonthWheel). */
 export function RitualYear({
-  throughYear,
   today,
   begins,
   wheel = false,
 }: {
-  throughYear: { id: string; name: string }[];
   /** today, and the first day of the line of months (Masi 2026) */
   today: string;
   begins: string;
@@ -210,18 +207,6 @@ export function RitualYear({
             <span lang="ta">{name.ta}</span> · {name.en}
           </p>
           <p>Open a month to see what the temples keep in it.</p>
-          {throughYear.length > 0 && (
-            <>
-              <h3 className="caps">All through the year</h3>
-              <ul>
-                {throughYear.map((o) => (
-                  <li key={o.id}>
-                    <FestivalLink id={o.id}>{o.name}</FestivalLink>
-                  </li>
-                ))}
-              </ul>
-            </>
-          )}
         </div>
         {/* (filled as the months above are laid out) */}
         {wheel && <MonthWheel months={wheelMonths} year={year} />}

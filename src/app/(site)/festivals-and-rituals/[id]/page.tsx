@@ -116,7 +116,14 @@ export default async function ObservancePage({ params }: Props) {
                         TBC
                       </abbr>
                     )}
-                    {i.label}
+                    {/* the day's name, leading to its field note when there is one */}
+                    {i.note ? (
+                      <Link className="when-note" href={`/field-notes/${i.note}`}>
+                        {i.label}
+                      </Link>
+                    ) : (
+                      i.label
+                    )}
                   </li>
                 );
               })}

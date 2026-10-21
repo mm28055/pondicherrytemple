@@ -1103,16 +1103,42 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
 .lingam::after { left: 0; bottom: 0; width: 15px; height: 1px; background: var(--ochre); }
 /* the mark and the count that follows it, kept on one line */
 .year-days { white-space: nowrap; }
-/* A temple's Ritual Year: under each month a list, one to a line, each named
-   as in the grid above (the Tamil, the English beneath), a few words below.
-   What comes every month or every week: in a pale panel, a thin rule at its
-   left, after the month's festivals. */
-.year-list .fl { display: block; padding-block: 14px; border-bottom: 1px solid var(--rule); }
+/* A temple's ritual calendar, in three parts chosen at the top
+   (components/RitualTabs): a switch of three, a box each, its Tamil, its
+   English and how many there are; the one shown dark. */
+.ritual-switch { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border: 1.5px solid var(--ink); margin: 6px 0 18px; }
+.ritual-switch button { background: none; border: 0; border-right: 1.5px solid var(--ink); padding: 8px 4px 7px; cursor: pointer; text-align: center; color: var(--ink); font: inherit; }
+.ritual-switch button:last-child { border-right: 0; }
+.ritual-switch button:hover:not(.on) { background: var(--chalk-2); }
+.ritual-switch .ta { display: block; font-family: var(--tamil); font-weight: 700; font-size: 16px; line-height: 1.2; }
+.ritual-switch .en { display: block; font-family: var(--display); font-weight: 600; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; margin-top: 2px; }
+.ritual-switch .n { display: block; font-style: italic; font-size: 11.5px; color: var(--muted); margin-top: 1px; }
+.ritual-switch .on { background: var(--ink); color: var(--chalk); }
+.ritual-switch .on .n { color: var(--on-night-dim); }
+/* Its parts. The year: under each month its festivals, the bigger utsavams,
+   each in a pale panel, a thin rule at its left, named as in the grid above
+   (the Tamil, the English beneath), a few words below. The month and the
+   week: under small red headings (every week, twice a month, every month),
+   each in a pale panel too, two to a line, more compact: the Tamil, the
+   English and the day and time. */
+.year-list .fl { display: block; background: var(--chalk-2); padding: 12px 12px 13px; border-left: 2px solid var(--rule); margin-block: 8px; }
 .year-list .t { display: block; font-family: var(--tamil); font-weight: 700; font-size: 20px; line-height: 1.35; transition: color 0.15s; }
-.year-list a:hover .t { color: var(--ochre); }
-.year-list .fl.recurring { background: var(--chalk-2); padding: 12px 12px 13px; border-bottom: 0; border-left: 2px solid var(--rule); margin-block: 8px; }
-.year-list .recurring .year-days { white-space: normal; } /* "Every month, on Punarpoosam" may run onto a second line */
+.year-list a:hover .t,
+.year-regular a:hover .t { color: var(--ochre); }
+.year-regular { margin-top: 4px; }
+.year-regular-head { font-family: var(--display); font-weight: 600; font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ochre); margin: 12px 0 2px; }
+.year-regular-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 18px; }
+.year-regular-list { row-gap: 8px; }
+.year-regular-list .fl { display: block; background: var(--chalk-2); padding: 8px 10px 9px; border-left: 2px solid var(--rule); }
+.year-regular-list .t { display: block; font-family: var(--tamil); font-weight: 700; font-size: 15.5px; line-height: 1.3; transition: color 0.15s; }
+.year-regular-list .caps { display: block; font-size: 10.5px; margin-top: 1px; }
+.year-when { display: block; font-style: italic; font-size: 12.5px; line-height: 1.35; color: var(--muted); margin-top: 2px; }
 .year-about { display: block; margin-top: 6px; font-style: italic; font-size: 14px; line-height: 1.45; color: var(--muted); }
+/* the month we are in: its heading in a band of its own colour, as on the calendar, marked "Now" */
+.year-month h3.now { background: var(--m); border-bottom-color: var(--m); color: var(--chalk); padding: 6px 10px 5px; }
+.year-now { font-size: 0.7em; letter-spacing: 0.08em; color: var(--lamp); }
+/* a month with nothing recorded in it yet */
+.year-none { padding-block: 12px; font-style: italic; font-size: 14px; color: var(--muted); border-bottom: 1px solid var(--rule); }
 
 /* Drawings, on temple and festival pages. A drawing always fills the width it
    is given — the whole page for a wide one, the main column for a tall one
@@ -1236,6 +1262,12 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
   color: var(--muted);
   margin-right: 10px;
 }
+/* a day's name, when it has a field note: the link to it, as the site's
+   other names that open a page (a temple, a festival, a latest note) — no
+   underline; it turns red when pointed at */
+.when-note { color: inherit; border-bottom: 0; transition: color 0.15s; }
+.when-note:hover,
+.when-note:focus-visible { color: var(--ochre); }
 
 /* ---------- A field note ---------- */
 /* The text in a column at the right, two thirds of the page, ending where
@@ -1868,18 +1900,12 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
   padding: 28px clamp(20px, 4vw, 56px);
 }
 .rasi-centre p { font-style: italic; font-size: 18px; line-height: 1.5; color: var(--ink-2); max-width: 14em; margin-top: 8px; }
-.rasi-centre h3 { margin-top: 22px; color: var(--ochre); }
-.rasi-centre ul { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 16px; margin-top: 6px; }
-.rasi-centre a,
-.rasi-centre .fl { font-size: 17px; border-bottom: 1px solid var(--rule); }
-.rasi-centre a:hover { color: var(--ochre); border-bottom-color: var(--ochre); }
 @media (max-width: 860px) {
   /* a phone: the months in order, one under the other */
   .rasi { grid-template-columns: minmax(0, 1fr); grid-auto-rows: auto; }
   .rasi-month,
   .rasi-centre { grid-row: auto; grid-column: auto; }
   .rasi-centre { align-items: flex-start; text-align: left; }
-  .rasi-centre ul { justify-content: flex-start; }
   /* the year first, above the months, in three lines: the year and its
      arrows; its name; what to do */
   .rasi .rasi-centre { order: -1; padding: 12px 16px 14px; }

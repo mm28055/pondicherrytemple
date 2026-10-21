@@ -1002,7 +1002,7 @@ export interface SpecialTithi {
   createdAt: string;
 }
 /**
- * What the temples do every week, like the Durga puja on Tuesday afternoons. Shown under every month’s calendar, under its day of the week.
+ * What the temples do again and again: every week (Varam, shown under every month’s calendar, under its day of the week), twice a month or every month. Each temple’s Ritual Year lists its own under every month.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "weekly-rituals".
@@ -1011,13 +1011,30 @@ export interface WeeklyRitual {
   id: number;
   what: string;
   /**
+   * Shown above it in a temple’s Ritual Year. Left empty: the Tamil of the festival or ritual chosen below.
+   */
+  tamil?: string | null;
+  often?: ('weekly' | 'fortnightly' | 'monthly') | null;
+  /**
    * One or more.
    */
-  days: ('sun' | 'mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat')[];
+  days?: ('sun' | 'mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat')[] | null;
+  /**
+   * The tithi, the nakshatram or the day it falls on.
+   */
+  on?: string | null;
   time?: string | null;
+  /**
+   * Marked TBC in the temple’s Ritual Year until it is confirmed.
+   */
+  tbc?: boolean | null;
+  /**
+   * Ten to twenty words on what is done, shown below it in a temple’s Ritual Year.
+   */
+  about?: string | null;
   temples: (number | Temple)[];
   /**
-   * Optional: the festival or ritual it is, linked to its page.
+   * Optional: the festival or ritual it is, linked to its page (and its Tamil, if none is given above).
    */
   observances?: (number | Observance)[] | null;
   updatedAt: string;
@@ -1523,8 +1540,13 @@ export interface SpecialTithisSelect<T extends boolean = true> {
  */
 export interface WeeklyRitualsSelect<T extends boolean = true> {
   what?: T;
+  tamil?: T;
+  often?: T;
   days?: T;
+  on?: T;
   time?: T;
+  tbc?: T;
+  about?: T;
   temples?: T;
   observances?: T;
   updatedAt?: T;
