@@ -1,9 +1,13 @@
 import { MigrateUpArgs, MigrateDownArgs, sql } from '@payloadcms/db-postgres'
+import { templeFacesColumns } from './20261021_164954_temple_faces'
 
 export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   await db.execute(sql`
-   ALTER TABLE "weekly_rituals" ADD COLUMN "part_of" varchar;
-  ALTER TABLE "weekly_rituals" ADD COLUMN "part_of_tamil" varchar;`)
+   ALTER TABLE "weekly_rituals" ADD COLUMN IF NOT EXISTS "part_of" varchar;
+  ALTER TABLE "weekly_rituals" ADD COLUMN IF NOT EXISTS "part_of_tamil" varchar;`)
+  // the temples' Faces (20261021_164954_temple_faces), here first: what
+  // follows reads the temples, and the code's temples have it already
+  await templeFacesColumns(db)
   await ritualSetsData({ payload, req })
 }
 

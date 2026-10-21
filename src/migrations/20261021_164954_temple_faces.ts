@@ -1,12 +1,23 @@
 import { MigrateUpArgs, MigrateDownArgs, sql } from '@payloadcms/db-postgres'
 
-export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
-  await db.execute(sql`
-   CREATE TYPE "public"."enum_temples_faces" AS ENUM('east', 'north', 'south', 'west');
-  CREATE TYPE "public"."enum__temples_v_version_faces" AS ENUM('east', 'north', 'south', 'west');
-  ALTER TABLE "temples" ADD COLUMN "faces" "enum_temples_faces" DEFAULT 'east';
-  ALTER TABLE "_temples_v" ADD COLUMN "version_faces" "enum__temples_v_version_faces" DEFAULT 'east';`)
+export async function up({ db }: MigrateUpArgs): Promise<void> {
+  await templeFacesColumns(db)
   await templeFacesData(db)
+}
+
+/* The columns, each only if it is not there yet: the migration before this
+   one adds them first (it reads the temples, whose fields in the code
+   include Faces). */
+export async function templeFacesColumns(db: MigrateUpArgs['db']): Promise<void> {
+  await db.execute(sql`
+   DO $$ BEGIN
+    CREATE TYPE "public"."enum_temples_faces" AS ENUM('east', 'north', 'south', 'west');
+  EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+  DO $$ BEGIN
+    CREATE TYPE "public"."enum__temples_v_version_faces" AS ENUM('east', 'north', 'south', 'west');
+  EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+  ALTER TABLE "temples" ADD COLUMN IF NOT EXISTS "faces" "enum_temples_faces" DEFAULT 'east';
+  ALTER TABLE "_temples_v" ADD COLUMN IF NOT EXISTS "version_faces" "enum__temples_v_version_faces" DEFAULT 'east';`)
 }
 
 /* Every temple faces East, but for Angalamman (north) and Nandhikeswara
