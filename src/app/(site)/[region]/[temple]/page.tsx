@@ -6,12 +6,11 @@ import {
   getFieldNotesForTemple,
   getFilmsForTemple,
   getIllustrationsForTemple,
-  getObservancesForTemple,
-  getOccasionsForTemple,
   getPhotosForTemple,
   getRegion,
   getRegions,
   getTemple,
+  getTempleRitualYear,
   getTempleStories,
   getTemples,
   getTemplesWithPages,
@@ -27,9 +26,8 @@ import { Drawings } from "@/components/Drawings";
 import { FilmWall } from "@/components/FilmWall";
 import { PhotoWall } from "@/components/PhotoWall";
 import { NoteRow } from "@/components/Rows";
-import { YearSoFar } from "@/components/YearSoFar";
+import { TempleYear } from "@/components/TempleYear";
 import { TempleLayout } from "@/components/TempleLayout";
-import { FestivalLink } from "@/components/FestivalLink";
 import { ReservedLink } from "@/components/ReservedLink";
 import { TEMPLE_STORIES_PUBLISHED } from "@/lib/festivals";
 
@@ -54,8 +52,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 /* A temple's page. The header: the name, and the temple's plan as a card at
    the right that hangs over the line below. Then two columns: on the left the
    introduction, a link to "The Temple and its Stories", field notes, photographs, films and articles;
-   on the right the festivals and rituals seen here and the ritual year,
-   newest first. (First designed on the Chetty Koil page, October 2026.) */
+   on the right its drawings and the ritual year, month by month, newest
+   first: the festivals seen in each. (First designed on the Chetty Koil page, October 2026.) */
 export default async function TemplePage({ params }: Props) {
   const { region: regionId, temple: templeId } = await params;
   const region = await getRegion(regionId);
@@ -64,8 +62,7 @@ export default async function TemplePage({ params }: Props) {
   if (isAround(t)) return <AroundTemplePage regionId={region.id} regionName={region.name} templeId={t.id} />;
 
   const allTemples = await getTemples(region.id);
-  const occasions = await getOccasionsForTemple(region.id, t.id);
-  const observances = await getObservancesForTemple(region.id, t.id);
+  const year = await getTempleRitualYear(region.id, t.id);
   const notes = (await getFieldNotesForTemple(region.id, t.id)).map((n) =>
     noteRow(n, allTemples, region.calendar)
   );
@@ -164,29 +161,13 @@ export default async function TemplePage({ params }: Props) {
         <aside className="stack">
           {otherDrawings.length > 0 && <Drawings items={otherDrawings} />}
 
-          {observances.length > 0 && (
-            <section>
-              <h2 className="sub-head">Festivals &amp; rituals seen here</h2>
-              <div className="tag-grid">
-                {observances.map((o) => (
-                  <FestivalLink key={o.id} id={o.id}>
-                    <span className="t" lang="ta">
-                      {o.tamil ?? o.name}
-                    </span>
-                    <span className="caps">{o.name}</span>
-                  </FestivalLink>
-                ))}
-              </div>
-            </section>
-          )}
-
           <section>
             <h2 className="sub-head">The Ritual Year</h2>
             <p className="note-line" style={{ marginBottom: 18 }}>
               What we have been present for, month by month. By the end of the year, this is the
               temple&apos;s ritual calendar.
             </p>
-            <YearSoFar occasions={occasions} calendar={region.calendar} newestFirst />
+            <TempleYear months={year} />
           </section>
         </aside>
       </div>

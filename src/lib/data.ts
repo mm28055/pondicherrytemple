@@ -272,6 +272,8 @@ const toObservance = (o: P.Observance, L: Lookups): Observance => ({
   about: o.about?.map((x) => ({ q: x.question, a: toHTML(x.answer, L.paths) })),
   months: (o.months ?? []).filter((m) => m !== "year"),
   throughYear: (o.months ?? []).includes("year"),
+  recurs: o.recurs ?? "yearly",
+  recursWhen: o.recursWhen ?? undefined,
 });
 
 const toOccasion = (o: P.Occasion, L: Lookups): Occasion => ({
@@ -691,16 +693,101 @@ export async function getOccasionsInMonth(monthSlug: string): Promise<Occasion[]
   return (await occasions()).filter((o) => tamilMonthOf(o.date) === monthSlug).sort(byDateAsc);
 }
 
-/** The festivals and rituals seen at a temple, in the order first seen. */
-export async function getObservancesForTemple(regionId: string, templeId: string): Promise<Observance[]> {
-  const ids: string[] = [];
-  for (const o of await getOccasionsForTemple(regionId, templeId)) {
-    for (const id of o.observances) if (!ids.includes(id)) ids.push(id);
+/** A temple's ritual year, as its page shows it: month by month (each
+    month in its year, the latest first), what was seen there, each once with
+    the number of days it was seen. Each day counts as one thing: the first
+    of its festivals and rituals (in the order they are tagged) that comes
+    once a year; failing that, one that comes every month; failing that,
+    every week. Rites done within other events (a purappadu, an abhishekam)
+    are never what a day counts as (set in the admin: "In a temple's Ritual
+    Year") — except on a day that has nothing else: then the day is listed
+    under its own name, as written ("Sunday Bhairava Abhishekam"), and leads
+    to its rite's one page (the Abhishekam); when the name begins with a day
+    of the week, it comes every week ("Every Sunday"), and the day is said
+    there only ("Bhairava Abhishekam • Every Sunday"). A thing's days are
+    taken as one run while they follow each other (a day or two apart at
+    most), and the run goes in the Tamil month that holds the most of them
+    (Ramanujar Utsavam, from the last day of Panguni into Chithirai, in
+    Chithirai). In each month the yearly ones come first, in the order they
+    began, then the monthly and weekly. */
+/** `observance`: what it is, and where it leads; `name`, `recurs` and `when`, for a
+    day listed under its own name (an instance of a rite), in place of its rite's. */
+export type TempleYearEntry = { observance: Observance; days: number; name?: string; recurs?: Observance["recurs"]; when?: string };
+export type TempleYearMonth = { month: TamilMonth; year: number; festivals: TempleYearEntry[] };
+export async function getTempleRitualYear(regionId: string, templeId: string): Promise<TempleYearMonth[]> {
+  const seen = await getOccasionsForTemple(regionId, templeId);
+  const all = await getObservancesById([...new Set(seen.flatMap((o) => o.observances))]);
+  const byId = new Map(all.map((o) => [o.id, o]));
+  const WEEKDAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+  // what each day counts as: a festival or ritual of its own; or, on a day
+  // of rites alone, the day under its own name, as an instance of the first
+  type What = { key: string; observance: Observance; name?: string; recurs?: Observance["recurs"]; when?: string };
+  const dayOf = (o: Occasion): What | undefined => {
+    const tagged = o.observances.map((id) => byId.get(id)).filter((x): x is Observance => Boolean(x));
+    const own =
+      tagged.find((x) => x.recurs === "yearly") ??
+      tagged.find((x) => x.recurs === "monthly") ??
+      tagged.find((x) => x.recurs === "weekly");
+    if (own) return { key: own.id, observance: own };
+    const rite = tagged[0];
+    if (!rite) return undefined;
+    const day = WEEKDAYS.find((d) => o.label.toLowerCase().startsWith(d.toLowerCase()));
+    return {
+      key: `${rite.id}|${o.label}`,
+      observance: rite,
+      // the day of the week said once, in "Every Friday", not in its name too
+      name: day ? o.label.slice(day.length).replace(/^[\s,:;·–—-]+/, "") || rite.name : o.label,
+      ...(day ? { recurs: "weekly" as const, when: `Every ${day}` } : { recurs: "yearly" as const }),
+    };
+  };
+  const whatOf = new Map<string, What>();
+  const datesOf = new Map<string, Set<string>>();
+  for (const o of seen) {
+    const what = dayOf(o);
+    if (!what) continue;
+    whatOf.set(what.key, what);
+    datesOf.set(what.key, (datesOf.get(what.key) ?? new Set<string>()).add(o.date));
   }
-  for (const n of await getFieldNotesForTemple(regionId, templeId)) {
-    for (const id of n.observances) if (!ids.includes(id)) ids.push(id);
+  const DAY = 86400000;
+  const months = new Map<string, { month: TamilMonth; year: number; entries: (TempleYearEntry & { key: string; start: string })[] }>();
+  for (const [id, set] of datesOf) {
+    const { observance, name, recurs, when } = whatOf.get(id)!;
+    // the days that follow each other, as runs
+    const runs: string[][] = [];
+    for (const d of [...set].sort()) {
+      const run = runs[runs.length - 1];
+      if (run && Date.parse(d) - Date.parse(run[run.length - 1]) <= 2 * DAY) run.push(d);
+      else runs.push([d]);
+    }
+    for (const run of runs) {
+      // the month (in its year) that holds the most of the run's days; on a tie, the first
+      const count = new Map<string, number>();
+      for (const d of run) {
+        const key = monthDates(tamilMonthOf(d), monthYearOf(d)).first;
+        count.set(key, (count.get(key) ?? 0) + 1);
+      }
+      const key = [...count].reduce((a, b) => (b[1] > a[1] ? b : a))[0];
+      const m = months.get(key) ?? {
+        month: TAMIL_MONTHS.find((x) => x.slug === tamilMonthOf(key))!,
+        year: monthYearOf(key),
+        entries: [],
+      };
+      const had = m.entries.find((x) => x.key === id);
+      if (had) had.days += run.length;
+      else m.entries.push({ key: id, observance, name, recurs, when, days: run.length, start: run[0] });
+      months.set(key, m);
+    }
   }
-  return getObservancesById(ids);
+  const yearly = (e: TempleYearEntry) => ((e.recurs ?? e.observance.recurs) === "yearly" ? 0 : 1);
+  return [...months]
+    .sort((a, b) => b[0].localeCompare(a[0]))
+    .map(([, m]) => ({
+      month: m.month,
+      year: m.year,
+      festivals: m.entries
+        .sort((a, b) => yearly(a) - yearly(b) || a.start.localeCompare(b.start))
+        .map(({ key: _key, start: _start, ...entry }) => entry),
+    }));
 }
 
 /** How many temples a festival or ritual has been seen at. */

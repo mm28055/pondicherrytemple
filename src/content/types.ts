@@ -82,6 +82,11 @@ export interface Observance {
   months: string[];
   /** Done again and again, all year (like Pradosham): not placed in a month. */
   throughYear: boolean;
+  /** How a temple's Ritual Year lists it: once a year, every month, every
+      week, or not at all (a rite done within other events). */
+  recurs: "yearly" | "monthly" | "weekly" | "rite";
+  /** When a monthly or weekly one comes round: "Every month, on Punarpoosam". */
+  recursWhen?: string;
 }
 
 /** A dated occasion the team was present for, at one temple. These build

@@ -84,6 +84,39 @@ export const Observances: CollectionConfig = {
               },
             },
             {
+              type: 'row',
+              fields: [
+                {
+                  name: 'recurs',
+                  type: 'select',
+                  label: 'In a temple’s Ritual Year',
+                  defaultValue: 'yearly',
+                  options: [
+                    { label: 'Once a year', value: 'yearly' },
+                    { label: 'Every month', value: 'monthly' },
+                    { label: 'Every week', value: 'weekly' },
+                    { label: 'Not listed: a rite within other events', value: 'rite' },
+                  ],
+                  admin: {
+                    width: '40%',
+                    description:
+                      'How it is listed under the months on a temple’s page: once a year (as a festival), every month or every week (set apart, in a pale panel), or not at all (a purappadu, an abhishekam: done within other events).',
+                  },
+                },
+                {
+                  name: 'recursWhen',
+                  type: 'text',
+                  label: 'When it comes round',
+                  admin: {
+                    width: '60%',
+                    placeholder: 'e.g. Every month, on Punarpoosam',
+                    description: 'Shown after its name, in place of a number of days.',
+                    condition: (data) => data?.recurs === 'monthly' || data?.recurs === 'weekly',
+                  },
+                },
+              ],
+            },
+            {
               name: 'about',
               type: 'array',
               label: 'Explanation',

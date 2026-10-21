@@ -611,6 +611,14 @@ export interface Observance {
       )[]
     | null;
   /**
+   * How it is listed under the months on a temple’s page: once a year (as a festival), every month or every week (set apart, in a pale panel), or not at all (a purappadu, an abhishekam: done within other events).
+   */
+  recurs?: ('yearly' | 'monthly' | 'weekly' | 'rite') | null;
+  /**
+   * Shown after its name, in place of a number of days.
+   */
+  recursWhen?: string | null;
+  /**
    * Questions and answers, in order: "What is it?", "When does it happen?", "What happens?", "What to look for", "In Pondicherry"…
    */
   about?:
@@ -1459,6 +1467,8 @@ export interface ObservancesSelect<T extends boolean = true> {
   alsoKnownAs?: T;
   gloss?: T;
   months?: T;
+  recurs?: T;
+  recursWhen?: T;
   about?:
     | T
     | {
