@@ -13,6 +13,7 @@ import {
   type TouchEvent,
 } from "react";
 import {
+  dateParts,
   daysBetween,
   formatDate,
   monthDates,
@@ -111,7 +112,12 @@ function GreatName({ g, plain }: { g: { name: string; tamil: string }; plain: st
           <span lang="ta">{g.tamil}</span>
         </>
       )}
-      {!g.name.toLowerCase().includes(plain.toLowerCase()) && <span className="great-plain">{plain}</span>}
+      {!g.name.toLowerCase().includes(plain.toLowerCase()) && (
+        <>
+          {" "}
+          <span className="great-plain">{plain}</span>
+        </>
+      )}
     </>
   );
 }
@@ -389,13 +395,10 @@ export function DayDialog({
               <div className="day-head">
                 <span className="day-num">{Number(day.slice(8))}</span>
                 <span>
+                  {/* the day of the month is the large number: here only its month, year and weekday */}
                   <span className="day-date">
-                    {
-                      ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][
-                        new Date(`${day}T00:00:00Z`).getUTCDay()
-                      ]
-                    }
-                    , {formatDate(day)}
+                    {dateParts(day).month} {dateParts(day).year},{" "}
+                    {["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][new Date(`${day}T00:00:00Z`).getUTCDay()]}
                   </span>
                   <span className="day-local">
                     {month.name} {dayOfMonth} ·{" "}
@@ -403,58 +406,74 @@ export function DayDialog({
                       {month.tamil} {dayOfMonth}
                     </span>
                   </span>
+                  {/* the moon, the tithis and the nakshatrams: a line each,
+                      every icon in one column (as wide as a halo), sitting on
+                      its line's baseline, the names after it all starting at
+                      one place and wrapping under themselves */}
                   {moon && (
-                    <span className={`cal-moon ${moon}${tithiMark(great, day, MOON_KEY[moon]) ? " great" : ""}`}>
-                      <MoonDot halo={Boolean(tithiMark(great, day, MOON_KEY[moon]))} />
-                      {tithiMark(great, day, MOON_KEY[moon]) ? (
-                        <GreatName g={tithiMark(great, day, MOON_KEY[moon])!} plain={MOON[moon].en} />
-                      ) : (
-                        <>
-                          {MOON[moon].en} · <span lang="ta">{MOON[moon].ta}</span>
-                        </>
-                      )}
+                    <span className={`day-line cal-moon ${moon}`}>
+                      <span className="day-icon">
+                        <MoonDot halo={Boolean(tithiMark(great, day, MOON_KEY[moon]))} />
+                      </span>
+                      <span className="day-text">
+                        {tithiMark(great, day, MOON_KEY[moon]) ? (
+                          <GreatName g={tithiMark(great, day, MOON_KEY[moon])!} plain={MOON[moon].en} />
+                        ) : (
+                          <>
+                            {MOON[moon].en} · <span lang="ta">{MOON[moon].ta}</span>
+                          </>
+                        )}
+                      </span>
                     </span>
                   )}
                   {others.map((k) => (
-                    <span key={k} className="cal-tithi-line">
-                      <span className={`cal-tithi${tithiMark(great, day, k) ? " great halo" : ""}`} aria-hidden="true">
-                        {tithiFace(great, day, k)}
+                    <span key={k} className="day-line">
+                      <span className="day-icon">
+                        <span className={`cal-tithi${tithiMark(great, day, k) ? " great halo" : ""}`} aria-hidden="true">
+                          {tithiFace(great, day, k)}
+                        </span>
                       </span>
-                      {tithiMark(great, day, k) ? (
-                        <GreatName g={tithiMark(great, day, k)!} plain={TITHI_NAMES[k].name} />
-                      ) : (
-                        <>
-                          {TITHI_NAMES[k].name} · <span lang="ta">{TITHI_NAMES[k].tamil}</span>
-                        </>
-                      )}
+                      <span className="day-text">
+                        {tithiMark(great, day, k) ? (
+                          <GreatName g={tithiMark(great, day, k)!} plain={TITHI_NAMES[k].name} />
+                        ) : (
+                          <>
+                            {TITHI_NAMES[k].name} · <span lang="ta">{TITHI_NAMES[k].tamil}</span>
+                          </>
+                        )}
+                      </span>
                     </span>
                   ))}
                   {nakMarks(great, day).map((m) => (
-                    <span key={m.name} className="cal-tithi-line">
-                      <span className="cal-nak-mark great halo" aria-hidden="true">
-                        {m.icon ? <SpecialIcon k={m.icon} /> : <NakshatraIcon n={m.nakshatra!} />}
+                    <span key={m.name} className="day-line">
+                      <span className="day-icon">
+                        <span className="cal-nak-mark great halo" aria-hidden="true">
+                          {m.icon ? <SpecialIcon k={m.icon} /> : <NakshatraIcon n={m.nakshatra!} />}
+                        </span>
                       </span>
-                      <GreatName g={m} plain={NAKSHATRAS[m.nakshatra!].name} />
+                      <span className="day-text">
+                        <GreatName g={m} plain={NAKSHATRAS[m.nakshatra!].name} />
+                      </span>
                     </span>
                   ))}
-                  {/* the nakshatra at sunrise, then any that begin before the next */}
-                  {nakshatras?.[day] && (
-                    <span className="cal-nak-line">
-                      {nakshatras[day].map((k, i) => (
-                        <span key={k} className={special?.[day]?.includes(k) ? "special" : undefined}>
-                          {i > 0 && <span className="cal-nak-then">then</span>}
-                          {special?.[day]?.includes(k) ? (
-                            <span className="cal-nak-mark great halo">
-                              {swap?.[day]?.[k] ? <SpecialIcon k={swap[day][k]} /> : <NakshatraIcon n={k} />}
-                            </span>
-                          ) : (
-                            <NakshatraIcon n={k} />
-                          )}
-                          <span className="cal-nak-name">{NAKSHATRAS[k].name}</span>
-                        </span>
-                      ))}
+                  {/* the nakshatra at sunrise, then any that begin before the next, a line each */}
+                  {nakshatras?.[day]?.map((k, i) => (
+                    <span key={k} className={`day-line day-nak${special?.[day]?.includes(k) ? " special" : ""}`}>
+                      <span className="day-icon">
+                        {special?.[day]?.includes(k) ? (
+                          <span className="cal-nak-mark great halo">
+                            {swap?.[day]?.[k] ? <SpecialIcon k={swap[day][k]} /> : <NakshatraIcon n={k} />}
+                          </span>
+                        ) : (
+                          <NakshatraIcon n={k} />
+                        )}
+                      </span>
+                      <span className="day-text">
+                        {i > 0 && <span className="cal-nak-then">then </span>}
+                        <span className="cal-nak-name">{NAKSHATRAS[k].name}</span>
+                      </span>
                     </span>
-                  )}
+                  ))}
                 </span>
               </div>
               {on.length > 0 ? (
