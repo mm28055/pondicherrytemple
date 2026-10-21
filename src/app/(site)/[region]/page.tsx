@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import {
   getDummyPhotos,
+  getOccasions,
   getRegion,
   getRegions,
   getTemples,
@@ -13,6 +14,8 @@ import { TempleRow, TempleRowPlain } from "@/components/Rows";
 import { PhotoWall } from "@/components/PhotoWall";
 import { seeded } from "@/lib/mahotsavam";
 import type { Temple } from "@/content/types";
+import { TodayTamil } from "@/components/TodayTamil";
+import { calendarEvents } from "@/lib/calendarEvents";
 
 type Props = { params: Promise<{ region: string }> };
 
@@ -62,12 +65,19 @@ export default async function RegionPage({ params }: Props) {
     title: `All ${total.toLocaleString("en-IN")} photographs of ${t.knownAs ?? t.name}`,
   });
 
+  // today's date, as on the home page, for the box in the header
+  const todayEvents = await calendarEvents(await getOccasions());
+
   return (
     <>
       <div className="wrap">
-        <header className="page-head">
+        {/* today's date and the way to the calendar, as on the home page: on a
+            computer the same box, at the header's right; on a phone a small
+            one beside the title */}
+        <header className="page-head with-today">
           <div className="kicker">{region.name}</div>
           <h1 className="page-title">Temples</h1>
+          <TodayTamil events={todayEvents} />
           <Html className="page-lede" html={region.intro} />
         </header>
 

@@ -71,7 +71,10 @@ export default async function HomePage() {
             </p>
             <p className="home-name">
               <span className="home-latin">Sthalam</span>
-              <span className="home-gloss">a sacred site</span>
+              <span className="home-gloss">
+                {/* the red mark between them: a lingam on its base */}
+                <span className="home-lingam" aria-hidden="true" />a sacred site
+              </span>
             </p>
           </div>
           <TodayTamil events={todayEvents} />

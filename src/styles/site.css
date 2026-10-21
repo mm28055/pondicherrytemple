@@ -704,13 +704,13 @@ a.temple-row:hover .temple-name { color: var(--ochre); }
 /* ticked "Show the headline in italics" in the admin */
 .home-opening h1.italic { font-style: italic; }
 
-.home-name { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 28px; margin-top: 4px; clip-path: inset(-20px -40px -20px 0); } /* clipped at the left only: there the red dot of a gloss wrapped onto its own line falls, and is hidden */
+.home-name { --latin: clamp(20px, 2.6vw, 32px); --gap: 28px; display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px var(--gap); margin-top: 4px; clip-path: inset(-20px -40px -20px 0); } /* clipped at the left only: there the red dot of a gloss wrapped onto its own line falls, and is hidden */
 
 .home-latin {
   font-family: var(--display);
   font-weight: 800;
   font-variation-settings: "wdth" 75;
-  font-size: clamp(20px, 2.6vw, 32px);
+  font-size: var(--latin);
   letter-spacing: 0.32em;
   text-transform: uppercase;
   color: var(--ochre);
@@ -719,18 +719,31 @@ a.temple-row:hover .temple-name { color: var(--ochre); }
 /* The site's red dot between a name and what goes with it: the shape of the
    pulli, the dot over a Tamil letter, in the Tamil face of the names (a round
    top, straight sides, a flat foot); it stands on the line of the words
-   beside it. On the home page, between STHALAM and "a sacred site"; on a
+   beside it. On the home page, between STHALAM and "a sacred site" (on a
+   base, as a lingam); on a
    festival's page and in the galleries, between the Tamil and the English. */
-.home-gloss::before,
+.home-lingam::before,
 .gallery-dot,
 .elements-dot { background: var(--ochre); border-radius: 50% 50% 16% 16% / 44% 44% 12% 12%; }
 
-.home-gloss { position: relative; font-style: italic; font-size: clamp(18px, 1.7vw, 21px); color: var(--muted); }
-/* a red dot between the name and the gloss, midway across the gap (the name
-   ends in its letter-spacing, so a little left of the gap's middle), sitting
-   on the line STHALAM stands on: drawn in the flow at the gloss's start, so
-   its foot is on the baseline, and taking no room of its own */
-.home-gloss::before { content: ""; display: inline-block; position: relative; left: -20px; width: 7px; height: 8px; margin-right: -7px; vertical-align: baseline; }
+/* "a sacred site" in the small grey capitals of the date in Today, beside it */
+.home-gloss { position: relative; font-family: var(--display); font-weight: 600; font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-2); }
+@media (max-width: 640px) { .home-gloss { font-size: 10.5px; } }
+/* the red mark between the name and the gloss, midway across the gap (the
+   name ends in its letter-spacing, so a little left of the gap's middle): the
+   dot standing on the line STHALAM stands on, in the middle of the space, on
+   a short red line, its base, a little more than twice its width. A mark of no size at the gloss's
+   start, on its baseline, so it takes no room of its own; the dot and the line
+   are drawn from it. */
+.home-lingam {
+  /* the clear space from STHALAM's last letter to the gloss: the gap, and the letter-spacing after the M */
+  --clear: calc(var(--gap) + 0.32 * var(--latin));
+  display: inline-block; position: relative; width: 0; height: 0; vertical-align: baseline;
+}
+.home-lingam::before,
+.home-lingam::after { content: ""; position: absolute; }
+.home-lingam::before { left: calc(var(--clear) / -2 - 3.5px); bottom: 0; width: 7px; height: 8px; }
+.home-lingam::after { left: calc(var(--clear) / -2 - 8px); top: 0; width: 16px; height: 2px; border-radius: 1px; background: var(--ochre); }
 
 /* Filled in by the browser; the space is kept so nothing jumps when it appears.
    It sits level with the STHALAM line under the Tamil name. */
@@ -869,6 +882,31 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
   .today-en { font-size: 14px; margin-top: 0; }
   .today .caps { font-size: 10.5px; margin-top: 1px; }
   .today-more { margin-top: 2px; font-size: 11.5px; }
+}
+.today-more-short { display: none; }
+
+/* A page's header with today's date in it (the Temples page): on a computer
+   the home page's box as it is, at the header's right, centred on its height; narrower, a small one beside the title (today's Tamil date and
+   "Calendar"), the words below running the whole width */
+.page-head.with-today {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas: "kicker today" "title today" "lede today";
+  column-gap: clamp(28px, 4vw, 56px);
+}
+.with-today > .kicker { grid-area: kicker; }
+.with-today > .page-title { grid-area: title; }
+.with-today > .page-lede { grid-area: lede; }
+.with-today > .today { align-self: center; margin: 0; }
+@media (max-width: 900px) {
+  .page-head.with-today { grid-template-areas: "kicker kicker" "title today" "lede lede"; column-gap: 12px; }
+  .with-today > .today { align-self: end; min-width: 0; min-height: 56px; margin-bottom: 6px; padding-left: 10px; }
+  .with-today .today .kicker { margin-bottom: 0; font-size: 10px; }
+  .with-today .today-tamil { font-size: 19px; }
+  .with-today :is(.today-en, .today .caps) { display: none; }
+  .with-today .today-more { margin-top: 2px; font-size: 11px; }
+  .with-today .today-more-long { display: none; }
+  .with-today .today-more-short { display: inline; }
 }
 
 .split {
