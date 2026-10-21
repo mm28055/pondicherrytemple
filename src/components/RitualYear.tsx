@@ -8,6 +8,7 @@ import { MonthMotif } from "@/components/MonthMotif";
 import { inGlide, startGlide } from "@/components/MonthSwipe";
 import { FestivalLink } from "@/components/FestivalLink";
 import { DropBand } from "@/components/DropBand";
+import { MonthWheel, type WheelMonth } from "@/components/MonthWheel";
 
 /** The ritual year as a chart after the South Indian rasi kattam: the twelve
     Tamil months round the edge of a square, Chithirai in the top-left box,
@@ -22,16 +23,20 @@ import { DropBand } from "@/components/DropBand";
     the months before it are shown, but cannot be opened), forward without
     end; the band offers up to two years on.
     Each month opens its own page, in that year. On a phone the months are a
-    plain list, in order. */
+    plain list, in order; or, with `wheel` (as on the Calendar page), a
+    wheel that turns, arriving on the month we are in (components/MonthWheel). */
 export function RitualYear({
   throughYear,
   today,
   begins,
+  wheel = false,
 }: {
   throughYear: { id: string; name: string }[];
   /** today, and the first day of the line of months (Masi 2026) */
   today: string;
   begins: string;
+  /** on a phone, the months as a turning wheel in place of the list */
+  wheel?: boolean;
 }) {
   // the year a date's ritual year begins in (it begins at Chithirai)
   const yearOf = (iso: string) => {
@@ -120,6 +125,9 @@ export function RitualYear({
     else bounce();
   };
 
+  // for the wheel: the months that can be opened, each as in the chart
+  const wheelMonths: WheelMonth[] = [];
+
   const name = tamilYearName(year);
   const label = labelOf(year);
 
@@ -140,7 +148,7 @@ export function RitualYear({
       ]}
     />
     <div className="rasi-years" onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}>
-      <div ref={grid} key={year} className={`rasi${came ? ` ${came}` : ""}`}>
+      <div ref={grid} key={year} className={`rasi${came ? ` ${came}` : ""}${wheel ? " has-wheel" : ""}`}>
         {TAMIL_MONTHS.map((m) => {
           // the month in this year: Thai, Masi and Panguni fall in the next calendar year
           const y = monthDates(m.slug, year).first >= monthDates("chithirai", year).first ? year : year + 1;
@@ -162,6 +170,8 @@ export function RitualYear({
               <span className="rasi-span">{m.span}</span>
             </>
           );
+          if (wheel && !before)
+            wheelMonths.push({ slug: m.slug, href: `/festivals-and-rituals/month/${m.slug}/${y}`, now, colour: m.colour, inside });
           return before ? (
             <div key={m.slug} className="rasi-month before" style={style} title="Before the documentation began">
               {inside}
@@ -213,6 +223,8 @@ export function RitualYear({
             </>
           )}
         </div>
+        {/* (filled as the months above are laid out) */}
+        {wheel && <MonthWheel months={wheelMonths} year={year} />}
       </div>
     </div>
     </>

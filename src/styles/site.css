@@ -1838,6 +1838,56 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
   .rasi .rasi-centre p:not(.rasi-year-name) { font-size: 15.5px; margin-top: 2px; max-width: none; }
 }
 
+/* The "new calendar animation": on a phone, the months as a wheel that turns
+   (components/MonthWheel), in place of the list. Three and a half months
+   show; the middle one plain, the others tipped back and fainter, and
+   fading out at the top and bottom, with an arrow at each, nudging once. */
+.wheel { display: none; }
+@media (max-width: 860px) {
+  .rasi.has-wheel > .rasi-month { display: none; }
+  .rasi > .wheel { display: block; position: relative; padding: 0; }
+  .wheel-box {
+    --wheel-h: calc(var(--row) * 3.5);
+    position: relative;
+    height: var(--wheel-h);
+    padding-block: calc((var(--wheel-h) - var(--row)) / 2);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scroll-snap-type: y mandatory;
+    scrollbar-width: none;
+    -webkit-mask-image: linear-gradient(transparent, #000 22%, #000 78%, transparent);
+    mask-image: linear-gradient(transparent, #000 22%, #000 78%, transparent);
+  }
+  .wheel-box::-webkit-scrollbar { display: none; }
+  /* (until it is turned to its month, as the page first loads) */
+  .wheel-box:not(.ready) { visibility: hidden; }
+  .rasi .wheel-month {
+    height: var(--row);
+    box-sizing: border-box;
+    padding: 8px 16px;
+    scroll-snap-align: center;
+    border-bottom: 1px solid var(--rule);
+    transform-origin: 50% 50%;
+    will-change: transform, opacity;
+  }
+  .rasi .wheel-month .rasi-motif { height: 28px; margin-bottom: 2px; }
+  .rasi .wheel-month.now { border-bottom-color: var(--ink); }
+  .wheel-cue {
+    position: absolute;
+    left: 50%;
+    z-index: 1;
+    font-size: 26px;
+    line-height: 1;
+    color: var(--muted);
+    pointer-events: none;
+    animation: wheel-nudge 1.6s ease-in-out 0.9s 2;
+  }
+  .wheel-cue.up { top: 4px; transform: translateX(-50%) rotate(90deg); }
+  .wheel-cue.down { bottom: 4px; transform: translateX(-50%) rotate(90deg); --way: 1; }
+  @keyframes wheel-nudge { 50% { translate: 0 calc(var(--way, -1) * 5px); } }
+}
+@media (prefers-reduced-motion: reduce) { .wheel-cue { animation: none; } }
+
 /* One month of the ritual year */
 .month-entries > li {
   display: grid;
