@@ -3103,6 +3103,15 @@ span.month-obs .month-obs-more { display: none; }
   /* on one line on a phone, four of them at most (the type a little smaller on the narrowest) */
   .page-parts a { font-family: var(--display); font-weight: 600; font-size: min(11.5px, 3vw); letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; color: var(--ink); }
   .page-parts a:first-child { color: var(--ochre); }
+  /* the field notes, then the Ritual Year, then the photographs, films and
+     articles: the two columns' parts in one list, in that order (the line of
+     links keeps its own order) */
+  .temple-body { row-gap: 0; }
+  .temple-body > .stack, .temple-body > aside { display: contents; }
+  .temple-body > .stack > * { order: 1; }
+  .temple-body > aside > * { order: 2; }
+  .temple-body > aside > :first-child { margin-top: clamp(20px, 2.5vw, 30px); }
+  .temple-body > .stack > :is(#photographs, #films, #articles) { order: 3; }
   .more-rest:not(.open) { display: none; }
   .more-button {
     display: inline-block;
