@@ -1908,7 +1908,21 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
     transform-origin: 50% 50%;
     will-change: transform, opacity;
   }
-  .rasi .wheel-month .rasi-motif { height: 28px; margin-bottom: 2px; }
+  /* the month's drawing at the left, in a column of its own, the full height
+     of the row (room for it to grow and move as it comes alive, uncut); its
+     names beside it */
+  .rasi .wheel-month {
+    display: grid;
+    grid-template-columns: 64px minmax(0, 1fr);
+    grid-template-rows: auto auto auto;
+    align-content: center;
+    justify-items: start;
+    column-gap: 14px;
+    row-gap: 2px;
+    padding-inline: 24px 16px;
+    text-align: left;
+  }
+  .rasi .wheel-month .rasi-motif { grid-row: 1 / 4; align-self: center; justify-self: center; width: 56px; height: 40px; margin: 0; }
   .rasi .wheel-month.now { border-bottom-color: var(--ink); }
   .wheel-cue {
     position: absolute;
