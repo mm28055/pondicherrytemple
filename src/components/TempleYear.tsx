@@ -13,13 +13,43 @@ const GROUPS = [
   { key: "monthly", label: "Every month" },
 ] as const;
 
-/** How often it comes round, and when, from what it says ("Every Friday, 5 pm",
-    "Twice a month, on Trayodashi", "Every month, on Krittikai"). */
+const DAYS: Record<string, string> = { sun: "Sunday", mon: "Monday", tue: "Tuesday", wed: "Wednesday", thu: "Thursday", fri: "Friday", sat: "Saturday" };
+const plain = (s: string) => ` ${s.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim()} `;
+
+/* The Pancha Paruva Utsavam's five, in their order; anything else after them, as it comes. */
+const SET_ORDER = ["Amavasya", "Pournami", "Maasa Pirappu", "Masa Shivaratri", "Theipirai Ashtami"];
+const setOrder = (name = "") => {
+  const i = SET_ORDER.indexOf(name);
+  return i < 0 ? SET_ORDER.length : i;
+};
+
+/** How often it comes round (its group), and when, below its name: how
+    often is said once, in the group's heading, and what its name says
+    already is not said again (Theipirai Ashtami: "11 am", not "On
+    Theipirai Ashtami, 11 am"; Maasa Pirappu: nothing, not "On the first day
+    of the month"); what is left is the day and the time (Perumal
+    Thirumanjanam: "On Thiruvonam"; Bhairava Abhishekam: "Sunday, after
+    7:30 pm"). */
 function timing(e: TempleYearEntry) {
   const how = e.recurs ?? e.observance?.recurs;
   const when = e.when || e.observance?.recursWhen || "";
   const group = how === "weekly" ? "weekly" : /^twice/i.test(when) ? "fortnightly" : "monthly";
-  // said once, in the group's heading: what is left is the day and the time
+  const name = e.name ?? e.observance?.name ?? "";
+  // a regular ritual: from its day and time, as set in the admin
+  if (e.time !== undefined) {
+    const said = (on: string) => plain(name).includes(plain(on)) || (/first day of the month/i.test(on) && /pirappu/i.test(name));
+    const day =
+      group === "weekly"
+        ? (e.weekdays ?? []).map((d) => DAYS[d] ?? d).join(" and ")
+        : e.on && !said(e.on)
+          ? `on ${e.on}`
+          : "";
+    // "After 7:30 pm" and "Morning" in lower case after the day; a name ("Pradosha kalam") as it is
+    const time = day && /^(after|before|from|morning|evening|noon|night)/i.test(e.time) ? e.time.charAt(0).toLowerCase() + e.time.slice(1) : e.time;
+    const short = [day, time].filter(Boolean).join(", ");
+    return { group, short: short.charAt(0).toUpperCase() + short.slice(1) };
+  }
+  // a day listed under its own name: from what it says ("Every Friday")
   const short = when
     .replace(/^every (week|month)(, )?/i, "")
     .replace(/^twice a month(, )?/i, "")
@@ -38,7 +68,9 @@ function timing(e: TempleYearEntry) {
     The Ritual Month: what comes twice a month and every month; the Ritual
     Week: what comes every week. Each once, in a pale panel too, two to a
     line, under its heading: the Tamil, the English, and the day and time
-    ("on Krittikai, 10 am to noon"; "Sunday, after 7:30 pm"). A day listed
+    below ("On Thiruvonam", in italics); those of a
+    set (the Pancha Paruva Utsavam) together, after the rest, under its
+    name. A day listed
     under its own name ("Bhairava Abhishekam") shows that name, its rite's
     Tamil above it, and leads to the rite's page. */
 export function TempleYear({ year }: { year: TempleRitualYear }) {
@@ -47,7 +79,7 @@ export function TempleYear({ year }: { year: TempleRitualYear }) {
   const monthly = regular.filter((x) => x.group !== "weekly");
   const festivals = year.months.reduce((n, m) => n + m.festivals.length, 0);
   const many = (n: number, one: string, more: string) => `${n} ${n === 1 ? one : more}`;
-  const list = (these: typeof regular) => (
+  const grid = (these: typeof regular) => (
     <div className="year-regular-list">
       {these.map(({ e, short }) => (
         <Entry key={`${e.name ?? ""}|${e.observance?.id ?? ""}|${e.when ?? ""}`} e={e} className="regular" after={null}>
@@ -56,6 +88,32 @@ export function TempleYear({ year }: { year: TempleRitualYear }) {
       ))}
     </div>
   );
+  // those of no set, then each set under its name
+  const list = (these: typeof regular) => {
+    const sets = [...new Set(these.flatMap((x) => (x.e.partOf ? [x.e.partOf] : [])))];
+    return (
+      <>
+        {grid(these.filter((x) => !x.e.partOf))}
+        {sets.map((set) => {
+          const members = these.filter((x) => x.e.partOf === set).sort((a, b) => setOrder(a.e.name) - setOrder(b.e.name));
+          const ta = members.find((x) => x.e.partOfTamil)?.e.partOfTamil;
+          return (
+            <div key={set} className="year-set">
+              <h5 className="year-set-head">
+                {ta && (
+                  <span className="t" lang="ta">
+                    {ta}
+                  </span>
+                )}
+                <span className="caps">{set}</span>
+              </h5>
+              {grid(members)}
+            </div>
+          );
+        })}
+      </>
+    );
+  };
   const none = <p className="year-none">Nothing recorded yet.</p>;
 
   return (

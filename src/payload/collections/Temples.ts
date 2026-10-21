@@ -95,6 +95,22 @@ export const Temples: CollectionConfig = {
               ],
             },
             {
+              name: 'faces',
+              label: 'Faces',
+              type: 'select',
+              defaultValue: 'east',
+              options: [
+                { label: 'East', value: 'east' },
+                { label: 'North', value: 'north' },
+                { label: 'South', value: 'south' },
+                { label: 'West', value: 'west' },
+              ],
+              admin: {
+                width: '50%',
+                description: 'The way its entrance (or its deity) faces: East, unless it is otherwise. The placeholder layout, until its own is drawn, is turned to match.',
+              },
+            },
+            {
               name: 'intro',
               type: 'richText',
               editor: shortEditor,

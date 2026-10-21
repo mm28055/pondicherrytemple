@@ -75,7 +75,6 @@ export function TempleLayout({ layouts }: { layouts: Illustration[] }) {
           </span>
         </button>
       </span>
-      <figcaption className="kicker">{n > 1 ? `Temple Layouts · ${n}` : "Temple Layout"}</figcaption>
       <dialog
         ref={dialog}
         className={n > 1 ? "layout-dialog stepped" : "layout-dialog"}

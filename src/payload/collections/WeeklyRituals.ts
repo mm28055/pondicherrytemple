@@ -105,6 +105,27 @@ export const WeeklyRituals: CollectionConfig = {
       ],
     },
     {
+      type: 'row',
+      fields: [
+        {
+          name: 'partOf',
+          type: 'text',
+          label: 'Part of',
+          admin: {
+            width: '50%',
+            placeholder: 'e.g. Pancha Paruva Utsavam',
+            description: 'Optional: the set it belongs to. In a temple’s Ritual Year, those in the same set are listed together, under its name.',
+          },
+        },
+        {
+          name: 'partOfTamil',
+          type: 'text',
+          label: 'Part of, in Tamil',
+          admin: { width: '50%', placeholder: 'e.g. பஞ்ச பருவ உற்சவம்' },
+        },
+      ],
+    },
+    {
       name: 'tbc',
       type: 'checkbox',
       label: 'To be confirmed',

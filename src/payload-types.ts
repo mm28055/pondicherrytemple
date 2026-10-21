@@ -278,6 +278,10 @@ export interface Temple {
   deityGroup: 'shiva' | 'vishnu' | 'amman' | 'vinayaka' | 'murugan';
   street?: string | null;
   /**
+   * The way its entrance (or its deity) faces: East, unless it is otherwise. The placeholder layout, until its own is drawn, is turned to match.
+   */
+  faces?: ('east' | 'north' | 'south' | 'west') | null;
+  /**
    * A few paragraphs, shown at the top of the temple’s page.
    */
   intro?: {
@@ -1025,6 +1029,11 @@ export interface WeeklyRitual {
   on?: string | null;
   time?: string | null;
   /**
+   * Optional: the set it belongs to. In a temple’s Ritual Year, those in the same set are listed together, under its name.
+   */
+  partOf?: string | null;
+  partOfTamil?: string | null;
+  /**
    * Marked TBC in the temple’s Ritual Year until it is confirmed.
    */
   tbc?: boolean | null;
@@ -1380,6 +1389,7 @@ export interface TemplesSelect<T extends boolean = true> {
   deity?: T;
   deityGroup?: T;
   street?: T;
+  faces?: T;
   intro?: T;
   coordinates?:
     | T
@@ -1545,6 +1555,8 @@ export interface WeeklyRitualsSelect<T extends boolean = true> {
   days?: T;
   on?: T;
   time?: T;
+  partOf?: T;
+  partOfTamil?: T;
   tbc?: T;
   about?: T;
   temples?: T;

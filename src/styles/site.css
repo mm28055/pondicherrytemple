@@ -366,7 +366,10 @@ a:focus-visible, button:focus-visible {
 }
 .layout-frame:hover { transform: translateY(-3px); box-shadow: 0 16px 34px rgba(25, 21, 18, 0.22); }
 .layout-mount { display: block; padding: 10px; background: var(--chalk-2); }
-.layout-turned { position: relative; display: block; overflow: hidden; height: clamp(190px, 18vw, 280px); }
+/* one height, never so tall that the card (with its hang) is taller than the
+   shortest header's words, a one-line name, so the header's line is always
+   the same distance below its last line */
+.layout-turned { position: relative; display: block; overflow: hidden; height: clamp(190px, 17.4vw, 265px); }
 .layout-turned img {
   position: absolute;
   top: 50%;
@@ -396,16 +399,35 @@ a:focus-visible, button:focus-visible {
 .layout-dialog.stepped { padding-inline: 56px; }
 .layout-dialog .day-step { color: var(--ink); }
 .layout-count { margin-left: 12px; font-size: 13px; letter-spacing: 0.08em; color: var(--muted); }
-.layout-card .kicker { margin: 0; }
 /* (said again, more firmly, over the page headers' rule that their last
    line adds no space below it: the card is the header's last thing, and its
    hang is what takes it over the line) */
-@media (min-width: 901px) { .page-head .temple-head-drawing > .layout-card { margin-bottom: calc(-1 * var(--layout-hang)); } } /* on a narrow screen it stands in the page, not hanging */
+/* (on a wider screen the header's bottom padding is --head-pad, more than
+   other pages' (below): the card hangs the further, so its foot is where it
+   would be with theirs) */
+@media (min-width: 901px) { .page-head .temple-head-drawing > .layout-card { margin-bottom: calc(-1 * (var(--layout-hang) + var(--head-pad) - clamp(10px, 1.2vw, 14px))); } } /* on a narrow screen it stands in the page, not hanging */
 /* The right-hand column starts 30px below the card's foot: the card hangs
    (--layout-hang − the header's bottom padding) below the line, and the
-   columns already start (two-col's top padding) below it. */
+   columns already start (the body's top padding, --body-top) below it. */
 .below-layout > aside {
-  padding-top: max(0px, calc(var(--layout-hang) - clamp(10px, 1.2vw, 14px) - clamp(24px, 3vw, 40px) + 30px));
+  padding-top: max(0px, calc(var(--layout-hang) - clamp(10px, 1.2vw, 14px) - var(--body-top) + 30px));
+}
+/* On a wider screen the introduction starts as far below the line as the
+   header's last line ends above it, about 30px: its capitals as far below
+   the line as the street's baseline is above it. The street's line ends the
+   header's bottom padding (--head-pad, 24px) above the line (the layouts are
+   never so tall that they push it down: .layout-turned), its baseline 6px
+   above its line's foot; the introduction's capitals are 14px below its
+   line's top. */
+.temple-head, .temple-body { --head-pad: clamp(10px, 1.2vw, 14px); }
+.temple-body { --body-top: clamp(24px, 3vw, 40px); }
+@media (min-width: 901px) {
+  .temple-head, .temple-body { --head-pad: 24px; }
+  .page-head.temple-head { padding-bottom: var(--head-pad); }
+  .two-col.temple-body { --body-top: calc(var(--head-pad) - 8px); padding-top: var(--body-top); }
+  /* the line of links is for a phone: hidden here, it adds no space above what follows */
+  .stack > .page-parts + * { margin-top: 0; }
+  .stack > .page-parts + .note-line { margin-top: 3px; } /* "being written", in smaller type: the same space to its capitals */
 }
 
 /* The full plan, upright, over the page */
@@ -1115,24 +1137,31 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
 .ritual-switch .n { display: block; font-style: italic; font-size: 11.5px; color: var(--muted); margin-top: 1px; }
 .ritual-switch .on { background: var(--ink); color: var(--chalk); }
 .ritual-switch .on .n { color: var(--on-night-dim); }
-/* Its parts. The year: under each month its festivals, the bigger utsavams,
-   each in a pale panel, a thin rule at its left, named as in the grid above
-   (the Tamil, the English beneath), a few words below. The month and the
-   week: under small red headings (every week, twice a month, every month),
-   each in a pale panel too, two to a line, more compact: the Tamil, the
-   English and the day and time. */
-.year-list .fl { display: block; background: var(--chalk-2); padding: 12px 12px 13px; border-left: 2px solid var(--rule); margin-block: 8px; }
+/* Its parts, each on one pale ground (a month's festivals; each heading's
+   rituals, its set too), every entry marked by a red line at its left. The
+   year: under each month its festivals, the bigger utsavams, named as in the
+   grid above (the Tamil, the English beneath), a few words below. The month
+   and the week: under small red headings (every week, twice a month, every
+   month), two to a line, more compact: the Tamil, the English, and the day
+   and time below. */
+.year-list { background: var(--chalk-2); padding: 14px 14px 15px; margin-top: 8px; }
+.year-list .fl { display: block; padding: 1px 0 2px 12px; border-left: 3px solid var(--ochre); }
+.year-list .fl + .fl { margin-top: 16px; }
 .year-list .t { display: block; font-family: var(--tamil); font-weight: 700; font-size: 20px; line-height: 1.35; transition: color 0.15s; }
 .year-list a:hover .t,
 .year-regular a:hover .t { color: var(--ochre); }
-.year-regular { margin-top: 4px; }
-.year-regular-head { font-family: var(--display); font-weight: 600; font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ochre); margin: 12px 0 2px; }
-.year-regular-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 18px; }
-.year-regular-list { row-gap: 8px; }
-.year-regular-list .fl { display: block; background: var(--chalk-2); padding: 8px 10px 9px; border-left: 2px solid var(--rule); }
+.year-regular { margin-top: 10px; background: var(--chalk-2); padding: 12px 14px 15px; }
+.year-regular-head { font-family: var(--display); font-weight: 600; font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ochre); margin: 0 0 10px; }
+.year-regular-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 18px; row-gap: 14px; }
+.year-regular-list .fl { display: block; padding: 0 0 1px 10px; border-left: 3px solid var(--ochre); }
 .year-regular-list .t { display: block; font-family: var(--tamil); font-weight: 700; font-size: 15.5px; line-height: 1.3; transition: color 0.15s; }
 .year-regular-list .caps { display: block; font-size: 10.5px; margin-top: 1px; }
 .year-when { display: block; font-style: italic; font-size: 12.5px; line-height: 1.35; color: var(--muted); margin-top: 2px; }
+/* a set (the Pancha Paruva Utsavam): its own, after the rest, under its name */
+.year-set { margin-top: 20px; }
+.year-set-head { margin: 0 0 10px; display: flex; align-items: baseline; flex-wrap: wrap; column-gap: 8px; }
+.year-set-head .t { font-family: var(--tamil); font-weight: 700; font-size: 15.5px; line-height: 1.3; }
+.year-set-head .caps { font-size: 10.5px; color: var(--ink-2); }
 .year-about { display: block; margin-top: 6px; font-style: italic; font-size: 14px; line-height: 1.45; color: var(--muted); }
 /* the month we are in: its heading in a band of its own colour, as on the calendar, marked "Now" */
 .year-month h3.now { background: var(--m); border-bottom-color: var(--m); color: var(--chalk); padding: 6px 10px 5px; }
@@ -3046,3 +3075,48 @@ span.month-obs .month-obs-more { display: none; }
 /* a film (or a field note's video) whose file cannot be had: a plain line in its place */
 .film-unavailable { display: flex; align-items: center; justify-content: center; min-height: 160px; padding: 24px; background: var(--chalk-2); color: var(--ink-2); font-style: italic; text-align: center; }
 .film-unavailable.tile { position: absolute; inset: 0; min-height: 0; padding: 8px; font-family: var(--display); font-style: normal; font-weight: 700; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+
+/* ---------- A temple's page, on a phone ----------
+   The layouts in the middle, hanging over the header's line as on a wider
+   screen (their foot 22px above what follows). The Ritual Year comes after
+   everything else there: near the top, the page's parts as a line of links,
+   the header's line above them and a thin rule below, the Ritual Year
+   first, in red; the field notes, the latest five, the rest a tap away. On a wider
+   screen, the Ritual Year is beside them: no links, every field note. */
+.page-parts { display: none; }
+.more-button { display: none; }
+#ritual-year, #field-notes, #photographs, #films, #articles { scroll-margin-top: 84px; }
+@media (max-width: 900px) {
+  .page-parts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px min(12px, 3vw);
+    padding-bottom: 10px;
+    border-bottom: 1px solid color-mix(in srgb, var(--ink) 22%, transparent);
+  }
+  .temple-head, .temple-body { --phone-hang: 56px; }
+  .temple-head-drawing { justify-content: center; }
+  .page-head .temple-head-drawing > .layout-card { margin-bottom: calc(-1 * var(--phone-hang)); align-items: center; }
+  .temple-body.below-layout { padding-top: calc(var(--phone-hang) - clamp(10px, 1.2vw, 14px) + 22px); }
+  /* never more than four-fifths of the page across, so the line shows either side (a layout lying down, too) */
+  .temple-head .layout-turned { height: min(260px, calc(((100vw - 2 * var(--gutter)) * 0.8 - 32px - var(--stack-drop, 0px)) / var(--ratio, 1))); }
+  /* on one line on a phone, four of them at most (the type a little smaller on the narrowest) */
+  .page-parts a { font-family: var(--display); font-weight: 600; font-size: min(11.5px, 3vw); letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; color: var(--ink); }
+  .page-parts a:first-child { color: var(--ochre); }
+  .more-rest:not(.open) { display: none; }
+  .more-button {
+    display: inline-block;
+    margin-top: 18px;
+    background: none;
+    border: 0;
+    border-bottom: 2px solid var(--ochre);
+    padding: 0 0 3px;
+    cursor: pointer;
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 15px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink);
+  }
+}

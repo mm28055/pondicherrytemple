@@ -253,6 +253,7 @@ const toTemple = (t: P.Temple, L: Lookups): Temple => ({
   deity: t.deity ?? undefined,
   group: t.deityGroup,
   street: t.street?.trim() || undefined,
+  faces: t.faces ?? "east",
   intro: toHTML(t.intro, L.paths) || undefined,
   introText: plainText(t.intro) || undefined,
   coordinates:
@@ -672,6 +673,9 @@ export type RegularRitual = {
   tbc: boolean;
   /** a few words on it, for a temple's Ritual Year */
   about?: string;
+  /** the set it belongs to (Pancha Paruva Utsavam), and its Tamil */
+  partOf?: string;
+  partOfTamil?: string;
   temples: { key: string; name: string; href: string | null }[];
   observances: { id: string; name: string }[];
 };
@@ -696,6 +700,8 @@ export const getRegularRituals = cache(async (): Promise<RegularRitual[]> => {
     time: d.time ?? "",
     tbc: Boolean(d.tbc),
     about: d.about?.trim() || undefined,
+    partOf: d.partOf?.trim() || undefined,
+    partOfTamil: d.partOfTamil?.trim() || undefined,
     temples: (d.temples ?? [])
       .map((ref) => byId.get(idOf(ref) ?? -1))
       .filter((t) => t !== undefined)
@@ -750,6 +756,13 @@ export type TempleYearEntry = {
   about?: string;
   /** to be confirmed */
   tbc?: boolean;
+  /** a regular ritual's days of the week (sun…sat), what it falls on, and when in the day */
+  weekdays?: string[];
+  on?: string;
+  time?: string;
+  /** the set it belongs to (Pancha Paruva Utsavam), and its Tamil */
+  partOf?: string;
+  partOfTamil?: string;
 };
 export type TempleYearMonth = { month: TamilMonth; festivals: TempleYearEntry[] };
 export type TempleRitualYear = { months: TempleYearMonth[]; regular: TempleYearEntry[] };
@@ -819,6 +832,11 @@ export async function getTempleRitualYear(regionId: string, templeId: string): P
         when: r.time ? `${when}, ${r.time}` : when,
         about: r.about,
         tbc: r.tbc,
+        weekdays: r.days,
+        on: r.on,
+        time: r.time,
+        partOf: r.partOf,
+        partOfTamil: r.partOfTamil,
       };
     });
 
@@ -925,14 +943,22 @@ export async function getIllustrationsForTemple(regionId: string, templeId: stri
 /** Stand-ins until a temple's layouts are drawn: its own layouts, then the
     placeholder plan, to make a stack of one to three (how many, chosen by the
     temple, so it stays the same from one visit to the next). A temple with
-    three or more of its own shows only its own. */
-export function withPlaceholderLayouts(templeId: string, regionId: RegionId, own: Illustration[]): Illustration[] {
+    three or more of its own shows only its own. The placeholder is drawn
+    north at the top for a temple facing east, its entrance at the foot
+    (upright); for one facing north or south, turned, its entrance at the
+    right or the left (lying down); for one facing west, turned round, its
+    entrance at the top. */
+const PLACEHOLDER = {
+  east: { src: "/placeholders/temple-layout.svg", width: 1200, height: 1500 },
+  north: { src: "/placeholders/temple-layout-north.svg", width: 1500, height: 1200 },
+  south: { src: "/placeholders/temple-layout-south.svg", width: 1500, height: 1200 },
+  west: { src: "/placeholders/temple-layout-west.svg", width: 1200, height: 1500 },
+} as const;
+export function withPlaceholderLayouts(templeId: string, regionId: RegionId, own: Illustration[], faces: Temple["faces"] = "east"): Illustration[] {
   const n = Math.max(own.length, 1 + Math.floor(seeded(`layouts-${templeId}`)() * 3));
   const stand = Array.from({ length: n - own.length }, (_, k): Illustration => ({
     id: `placeholder-${templeId}-${k + 1}`,
-    src: "/placeholders/temple-layout.svg",
-    width: 1200,
-    height: 1500,
+    ...PLACEHOLDER[faces],
     alt: "A placeholder: a generic temple plan, until this temple's layout is drawn",
     region: regionId,
     kind: "plan",

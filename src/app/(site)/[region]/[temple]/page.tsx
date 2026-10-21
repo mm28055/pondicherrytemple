@@ -27,6 +27,7 @@ import { FilmWall } from "@/components/FilmWall";
 import { PhotoWall } from "@/components/PhotoWall";
 import { NoteRow } from "@/components/Rows";
 import { TempleYear } from "@/components/TempleYear";
+import { ShowMore } from "@/components/ShowMore";
 import { TempleLayout } from "@/components/TempleLayout";
 import { ReservedLink } from "@/components/ReservedLink";
 import { TEMPLE_STORIES_PUBLISHED } from "@/lib/festivals";
@@ -75,7 +76,7 @@ export default async function TemplePage({ params }: Props) {
   // Its histories, the place, its people, its stories and songs: on a page of their own.
   const hasStories = (await getTempleStories(region.id, t.id)).length > 0;
   // its layouts, as a stack in the header (the first on top; placeholders until they are drawn); its other drawings in the right-hand column
-  const layouts = withPlaceholderLayouts(t.id, region.id, layoutsOf(drawings));
+  const layouts = withPlaceholderLayouts(t.id, region.id, layoutsOf(drawings), t.faces);
   const otherDrawings = drawings.filter((d) => d.kind !== "plan");
   const plan = layouts[0];
 
@@ -106,6 +107,15 @@ export default async function TemplePage({ params }: Props) {
         className={plan ? "two-col temple-body below-layout" : "two-col temple-body"}
       >
         <div className="stack">
+          {/* on a phone, where the Ritual Year comes after everything else: the page's parts, a tap away */}
+          <nav className="page-parts" aria-label="On this page">
+            <a href="#ritual-year">Ritual Year ↓</a>
+            {notes.length > 0 && <a href="#field-notes">Field notes ↓</a>}
+            {photos.length > 0 && <a href="#photographs">Photographs ↓</a>}
+            {films.length > 0 && <a href="#films">Films ↓</a>}
+            {articles.length > 0 && <a href="#articles">Articles ↓</a>}
+          </nav>
+
           {/* its introduction (Admin → Temples); a note in its place until it is written */}
           {t.intro ? (
             <Html className="prose" html={t.intro} />
@@ -125,11 +135,14 @@ export default async function TemplePage({ params }: Props) {
           )}
 
           {notes.length > 0 && (
-            <section>
+            <section id="field-notes">
               <h2 className="sub-head">Field notes</h2>
-              {notes.map((r) => (
-                <NoteRow key={r.id} row={r} />
-              ))}
+              {/* on a phone, the latest five, the rest a tap away, so the Ritual Year is not far below */}
+              <ShowMore shown={5} label={`All ${notes.length} field notes`}>
+                {notes.map((r) => (
+                  <NoteRow key={r.id} row={r} />
+                ))}
+              </ShowMore>
             </section>
           )}
 
@@ -141,14 +154,14 @@ export default async function TemplePage({ params }: Props) {
           )}
 
           {films.length > 0 && (
-            <section>
+            <section id="films">
               <h2 className="sub-head">Films</h2>
               <FilmWall tiles={films} />
             </section>
           )}
 
           {articles.length > 0 && (
-            <section>
+            <section id="articles">
               <h2 className="sub-head">Articles</h2>
               {articles.map((r) => (
                 <NoteRow key={r.id} row={r} />
@@ -161,7 +174,7 @@ export default async function TemplePage({ params }: Props) {
         <aside className="stack">
           {otherDrawings.length > 0 && <Drawings items={otherDrawings} />}
 
-          <section>
+          <section id="ritual-year">
             <h2 className="sub-head">The Ritual Year</h2>
             <p className="note-line" style={{ marginBottom: 18 }}>
               What we have been present for, month by month. By the end of the year, this is the

@@ -25,6 +25,8 @@ import * as migration_20261019_124443_film_files from './20261019_124443_film_fi
 import * as migration_20261019_183000_short_name_thiruvahindrapuram from './20261019_183000_short_name_thiruvahindrapuram';
 import * as migration_20261021_101017_observance_recurs from './20261021_101017_observance_recurs';
 import * as migration_20261021_130458_regular_rituals from './20261021_130458_regular_rituals';
+import * as migration_20261021_160804_regular_ritual_sets from './20261021_160804_regular_ritual_sets';
+import * as migration_20261021_164954_temple_faces from './20261021_164954_temple_faces';
 
 export const migrations = [
   {
@@ -160,6 +162,16 @@ export const migrations = [
   {
     up: migration_20261021_130458_regular_rituals.up,
     down: migration_20261021_130458_regular_rituals.down,
-    name: '20261021_130458_regular_rituals'
+    name: '20261021_130458_regular_rituals',
+  },
+  {
+    up: migration_20261021_160804_regular_ritual_sets.up,
+    down: migration_20261021_160804_regular_ritual_sets.down,
+    name: '20261021_160804_regular_ritual_sets',
+  },
+  {
+    up: migration_20261021_164954_temple_faces.up,
+    down: migration_20261021_164954_temple_faces.down,
+    name: '20261021_164954_temple_faces'
   },
 ];

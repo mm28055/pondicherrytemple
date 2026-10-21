@@ -53,6 +53,8 @@ export interface Temple {
   /** its deity: recorded, not shown, for sorting and filtering */
   group: DeityGroup;
   street?: string;
+  /** The way its entrance (or its deity) faces: east, unless set otherwise. */
+  faces: "east" | "north" | "south" | "west";
   /** Short introduction (HTML). Temples without one have no page yet. */
   intro?: string;
   introText?: string;
