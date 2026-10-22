@@ -356,7 +356,8 @@ function toFilm(f: P.Film, L: Lookups, full: boolean): Film | null {
 }
 
 function toIllustration(d: P.Drawing, L: Lookups): Illustration | null {
-  const picture = toPicture(d.image);
+  // the copy made for the site (cut to the drawing, its paper clear), or the image as uploaded
+  const picture = toPicture(d.shown) ?? toPicture(d.image);
   if (!picture) return null;
   return {
     ...picture,

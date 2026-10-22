@@ -1,4 +1,7 @@
-import type { CollectionConfig } from 'payload'
+import fs from 'fs/promises'
+import path from 'path'
+import type { CollectionBeforeChangeHook, CollectionConfig, PayloadRequest } from 'payload'
+import { prepareDrawing } from '../../lib/drawingImage'
 import { canCreateContent, canUpdateContent, isEditor, publishedOrTeam } from '../access'
 import {
   createdByField,
@@ -9,6 +12,70 @@ import {
 } from '../fields'
 import { draftButtons, previewURL } from '../preview'
 import { refreshHooks } from '../revalidate'
+
+const idOf = (v: unknown) => (typeof v === 'object' && v ? (v as { id: number }).id : (v as number | null | undefined)) ?? null
+
+/** An uploaded file's contents, where it is kept: on this laptop (MEDIA_DIR), or in R2. */
+async function fileOf(media: { filename?: string | null; url?: string | null; prefix?: string | null }): Promise<Buffer | null> {
+  if (!media.filename) return null
+  const local = await fs
+    .readFile(path.join(process.env.MEDIA_DIR || path.resolve(process.cwd(), '.data/media'), media.filename))
+    .catch(() => null)
+  if (local) return local
+  const base = (process.env.R2_PUBLIC_URL || '').replace(/\/$/, '')
+  const url = media.url?.startsWith('http')
+    ? media.url
+    : base
+      ? `${base}/${media.prefix ? `${media.prefix}/` : ''}${encodeURIComponent(media.filename)}`
+      : ''
+  if (!url) return null
+  const res = await fetch(url)
+  return res.ok ? Buffer.from(await res.arrayBuffer()) : null
+}
+
+/** The copy of a drawing the site shows (lib/drawingImage: cut to the
+    drawing, the same margin all round, its paper made clear), made from the
+    image uploaded and saved as a file of its own; the upload itself is kept
+    as it is. Null where there is none to make (no drawing found, or a
+    placeholder). Exported for the migration that makes it for the drawings
+    already there. */
+export async function makeShownCopy(req: PayloadRequest, imageId: number, title: string): Promise<number | null> {
+  const media = await req.payload.findByID({ collection: 'media', id: imageId, depth: 0, req, overrideAccess: true })
+  const type = String(media?.mimeType ?? '')
+  if (!media || !type.startsWith('image/') || type === 'image/svg+xml') return null
+  const file = await fileOf(media)
+  const png = file && (await prepareDrawing(file))
+  if (!png) return null
+  const name = `${(media.filename ?? 'drawing').replace(/\.[^.]+$/, '')} (on the site).png`
+  const copy = await req.payload.create({
+    collection: 'media',
+    data: { alt: media.alt || title, credit: media.credit ?? undefined, consent: media.consent ?? undefined },
+    file: { data: png, mimetype: 'image/png', name, size: png.length },
+    req,
+    overrideAccess: true,
+    context: { ...req.context, skipRevalidate: true },
+  })
+  return copy.id as number
+}
+
+/* Made again whenever the drawing's image changes (the copy before it
+   removed), or when it has none yet. A file that cannot be read just now
+   leaves the drawing shown as uploaded, until it is next saved. */
+const makeShown: CollectionBeforeChangeHook = async ({ data, originalDoc, req }) => {
+  const image = idOf(data?.image)
+  if (!image) return data
+  const changed = image !== idOf(originalDoc?.image)
+  if (!changed && idOf(data.shown)) return data
+  try {
+    const shown = await makeShownCopy(req, image, data.title ?? '')
+    const before = idOf(originalDoc?.shown)
+    if (before && before !== shown)
+      await req.payload.delete({ collection: 'media', id: before, req, overrideAccess: true, context: { ...req.context, skipRevalidate: true } }).catch(() => null)
+    return { ...data, shown }
+  } catch {
+    return data
+  }
+}
 
 export const Drawings: CollectionConfig = {
   slug: 'drawings',
@@ -29,7 +96,7 @@ export const Drawings: CollectionConfig = {
     update: canUpdateContent,
     delete: isEditor,
   },
-  hooks: refreshHooks,
+  hooks: { ...refreshHooks, beforeChange: [makeShown] },
   fields: [
     {
       type: 'row',
@@ -84,7 +151,18 @@ export const Drawings: CollectionConfig = {
       relationTo: 'media',
       required: true,
       filterOptions: { mimeType: { contains: 'image' } },
-      admin: { description: 'Upload the drawing as a large JPG or PNG.' },
+      admin: { description: 'Upload the drawing as a large JPG or PNG, with the deity facing down.' },
+    },
+    {
+      name: 'shown',
+      type: 'upload',
+      relationTo: 'media',
+      label: 'As shown on the site',
+      admin: {
+        readOnly: true,
+        description:
+          'Made from the image above when the drawing is saved: cut to the drawing with the same margin all round, its white paper made clear so the site’s off-white shows through. The image above is kept as it is.',
+      },
     },
     {
       type: 'row',

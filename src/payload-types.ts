@@ -789,9 +789,13 @@ export interface Drawing {
    */
   layoutOrder?: number | null;
   /**
-   * Upload the drawing as a large JPG or PNG.
+   * Upload the drawing as a large JPG or PNG, with the deity facing down.
    */
   image: number | Media;
+  /**
+   * Made from the image above when the drawing is saved: cut to the drawing with the same margin all round, its white paper made clear so the site’s off-white shows through. The image above is kept as it is.
+   */
+  shown?: (number | null) | Media;
   caption?: string | null;
   credit?: string | null;
   /**
@@ -1467,6 +1471,7 @@ export interface DrawingsSelect<T extends boolean = true> {
   faces?: T;
   layoutOrder?: T;
   image?: T;
+  shown?: T;
   caption?: T;
   credit?: T;
   temples?: T;
