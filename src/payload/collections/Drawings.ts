@@ -39,12 +39,12 @@ async function fileOf(media: { filename?: string | null; url?: string | null; pr
     as it is. Null where there is none to make (no drawing found, or a
     placeholder). Exported for the migration that makes it for the drawings
     already there. */
-export async function makeShownCopy(req: PayloadRequest, imageId: number, title: string): Promise<number | null> {
+export async function makeShownCopy(req: PayloadRequest, imageId: number, title: string, cut = true): Promise<number | null> {
   const media = await req.payload.findByID({ collection: 'media', id: imageId, depth: 0, req, overrideAccess: true })
   const type = String(media?.mimeType ?? '')
   if (!media || !type.startsWith('image/') || type === 'image/svg+xml') return null
   const file = await fileOf(media)
-  const png = file && (await prepareDrawing(file))
+  const png = file && (await prepareDrawing(file, { cut }))
   if (!png) return null
   const name = `${(media.filename ?? 'drawing').replace(/\.[^.]+$/, '')} (on the site).png`
   const copy = await req.payload.create({
@@ -58,16 +58,17 @@ export async function makeShownCopy(req: PayloadRequest, imageId: number, title:
   return copy.id as number
 }
 
-/* Made again whenever the drawing's image changes (the copy before it
-   removed), or when it has none yet. A file that cannot be read just now
+/* Made again whenever the drawing's image changes, or "Cut to the drawing"
+   does (the copy before it removed), or when it has none yet. A file that cannot be read just now
    leaves the drawing shown as uploaded, until it is next saved. */
 const makeShown: CollectionBeforeChangeHook = async ({ data, originalDoc, req }) => {
   const image = idOf(data?.image)
   if (!image) return data
-  const changed = image !== idOf(originalDoc?.image)
+  const cut = data.cut !== false
+  const changed = image !== idOf(originalDoc?.image) || cut !== (originalDoc?.cut !== false)
   if (!changed && idOf(data.shown)) return data
   try {
-    const shown = await makeShownCopy(req, image, data.title ?? '')
+    const shown = await makeShownCopy(req, image, data.title ?? '', cut)
     const before = idOf(originalDoc?.shown)
     if (before && before !== shown)
       await req.payload.delete({ collection: 'media', id: before, req, overrideAccess: true, context: { ...req.context, skipRevalidate: true } }).catch(() => null)
@@ -152,6 +153,16 @@ export const Drawings: CollectionConfig = {
       required: true,
       filterOptions: { mimeType: { contains: 'image' } },
       admin: { description: 'Upload the drawing as a large JPG or PNG, with the deity facing down.' },
+    },
+    {
+      name: 'cut',
+      type: 'checkbox',
+      label: 'Cut to the drawing',
+      defaultValue: true,
+      admin: {
+        description:
+          'On: the copy shown on the site is cut to the drawing, with the same margin all round. Off: the whole image, as uploaded. Either way its white paper is made clear.',
+      },
     },
     {
       name: 'shown',

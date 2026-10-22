@@ -4,9 +4,13 @@ import sharp from 'sharp'
     to the drawing (the part of the sheet with ink on it), with the same
     margin all round, a twenty-fifth of its longer side; and its paper made
     clear, so the site's own off-white shows through, the ink kept as drawn
-    (paler strokes partly clear). A PNG, at most 3000 pixels on its longer
+    (paler strokes partly clear). The paper is judged where it is, not as
+    one tone: a photographed sheet, lit unevenly or with a colour cast (a
+    shadow, a bluish corner), is evened out first, so all of it clears.
+    `cut` false: the whole image as uploaded, its paper made clear, nothing
+    cut away and no margin added. A PNG, at most 3000 pixels on its longer
     side. Null for an image with no drawing found on it. */
-export async function prepareDrawing(file: Buffer): Promise<Buffer | null> {
+export async function prepareDrawing(file: Buffer, { cut: cutTo = true }: { cut?: boolean } = {}): Promise<Buffer | null> {
   const base = sharp(file).rotate().flatten({ background: '#ffffff' }).removeAlpha()
   const meta = await base.clone().toBuffer({ resolveWithObject: true })
   const { width: W0, height: H0 } = meta.info
@@ -32,9 +36,11 @@ export async function prepareDrawing(file: Buffer): Promise<Buffer | null> {
     while (counts[last] < min) last--
     return [first, last + 1] as const
   }
-  const ys = span(rows, W)
-  const xs = span(cols, H)
-  if (!ys || !xs) return null
+  const found = { ys: span(rows, W), xs: span(cols, H) }
+  if (!found.ys || !found.xs) return null
+  // the whole image, where it is not to be cut
+  const ys = cutTo ? found.ys : ([0, H] as const)
+  const xs = cutTo ? found.xs : ([0, W] as const)
   // back to the full image, a pixel of the small copy each way to spare
   const k = W0 / W
   const left = Math.max(0, Math.floor((xs[0] - 1) * k))
@@ -43,28 +49,47 @@ export async function prepareDrawing(file: Buffer): Promise<Buffer | null> {
   const height = Math.min(H0, Math.ceil((ys[1] + 1) * k)) - top
   const cut = await base.clone().extract({ left, top, width, height }).raw().toBuffer({ resolveWithObject: true })
   const px = cut.data
-  const n = cut.info.width * cut.info.height
-  // the paper's tone: the lightest tenth of the drawing's area
-  const tones = new Uint32Array(256)
-  for (let i = 0; i < n; i++) tones[Math.round(0.299 * px[i * 3] + 0.587 * px[i * 3 + 1] + 0.114 * px[i * 3 + 2])]++
-  let paper = 255
-  for (let seen = 0; paper > 0 && seen < n * 0.1; paper--) seen += tones[paper]
-  // clear where it is as light as the paper; whole where it is ink
-  const clear = paper - 14
-  const ink = Math.max(0, paper * 0.5)
+  const cw = cut.info.width, ch = cut.info.height
+  const n = cw * ch
+  // the paper's colour at each place: from a small copy, each pixel the
+  // lightest round it (so the ink's strokes are passed over), then softened,
+  // then brought back up to full size
+  const sw = Math.max(8, Math.round(cw / 12)), sh = Math.max(8, Math.round(ch / 12))
+  const lo = await sharp(px, { raw: { width: cw, height: ch, channels: 3 } }).resize(sw, sh, { kernel: 'cubic' }).raw().toBuffer()
+  const lightest = Buffer.alloc(lo.length)
+  const R = 2
+  for (let y = 0; y < sh; y++)
+    for (let x = 0; x < sw; x++)
+      for (let c = 0; c < 3; c++) {
+        let m = 0
+        for (let dy = -R; dy <= R; dy++)
+          for (let dx = -R; dx <= R; dx++) {
+            const yy = Math.min(sh - 1, Math.max(0, y + dy)), xx = Math.min(sw - 1, Math.max(0, x + dx))
+            m = Math.max(m, lo[(yy * sw + xx) * 3 + c])
+          }
+        lightest[(y * sw + x) * 3 + c] = m
+      }
+  const paper = await sharp(lightest, { raw: { width: sw, height: sh, channels: 3 } }).blur(1.5).resize(cw, ch, { kernel: 'cubic' }).raw().toBuffer()
   const out = Buffer.alloc(n * 4)
   for (let i = 0; i < n; i++) {
-    const r = px[i * 3], g = px[i * 3 + 1], b = px[i * 3 + 2]
+    // each colour as a share of the paper's there: the paper becomes white
+    const r = Math.min(255, (px[i * 3] * 255) / Math.max(40, paper[i * 3]))
+    const g = Math.min(255, (px[i * 3 + 1] * 255) / Math.max(40, paper[i * 3 + 1]))
+    const b = Math.min(255, (px[i * 3 + 2] * 255) / Math.max(40, paper[i * 3 + 2]))
     const L = 0.299 * r + 0.587 * g + 0.114 * b
-    const a = Math.min(1, Math.max(0, (clear - L) / (clear - ink)))
-    // the ink's own colour, without the paper showing through it
-    const un = (c: number) => (a > 0.02 ? Math.min(255, Math.max(0, Math.round((c - (1 - a) * paper) / a))) : 0)
-    out[i * 4] = un(r)
-    out[i * 4 + 1] = un(g)
-    out[i * 4 + 2] = un(b)
+    // clear where it is as light as the paper; whole where it is ink
+    const a = Math.min(1, Math.max(0, (238 - L) / (238 - 120)))
+    // the ink's own colour, without the paper showing through it; at a
+    // stroke's faint edge, grey rather than a tint (a photograph's fringes)
+    const un = (c: number) => (a > 0.02 ? Math.min(255, Math.max(0, (c - (1 - a) * 255) / a)) : 0)
+    const grey = un(L)
+    const tone = (c: number) => Math.round(grey + (un(c) - grey) * a)
+    out[i * 4] = tone(r)
+    out[i * 4 + 1] = tone(g)
+    out[i * 4 + 2] = tone(b)
     out[i * 4 + 3] = Math.round(a * 255)
   }
-  const margin = Math.round(Math.max(cut.info.width, cut.info.height) / 25)
+  const margin = cutTo ? Math.round(Math.max(cut.info.width, cut.info.height) / 25) : 0
   let img = sharp(out, { raw: { width: cut.info.width, height: cut.info.height, channels: 4 } }).extend({
     top: margin,
     bottom: margin,

@@ -28,6 +28,7 @@ import * as migration_20261021_130458_regular_rituals from './20261021_130458_re
 import * as migration_20261021_160804_regular_ritual_sets from './20261021_160804_regular_ritual_sets';
 import * as migration_20261021_164954_temple_faces from './20261021_164954_temple_faces';
 import * as migration_20261022_062621_drawing_shown from './20261022_062621_drawing_shown';
+import * as migration_20261022_064855_drawing_cut from './20261022_064855_drawing_cut';
 
 export const migrations = [
   {
@@ -178,6 +179,11 @@ export const migrations = [
   {
     up: migration_20261022_062621_drawing_shown.up,
     down: migration_20261022_062621_drawing_shown.down,
-    name: '20261022_062621_drawing_shown'
+    name: '20261022_062621_drawing_shown',
+  },
+  {
+    up: migration_20261022_064855_drawing_cut.up,
+    down: migration_20261022_064855_drawing_cut.down,
+    name: '20261022_064855_drawing_cut'
   },
 ];

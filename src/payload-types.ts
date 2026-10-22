@@ -793,6 +793,10 @@ export interface Drawing {
    */
   image: number | Media;
   /**
+   * On: the copy shown on the site is cut to the drawing, with the same margin all round. Off: the whole image, as uploaded. Either way its white paper is made clear.
+   */
+  cut?: boolean | null;
+  /**
    * Made from the image above when the drawing is saved: cut to the drawing with the same margin all round, its white paper made clear so the site’s off-white shows through. The image above is kept as it is.
    */
   shown?: (number | null) | Media;
@@ -1471,6 +1475,7 @@ export interface DrawingsSelect<T extends boolean = true> {
   faces?: T;
   layoutOrder?: T;
   image?: T;
+  cut?: T;
   shown?: T;
   caption?: T;
   credit?: T;
