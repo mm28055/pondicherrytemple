@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useLayoutEffect, useRef, type ReactNode, type TouchEvent } from "react";
+import { keepScroll } from "@/lib/keepScroll";
 
 /** A month's calendar is swiped to the month either side: left for the
     next, right for the one before — with a finger on a phone, or two fingers
@@ -137,7 +138,7 @@ export function MonthSwipe({
       page.style.setProperty("--mt", way > 0 ? colours[1] : colours[0]);
       page.classList.add("month-leaving");
     }
-    window.setTimeout(() => router.push(to, { scroll: false }), 300);
+    window.setTimeout(() => (keepScroll(), router.push(to, { scroll: false })), 300);
   };
   latest.current = go;
 

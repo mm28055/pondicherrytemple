@@ -133,7 +133,7 @@ export default async function MonthPage({ params }: Props) {
       <div className="cal-with-steps">
         {/* scroll={false}: the next month opens where you are, the calendar in view */}
         {prev ? (
-          <Link className="cal-step prev" href={href(prev)} scroll={false}>
+          <Link className="cal-step prev" href={href(prev)} scroll={false} data-keep-scroll>
             <span className="cal-step-arrow" aria-hidden="true">
               ←
             </span>
@@ -159,7 +159,7 @@ export default async function MonthPage({ params }: Props) {
           />
         </MonthSwipe>
         {next ? (
-          <Link className="cal-step next" href={href(next)} scroll={false}>
+          <Link className="cal-step next" href={href(next)} scroll={false} data-keep-scroll>
             <span className="cal-step-arrow" aria-hidden="true">
               →
             </span>

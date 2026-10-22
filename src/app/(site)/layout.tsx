@@ -6,6 +6,7 @@ import { Nav } from "@/components/Nav";
 import { Footer } from "@/components/Footer";
 import { RevealManager } from "@/components/RevealManager";
 import { DialogBack } from "@/components/DialogBack";
+import { LandAtTop } from "@/components/LandAtTop";
 
 /* The public site. (The admin, under /admin, has its own layout in (payload).) */
 
@@ -70,6 +71,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
         <Footer />
         <RevealManager />
         <DialogBack />
+        <LandAtTop />
       </body>
     </html>
   );
