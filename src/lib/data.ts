@@ -364,7 +364,7 @@ function toIllustration(d: P.Drawing, L: Lookups): Illustration | null {
     id: String(d.id),
     region: L.regionOf(d.region),
     kind: d.kind,
-    layoutOrder: d.layoutOrder ?? undefined,
+    stackOrder: d._drawings_drawings_order ?? undefined,
     faces: (d.faces as Facing | null | undefined) ?? undefined,
     title: d.title,
     caption: d.caption ?? undefined,
@@ -971,12 +971,14 @@ export function withPlaceholderLayouts(templeId: string, regionId: RegionId, own
 }
 
 /** A temple's layouts (its drawings of the plan), for the stack in the header
-    of its page: in the order set in the admin (1 on top), then the rest,
-    oldest first. */
+    of its page: in the order they are dragged into in the temple's Drawings
+    tab in the admin (the first on top), then any not placed yet, oldest
+    first. */
 export function layoutsOf(drawings: Illustration[]): Illustration[] {
+  const placed = (a?: string, b?: string) => (a === b ? 0 : a === undefined ? 1 : b === undefined ? -1 : a < b ? -1 : 1);
   return drawings
     .filter((d) => d.kind === "plan")
-    .sort((a, b) => (a.layoutOrder ?? Infinity) - (b.layoutOrder ?? Infinity) || Number(a.id) - Number(b.id));
+    .sort((a, b) => placed(a.stackOrder, b.stackOrder) || Number(a.id) - Number(b.id));
 }
 
 export async function getIllustrationsForObservance(observanceId: string): Promise<Illustration[]> {

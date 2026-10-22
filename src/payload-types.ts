@@ -768,13 +768,14 @@ export interface Occasion {
   createdAt: string;
 }
 /**
- * Abishek's drawings: each temple's illustrated plan (its layout), and scenes photographs can't capture. A temple can have several layouts: each drawing of the temple's plan tagged with it joins the stack in the header of its page, in the order set below. Scenes appear on every temple and festival page they are tagged with.
+ * Abishek's drawings: each temple's illustrated plan (its layout), and scenes photographs can't capture. A temple can have several layouts: each drawing of the temple's plan tagged with it joins the stack in the header of its page, in the order set by dragging them in the temple's Drawings tab. Scenes appear on every temple and festival page they are tagged with.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "drawings".
  */
 export interface Drawing {
   id: number;
+  _drawings_drawings_order?: string | null;
   title: string;
   /**
    * A temple's plan is its layout, in the stack at the top of its page.
@@ -784,10 +785,6 @@ export interface Drawing {
    * The way the deity faces. Upload the drawing with the deity facing down (south): on the site, where north is at the top, it is turned to face this way.
    */
   faces?: ('north' | 'north-east' | 'east' | 'south-east' | 'south' | 'south-west' | 'west' | 'north-west') | null;
-  /**
-   * Where this layout sits in its temple's stack: 1 on top, then 2, 3… Layouts without a number come after, oldest first.
-   */
-  layoutOrder?: number | null;
   /**
    * Upload the drawing as a large JPG or PNG, with the deity facing down.
    */
@@ -1470,10 +1467,10 @@ export interface OccasionsSelect<T extends boolean = true> {
  * via the `definition` "drawings_select".
  */
 export interface DrawingsSelect<T extends boolean = true> {
+  _drawings_drawings_order?: T;
   title?: T;
   kind?: T;
   faces?: T;
-  layoutOrder?: T;
   image?: T;
   cut?: T;
   shown?: T;

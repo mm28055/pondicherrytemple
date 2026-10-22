@@ -171,14 +171,16 @@ export const Temples: CollectionConfig = {
         },
         {
           label: 'Drawings',
-          description: "Abishek's drawings shown at the top of this temple’s page — its plan first.",
+          description:
+            "Abishek's drawings for this temple. Drag them (by the handle at the left of each row) into the order of the stack of layouts at the top of its page: the first on top.",
           fields: [
             {
               name: 'drawings',
               type: 'join',
               collection: 'drawings',
               on: 'temples',
-              defaultSort: 'createdAt',
+              // dragged into order here: the stack's order on the temple's page
+              orderable: true,
               admin: { defaultColumns: ['title', 'kind', 'image', '_status'] },
             },
           ],

@@ -86,7 +86,7 @@ export const Drawings: CollectionConfig = {
     useAsTitle: 'title',
     defaultColumns: ['title', 'kind', 'image', '_status'],
     description:
-      "Abishek's drawings: each temple's illustrated plan (its layout), and scenes photographs can't capture. A temple can have several layouts: each drawing of the temple's plan tagged with it joins the stack in the header of its page, in the order set below. Scenes appear on every temple and festival page they are tagged with.",
+      "Abishek's drawings: each temple's illustrated plan (its layout), and scenes photographs can't capture. A temple can have several layouts: each drawing of the temple's plan tagged with it joins the stack in the header of its page, in the order set by dragging them in the temple's Drawings tab. Scenes appear on every temple and festival page they are tagged with.",
     preview: previewURL('drawings'),
     components: draftButtons,
   },
@@ -134,16 +134,6 @@ export const Drawings: CollectionConfig = {
       admin: {
         condition: (data) => data?.kind === 'plan',
         description: 'The way the deity faces. Upload the drawing with the deity facing down (south): on the site, where north is at the top, it is turned to face this way.',
-      },
-    },
-    {
-      name: 'layoutOrder',
-      type: 'number',
-      label: 'Order in the stack of layouts',
-      min: 1,
-      admin: {
-        condition: (data) => data?.kind === 'plan',
-        description: "Where this layout sits in its temple's stack: 1 on top, then 2, 3… Layouts without a number come after, oldest first.",
       },
     },
     {

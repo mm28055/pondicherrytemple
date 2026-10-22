@@ -238,8 +238,8 @@ export interface Illustration extends Picture {
   id: string;
   region: RegionId;
   kind: "plan" | "scene";
-  /** a layout's place in its temple's stack (1 on top), if set */
-  layoutOrder?: number;
+  /** a layout's place in its temple's stack, as dragged in the admin (a key: the lower, the higher up), if placed */
+  stackOrder?: string;
   /** the way its deity faces: a layout is drawn with the deity facing down
       (south), and turned on the site, north at the top, to face this way */
   faces?: Facing;
