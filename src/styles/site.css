@@ -1161,6 +1161,8 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
 .year-regular-list .t { display: block; font-family: var(--tamil); font-weight: 700; font-size: 15.5px; line-height: 1.3; transition: color 0.15s; }
 .year-regular-list .caps { display: block; font-size: 10.5px; margin-top: 1px; }
 .year-when { display: block; font-style: italic; font-size: 12.5px; line-height: 1.35; color: var(--muted); margin-top: 2px; }
+/* a regular ritual's few words at the temple, below its timing: upright, so as not to be taken for it */
+.year-regular-about { display: block; margin-top: 5px; font-size: 13.5px; line-height: 1.45; color: var(--ink-2); }
 /* a set (the Pancha Paruva Utsavam): its own, after the rest, under its name */
 .year-set { margin-top: 20px; }
 .year-set-head { margin: 0 0 10px; display: flex; align-items: baseline; flex-wrap: wrap; column-gap: 8px; }

@@ -69,7 +69,8 @@ function timing(e: TempleYearEntry) {
     The Ritual Month: what comes twice a month and every month; the Ritual
     Week: what comes every week. Each once, in a pale panel too, two to a
     line, under its heading: the Tamil, the English, and the day and time
-    below ("On Thiruvonam", in italics); those of a
+    below ("On Thiruvonam", in italics), then its few words at the temple;
+    those of a
     set (the Pancha Paruva Utsavam) together, after the rest, under its
     name. A day listed
     under its own name ("Bhairava Abhishekam") shows that name, its rite's
@@ -85,6 +86,8 @@ export function TempleYear({ year }: { year: TempleRitualYear }) {
       {these.map(({ e, short }) => (
         <Entry key={`${e.name ?? ""}|${e.observance?.id ?? ""}|${e.when ?? ""}`} e={e} className="regular" after={null}>
           {short && <span className="year-when">{short}</span>}
+          {/* its few words at this temple (the admin: "In a few words, here") */}
+          {e.about && <span className="year-regular-about">{e.about}</span>}
         </Entry>
       ))}
     </div>
