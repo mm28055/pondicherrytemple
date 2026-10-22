@@ -240,6 +240,8 @@ export interface Illustration extends Picture {
   kind: "plan" | "scene";
   /** a layout's place in its temple's stack, as dragged in the admin (a key: the lower, the higher up), if placed */
   stackOrder?: string;
+  /** shown on the temple's page (on top of its stack), not in the pop-up */
+  coverOnly?: boolean;
   /** the way its deity faces: a layout is drawn with the deity facing down
       (south), and turned on the site, north at the top, to face this way */
   faces?: Facing;

@@ -790,6 +790,10 @@ export interface Drawing {
    */
   image: number | Media;
   /**
+   * On: shown on the temple's page, on top of its stack, but not in the pop-up, which opens straight onto the next layout (a simpler drawing standing for a detailed one).
+   */
+  coverOnly?: boolean | null;
+  /**
    * On: the copy shown on the site is cut to the drawing, with the same margin all round. Off: the whole image, as uploaded. Either way its white paper is made clear.
    */
   cut?: boolean | null;
@@ -1472,6 +1476,7 @@ export interface DrawingsSelect<T extends boolean = true> {
   kind?: T;
   faces?: T;
   image?: T;
+  coverOnly?: T;
   cut?: T;
   shown?: T;
   caption?: T;

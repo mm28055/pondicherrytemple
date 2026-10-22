@@ -145,6 +145,17 @@ export const Drawings: CollectionConfig = {
       admin: { description: 'Upload the drawing as a large JPG or PNG, with the deity facing down.' },
     },
     {
+      name: 'coverOnly',
+      type: 'checkbox',
+      label: 'Cover only',
+      defaultValue: false,
+      admin: {
+        condition: (data) => data?.kind === 'plan',
+        description:
+          "On: shown on the temple's page, on top of its stack, but not in the pop-up, which opens straight onto the next layout (a simpler drawing standing for a detailed one).",
+      },
+    },
+    {
       name: 'cut',
       type: 'checkbox',
       label: 'Cut to the drawing',

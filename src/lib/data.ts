@@ -365,6 +365,7 @@ function toIllustration(d: P.Drawing, L: Lookups): Illustration | null {
     region: L.regionOf(d.region),
     kind: d.kind,
     stackOrder: d._drawings_drawings_order ?? undefined,
+    coverOnly: d.coverOnly === true || undefined,
     faces: (d.faces as Facing | null | undefined) ?? undefined,
     title: d.title,
     caption: d.caption ?? undefined,

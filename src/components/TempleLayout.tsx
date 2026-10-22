@@ -58,16 +58,21 @@ function LayoutImage({ d, alt, style, fill }: { d: Illustration; alt: string; st
     site's striped frame; as a stack of cards, the top one hanging over the line below the header (every
     temple's layout is shown this way; see site.css). The cards under it (two at
     most) show at its edges, each a step up and to the right, fainter the
-    deeper it is. Clicking opens the layouts large over the page; with more than
-    one, the arrows (or the arrow keys, or a swipe) go through them. */
+    deeper it is. Clicking opens the layouts large over the page, but for a
+    cover (shown only on the page); with more than one, the arrows (or the
+    arrow keys, or a swipe) go through them. */
 export function TempleLayout({ layouts }: { layouts: Illustration[] }) {
   const dialog = useRef<HTMLDialogElement>(null);
   const touch = useRef<number | null>(null);
   const [at, setAt] = useState(0);
-  const n = layouts.length;
   const d = layouts[0];
-  const shown = layouts[at] ?? d;
   const under = layouts.slice(1, 1 + LAYOUT_UNDER);
+  // in the pop-up: all but a cover (Drawings: "Cover only"), so a stack whose
+  // top is one opens onto the layout after it
+  const inPopUp = layouts.filter((l) => !l.coverOnly);
+  const opened = inPopUp.length ? inPopUp : layouts;
+  const n = opened.length;
+  const shown = opened[at] ?? opened[0];
 
   const step = useCallback((by: number) => setAt((i) => (i + by + n) % n), [n]);
   const open = () => {
@@ -90,8 +95,8 @@ export function TempleLayout({ layouts }: { layouts: Illustration[] }) {
   // the next and previous layouts fetched ahead, so stepping is instant
   useEffect(() => {
     if (n < 2) return;
-    for (const by of [1, -1]) new Image().src = layouts[(at + by + n) % n].src;
-  }, [at, n, layouts]);
+    for (const by of [1, -1]) new Image().src = opened[(at + by + n) % n].src;
+  }, [at, n, opened]);
 
   return (
     <figure className="layout-card" style={{ "--stack-drop": `${under.length * LAYOUT_STEP}px` } as CSSProperties}>

@@ -31,6 +31,7 @@ import * as migration_20261022_062621_drawing_shown from './20261022_062621_draw
 import * as migration_20261022_064855_drawing_cut from './20261022_064855_drawing_cut';
 import * as migration_20261022_070227_drawing_stack_drag from './20261022_070227_drawing_stack_drag';
 import * as migration_20261022_070238_drawing_drop_layout_order from './20261022_070238_drawing_drop_layout_order';
+import * as migration_20261022_071527_drawing_cover_only from './20261022_071527_drawing_cover_only';
 
 export const migrations = [
   {
@@ -196,6 +197,11 @@ export const migrations = [
   {
     up: migration_20261022_070238_drawing_drop_layout_order.up,
     down: migration_20261022_070238_drawing_drop_layout_order.down,
-    name: '20261022_070238_drawing_drop_layout_order'
+    name: '20261022_070238_drawing_drop_layout_order',
+  },
+  {
+    up: migration_20261022_071527_drawing_cover_only.up,
+    down: migration_20261022_071527_drawing_cover_only.down,
+    name: '20261022_071527_drawing_cover_only'
   },
 ];
