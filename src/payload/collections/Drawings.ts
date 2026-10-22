@@ -51,7 +51,7 @@ export const Drawings: CollectionConfig = {
     {
       name: 'faces',
       type: 'select',
-      label: 'The temple faces',
+      label: 'The deity faces',
       defaultValue: 'east',
       options: [
         { label: 'North', value: 'north' },
@@ -65,7 +65,7 @@ export const Drawings: CollectionConfig = {
       ],
       admin: {
         condition: (data) => data?.kind === 'plan',
-        description: 'The way its main entrance faces: recorded, not shown. Upload the drawing with north at the top: it is shown just so, never turned.',
+        description: 'The way the deity faces. Upload the drawing with the deity facing down (south): on the site, where north is at the top, it is turned to face this way.',
       },
     },
     {

@@ -1,11 +1,60 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
-import type { Illustration } from "@/content/types";
+import type { Facing, Illustration } from "@/content/types";
 import { LAYOUT_STEP, LAYOUT_UNDER } from "@/lib/layoutStack";
 
-/** The temple's layouts in the header of its page: each as drawn, north at the
-    top (never turned), at one height, as wide as its own shape makes it, in the
+/* A layout is drawn with its deity facing down (south); on the site north is
+   at the top, so it is turned until its deity faces the way the drawing says
+   (Drawings: "The deity faces"): east, a quarter turn to the left (its foot
+   to the right); north, upside down; west, a quarter turn to the right; the
+   four between, by an eighth more. Clockwise, in degrees. */
+const TURN: Record<Facing, number> = {
+  south: 0,
+  "south-east": -45,
+  east: -90,
+  "north-east": -135,
+  north: 180,
+  "north-west": 135,
+  west: 90,
+  "south-west": 45,
+};
+
+/** A layout's shape on the screen, turned: the box round the turned drawing,
+    and its width over its height. */
+function shapeOf(d: Illustration) {
+  const turn = d.faces ? TURN[d.faces] : 0;
+  const a = (turn * Math.PI) / 180;
+  const w = Math.abs(d.width * Math.cos(a)) + Math.abs(d.height * Math.sin(a));
+  const h = Math.abs(d.width * Math.sin(a)) + Math.abs(d.height * Math.cos(a));
+  return { turn, w, h, ratio: w / h };
+}
+
+/** A layout's image, turned as its deity faces: as it is, or, turned, drawn
+    in a box of the turned shape (an SVG, which takes its width from its
+    height, or its height from its width, as an image does). `fill`: covering
+    a box of its own shape (the cards under the top one). */
+function LayoutImage({ d, alt, style, fill }: { d: Illustration; alt: string; style?: CSSProperties; fill?: boolean }) {
+  const { turn, w, h } = shapeOf(d);
+  // eslint-disable-next-line @next/next/no-img-element
+  if (!turn) return <img src={d.src} alt={alt} style={style} width={fill ? undefined : d.width} height={fill ? undefined : d.height} />;
+  return (
+    <svg
+      className="layout-svg"
+      viewBox={`${-w / 2} ${-h / 2} ${w} ${h}`}
+      preserveAspectRatio={fill ? "xMidYMid slice" : "xMidYMid meet"}
+      role={alt ? "img" : undefined}
+      aria-label={alt || undefined}
+      aria-hidden={alt ? undefined : true}
+      style={style}
+    >
+      <image href={d.src} x={-d.width / 2} y={-d.height / 2} width={d.width} height={d.height} transform={`rotate(${turn})`} />
+    </svg>
+  );
+}
+
+/** The temple's layouts in the header of its page: each turned so north is at
+    the top (above), at one height, as wide as its own shape makes it, in the
     site's striped frame; as a stack of cards, the top one hanging over the line below the header (every
     temple's layout is shown this way; see site.css). The cards under it (two at
     most) show at its edges, each a step up and to the right, fainter the
@@ -52,8 +101,7 @@ export function TempleLayout({ layouts }: { layouts: Illustration[] }) {
           .map((u, k) => (
             <span key={u.id} className="layout-under" aria-hidden="true" style={{ "--depth": k + 1 } as CSSProperties}>
               <span className="layout-mount">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={u.src} alt="" />
+                <LayoutImage d={u} alt="" fill />
               </span>
             </span>
           ))
@@ -67,10 +115,9 @@ export function TempleLayout({ layouts }: { layouts: Illustration[] }) {
           <span className="layout-mount">
             <span
               className="layout-turned upright"
-              style={{ aspectRatio: `${d.width} / ${d.height}`, "--ratio": d.width / d.height } as CSSProperties}
+              style={{ aspectRatio: `${shapeOf(d).ratio}`, "--ratio": shapeOf(d).ratio } as CSSProperties}
             >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={d.src} alt={d.alt} />
+              <LayoutImage d={d} alt={d.alt} />
             </span>
           </span>
         </button>
@@ -95,8 +142,7 @@ export function TempleLayout({ layouts }: { layouts: Illustration[] }) {
             ‹
           </button>
         )}
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img key={shown.id} src={shown.src} alt={shown.alt} width={shown.width} height={shown.height} />
+        <LayoutImage key={shown.id} d={shown} alt={shown.alt} style={{ "--ratio": shapeOf(shown).ratio } as CSSProperties} />
         <p className="layout-dialog-caption">
           {shown.title}
           {n > 1 && (

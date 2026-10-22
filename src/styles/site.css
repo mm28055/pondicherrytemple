@@ -379,6 +379,9 @@ a:focus-visible, button:focus-visible {
   transform: translate(-50%, -50%) rotate(-90deg);
 }
 .layout-turned.upright img { position: static; width: 100%; transform: none; }
+/* a layout turned as its deity faces (TempleLayout): a box of the turned shape, as tall as the card */
+.layout-turned .layout-svg { display: block; height: 100%; width: auto; }
+.layout-under .layout-svg { display: block; width: 100%; height: 100%; opacity: 0.45; }
 /* A temple with several layouts: a stack of cards. The top one is the card
    above, exactly where it would be alone; each under it is the same card
    (frame, mount, drawing) set a step up and to the right, and fainter the
@@ -434,6 +437,7 @@ a:focus-visible, button:focus-visible {
 .layout-dialog { margin: auto; border: 0; padding: 20px 20px 14px; background: var(--chalk); max-width: 92vw; max-height: 94vh; }
 .layout-dialog::backdrop { background: rgba(22, 17, 14, 0.78); }
 .layout-dialog img { display: block; max-width: 100%; max-height: calc(94vh - 90px); width: auto; height: auto; }
+.layout-dialog .layout-svg { display: block; width: min(calc(92vw - 40px), calc((94vh - 90px) * var(--ratio))); height: auto; }
 .layout-dialog-caption { margin-top: 10px; font-size: 16px; }
 .layout-close {
   position: absolute;

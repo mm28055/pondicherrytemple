@@ -240,8 +240,8 @@ export interface Illustration extends Picture {
   kind: "plan" | "scene";
   /** a layout's place in its temple's stack (1 on top), if set */
   layoutOrder?: number;
-  /** the way the temple's main entrance faces: recorded, not shown (a layout
-      is always drawn with north at the top, and shown so) */
+  /** the way its deity faces: a layout is drawn with the deity facing down
+      (south), and turned on the site, north at the top, to face this way */
   faces?: Facing;
   title: string;
   temples: string[];
