@@ -230,7 +230,7 @@ a:focus-visible, button:focus-visible {
   padding-block: clamp(10px, 1.4vw, 16px) clamp(10px, 1.2vw, 14px);
   border-bottom: 2px solid var(--ink);
 }
-.page-head :last-child:not(svg *) { margin-bottom: 0; }
+.page-head :last-child:not(svg *, dialog) { margin-bottom: 0; } /* (a pop-up in a header keeps its own margins: it is centred on the screen) */
 /* The menu's own pages (Temples, Festivals & Rituals, Calendar, Field Notes,
    Photographs, Articles, Films, About): the same white space between the
    header's last line and its rule as on the home page, from that line's
