@@ -40,12 +40,12 @@ function timing(e: TempleYearEntry) {
     const said = (on: string) => plain(name).includes(plain(on)) || (/first day of the month/i.test(on) && /pirappu/i.test(name));
     const day =
       group === "weekly"
-        ? (e.weekdays ?? []).map((d) => DAYS[d] ?? d).join(" and ")
+        ? [(e.weekdays ?? []).map((d) => DAYS[d] ?? d).join(" and "), e.on].filter(Boolean).join(", ")
         : e.on && !said(e.on)
           ? `on ${e.on}`
           : "";
     // "After 7:30 pm" and "Morning" in lower case after the day; a name ("Pradosha kalam") as it is
-    const time = day && /^(after|before|from|morning|evening|noon|night)/i.test(e.time) ? e.time.charAt(0).toLowerCase() + e.time.slice(1) : e.time;
+    const time = day && /^(after|before|from|morning|evening|noon|night)\b/i.test(e.time) ? e.time.charAt(0).toLowerCase() + e.time.slice(1) : e.time;
     // then anything particular to this time
     const short = [[day, time].filter(Boolean).join(", "), e.details].filter(Boolean).join(" · ");
     return { group, short: short.charAt(0).toUpperCase() + short.slice(1) };

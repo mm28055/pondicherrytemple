@@ -34,6 +34,9 @@ import * as migration_20261022_070238_drawing_drop_layout_order from './20261022
 import * as migration_20261022_071527_drawing_cover_only from './20261022_071527_drawing_cover_only';
 import * as migration_20261022_073543_regular_rituals_at_temples from './20261022_073543_regular_rituals_at_temples';
 import * as migration_20261022_073558_regular_rituals_old_fields from './20261022_073558_regular_rituals_old_fields';
+import * as migration_20261022_093316_regular_rituals_by_weekday from './20261022_093316_regular_rituals_by_weekday';
+import * as migration_20261022_100844_regular_rituals_weekday from './20261022_100844_regular_rituals_weekday';
+import * as migration_20261022_100953_regular_rituals_times_days from './20261022_100953_regular_rituals_times_days';
 
 export const migrations = [
   {
@@ -214,6 +217,21 @@ export const migrations = [
   {
     up: migration_20261022_073558_regular_rituals_old_fields.up,
     down: migration_20261022_073558_regular_rituals_old_fields.down,
-    name: '20261022_073558_regular_rituals_old_fields'
+    name: '20261022_073558_regular_rituals_old_fields',
+  },
+  {
+    up: migration_20261022_093316_regular_rituals_by_weekday.up,
+    down: migration_20261022_093316_regular_rituals_by_weekday.down,
+    name: '20261022_093316_regular_rituals_by_weekday',
+  },
+  {
+    up: migration_20261022_100844_regular_rituals_weekday.up,
+    down: migration_20261022_100844_regular_rituals_weekday.down,
+    name: '20261022_100844_regular_rituals_weekday',
+  },
+  {
+    up: migration_20261022_100953_regular_rituals_times_days.up,
+    down: migration_20261022_100953_regular_rituals_times_days.down,
+    name: '20261022_100953_regular_rituals_times_days'
   },
 ];

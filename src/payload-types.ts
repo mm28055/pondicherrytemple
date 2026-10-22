@@ -1029,6 +1029,10 @@ export interface WeeklyRitual {
   tamil?: string | null;
   often?: ('weekly' | 'fortnightly' | 'monthly') | null;
   /**
+   * What is done every week has an entry for each day (“Fridays”): every temple’s, that day, in its sections.
+   */
+  weekday?: ('sun' | 'mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat') | null;
+  /**
    * Optional: ten to twenty words for every temple without its own (each temple’s own go in its section, under “Different here”).
    */
   about?: string | null;
@@ -1046,10 +1050,9 @@ export interface WeeklyRitual {
      */
     panchaParvam?: boolean | null;
     /**
-     * Once, or a row for each time it is done here with its own timing or details (e.g. Rahu Kala Durga Abhishekam on Tuesday and on Friday).
+     * Once, or a row for each time it is done here with its own timing or details (e.g. in the morning and again in the evening).
      */
     times: {
-      days?: ('sun' | 'mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat')[] | null;
       on?: string | null;
       time?: string | null;
       details?: string | null;
@@ -1058,6 +1061,10 @@ export interface WeeklyRitual {
     name?: string | null;
     tamil?: string | null;
     about?: string | null;
+    /**
+     * Optional: the festival or ritual it is here, linked to its page (for a day of the week’s entry, where each temple’s is its own). Left empty: the one chosen above.
+     */
+    observances?: (number | Observance)[] | null;
     /**
      * Marked TBC in this temple’s Ritual Year until it is confirmed.
      */
@@ -1573,6 +1580,7 @@ export interface WeeklyRitualsSelect<T extends boolean = true> {
   what?: T;
   tamil?: T;
   often?: T;
+  weekday?: T;
   about?: T;
   observances?: T;
   atTemples?:
@@ -1583,7 +1591,6 @@ export interface WeeklyRitualsSelect<T extends boolean = true> {
         times?:
           | T
           | {
-              days?: T;
               on?: T;
               time?: T;
               details?: T;
@@ -1592,6 +1599,7 @@ export interface WeeklyRitualsSelect<T extends boolean = true> {
         name?: T;
         tamil?: T;
         about?: T;
+        observances?: T;
         tbc?: T;
         id?: T;
       };

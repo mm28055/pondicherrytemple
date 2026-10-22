@@ -78,3 +78,31 @@
   background: color-mix(in srgb, var(--sthalam-ochre) 14%, transparent);
   transition: background 1.5s ease;
 }
+
+/* A regular repeating ritual's temple sections (several in a day's or a
+   tithi's entry): each set apart, so that scrolling, a new temple's is plain
+   to see. Its header (components/admin/TempleRowLabel: the temple, and what
+   it does there) on a band of the site's ochre, a thick ochre bar down its
+   left, and room above it. The times inside it keep the admin's own look. */
+.collapsible:has(> .collapsible__toggle-wrap .temple-row-label) {
+  margin-top: calc(var(--base) * 1.5);
+  border: 1px solid color-mix(in srgb, var(--sthalam-ochre) 45%, transparent);
+  border-left: 8px solid var(--sthalam-ochre);
+  border-radius: 4px;
+
+  > .collapsible__toggle-wrap {
+    background: color-mix(in srgb, var(--sthalam-ochre) 16%, var(--theme-elevation-50));
+    border-bottom: 1px solid color-mix(in srgb, var(--sthalam-ochre) 35%, transparent);
+  }
+}
+
+.temple-row-label {
+  font-weight: 700;
+  font-size: 1.1em;
+  letter-spacing: 0.01em;
+
+  &__what {
+    font-weight: 500;
+    color: var(--theme-elevation-700);
+  }
+}

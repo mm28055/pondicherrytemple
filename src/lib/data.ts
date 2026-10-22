@@ -707,6 +707,11 @@ export const getRegularRituals = cache(async (): Promise<RegularRitual[]> => {
     return (d.atTemples ?? []).flatMap((at) => {
       const t = byId.get(idOf(at.temple) ?? -1);
       if (!t) return [];
+      // the festival or ritual it is at this temple (a day of the week's entry: each its own), or the entry's
+      const here = (at.observances ?? [])
+        .map((ref) => obs.find((o) => o.id === L.observanceSlug.get(idOf(ref) ?? -1)))
+        .filter((o) => o !== undefined)
+        .map((o) => ({ id: o.id, name: o.name }));
       const temple = { key: L.templeKey.get(t.id) ?? "", name: t.knownAs || t.name, href: L.paths.temple(t.id) };
       return (at.times ?? []).map(
         (time): RegularRitual => ({
@@ -714,7 +719,8 @@ export const getRegularRituals = cache(async (): Promise<RegularRitual[]> => {
           what: text(at.name) ?? d.what,
           tamil: text(at.tamil) ?? text(d.tamil),
           often: d.often ?? "weekly",
-          days: time.days ?? [],
+          // the day of the week, for what is done every week: the entry's ("Fridays")
+          days: (d.often ?? "weekly") === "weekly" && d.weekday ? [d.weekday] : [],
           on: text(time.on) ?? "",
           time: text(time.time) ?? "",
           details: text(time.details),
@@ -723,7 +729,7 @@ export const getRegularRituals = cache(async (): Promise<RegularRitual[]> => {
           partOf: at.panchaParvam ? "Pancha Paruva Utsavam" : undefined,
           partOfTamil: at.panchaParvam ? "பஞ்ச பருவ உற்சவம்" : undefined,
           temples: [temple],
-          observances,
+          observances: here.length ? here : observances,
         }),
       );
     });

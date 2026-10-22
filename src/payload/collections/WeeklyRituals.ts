@@ -19,8 +19,11 @@ const weekly = (data: { often?: string } | undefined) => (data?.often ?? 'weekly
 /* What the temples do again and again: every week, on a day of the week
    (Varam: like the Durga puja on Tuesday afternoons, shown under every
    month's calendar, the week's days across the top), twice a month, or every
-   month, on a tithi or a nakshatram (like Pradosham, or Punarpoosam). Each
-   ritual once, with a section for each temple it is done at: when there (one
+   month, on a tithi or a nakshatram (like Pradosham, or Punarpoosam). What is
+   done every week, an entry for each day of the week ("Fridays"), with a
+   section for each temple and what it does that day (its name, its festival
+   or ritual); the rest, each ritual once, with a section for each temple it
+   is done at: when there (one
    or more times, each with its own details), and, where it differs there,
    its name, its Tamil and a few words; whether it is counted there in the
    Pancha Parvam; to be confirmed. Each temple's Ritual Year lists its own
@@ -37,7 +40,16 @@ export const WeeklyRituals: CollectionConfig = {
       'What the temples do again and again: every week (shown under every month’s calendar, under its day of the week), twice a month or every month. Each ritual once, with a section for each temple it is done at. Each temple’s Ritual Year lists its own under every month.',
   },
   access: { read: () => true, create: isEditor, update: isEditor, delete: isAdmin },
-  hooks: refreshHooks,
+  hooks: {
+    ...refreshHooks,
+    // a day of the week's entry, left unnamed: named for its day ("Fridays")
+    beforeValidate: [
+      ({ data }) =>
+        data && weekly(data) && data.weekday && !String(data.what ?? '').trim()
+          ? { ...data, what: `${WEEKDAYS.find((d) => d.value === data.weekday)?.label}s` }
+          : data,
+    ],
+  },
   fields: [
     {
       type: 'row',
@@ -61,16 +73,34 @@ export const WeeklyRituals: CollectionConfig = {
       ],
     },
     {
-      name: 'often',
-      type: 'select',
-      label: 'How often',
-      defaultValue: 'weekly',
-      options: [
-        { label: 'Every week', value: 'weekly' },
-        { label: 'Twice a month', value: 'fortnightly' },
-        { label: 'Every month', value: 'monthly' },
+      type: 'row',
+      fields: [
+        {
+          name: 'often',
+          type: 'select',
+          label: 'How often',
+          defaultValue: 'weekly',
+          options: [
+            { label: 'Every week', value: 'weekly' },
+            { label: 'Twice a month', value: 'fortnightly' },
+            { label: 'Every month', value: 'monthly' },
+          ],
+          admin: { width: '25%' },
+        },
+        {
+          name: 'weekday',
+          type: 'select',
+          label: 'Day of the week',
+          options: WEEKDAYS,
+          admin: {
+            width: '25%',
+            condition: (data) => weekly(data),
+            description: 'What is done every week has an entry for each day (“Fridays”): every temple’s, that day, in its sections.',
+          },
+          validate: (value: unknown, { data }: { data?: { often?: string } }) =>
+            !weekly(data) || value ? true : 'Choose the day of the week.',
+        },
       ],
-      admin: { width: '25%' },
     },
     {
       name: 'about',
@@ -91,6 +121,8 @@ export const WeeklyRituals: CollectionConfig = {
       required: true,
       admin: {
         description: 'A section for each temple it is done at: when, there (one or more times, each with its own details), and anything that is different there.',
+        // each section headed by its temple (and what it does there), set apart in the admin's stylesheet
+        components: { RowLabel: '/components/admin/TempleRowLabel#TempleRowLabel' },
       },
       fields: [
         {
@@ -117,30 +149,20 @@ export const WeeklyRituals: CollectionConfig = {
           minRows: 1,
           required: true,
           admin: {
-            description: 'Once, or a row for each time it is done here with its own timing or details (e.g. Rahu Kala Durga Abhishekam on Tuesday and on Friday).',
+            description: 'Once, or a row for each time it is done here with its own timing or details (e.g. in the morning and again in the evening).',
           },
           fields: [
             {
               type: 'row',
               fields: [
                 {
-                  name: 'days',
-                  type: 'select',
-                  hasMany: true,
-                  label: 'Day of the week',
-                  options: WEEKDAYS,
-                  admin: { width: '30%', condition: (data) => weekly(data) },
-                  validate: (value: unknown, { data }: { data?: { often?: string } }) =>
-                    !weekly(data) || (Array.isArray(value) && value.length > 0) ? true : 'Choose the day of the week.',
-                },
-                {
                   name: 'on',
                   type: 'text',
                   label: 'On',
                   admin: {
                     width: '30%',
-                    placeholder: 'e.g. Trayodashi, Punarpoosam, Amavasya',
-                    condition: (data) => !weekly(data),
+                    // the day of the week is the entry's: here, only which of them, if not every one
+                    placeholder: 'e.g. Trayodashi, Punarpoosam, Amavasya; for a day of the week, the first of the month',
                   },
                 },
                 {
@@ -172,6 +194,10 @@ export const WeeklyRituals: CollectionConfig = {
               ],
             },
             { name: 'about', type: 'textarea', label: 'In a few words, here', admin: { rows: 2 } },
+            observancesField({
+              description:
+                'Optional: the festival or ritual it is here, linked to its page (for a day of the week’s entry, where each temple’s is its own). Left empty: the one chosen above.',
+            }),
           ],
         },
         {
