@@ -46,7 +46,8 @@ function timing(e: TempleYearEntry) {
           : "";
     // "After 7:30 pm" and "Morning" in lower case after the day; a name ("Pradosha kalam") as it is
     const time = day && /^(after|before|from|morning|evening|noon|night)/i.test(e.time) ? e.time.charAt(0).toLowerCase() + e.time.slice(1) : e.time;
-    const short = [day, time].filter(Boolean).join(", ");
+    // then anything particular to this time
+    const short = [[day, time].filter(Boolean).join(", "), e.details].filter(Boolean).join(" · ");
     return { group, short: short.charAt(0).toUpperCase() + short.slice(1) };
   }
   // a day listed under its own name: from what it says ("Every Friday")

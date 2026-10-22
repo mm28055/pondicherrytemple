@@ -660,9 +660,13 @@ export const getSpecialTithis = cache(async (): Promise<Record<string, SpecialTi
 });
 
 /** What the temples do again and again, as set in the admin ("Regular
-    rituals"): each how often (every week, twice a month, every month), its
-    days of the week (sun…sat) or what it falls on (a tithi, a nakshatram),
-    when in the day, its temples (named, with their pages) and festivals. */
+    repeating rituals"), once for each time it is done at a temple (a ritual
+    has a section for each of its temples, each with one or more times): how
+    often (every week, twice a month, every month), its days of the week
+    (sun…sat) or what it falls on (a tithi, a nakshatram), when in the day
+    and anything particular to that time; its name, Tamil and few words
+    there; its temples (named, with their pages: several, where it is done
+    at the same time and in the same way at each) and festivals. */
 export type RegularRitual = {
   id: string;
   what: string;
@@ -671,6 +675,8 @@ export type RegularRitual = {
   days: string[];
   on: string;
   time: string;
+  /** particular to this time (its "Details" in the admin) */
+  details?: string;
   /** to be confirmed */
   tbc: boolean;
   /** a few words on it, for a temple's Ritual Year */
@@ -692,27 +698,45 @@ export const getRegularRituals = cache(async (): Promise<RegularRitual[]> => {
     observances(),
   ]);
   const byId = new Map(temples.map((t) => [t.id, t]));
-  return docs.map((d) => ({
-    id: String(d.id),
-    what: d.what,
-    tamil: d.tamil?.trim() || undefined,
-    often: d.often ?? "weekly",
-    days: d.days ?? [],
-    on: d.on?.trim() ?? "",
-    time: d.time ?? "",
-    tbc: Boolean(d.tbc),
-    about: d.about?.trim() || undefined,
-    partOf: d.partOf?.trim() || undefined,
-    partOfTamil: d.partOfTamil?.trim() || undefined,
-    temples: (d.temples ?? [])
-      .map((ref) => byId.get(idOf(ref) ?? -1))
-      .filter((t) => t !== undefined)
-      .map((t) => ({ key: L.templeKey.get(t.id) ?? "", name: t.knownAs || t.name, href: L.paths.temple(t.id) })),
-    observances: (d.observances ?? [])
+  const text = (v: string | null | undefined) => v?.trim() || undefined;
+  const each = docs.flatMap((d) => {
+    const observances = (d.observances ?? [])
       .map((ref) => obs.find((o) => o.id === L.observanceSlug.get(idOf(ref) ?? -1)))
       .filter((o) => o !== undefined)
-      .map((o) => ({ id: o.id, name: o.name })),
-  }));
+      .map((o) => ({ id: o.id, name: o.name }));
+    return (d.atTemples ?? []).flatMap((at) => {
+      const t = byId.get(idOf(at.temple) ?? -1);
+      if (!t) return [];
+      const temple = { key: L.templeKey.get(t.id) ?? "", name: t.knownAs || t.name, href: L.paths.temple(t.id) };
+      return (at.times ?? []).map(
+        (time): RegularRitual => ({
+          id: String(d.id),
+          what: text(at.name) ?? d.what,
+          tamil: text(at.tamil) ?? text(d.tamil),
+          often: d.often ?? "weekly",
+          days: time.days ?? [],
+          on: text(time.on) ?? "",
+          time: text(time.time) ?? "",
+          details: text(time.details),
+          tbc: Boolean(at.tbc),
+          about: text(at.about) ?? text(d.about),
+          partOf: at.panchaParvam ? "Pancha Paruva Utsavam" : undefined,
+          partOfTamil: at.panchaParvam ? "பஞ்ச பருவ உற்சவம்" : undefined,
+          temples: [temple],
+          observances,
+        }),
+      );
+    });
+  });
+  // the same ritual, at the same time and in the same way at several temples: once, with them all
+  const once = new Map<string, RegularRitual>();
+  for (const r of each) {
+    const key = JSON.stringify([r.id, r.what, r.tamil, r.days, r.on, r.time, r.details, r.tbc, r.about, r.partOf]);
+    const had = once.get(key);
+    if (had) had.temples.push(...r.temples);
+    else once.set(key, r);
+  }
+  return [...once.values()];
 });
 
 /** Every date the team was present, oldest first. */
@@ -762,6 +786,8 @@ export type TempleYearEntry = {
   weekdays?: string[];
   on?: string;
   time?: string;
+  /** anything particular to this time */
+  details?: string;
   /** the set it belongs to (Pancha Paruva Utsavam), and its Tamil */
   partOf?: string;
   partOfTamil?: string;
@@ -837,6 +863,7 @@ export async function getTempleRitualYear(regionId: string, templeId: string): P
         weekdays: r.days,
         on: r.on,
         time: r.time,
+        details: r.details,
         partOf: r.partOf,
         partOfTamil: r.partOfTamil,
       };

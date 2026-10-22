@@ -1,3 +1,4 @@
+// @ts-nocheck -- written for the regular rituals' fields as they were then (one temple list, and days and time, on each entry); it has run, and is kept as it was
 import { MigrateUpArgs, MigrateDownArgs, sql } from '@payloadcms/db-postgres'
 import { EXISTING_WORDS, REGULAR_RITUALS } from './data/regular-rituals-2026-10-21'
 

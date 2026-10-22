@@ -17,7 +17,8 @@ export const Temples: CollectionConfig = {
   orderable: true,
   admin: {
     group: 'Temple pages',
-    useAsTitle: 'name',
+    // in the admin, everywhere a temple is chosen or listed: its shortest name
+    useAsTitle: 'shortName',
     defaultColumns: ['knownAs', 'name', 'shortName', 'deityGroup', 'street', '_status'],
     description:
       'The temples being documented, in the order the site shows them — drag to reorder. Open a temple to edit everything on its page.',

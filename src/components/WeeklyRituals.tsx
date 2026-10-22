@@ -98,7 +98,8 @@ export function WeeklyRituals({
         {on.length > 0 ? (
           <ul className="varam-list">
             {on.map((r) => (
-              <li key={r.id}>
+              // a ritual may come more than once in a day: at another temple, or another time
+              <li key={`${r.id}|${r.time}|${r.temples.map((t) => t.key).join()}`}>
                 <span className="varam-time">{r.time}</span>
                 <span className="varam-what">
                   {r.what}

@@ -32,6 +32,8 @@ import * as migration_20261022_064855_drawing_cut from './20261022_064855_drawin
 import * as migration_20261022_070227_drawing_stack_drag from './20261022_070227_drawing_stack_drag';
 import * as migration_20261022_070238_drawing_drop_layout_order from './20261022_070238_drawing_drop_layout_order';
 import * as migration_20261022_071527_drawing_cover_only from './20261022_071527_drawing_cover_only';
+import * as migration_20261022_073543_regular_rituals_at_temples from './20261022_073543_regular_rituals_at_temples';
+import * as migration_20261022_073558_regular_rituals_old_fields from './20261022_073558_regular_rituals_old_fields';
 
 export const migrations = [
   {
@@ -202,6 +204,16 @@ export const migrations = [
   {
     up: migration_20261022_071527_drawing_cover_only.up,
     down: migration_20261022_071527_drawing_cover_only.down,
-    name: '20261022_071527_drawing_cover_only'
+    name: '20261022_071527_drawing_cover_only',
+  },
+  {
+    up: migration_20261022_073543_regular_rituals_at_temples.up,
+    down: migration_20261022_073543_regular_rituals_at_temples.down,
+    name: '20261022_073543_regular_rituals_at_temples',
+  },
+  {
+    up: migration_20261022_073558_regular_rituals_old_fields.up,
+    down: migration_20261022_073558_regular_rituals_old_fields.down,
+    name: '20261022_073558_regular_rituals_old_fields'
   },
 ];

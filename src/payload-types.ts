@@ -1015,7 +1015,7 @@ export interface SpecialTithi {
   createdAt: string;
 }
 /**
- * What the temples do again and again: every week (Varam, shown under every month’s calendar, under its day of the week), twice a month or every month. Each temple’s Ritual Year lists its own under every month.
+ * What the temples do again and again: every week (shown under every month’s calendar, under its day of the week), twice a month or every month. Each ritual once, with a section for each temple it is done at. Each temple’s Ritual Year lists its own under every month.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "weekly-rituals".
@@ -1029,32 +1029,41 @@ export interface WeeklyRitual {
   tamil?: string | null;
   often?: ('weekly' | 'fortnightly' | 'monthly') | null;
   /**
-   * One or more.
-   */
-  days?: ('sun' | 'mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat')[] | null;
-  /**
-   * The tithi, the nakshatram or the day it falls on.
-   */
-  on?: string | null;
-  time?: string | null;
-  /**
-   * Optional: the set it belongs to. In a temple’s Ritual Year, those in the same set are listed together, under its name.
-   */
-  partOf?: string | null;
-  partOfTamil?: string | null;
-  /**
-   * Marked TBC in the temple’s Ritual Year until it is confirmed.
-   */
-  tbc?: boolean | null;
-  /**
-   * Ten to twenty words on what is done, shown below it in a temple’s Ritual Year.
+   * Optional: ten to twenty words for every temple without its own (each temple’s own go in its section, under “Different here”).
    */
   about?: string | null;
-  temples: (number | Temple)[];
   /**
    * Optional: the festival or ritual it is, linked to its page (and its Tamil, if none is given above).
    */
   observances?: (number | Observance)[] | null;
+  /**
+   * A section for each temple it is done at: when, there (one or more times, each with its own details), and anything that is different there.
+   */
+  atTemples: {
+    temple: number | Temple;
+    /**
+     * Listed with the Pancha Paruva Utsavam (பஞ்ச பருவ உற்சவம்) in this temple’s Ritual Year.
+     */
+    panchaParvam?: boolean | null;
+    /**
+     * Once, or a row for each time it is done here with its own timing or details (e.g. Rahu Kala Durga Abhishekam on Tuesday and on Friday).
+     */
+    times: {
+      days?: ('sun' | 'mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat')[] | null;
+      on?: string | null;
+      time?: string | null;
+      details?: string | null;
+      id?: string | null;
+    }[];
+    name?: string | null;
+    tamil?: string | null;
+    about?: string | null;
+    /**
+     * Marked TBC in this temple’s Ritual Year until it is confirmed.
+     */
+    tbc?: boolean | null;
+    id?: string | null;
+  }[];
   updatedAt: string;
   createdAt: string;
 }
@@ -1564,15 +1573,28 @@ export interface WeeklyRitualsSelect<T extends boolean = true> {
   what?: T;
   tamil?: T;
   often?: T;
-  days?: T;
-  on?: T;
-  time?: T;
-  partOf?: T;
-  partOfTamil?: T;
-  tbc?: T;
   about?: T;
-  temples?: T;
   observances?: T;
+  atTemples?:
+    | T
+    | {
+        temple?: T;
+        panchaParvam?: T;
+        times?:
+          | T
+          | {
+              days?: T;
+              on?: T;
+              time?: T;
+              details?: T;
+              id?: T;
+            };
+        name?: T;
+        tamil?: T;
+        about?: T;
+        tbc?: T;
+        id?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
 }
