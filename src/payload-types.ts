@@ -781,7 +781,7 @@ export interface Drawing {
    */
   kind: 'plan' | 'scene';
   /**
-   * The way its main entrance faces: recorded, not shown. Upload the drawing with north at the top: it is shown just so, never turned.
+   * The way the deity faces. Upload the drawing with the deity facing down (south): on the site, where north is at the top, it is turned to face this way.
    */
   faces?: ('north' | 'north-east' | 'east' | 'south-east' | 'south' | 'south-west' | 'west' | 'north-west') | null;
   /**
