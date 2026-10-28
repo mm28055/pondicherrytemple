@@ -188,7 +188,7 @@ async function rawOne<C extends "field-notes" | "articles" | "films">(collection
     with a temple or festival, or in a field note, are picked out below.
     Read a part at a time, each part kept on its own (the data cache keeps
     nothing over 2 MB), with only what the site shows of each. */
-const PHOTO_PART = 1500;
+const PHOTO_PART = 1000; // about 1 KB each: 1 MB a part, well under the limit
 const rawPhotos = cache(async () => {
   const out: P.Media[] = [];
   for (let page = 1; ; page++) {

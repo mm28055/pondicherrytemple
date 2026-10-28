@@ -57,12 +57,14 @@ export default async function MonthPage({ params }: Props) {
   const today = new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Kolkata" });
   const begins = await getLineBegins();
   const y = asked ? Number(asked) : yearNow(slug, begins, today);
-  // nothing before the team began
-  if (!Number.isInteger(y) || monthDates(slug, y).first < begins || y > Number(today.slice(0, 4)) + 100) notFound();
+  // nothing before the team began, nor more than a hundred years ahead
+  const last = Number(today.slice(0, 4)) + 100;
+  if (!Number.isInteger(y) || monthDates(slug, y).first < begins || y > last) notFound();
 
-  // the months either side, in the line: none before the first
+  // the months either side, in the line: none before the first, nor after the last
   const prev = step(at, y, -1, begins);
-  const next = step(at, y, 1, begins);
+  const onward = step(at, y, 1, begins);
+  const next = onward && onward.year <= last ? onward : null;
   const href = (s: Step) => `/festivals-and-rituals/month/${s.month.slug}/${s.year}`;
 
   // Varam: what is done every week, and stand-in photographs for each day's temples
