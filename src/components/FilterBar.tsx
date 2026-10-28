@@ -19,7 +19,9 @@ export type BarFilter = {
     on. With `stripes`, the bar is as wide as rows of photos hung from the
     stripes at the top of the page (lib/stripes), so that stuck under the
     menu it covers them; but its words and its line keep to the page's
-    margins, in line with the header above it. */
+    margins, in line with the header above it. With `jump`, one more
+    dropdown, which narrows nothing: a choice goes to that place in the
+    photographs (a month: its first day). */
 export function FilterBar({
   filters,
   chosen,
@@ -27,6 +29,7 @@ export function FilterBar({
   oldestFirst,
   onOrder,
   stripes = false,
+  jump,
 }: {
   filters: BarFilter[];
   chosen: Partial<Record<string, string>>;
@@ -34,6 +37,7 @@ export function FilterBar({
   oldestFirst: boolean;
   onOrder: () => void;
   stripes?: boolean;
+  jump?: { label: string; options: { id: string; label: string }[]; onJump: (id: string) => void };
 }) {
   const [menu, setMenu] = useState<string | null>(null);
   const box = useRef<HTMLDivElement>(null);
@@ -127,6 +131,18 @@ export function FilterBar({
               )}
             </span>
           ))}
+          {jump && jump.options.length > 1 && (
+            <span className="filter-bar-item">
+              <button
+                className={`filter-bar-btn${menu === "jump" ? " open" : ""}`}
+                aria-expanded={menu === "jump"}
+                onClick={() => setMenu(menu === "jump" ? null : "jump")}
+              >
+                {jump.label}
+                <i aria-hidden="true">▾</i>
+              </button>
+            </span>
+          )}
           <button className="filter-bar-btn filter-bar-sort" onClick={onOrder}>
             {oldestFirst ? "Oldest first" : "Newest first"} <i aria-hidden="true">⇅</i>
           </button>
@@ -145,6 +161,21 @@ export function FilterBar({
               ))}
             </div>
           ))}
+        {jump && menu === "jump" && (
+          <div className="filters filter-bar-panel" role="group" aria-label={jump.label}>
+            {jump.options.map((o) => (
+              <button
+                key={o.id}
+                onClick={() => {
+                  setMenu(null);
+                  jump.onJump(o.id);
+                }}
+              >
+                {o.label}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
     </>
   );

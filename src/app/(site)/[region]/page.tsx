@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import {
   getDummyPhotos,
+  getEthosSets,
   getOccasions,
+  getPhotosForTemple,
   getRegion,
   getRegions,
   getTemples,
@@ -16,6 +18,8 @@ import { seeded } from "@/lib/mahotsavam";
 import type { Temple } from "@/content/types";
 import { TodayTamil } from "@/components/TodayTamil";
 import { calendarEvents } from "@/lib/calendarEvents";
+import { formatDate } from "@/lib/calendar";
+import { photoCount } from "@/lib/photoPack";
 
 type Props = { params: Promise<{ region: string }> };
 
@@ -34,18 +38,20 @@ export default async function RegionPage({ params }: Props) {
 
   // the temples listed on this page (a temple can be left off it in the admin)
   const temples = (await getTemples(region.id)).filter((t) => t.listed);
-  // a temple's latest photographs and how many it has (stand-ins for now; see below)
-  const latest = async (t: Temple) => ({
-    t,
-    photos: await getDummyPhotos(`latest-${t.id}`, 12),
-    total: 24 + Math.floor(seeded(`count-${t.id}`)() * 100),
-  });
+  // a temple's latest photographs (newest first) and how many it has; stand-ins
+  // for a temple with none yet
+  const latest = async (t: Temple) => {
+    const own = await getPhotosForTemple(t.region, t.id);
+    return own.length
+      ? { t, photos: own.slice(0, 12), total: own.length }
+      : {
+          t,
+          photos: await getDummyPhotos(`latest-${t.id}`, 12),
+          total: 24 + Math.floor(seeded(`count-${t.id}`)() * 100),
+        };
+  };
   // each temple by its name, its proper name and its street alone, and a row of
-  // its latest photographs. For now, stand-ins for every temple; when the real
-  // ones are to show, its own newest first:
-  //   [...(await getPhotosForTemple(region.id, t.id))].sort((a, b) => b.date.localeCompare(a.date))
-  // (and its total, for the row's last photo to count the rest, will be
-  // (await getPhotosForTemple(region.id, t.id)).length)
+  // its latest photographs
   const withPages = await Promise.all(temples.filter(hasPage).map(latest));
   const others = temples.filter((t) => !hasPage(t));
 
@@ -62,8 +68,11 @@ export default async function RegionPage({ params }: Props) {
   const toPhotos = (t: Temple, total: number) => ({
     href: `/${t.region}/${t.id}#photographs`,
     total,
-    title: `All ${total.toLocaleString("en-IN")} photographs of ${t.knownAs ?? t.name}`,
+    title: `All ${photoCount(total)} photographs of ${t.knownAs ?? t.name}`,
   });
+
+  // Pondicherry's Hindu Ethos: the town's photo sets of that name, each a card
+  const ethos = await getEthosSets(region.id);
 
   // today's date, as on the home page, for the box in the header
   const todayEvents = await calendarEvents(await getOccasions());
@@ -92,6 +101,7 @@ export default async function RegionPage({ params }: Props) {
                   photos={photos}
                   layout="row"
                   note="Latest from this temple"
+                  reveal
                   addressable={false}
                   moreLink={toPhotos(t, total)}
                 />
@@ -136,10 +146,45 @@ export default async function RegionPage({ params }: Props) {
                     photos={photos}
                     layout="row"
                     note="Latest from this temple"
+                    reveal
                     addressable={false}
                     moreLink={toPhotos(t, total)}
                   />
                   <TempleRow temple={t} formal />
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Pondicherry's Hindu Ethos: as the temples in and around it, past the
+          wall's stripes, each a card, a row of its photographs (a press opens
+          them, to go through them all) over its name and day. */}
+      {ethos.length > 0 && (
+        <section className="around ethos" id="hindu-ethos">
+          <div className="stripes around-wall" aria-hidden="true" />
+          <div className="wrap">
+            <div className="around-head">
+              <h2>{region.name}&apos;s Hindu Ethos</h2>
+            </div>
+            <div className="temple-cards">
+              {ethos.map((e) => (
+                <div key={e.id} className="temple-card">
+                  <PhotoWall
+                    photos={e.photos}
+                    layout="row"
+                    note={e.title}
+                    addressable={false}
+                    moreLink={{ total: e.photos.length, title: `All ${photoCount(e.photos.length)} photographs` }}
+                    reveal
+                  />
+                  <div className="temple-row plain">
+                    <div>
+                      <div className="temple-name">{e.title}</div>
+                      {e.date && <div className="temple-sub">{formatDate(e.date)}</div>}
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>

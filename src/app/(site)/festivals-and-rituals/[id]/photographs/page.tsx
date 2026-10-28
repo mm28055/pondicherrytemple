@@ -1,8 +1,9 @@
-import type { Metadata } from "next";
 import Link from "next/link";
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getObservance, getPhotoFilters, getPhotosForObservance } from "@/lib/data";
 import { PhotoWall } from "@/components/PhotoWall";
+import { packPhotos } from "@/lib/photoPack";
 import { seesFestivalPages } from "@/lib/festivals-access";
 
 type Props = { params: Promise<{ id: string }> };
@@ -12,6 +13,7 @@ type Props = { params: Promise<{ id: string }> };
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  if (!(await seesFestivalPages())) return {};
   const o = await getObservance((await params).id);
   return o ? { title: `${o.name}: photographs` } : {};
 }
@@ -19,8 +21,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 /** Every photograph of a festival or ritual, which can be narrowed by
     temple, deity and year. */
 export default async function ObservancePhotosPage({ params }: Props) {
-  const o = await getObservance((await params).id);
   if (!(await seesFestivalPages())) notFound();
+  const o = await getObservance((await params).id);
   if (!o) notFound();
   const photos = await getPhotosForObservance(o.id);
   if (!photos.length) notFound();
@@ -32,9 +34,6 @@ export default async function ObservancePhotosPage({ params }: Props) {
         <Link className="crumb" href={`/festivals-and-rituals/${o.id}`}>
           ← {o.name}
         </Link>
-        <div className="kicker">
-          Photographs · {photos.length}
-        </div>
         {o.tamil && (
           <p className="tamil-title" lang="ta">
             {o.tamil}
@@ -43,7 +42,7 @@ export default async function ObservancePhotosPage({ params }: Props) {
         <h1 className="name-title">{o.name}</h1>
       </header>
       <section className="section">
-        <PhotoWall photos={photos} layout="all" filters={filters} />
+        <PhotoWall pack={packPhotos(photos)} layout="all" filters={filters} heads={{ temple: true }} />
       </section>
     </div>
   );

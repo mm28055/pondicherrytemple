@@ -1,4 +1,4 @@
-import { headers } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { getPayload } from "payload";
 import config from "@payload-config";
 import { FESTIVALS_PUBLISHED, TEMPLE_STORIES_PUBLISHED } from "./festivals";
@@ -11,6 +11,9 @@ export async function seesReserved(published: boolean, asPublic = false): Promis
   if (published) return true;
   if (asPublic) return false;
   if (process.env.NODE_ENV === "development") return true;
+  // no sign-in cookie: not signed in, known without asking the database (as
+  // for every member of the public, and every search engine, that comes here)
+  if (!(await cookies()).get("payload-token")) return false;
   try {
     const payload = await getPayload({ config });
     const { user } = await payload.auth({ headers: await headers() });

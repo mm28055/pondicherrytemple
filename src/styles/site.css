@@ -1613,6 +1613,20 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
 .photo-rows { --h: 260px; padding-top: 24px; min-height: var(--h); }
 .photo-row { display: flex; gap: 20px; height: var(--h); margin-bottom: 20px; }
 .photo-row .photo-tile { flex: none; height: 100%; aspect-ratio: auto; }
+/* at the end of a day's or event's photos, opened: the way back to fewer of them */
+/* (the day's first photo, dimmed as the "+46" one is, the words over it) */
+.photo-fewer > span { font-size: clamp(12px, 10cqi, 17px); letter-spacing: 0.12em; text-transform: uppercase; }
+/* over each day's or event's photos: its day · temple · what it was · its field note, as .caps */
+.photo-group-head { font-family: var(--display); font-weight: 600; font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); padding: 14px 0 10px; scroll-margin-top: 130px; /* (clear of the bars kept at the top) */ }
+.photo-rows > div > .photo-group-head:first-child { padding-top: 0; }
+.photo-group-head > * + *::before { content: " · "; color: var(--muted); }
+.photo-group-head .note { color: var(--muted); }
+.photo-group-head .note:hover { color: var(--ink); }
+/* on a phone, one line: the field note left out, and what is too long cut short */
+@media (max-width: 560px) {
+  .photo-group-head { font-size: 11.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 10px 0 8px; }
+  .photo-group-head .note { display: none; }
+}
 @media (max-width: 900px) { .photo-rows { --h: 200px; } }
 @media (max-width: 560px) { .photo-rows { --h: 130px; padding-top: 18px; } }
 /* one large, five small: the large one fills two columns and two rows */

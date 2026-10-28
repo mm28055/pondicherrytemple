@@ -5,7 +5,6 @@ import { RitualTabs } from "@/components/RitualTabs";
 import type { ReactNode } from "react";
 
 /* A few words on each festival, below its name: to be written (for now, a stand-in). */
-const ABOUT = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore.";
 
 const GROUPS = [
   { key: "weekly", label: "Every week" },
@@ -139,7 +138,7 @@ export function TempleYear({ year }: { year: TempleRitualYear }) {
                     <div className="year-list">
                       {these.map((e) => (
                         <Entry key={`${e.name ?? ""}|${e.observance?.id ?? ""}`} e={e} className="festival" after={e.days > 1 ? `${e.days} days` : null}>
-                          <span className="year-about">{e.about ?? ABOUT}</span>
+                          {e.about && <span className="year-about">{e.about}</span>}
                         </Entry>
                       ))}
                     </div>

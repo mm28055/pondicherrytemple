@@ -37,13 +37,14 @@ type Props = { params: Promise<{ id: string }> };
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  if (!(await seesFestivalPages())) return {};
   const o = await getObservance((await params).id);
   return o ? { title: o.name, description: `${o.name} — ${o.gloss}.` } : {};
 }
 
 export default async function ObservancePage({ params }: Props) {
-  const o = await getObservance((await params).id);
   if (!(await seesFestivalPages())) notFound();
+  const o = await getObservance((await params).id);
   if (!o) notFound();
 
   // Festival pages are not tied to a region; rows are labelled with each

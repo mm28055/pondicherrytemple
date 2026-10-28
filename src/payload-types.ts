@@ -71,6 +71,7 @@ export interface Config {
     films: Film;
     articles: Article;
     media: Media;
+    'photo-sets': PhotoSet;
     temples: Temple;
     'temple-pieces': TemplePiece;
     occasions: Occasion;
@@ -88,6 +89,9 @@ export interface Config {
     'payload-migrations': PayloadMigration;
   };
   collectionsJoins: {
+    'photo-sets': {
+      photos: 'media';
+    };
     temples: {
       pieces: 'temple-pieces';
       yearSoFar: 'occasions';
@@ -105,6 +109,7 @@ export interface Config {
     films: FilmsSelect<false> | FilmsSelect<true>;
     articles: ArticlesSelect<false> | ArticlesSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
+    'photo-sets': PhotoSetsSelect<false> | PhotoSetsSelect<true>;
     temples: TemplesSelect<false> | TemplesSelect<true>;
     'temple-pieces': TemplePiecesSelect<false> | TemplePiecesSelect<true>;
     occasions: OccasionsSelect<false> | OccasionsSelect<true>;
@@ -438,6 +443,10 @@ export interface Media {
         value: number | FieldNote;
       } | null);
   /**
+   * The day or event it was taken at: it appears wherever its set does, with no tags of its own needed.
+   */
+  set?: (number | null) | PhotoSet;
+  /**
    * A few words describing the photo, for people who cannot see it.
    */
   alt?: string | null;
@@ -447,6 +456,10 @@ export interface Media {
    * Optional. The day the photo was taken, so it is grouped under the right year. Photos in a field note take the note’s date.
    */
   takenOn?: string | null;
+  /**
+   * From the camera, when the photo was brought in. A day’s photos are shown in this order.
+   */
+  takenAt?: string | null;
   /**
    * The picture shown before the video plays. Optional.
    */
@@ -733,6 +746,49 @@ export interface Region {
    * Made from the title when left empty. Change it only before publishing.
    */
   slug?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * The photographs of one day or event, as kept in its folder. They appear on the pages of its temples, beside the field note of the same temple and day (by themselves, once it is published), on the pages of that day’s festivals and rituals, and on the Photographs page.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "photo-sets".
+ */
+export interface PhotoSet {
+  id: number;
+  title: string;
+  /**
+   * The day they were taken. Empty where it is not known.
+   */
+  date?: string | null;
+  /**
+   * The temples they were taken at. Empty for none.
+   */
+  temples?: (number | Temple)[] | null;
+  /**
+   * Only where the day’s festivals and rituals (from “The year so far”) are not enough: these are added to them.
+   */
+  observances?: (number | Observance)[] | null;
+  /**
+   * A card of its own in the section "Pondicherry's Hindu Ethos" on the Temples page.
+   */
+  ethos?: boolean | null;
+  /**
+   * Optional. Left empty, they go beside every field note of the same day and temple. Chosen, beside this note only.
+   */
+  fieldNote?: (number | null) | FieldNote;
+  photos?: {
+    docs?: (number | Media)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
+  /**
+   * Where its photos were brought in from.
+   */
+  folder?: string | null;
+  region: number | Region;
+  createdBy?: (number | null) | User;
   updatedAt: string;
   createdAt: string;
 }
@@ -1153,6 +1209,10 @@ export interface PayloadLockedDocument {
         value: number | Media;
       } | null)
     | ({
+        relationTo: 'photo-sets';
+        value: number | PhotoSet;
+      } | null)
+    | ({
         relationTo: 'temples';
         value: number | Temple;
       } | null)
@@ -1344,10 +1404,12 @@ export interface ArticlesSelect<T extends boolean = true> {
  */
 export interface MediaSelect<T extends boolean = true> {
   partOf?: T;
+  set?: T;
   alt?: T;
   caption?: T;
   credit?: T;
   takenOn?: T;
+  takenAt?: T;
   poster?: T;
   featured?: T;
   consent?: T;
@@ -1401,6 +1463,24 @@ export interface MediaSelect<T extends boolean = true> {
               filename?: T;
             };
       };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "photo-sets_select".
+ */
+export interface PhotoSetsSelect<T extends boolean = true> {
+  title?: T;
+  date?: T;
+  temples?: T;
+  observances?: T;
+  ethos?: T;
+  fieldNote?: T;
+  photos?: T;
+  folder?: T;
+  region?: T;
+  createdBy?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

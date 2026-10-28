@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useState, type CSSProperties, type ReactNode } from "react";
 import type { ObservanceRowData } from "@/lib/view";
+import { FESTIVALS_PUBLISHED } from "@/lib/festivals";
+import { useTeam } from "@/lib/team";
 
 export type GalleryItem = {
   row: ObservanceRowData;
@@ -25,15 +27,16 @@ export function ObservanceGallery({
   lead,
   items,
   head,
-  linked = true,
 }: {
   lead: GalleryItem;
   items: GalleryItem[];
-  /** whether the cards open their festivals' pages */
-  linked?: boolean;
   /** the page's heading and introduction: the search sits under them, on the right */
   head: ReactNode;
 }) {
+  // whether the cards open their festivals' pages: for everyone once published;
+  // until then, for someone signed in to the admin (asked in the browser, lib/team)
+  const team = useTeam(!FESTIVALS_PUBLISHED);
+  const linked = FESTIVALS_PUBLISHED || team;
   const [q, setQ] = useState("");
   const words = q.trim().toLowerCase();
   const matches = (it: GalleryItem) =>

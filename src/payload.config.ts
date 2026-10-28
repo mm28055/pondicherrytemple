@@ -12,6 +12,7 @@ import { FieldNotes } from './payload/collections/FieldNotes'
 import { Films } from './payload/collections/Films'
 import { Media } from './payload/collections/Media'
 import { Observances } from './payload/collections/Observances'
+import { PhotoSets } from './payload/collections/PhotoSets'
 import { Occasions } from './payload/collections/Occasions'
 import { Regions } from './payload/collections/Regions'
 import { SpecialNakshatras } from './payload/collections/SpecialNakshatras'
@@ -67,6 +68,7 @@ export default buildConfig({
     Films,
     Articles,
     Media,
+    PhotoSets,
     Temples,
     TemplePieces,
     Occasions,

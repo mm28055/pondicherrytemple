@@ -21,11 +21,12 @@ function rows(photos: NotePhoto[], units: number, height: number, seed: string):
   const out: Row[] = [];
   let y = 0;
   let i = 0;
-  const next = () => photos[i++ % photos.length];
+  const next = () => photos[i++];
   const shape = (p: NotePhoto) => p.width / p.height;
-  while (height - y >= 80 && photos.length) {
+  // (each photo once: the column ends early if they run out)
+  while (height - y >= 80 && i < photos.length) {
     let row: Row;
-    if (units < 5 || r() < 0.35) {
+    if (units < 5 || r() < 0.35 || photos.length - i < 2) {
       const p = next();
       const h = Math.round(Math.min(340, Math.max(140, stripeWidth(units) / shape(p))));
       row = { h, cells: [{ p, units }] };
@@ -50,8 +51,8 @@ function rows(photos: NotePhoto[], units: number, height: number, seed: string):
 /** Beside a field note's text: photographs down the left of the page, hung
     from the stripes at the top of the page (each photo spans whole red
     stripes, the gaps are white ones), as long as the text. On a narrow
-    screen, a few rows under the text. For now, dummies: the site's
-    photographs, in an order fixed by the note. */
+    screen, a few rows under the text. The note's own photographs (those of
+    its photo sets), in the order taken, as many as fit. */
 export function NotePhotos({ photos, seed }: { photos: NotePhoto[]; seed: string }) {
   const box = useRef<HTMLDivElement>(null);
   // the space the photos may fill, beside the text (see site.css)

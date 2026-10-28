@@ -62,6 +62,8 @@ export async function makeShownCopy(req: PayloadRequest, imageId: number, title:
    does (the copy before it removed), or when it has none yet. A file that cannot be read just now
    leaves the drawing shown as uploaded, until it is next saved. */
 const makeShown: CollectionBeforeChangeHook = async ({ data, originalDoc, req }) => {
+  // (a copy of the live site's own drawings, made on this laptop, comes with its copy for the site)
+  if (req.context?.mirror) return data
   const image = idOf(data?.image)
   if (!image) return data
   const cut = data.cut !== false

@@ -16,7 +16,9 @@
 
 import config from "@payload-config";
 import { draftMode } from "next/headers";
-import { getPayload, type Where } from "payload";
+import { unstable_cache } from "next/cache";
+import { getPayload, type Payload, type Where } from "payload";
+import { PHOTOS_TAG, SITE_CONTENT_TAG } from "./siteCache";
 import { cache } from "react";
 import type * as P from "@/payload-types";
 import type {
@@ -65,6 +67,28 @@ async function previewing(): Promise<boolean> {
   }
 }
 
+/* What the site reads from the database is kept between visits (Next's data
+   cache), each query by its own terms, until anything is saved or deleted in
+   the admin (payload/revalidate clears it all, SITE_CONTENT_TAG): so pages
+   built or rebuilt read the database only after a change, not each time. An
+   editor previewing drafts reads it fresh; so does this laptop's copy of the
+   site (`next dev`), whose database the scripts change from outside it. */
+const fresh = async (draft?: boolean) => Boolean(draft) || process.env.NODE_ENV === "development" || (await previewing());
+const findTagged = (tag: string) =>
+  (async (args: Parameters<Payload["find"]>[0]) => {
+    const load = async () => (await db()).find(args);
+    if (await fresh(args.draft)) return load();
+    return unstable_cache(load, ["find", JSON.stringify(args)], { tags: [tag] })();
+  }) as Payload["find"];
+const find = findTagged(SITE_CONTENT_TAG);
+// the photographs, under their own tag (lib/siteCache)
+const findPhotos = findTagged(PHOTOS_TAG);
+const findGlobal = (async (args: Parameters<Payload["findGlobal"]>[0]) => {
+  const load = async () => (await db()).findGlobal(args);
+  if (await fresh(args.draft)) return load();
+  return unstable_cache(load, ["findGlobal", JSON.stringify(args)], { tags: [SITE_CONTENT_TAG] })();
+}) as Payload["findGlobal"];
+
 /** For collections with drafts: published only, unless previewing. */
 async function visible(): Promise<{ draft: boolean; where?: Where }> {
   const draft = await previewing();
@@ -85,13 +109,13 @@ const populate = {
 const base = { overrideAccess: true, pagination: false, populate } as const;
 
 const rawRegions = cache(async () =>
-  (await (await db()).find({ ...base, collection: "regions", depth: 0, sort: "createdAt" })).docs
+  (await find({ ...base, collection: "regions", depth: 0, sort: "createdAt" })).docs
 );
 
 // (joins: false — the admin's lists of each temple's pieces aren't needed here)
 const rawTemples = cache(async () =>
   (
-    await (await db()).find({
+    await find({
       ...base,
       ...(await visible()),
       collection: "temples",
@@ -105,7 +129,7 @@ const rawTemples = cache(async () =>
 // (joins: false — the admin's lists of each festival's photographs aren't needed here)
 const rawObservances = cache(async () =>
   (
-    await (await db()).find({
+    await find({
       ...base,
       ...(await visible()),
       collection: "observances",
@@ -117,38 +141,38 @@ const rawObservances = cache(async () =>
 );
 
 const rawOccasions = cache(async () =>
-  (await (await db()).find({ ...base, collection: "occasions", depth: 0, sort: "date" })).docs
+  (await find({ ...base, collection: "occasions", depth: 0, sort: "date" })).docs
 );
 
 // Lists of notes and articles skip their pictures and links; each one's own page loads those.
 const rawNotes = cache(async () =>
-  (await (await db()).find({ ...base, ...(await visible()), collection: "field-notes", depth: 0, sort: "-date" }))
+  (await find({ ...base, ...(await visible()), collection: "field-notes", depth: 0, sort: "-date" }))
     .docs
 );
 
 const rawArticles = cache(async () =>
-  (await (await db()).find({ ...base, ...(await visible()), collection: "articles", depth: 0, sort: "-date" })).docs
+  (await find({ ...base, ...(await visible()), collection: "articles", depth: 0, sort: "-date" })).docs
 );
 
 const rawDrawings = cache(async () =>
-  (await (await db()).find({ ...base, ...(await visible()), collection: "drawings", depth: 1, sort: "createdAt" }))
+  (await find({ ...base, ...(await visible()), collection: "drawings", depth: 1, sort: "createdAt" }))
     .docs
 );
 
 const rawPieces = cache(async () =>
-  (await (await db()).find({ ...base, ...(await visible()), collection: "temple-pieces", depth: 1, sort: "createdAt" }))
+  (await find({ ...base, ...(await visible()), collection: "temple-pieces", depth: 1, sort: "createdAt" }))
     .docs
 );
 
 const rawBooks = cache(async () =>
-  (await (await db()).find({ ...base, ...(await visible()), collection: "books", depth: 0 })).docs
+  (await find({ ...base, ...(await visible()), collection: "books", depth: 0 })).docs
 );
 
 /** One document by its web address, with its pictures and links. */
 async function rawOne<C extends "field-notes" | "articles" | "films">(collection: C, slug: string) {
   const { draft, where } = await visible();
   const bySlug: Where = { slug: { equals: slug } };
-  const { docs } = await (await db()).find({
+  const { docs } = await find({
     collection,
     draft,
     where: where ? { and: [bySlug, where] } : bySlug,
@@ -160,23 +184,46 @@ async function rawOne<C extends "field-notes" | "articles" | "films">(collection
   return docs[0] ?? null;
 }
 
-/** Every photograph (not videos or files): the ones tagged with a temple or
-    festival, and the ones in field notes, are picked out below. */
-const rawPhotos = cache(async () =>
-  (
-    await (await db()).find({
-      ...base,
+/** Every photograph (not videos or files): the ones in a photo set, tagged
+    with a temple or festival, or in a field note, are picked out below.
+    Read a part at a time, each part kept on its own (the data cache keeps
+    nothing over 2 MB), with only what the site shows of each. */
+const PHOTO_PART = 1500;
+const rawPhotos = cache(async () => {
+  const out: P.Media[] = [];
+  for (let page = 1; ; page++) {
+    const { docs, hasNextPage } = await findPhotos({
       collection: "media",
       depth: 0,
+      overrideAccess: true,
       where: { mimeType: { contains: "image" } },
-      sort: "-createdAt",
-    })
-  ).docs
+      sort: "id",
+      limit: PHOTO_PART,
+      page,
+      select: {
+        filename: true, url: true, width: true, height: true, focalX: true, focalY: true,
+        alt: true, caption: true, credit: true, consent: true, featured: true, takenOn: true, takenAt: true,
+        temples: true, observances: true, set: true, createdAt: true,
+        sizes: {
+          thumbnail: { url: true, filename: true },
+          card: { url: true, filename: true },
+          large: { url: true, filename: true, width: true, height: true },
+        },
+      },
+    });
+    out.push(...(docs as P.Media[]));
+    if (!hasNextPage) return out;
+  }
+});
+
+/** The photo sets: each day's or event's photographs, as kept in their folders. */
+const rawSets = cache(async () =>
+  (await find({ ...base, collection: "photo-sets", depth: 0, sort: "-date", joins: false })).docs
 );
 
 /** Films, with their video files and still frames (so depth 2). */
 const rawFilms = cache(async () =>
-  (await (await db()).find({ ...base, ...(await visible()), collection: "films", depth: 2, sort: "-date" })).docs
+  (await find({ ...base, ...(await visible()), collection: "films", depth: 2, sort: "-date" })).docs
 );
 
 /* ---------- From stored documents to the site's shapes ---------- */
@@ -187,12 +234,11 @@ const idOf = (ref: Ref) => (ref && typeof ref === "object" ? ref.id : (ref ?? un
 /** Web addresses of everything visible, by database id. Anything not visible
     (unpublished, or deleted) is missing here, so tags pointing at it drop out. */
 const lookups = cache(async () => {
-  const [regions, temples, observances, notes, photos] = await Promise.all([
+  const [regions, temples, observances, notes] = await Promise.all([
     rawRegions(),
     rawTemples(),
     rawObservances(),
     rawNotes(),
-    rawPhotos(),
   ]);
   const regionSlug = new Map(regions.map((r) => [r.id, r.slug ?? ""]));
   const regionOf = (ref: Ref) => regionSlug.get(idOf(ref) ?? -1) ?? "";
@@ -207,7 +253,6 @@ const lookups = cache(async () => {
     templeKey: new Map(temples.filter((t) => t.slug).map((t) => [t.id, `${regionOf(t.region)}/${t.slug}`])),
     observanceSlug: new Map(observances.filter((o) => o.slug).map((o) => [o.id, o.slug!])),
     noteSlug: new Map(notes.filter((n) => n.slug).map((n) => [n.id, n.slug!])),
-    photoById: new Map(photos.map((m) => [m.id, m])),
     paths,
   };
 });
@@ -218,8 +263,18 @@ function slugs(refs: Ref[] | null | undefined, map: Map<number, string>): string
   return (refs ?? []).map((ref) => map.get(idOf(ref) ?? -1)).filter((s): s is string => Boolean(s));
 }
 
-/** Dates are stored as moments; the site shows the day it was in Pondicherry. */
-const dayOf = (moment: string) => new Date(moment).toLocaleDateString("en-CA", { timeZone: "Asia/Kolkata" });
+/** Dates are stored as moments; the site shows the day it was in Pondicherry.
+    (Each worked out once: it is asked of the same few moments thousands of
+    times over, for the photographs, and working it out is slow.) */
+const days = new Map<string, string>();
+const dayOf = (moment: string) => {
+  let day = days.get(moment);
+  if (day === undefined) {
+    day = new Date(moment).toLocaleDateString("en-CA", { timeZone: "Asia/Kolkata" });
+    days.set(moment, day);
+  }
+  return day;
+};
 
 function toPicture(ref: number | P.Media | null | undefined): Picture | undefined {
   if (!ref || typeof ref !== "object" || !ref.url || ref.consent === "withhold") return undefined;
@@ -302,11 +357,9 @@ function toFieldNote(n: P.FieldNote, L: Lookups, full: boolean): FieldNote {
     excerpt: openingText(n.body),
     // For the Field Notes page, which shows as much as fits beside the photograph.
     summary: plainText(n.body).slice(0, 1500),
-    // For lists: its first photograph (if any can be shown).
-    lead: (n.photos ?? [])
-      .map((ref) => (typeof ref === "object" ? ref : L.photoById.get(ref)))
-      .map(toPicture)
-      .find((p): p is Picture => Boolean(p)),
+    // For lists: its first photograph (if any can be shown); for a list's
+    // notes, read without their photographs, filled in from them (fieldNotes)
+    lead: (n.photos ?? []).map((ref) => (typeof ref === "object" ? toPicture(ref) : undefined)).find((p): p is Picture => Boolean(p)),
   };
   if (!full) return note;
   // An older single recording, if any, comes first.
@@ -431,9 +484,18 @@ const occasions = cache(async () => {
     );
 });
 
+// (a note's first photograph, for lists: its own, or else the first of its photo sets')
 const fieldNotes = cache(async () => {
   const L = await lookups();
-  return (await rawNotes()).filter((n) => n.slug).map((n) => toFieldNote(n, L, false));
+  const { byNote } = await photoData();
+  return (await rawNotes())
+    .filter((n) => n.slug)
+    .map((n) => toFieldNote(n, L, false))
+    // (its 960 px copy: lists show it small)
+    .map((n) => {
+      const first = byNote.get(n.id)?.[0];
+      return n.lead || !first ? n : { ...n, lead: { ...first, src: first.medium } };
+    });
 });
 
 const articles = cache(async () => {
@@ -453,34 +515,83 @@ const illustrations = cache(async () => {
 });
 
 /* A photo shows wherever it is tagged itself, and wherever each visible
-   field note it is in is tagged. */
-const photos = cache(async () => {
+   field note it is in is tagged. A photo in a photo set shows where its set
+   does: at the set's temples; beside the field note chosen for the set, or
+   else each one of the same day at one of its temples (so a note's photos
+   come by themselves the day it is published); and at the festivals and
+   rituals of that day at its temples, from "The year so far", with those
+   chosen for the set and those of its notes. A set of Pondicherry's Hindu
+   Ethos takes only the tags chosen for it. Photos in a set show on the
+   Photographs page even with no tags at all. */
+async function buildPhotoData() {
   const L = await lookups();
+  const notes = await rawNotes();
   const notesWith = new Map<number, P.FieldNote[]>(); // newest note first
-  for (const n of await rawNotes()) {
+  for (const n of notes) {
     if (!n.slug) continue;
     for (const ref of n.photos ?? []) {
       const id = idOf(ref);
       if (id !== undefined) notesWith.set(id, [...(notesWith.get(id) ?? []), n]);
     }
   }
+  // each set's own place: its temples, festivals, notes and day
+  const ids = (refs: Ref[] | null | undefined) => (refs ?? []).map(idOf).filter((id): id is number => id !== undefined);
+  const occasionsOn = new Map<string, P.Occasion[]>();
+  for (const o of await rawOccasions()) {
+    const day = dayOf(o.date);
+    occasionsOn.set(day, [...(occasionsOn.get(day) ?? []), o]);
+  }
+  const sets = new Map(
+    (await rawSets()).map((s) => {
+      const day = s.date ? dayOf(s.date) : undefined;
+      const temples = ids(s.temples);
+      const chosen = idOf(s.fieldNote);
+      // (that day's occasions at its temples may name their note, too)
+      const dayHere = day ? (occasionsOn.get(day) ?? []).filter((o) => temples.includes(idOf(o.temple) ?? -1)) : [];
+      const named = dayHere.map((o) => idOf(o.fieldNote));
+      const setNotes = notes.filter(
+        (n) =>
+          n.slug &&
+          (chosen !== undefined
+            ? n.id === chosen
+            : (Boolean(day) && dayOf(n.date) === day && ids(n.temples).some((t) => temples.includes(t))) || named.includes(n.id))
+      );
+      const observances = new Set(slugs(s.observances, L.observanceSlug));
+      if (!s.ethos) for (const o of dayHere) slugs(o.observances, L.observanceSlug).forEach((x) => observances.add(x));
+      return [s.id, { set: s, day, temples, notes: setNotes, observances }] as const;
+    })
+  );
+
   const templeByKey = new Map((await temples()).map((t) => [`${t.region}/${t.id}`, t]));
   const observanceById = new Map((await observances()).map((o) => [o.id, o]));
+  // a set's temple, or two, by their shortest names (more: none, a whole town's event)
+  const placeOf = (ids: number[]) => {
+    const names = ids.flatMap((id) => {
+      const t = templeByKey.get(L.templeKey.get(id) ?? "");
+      return t ? [t.shortName ?? t.knownAs ?? t.name] : [];
+    });
+    return names.length && names.length <= 2 ? names.join(" and ") : undefined;
+  };
   const out: Photo[] = [];
+  const byNote = new Map<string, Photo[]>();
+  const timeOf = new Map<Photo, string>(); // when the camera says each was taken, for the order within a day
   for (const m of await rawPhotos()) {
     const picture = toPicture(m);
     if (!picture) continue;
-    const notes = notesWith.get(m.id) ?? [];
+    const inSet = sets.get(idOf(m.set) ?? -1);
+    const notes = [...(notesWith.get(m.id) ?? []), ...(inSet?.notes ?? [])].filter((n, i, all) => all.indexOf(n) === i);
     const temples = new Set(slugs(m.temples, L.templeKey));
     const observances = new Set(slugs(m.observances, L.observanceSlug));
+    inSet?.temples.forEach((t) => L.templeKey.has(t) && temples.add(L.templeKey.get(t)!));
+    inSet?.observances.forEach((o) => observances.add(o));
     for (const n of notes) {
       slugs(n.temples, L.templeKey).forEach((t) => temples.add(t));
       slugs(n.observances, L.observanceSlug).forEach((o) => observances.add(o));
     }
-    if (!temples.size && !observances.size) continue;
-    const note = notes[0];
-    const taken = m.takenOn ?? note?.date;
-    out.push({
+    if (!inSet && !temples.size && !observances.size) continue;
+    const note = [...notes].sort((a, b) => b.date.localeCompare(a.date))[0];
+    const taken = m.takenOn ?? inSet?.day ?? note?.date;
+    const photo: Photo = {
       ...picture,
       id: String(m.id),
       small: m.sizes?.thumbnail?.url ?? picture.src,
@@ -503,10 +614,68 @@ const photos = cache(async () => {
       dated: Boolean(taken),
       featured: Boolean(m.featured),
       note: note ? { href: `/field-notes/${note.slug}`, title: note.title } : undefined,
-    });
+      set: inSet ? String(inSet.set.id) : undefined,
+      occasion: inSet?.set.title || undefined,
+      place: inSet ? placeOf(inSet.temples) : undefined,
+    };
+    out.push(photo);
+    if (m.takenAt) timeOf.set(photo, m.takenAt);
+    for (const n of notes) byNote.set(n.slug!, [...(byNote.get(n.slug!) ?? []), photo]);
   }
-  return out.sort(byDateDesc);
+  // newest day first, those of no known day after all the rest; a day's
+  // photos in the order they were taken (by the camera's time, else as
+  // numbered by the camera and brought in)
+  // and each day's sets kept together, in the order they began
+  const began = new Map<string, string>();
+  for (const p of out) {
+    const t = timeOf.get(p) ?? "~";
+    if (p.set && !(began.get(p.set)! <= t)) began.set(p.set, t);
+  }
+  const startOf = (p: Photo) => (p.set ? `${began.get(p.set)}|${p.set.padStart(8, "0")}` : "");
+  const list = out.sort(
+    (a, b) =>
+      Number(b.dated) - Number(a.dated) ||
+      b.date.localeCompare(a.date) ||
+      startOf(a).localeCompare(startOf(b)) ||
+      (timeOf.get(a) ?? "").localeCompare(timeOf.get(b) ?? "") ||
+      Number(a.id) - Number(b.id)
+  );
+  for (const [, list] of byNote) list.sort((a, b) => (timeOf.get(a) ?? "").localeCompare(timeOf.get(b) ?? "") || Number(a.id) - Number(b.id));
+  return { list, byNote, sets };
+}
+
+/* Working the photographs out takes a while (there are thousands), so it is
+   done once and kept, across visits, until anything it rests on changes: a
+   photo, a photo set, a field note, an occasion, a temple or a festival (each
+   one's latest change, and how many there are), or drafts being previewed. */
+const PHOTO_SOURCES = ["media", "photo-sets", "field-notes", "occasions", "temples", "observances"] as const;
+let keptPhotos: { key: string; data: ReturnType<typeof buildPhotoData> } | null = null;
+const photoData = cache(async () => {
+  const draft = await previewing();
+  const marks = await Promise.all(
+    PHOTO_SOURCES.map(async (collection) => {
+      const { docs, totalDocs } = await (collection === "media" ? findPhotos : find)({
+        collection,
+        depth: 0,
+        limit: 1,
+        sort: "-updatedAt",
+        overrideAccess: true,
+        draft,
+        select: { updatedAt: true },
+      });
+      return `${totalDocs}@${docs[0]?.updatedAt ?? ""}`;
+    })
+  );
+  const key = [draft, ...marks].join("|");
+  if (keptPhotos?.key !== key) {
+    const data = buildPhotoData();
+    keptPhotos = { key, data };
+    data.catch(() => keptPhotos?.data === data && (keptPhotos = null)); // a failed one is tried again next time
+  }
+  return keptPhotos.data;
 });
+
+const photos = cache(async () => (await photoData()).list);
 
 const templeEntries = cache(async () => {
   const L = await lookups();
@@ -643,7 +812,7 @@ export async function getLineBegins(): Promise<string> {
 
 /** The nakshatrams kept specially in a Tamil month (set in the admin as rules): month → nakshatram names. */
 export const getSpecialNakshatras = cache(async (): Promise<Record<string, { name: string; nakshatram: string; icon: SpecialIconKey | null }[]>> => {
-  const docs = (await (await db()).find({ ...base, collection: "special-nakshatras", depth: 0 })).docs;
+  const docs = (await find({ ...base, collection: "special-nakshatras", depth: 0 })).docs;
   const out: Record<string, { name: string; nakshatram: string; icon: SpecialIconKey | null }[]> = {};
   for (const d of docs) (out[d.month] ??= []).push({ name: d.name, nakshatram: d.nakshatram, icon: d.replaceIcon && d.icon ? (d.icon as SpecialIconKey) : null });
   return out;
@@ -653,7 +822,7 @@ export const getSpecialNakshatras = cache(async (): Promise<Record<string, { nam
     month → its rules, each a tithi and the day's name in English and Tamil. */
 export type SpecialTithi = { name: string; tamil: string; tithi: TithiKey; nakshatram: string | null; icon: SpecialIconKey | null };
 export const getSpecialTithis = cache(async (): Promise<Record<string, SpecialTithi[]>> => {
-  const docs = (await (await db()).find({ ...base, collection: "special-tithis", depth: 0 })).docs;
+  const docs = (await find({ ...base, collection: "special-tithis", depth: 0 })).docs;
   const out: Record<string, SpecialTithi[]> = {};
   for (const d of docs) (out[d.month] ??= []).push({ name: d.name, tamil: d.tamil ?? "", tithi: d.tithi as TithiKey, nakshatram: d.nakshatram ?? null, icon: d.replaceIcon && d.icon ? (d.icon as SpecialIconKey) : null });
   return out;
@@ -692,7 +861,7 @@ export type WeeklyRitual = RegularRitual;
 export const getWeeklyRituals = cache(async (): Promise<WeeklyRitual[]> => (await getRegularRituals()).filter((r) => r.often === "weekly"));
 export const getRegularRituals = cache(async (): Promise<RegularRitual[]> => {
   const [docs, temples, L, obs] = await Promise.all([
-    (async () => (await (await db()).find({ ...base, collection: "weekly-rituals", depth: 0 })).docs)(),
+    (async () => (await find({ ...base, collection: "weekly-rituals", depth: 0 })).docs)(),
     rawTemples(),
     lookups(),
     observances(),
@@ -880,8 +1049,12 @@ export async function getTempleRitualYear(regionId: string, templeId: string): P
   for (const o of seen) {
     const what = dayOf(o);
     if (!what) continue;
-    // a day of one of the regular rituals: counted there, not again
-    if ((what.recurs ?? what.observance.recurs) !== "yearly" && isRegular(o)) continue;
+    // a day of one of the regular rituals: counted there, not again. So too a
+    // day of rites alone listed under its own name ("Puja for Punarpoosam…",
+    // tagged Purappadu): counted with the yearly, it would otherwise stay
+    // among the festivals although it is the monthly Punarpoosam
+    const ownName = what.name !== undefined;
+    if (((what.recurs ?? what.observance.recurs) !== "yearly" || ownName) && isRegular(o)) continue;
     whatOf.set(what.key, what);
     datesOf.set(what.key, (datesOf.get(what.key) ?? new Set<string>()).add(o.date));
   }
@@ -1087,6 +1260,24 @@ export async function getPhotosForTemple(regionId: string, templeId: string): Pr
   return (await photos()).filter((p) => p.temples.includes(`${regionId}/${templeId}`));
 }
 
+/** A field note's photographs: those of its photo sets (the same day, at
+    its temples), and any put in the note itself; in the order taken. */
+export async function getPhotosForNote(noteId: string): Promise<Photo[]> {
+  return (await photoData()).byNote.get(noteId) ?? [];
+}
+
+/** The photo sets of Pondicherry's Hindu Ethos in a region, newest first,
+    each with its photographs. */
+export async function getEthosSets(regionId: string): Promise<{ id: string; title: string; date?: string; photos: Photo[] }[]> {
+  const L = await lookups();
+  const { list, sets } = await photoData();
+  return [...sets.values()]
+    .filter(({ set }) => set.ethos && L.regionOf(set.region) === regionId)
+    .map(({ set, day }) => ({ id: String(set.id), title: set.title, date: day, photos: list.filter((p) => p.set === String(set.id)) }))
+    .filter((s) => s.photos.length > 0)
+    .sort((a, b) => (b.date ?? "").localeCompare(a.date ?? ""));
+}
+
 /** Every photograph that may be shown. */
 export async function getPhotos(): Promise<Photo[]> {
   return photos();
@@ -1182,7 +1373,7 @@ export async function getBook(regionId: string): Promise<Book | null> {
 export async function getSectionIntro(name: SectionName): Promise<string> {
   const original = SECTION_INTROS.find((s) => s.name === name)!.text;
   try {
-    const g = await (await db()).findGlobal({ slug: "section-descriptions", depth: 0, overrideAccess: true });
+    const g = await findGlobal({ slug: "section-descriptions", depth: 0, overrideAccess: true });
     return g[name]?.trim() || original;
   } catch {
     return original;
@@ -1193,7 +1384,7 @@ export async function getSectionIntro(name: SectionName): Promise<string> {
     admin; a day not yet written is left out. */
 export async function getVaramDays(): Promise<Record<string, string>> {
   try {
-    const g = (await (await db()).findGlobal({ slug: "varam", depth: 0, overrideAccess: true })) as unknown as Record<string, unknown>;
+    const g = (await findGlobal({ slug: "varam", depth: 0, overrideAccess: true })) as unknown as Record<string, unknown>;
     return Object.fromEntries(
       ["sun", "mon", "tue", "wed", "thu", "fri", "sat"]
         .map((d) => [d, typeof g[d] === "string" ? (g[d] as string).trim() : ""])
@@ -1206,7 +1397,7 @@ export async function getVaramDays(): Promise<Record<string, string>> {
 
 /** The home page's words, or null if not yet written. */
 export async function getHomePage(): Promise<HomePageText | null> {
-  const g = await (await db()).findGlobal({ slug: "home-page", depth: 1, overrideAccess: true });
+  const g = await findGlobal({ slug: "home-page", depth: 1, overrideAccess: true });
   if (!g.headline) return null;
   const L = await lookups();
   return {
@@ -1225,7 +1416,7 @@ export async function getHomePage(): Promise<HomePageText | null> {
 
 /** The About page's words, or null if not yet written. */
 export async function getAboutPage(): Promise<AboutPageText | null> {
-  const g = await (await db()).findGlobal({ slug: "about-page", depth: 1, overrideAccess: true });
+  const g = await findGlobal({ slug: "about-page", depth: 1, overrideAccess: true });
   if (!g.lede) return null;
   const L = await lookups();
   return {

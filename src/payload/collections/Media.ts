@@ -94,6 +94,18 @@ export const Media: CollectionConfig = {
       },
     },
     {
+      name: 'set',
+      type: 'relationship',
+      relationTo: 'photo-sets',
+      label: 'Photo set',
+      index: true,
+      admin: {
+        position: 'sidebar',
+        condition: (data) => isImage(data) && !inFilm(data),
+        description: 'The day or event it was taken at: it appears wherever its set does, with no tags of its own needed.',
+      },
+    },
+    {
       name: 'alt',
       type: 'text',
       label: 'What it shows',
@@ -113,6 +125,17 @@ export const Media: CollectionConfig = {
         date: { pickerAppearance: 'dayOnly', displayFormat: 'd MMMM yyyy' },
         description:
           'Optional. The day the photo was taken, so it is grouped under the right year. Photos in a field note take the note’s date.',
+      },
+    },
+    {
+      name: 'takenAt',
+      type: 'date',
+      label: 'Time taken',
+      admin: {
+        readOnly: true,
+        condition: (data) => Boolean(data?.takenAt),
+        date: { pickerAppearance: 'dayAndTime', displayFormat: 'd MMMM yyyy, h:mm:ss a' },
+        description: 'From the camera, when the photo was brought in. A day’s photos are shown in this order.',
       },
     },
     {

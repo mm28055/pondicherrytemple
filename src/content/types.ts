@@ -214,6 +214,13 @@ export interface Photo extends Picture {
   dated: boolean;
   /** Ticked "Show first" in the admin: leads the Photographs section. */
   featured: boolean;
+  /** The photo set it is in (the day or event it was taken at), if any. */
+  set?: string;
+  /** What its set was, as named in the admin ("Vallala Kottai"), and the
+      temple(s) it was at, by their shortest names: for the line over each
+      set's photographs. */
+  occasion?: string;
+  place?: string;
   /** The newest field note it appears in. */
   note?: { href: string; title: string };
 }

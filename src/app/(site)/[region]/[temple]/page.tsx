@@ -25,6 +25,7 @@ import { articleRow, filmTile, noteRow, templesOf } from "@/lib/view";
 import { Drawings } from "@/components/Drawings";
 import { FilmWall } from "@/components/FilmWall";
 import { PhotoWall } from "@/components/PhotoWall";
+import { leadPhotos } from "@/lib/photoPack";
 import { NoteRow } from "@/components/Rows";
 import { TempleYear } from "@/components/TempleYear";
 import { ShowMore } from "@/components/ShowMore";
@@ -149,7 +150,7 @@ export default async function TemplePage({ params }: Props) {
           {photos.length > 0 && (
             <section id="photographs">
               <h2 className="sub-head">Photographs</h2>
-              <PhotoWall photos={photos} layout="lead" seeAll={own.length ? `/${region.id}/${t.id}/photographs` : undefined} />
+              <PhotoWall photos={leadPhotos(photos)} total={photos.length} layout="lead" seeAll={own.length ? `/${region.id}/${t.id}/photographs` : undefined} />
             </section>
           )}
 
@@ -228,7 +229,7 @@ async function AroundTemplePage({ regionId, regionName, templeId }: { regionId: 
         )}
         <section id="photographs">
           <h2 className="sub-head">Photographs</h2>
-          <PhotoWall photos={photos} layout="lead" seeAll={own.length ? `/${regionId}/${t.id}/photographs` : undefined} />
+          <PhotoWall photos={leadPhotos(photos)} total={photos.length} layout="lead" seeAll={own.length ? `/${regionId}/${t.id}/photographs` : undefined} />
         </section>
         {films.length > 0 && (
           <section>

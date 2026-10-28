@@ -1,5 +1,5 @@
-import type { Metadata } from "next";
 import Link from "next/link";
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import {
   getPhotoFilters,
@@ -11,6 +11,7 @@ import {
   hasPage,
 } from "@/lib/data";
 import { PhotoWall } from "@/components/PhotoWall";
+import { packPhotos } from "@/lib/photoPack";
 
 type Props = { params: Promise<{ region: string; temple: string }> };
 
@@ -45,13 +46,10 @@ export default async function TemplePhotosPage({ params }: Props) {
         <Link className="crumb" href={`/${region.id}/${t.id}`}>
           ← {t.knownAs ?? t.name}
         </Link>
-        <div className="kicker">
-          Photographs · {photos.length}
-        </div>
         <h1 className="temple-title">{t.knownAs ?? t.name}</h1>
       </header>
       <section className="section">
-        <PhotoWall photos={photos} layout="all" filters={filters} />
+        <PhotoWall pack={packPhotos(photos)} layout="all" filters={filters} heads={{}} />
       </section>
     </div>
   );

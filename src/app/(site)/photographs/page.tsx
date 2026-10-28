@@ -1,7 +1,8 @@
-import type { Metadata } from "next";
 import Link from "next/link";
+import type { Metadata } from "next";
 import { getPhotoFilters, getPhotos } from "@/lib/data";
 import { PhotoWall } from "@/components/PhotoWall";
+import { packPhotos } from "@/lib/photoPack";
 
 export const metadata: Metadata = {
   title: "Photographs",
@@ -11,7 +12,8 @@ export const metadata: Metadata = {
 /** Every photograph, newest first, which can be narrowed by temple,
     festival and year. (To be designed.) In the menu, under Field Notes. */
 export default async function PhotographsPage() {
-  const photos = [...(await getPhotos())].sort((a, b) => b.date.localeCompare(a.date));
+  // newest first (as they come: a day's photos in the order taken)
+  const photos = await getPhotos();
   const filters = await getPhotoFilters(photos, ["temples", "observances", "years"]);
 
   return (
@@ -23,7 +25,7 @@ export default async function PhotographsPage() {
         <h1 className="page-title">Photographs</h1>
       </header>
       <section className="section">
-        <PhotoWall photos={photos} layout="all" filters={filters} />
+        <PhotoWall pack={packPhotos(photos)} layout="all" filters={filters} heads={{ temple: true, note: true }} />
       </section>
     </div>
   );

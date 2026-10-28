@@ -6,7 +6,7 @@ import {
   getFieldNote,
   getFieldNotes,
   getFieldNotesForTemple,
-  getPhotos,
+  getPhotosForNote,
   getObservancesById,
   getRegion,
   getTemple,
@@ -20,7 +20,6 @@ import { Html } from "@/components/Prose";
 import { NoteRow } from "@/components/Rows";
 import { FestivalLink } from "@/components/FestivalLink";
 import { NotePhotos } from "@/components/NotePhotos";
-import { seeded } from "@/lib/mahotsavam";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -59,13 +58,16 @@ export default async function FieldNotePage({ params }: Props) {
   const older = at >= 0 ? all[at + 1] : undefined;
   const newer = at > 0 ? all[at - 1] : undefined;
 
-  // the photographs beside the text: dummies for now, the site's own, in an
-  // order fixed by the note
-  const r = seeded(note.id);
-  const dummies = (await getPhotos())
-    .map((p) => ({ p, k: r() }))
-    .sort((a, b) => a.k - b.k)
-    .map(({ p: { id, medium, alt, focus, width, height } }) => ({ id, medium, alt, focus, width, height }));
+  // the photographs beside the text: its own (those of its photo sets, the
+  // same day at its temples), in the order taken
+  const photos = (await getPhotosForNote(note.id)).map(({ id, medium, alt, focus, width, height }) => ({
+    id,
+    medium,
+    alt,
+    focus,
+    width,
+    height,
+  }));
 
   return (
     <>
@@ -105,7 +107,7 @@ export default async function FieldNotePage({ params }: Props) {
       {/* the text in a column at the right, ending where the line above
           ends; the photographs down the left beside it */}
       <div className="wrap note-layout">
-        <NotePhotos photos={dummies} seed={note.id} />
+        <NotePhotos photos={photos} seed={note.id} />
         <div className="note-text">
           <article className="note-body">
             {note.body && <Html className="rich" html={note.body} />}

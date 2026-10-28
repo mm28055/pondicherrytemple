@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { getFieldNotes, getPhotos, getRegion, getSectionIntro, getTemples } from "@/lib/data";
+import { STRIP_PHOTOS } from "@/lib/photoPack";
 import { FIELD_KIND_LABELS } from "@/content/labels";
 import type { FieldKind } from "@/content/types";
 import { noteRow } from "@/lib/view";
@@ -29,8 +30,10 @@ export default async function FieldNotesPage() {
 
   // the home page's strip of photographs, the same in every way: the newest
   // first, all of them in turn
-  const stripPhotos = [...(await getPhotos())]
-    .sort((a, b) => b.date.localeCompare(a.date))
+  // (as they come, the newest first; and only the newest STRIP_PHOTOS:
+  // thousands would weigh the page down)
+  const stripPhotos = (await getPhotos())
+    .slice(0, STRIP_PHOTOS)
     .map(({ id, small, alt, focus, width, height }) => ({ id, small, alt, focus, width, height }));
 
   return (
