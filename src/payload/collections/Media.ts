@@ -1,6 +1,7 @@
 import fs from 'fs/promises'
 import path from 'path'
 import { APIError, type CollectionBeforeChangeHook, type CollectionConfig } from 'payload'
+import { hasCopyright } from '../../lib/copyrightExif'
 import { checkVideoAt, checkVideoBytes, HEVC_MESSAGE, isHevc } from '../../lib/videoCheck'
 import { fileURLToPath } from 'url'
 import { canUpdateOwn, isEditor, isLoggedIn } from '../access'
@@ -79,6 +80,10 @@ export const Media: CollectionConfig = {
     ],
     adminThumbnail: 'thumbnail',
     focalPoint: true,
+    // the smaller copies keep the photo's details only where they carry the
+    // site's copyright (lib/copyrightExif), so that goes with every copy; a
+    // camera's own (where it was taken, the camera) are never passed on
+    withMetadata: async ({ metadata }) => Boolean(metadata.exif && hasCopyright(new Uint8Array(metadata.exif))),
   },
   fields: [
     {

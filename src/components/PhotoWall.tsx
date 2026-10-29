@@ -7,6 +7,7 @@ import type { Photo, PhotoFilter } from "@/content/types";
 import { formatDate } from "@/lib/calendar";
 import { stripeRows, stripeWidth, useStripeFit } from "@/lib/stripes";
 import { FilterBar } from "@/components/FilterBar";
+import { Zoomable } from "@/components/Zoomable";
 import { eventOf, photoCount, unpackPhotos, type PhotoPack } from "@/lib/photoPack";
 
 const PAGE = 30;
@@ -416,7 +417,9 @@ export function PhotoWall({ photos: given, pack, total, layout, seeAll, filters 
       >
         {photo && (
           <figure className="photo-viewer-inner" onClick={(e) => e.target === e.currentTarget && close()}>
-            <img key={photo.id} src={photo.src} alt={photo.alt || photo.caption || ""} />
+            <Zoomable key={photo.id}>
+              <img src={photo.src} alt={photo.alt || photo.caption || ""} />
+            </Zoomable>
             <figcaption>
               {note && <span className="photo-viewer-note">{note}</span>}
               {/* its date, where it was, what for, then who took it (not "12 of 2,600": no help in so many) */}

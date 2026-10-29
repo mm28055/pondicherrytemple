@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import type { Facing, Illustration } from "@/content/types";
 import { LAYOUT_STEP, LAYOUT_UNDER } from "@/lib/layoutStack";
+import { Zoomable } from "@/components/Zoomable";
 
 /* A layout is drawn with its deity facing down (south); on the site north is
    at the top, so it is turned until its deity faces the way the drawing says
@@ -147,7 +148,9 @@ export function TempleLayout({ layouts }: { layouts: Illustration[] }) {
             ‹
           </button>
         )}
-        <LayoutImage key={shown.id} d={shown} alt={shown.alt} style={{ "--ratio": shapeOf(shown).ratio } as CSSProperties} />
+        <Zoomable key={shown.id}>
+          <LayoutImage d={shown} alt={shown.alt} style={{ "--ratio": shapeOf(shown).ratio } as CSSProperties} />
+        </Zoomable>
         <p className="layout-dialog-caption">
           {shown.title}
           {n > 1 && (

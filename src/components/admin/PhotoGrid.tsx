@@ -2,6 +2,7 @@
 
 import { useDocumentInfo, useFormFields } from '@payloadcms/ui'
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { withCopyright } from '../../lib/copyrightExif'
 
 /* In a photo set's form: its photos as small pictures, to see at a glance.
    - Dragged into the order the site shows them in (saved with "Save order").
@@ -10,7 +11,8 @@ import { useCallback, useEffect, useRef, useState } from 'react'
    - More added, as many at once as wanted (dropped on the grid, or "Add
      photos"): each made ready in this browser as the import makes them
      (upright, at most 2400 pixels long, the camera's time kept, credited
-     Deepa for files named IMG…, else Arunaditya), then sent to the set, where
+     Deepa for files named IMG…, else Arunaditya, the site's copyright in its
+     details: lib/copyrightExif), then sent to the set, where
      the server makes its three smaller sizes. How long the rest will take is
      shown as they go. */
 
@@ -212,7 +214,8 @@ export function PhotoGrid() {
           const [blob, takenAt] = await Promise.all([shrink(file), takenAtOf(file)])
           const form = new FormData()
           const name = `${stem}-${slugify(file.name.replace(/\.[^.]+$/, ''))}.jpg`
-          form.append('file', new File([blob], name, { type: 'image/jpeg' }))
+          const marked = withCopyright(new Uint8Array(await blob.arrayBuffer()), takenAt ? new Date(takenAt) : undefined)
+          form.append('file', new File([marked as BlobPart], name, { type: 'image/jpeg' }))
           form.append(
             '_payload',
             JSON.stringify({
