@@ -106,6 +106,13 @@ export const Media: CollectionConfig = {
       },
     },
     {
+      // its place in its set, as arranged in the set's photo grid (empty: by the time taken)
+      name: 'position',
+      type: 'number',
+      index: true,
+      admin: { hidden: true },
+    },
+    {
       name: 'alt',
       type: 'text',
       label: 'What it shows',

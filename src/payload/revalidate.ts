@@ -17,7 +17,7 @@ import { PHOTOS_TAG, SITE_CONTENT_TAG } from '../lib/siteCache'
    Scripts (like the import) pass `skipRevalidate`, and outside Next.js
    there is nothing to refresh, so errors are ignored. */
 
-function refresh(context: Record<string, unknown>, collection?: string) {
+export function refresh(context: Record<string, unknown>, collection?: string) {
   if (context.skipRevalidate) return
   try {
     revalidateTag(SITE_CONTENT_TAG, 'max')

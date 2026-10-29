@@ -1,7 +1,7 @@
-import type { CollectionConfig } from 'payload'
+import { APIError, type CollectionConfig } from 'payload'
 import { canCreateContent, canUpdateContent, isEditor } from '../access'
 import { createdByField, observancesField, regionField, templesField } from '../fields'
-import { refreshHooks } from '../revalidate'
+import { refresh, refreshHooks } from '../revalidate'
 
 /* The photographs of one visit: a temple's day (or event), as they were kept
    in their folder (temple / date_event / photos). Its photos belong where it
@@ -32,6 +32,39 @@ export const PhotoSets: CollectionConfig = {
     delete: isEditor,
   },
   hooks: refreshHooks,
+  endpoints: [
+    {
+      // the set's photos in the order arranged in its photo grid: each one's
+      // place saved, and the site refreshed once, not once for each photo
+      path: '/:id/order',
+      method: 'post',
+      handler: async (req) => {
+        if (!req.user) throw new APIError('Sign in first.', 401)
+        const set = Number(req.routeParams?.id)
+        const { ids } = ((await req.json?.()) ?? {}) as { ids?: number[] }
+        if (!set || !Array.isArray(ids)) throw new APIError('Which photos, in what order?', 400)
+        const own = await req.payload.find({
+          collection: 'media',
+          where: { set: { equals: set } },
+          depth: 0,
+          limit: 0,
+          pagination: false,
+          select: { position: true },
+          req,
+        })
+        const was = new Map(own.docs.map((m) => [m.id, m.position]))
+        const quiet = { req, depth: 0, overrideAccess: false, context: { skipRevalidate: true } } as const
+        let changed = 0
+        for (const [i, id] of ids.entries()) {
+          if (!was.has(id) || was.get(id) === i + 1) continue
+          await req.payload.update({ collection: 'media', id, data: { position: i + 1 }, ...quiet })
+          changed++
+        }
+        if (changed) refresh({}, 'media')
+        return Response.json({ changed })
+      },
+    },
+  ],
   fields: [
     {
       type: 'row',
@@ -87,12 +120,18 @@ export const PhotoSets: CollectionConfig = {
       },
     },
     {
+      // its photos as small pictures: dragged into order, chosen to delete, more added
+      name: 'photoGrid',
+      type: 'ui',
+      admin: { components: { Field: '/components/admin/PhotoGrid#PhotoGrid' } },
+    },
+    {
       name: 'photos',
       type: 'join',
       collection: 'media',
       on: 'set',
       defaultLimit: 50,
-      admin: { defaultColumns: ['filename', 'credit', 'featured'] },
+      admin: { hidden: true, defaultColumns: ['filename', 'credit', 'featured'] },
     },
     {
       name: 'folder',

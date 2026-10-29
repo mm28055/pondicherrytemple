@@ -203,7 +203,7 @@ const rawPhotos = cache(async () => {
       page,
       select: {
         filename: true, url: true, width: true, height: true, focalX: true, focalY: true,
-        alt: true, caption: true, credit: true, consent: true, featured: true, takenOn: true, takenAt: true,
+        alt: true, caption: true, credit: true, consent: true, featured: true, takenOn: true, takenAt: true, position: true,
         temples: true, observances: true, set: true, createdAt: true,
         sizes: {
           thumbnail: { url: true, filename: true },
@@ -600,6 +600,7 @@ async function buildPhotoData() {
   const out: Photo[] = [];
   const byNote = new Map<string, Photo[]>();
   const timeOf = new Map<Photo, string>(); // when the camera says each was taken, for the order within a day
+  const placeIn = new Map<Photo, number>(); // its place in its set, as arranged in the admin's photo grid
   // the sets of each day at each temple: a photo in no set (a film's still) is
   // shown with the one set of its day at its temple, as part of that event
   const setsOfDay = new Map<string, Set<typeof sets extends Map<unknown, infer V> ? V : never>>();
@@ -664,28 +665,36 @@ async function buildPhotoData() {
     };
     out.push(photo);
     if (m.takenAt) timeOf.set(photo, m.takenAt);
+    if (typeof m.position === "number") placeIn.set(photo, m.position);
     for (const n of notes) byNote.set(n.slug!, [...(byNote.get(n.slug!) ?? []), photo]);
   }
   // newest day first, those of no known day after all the rest; a day's
   // photos in the order they were taken (by the camera's time, else as
   // numbered by the camera and brought in)
   // and each day's events kept together (two sets of one name, one event:
-  // lib/photoPack, eventOf), in the order they began
+  // lib/photoPack, eventOf), in the order they began; within an event, set
+  // by set, each as arranged in its photo grid, if it has been
   const began = new Map<string, string>();
+  const setBegan = new Map<string, string>();
   for (const p of out) {
     const t = timeOf.get(p) ?? "~";
     if (p.set && !(began.get(eventOf(p))! <= t)) began.set(eventOf(p), t);
+    if (p.set && !(setBegan.get(p.set)! <= t)) setBegan.set(p.set, t);
   }
   const startOf = (p: Photo) => (p.set ? `${began.get(eventOf(p))}|${eventOf(p)}` : "");
+  const inSetOrder = (a: Photo, b: Photo) =>
+    (a.set && b.set ? `${setBegan.get(a.set)}|${a.set}`.localeCompare(`${setBegan.get(b.set)}|${b.set}`) : 0) ||
+    (a.set && a.set === b.set ? (placeIn.get(a) ?? Infinity) - (placeIn.get(b) ?? Infinity) : 0) ||
+    (timeOf.get(a) ?? "").localeCompare(timeOf.get(b) ?? "") ||
+    Number(a.id) - Number(b.id);
   const list = out.sort(
     (a, b) =>
       Number(b.dated) - Number(a.dated) ||
       b.date.localeCompare(a.date) ||
       startOf(a).localeCompare(startOf(b)) ||
-      (timeOf.get(a) ?? "").localeCompare(timeOf.get(b) ?? "") ||
-      Number(a.id) - Number(b.id)
+      inSetOrder(a, b)
   );
-  for (const [, list] of byNote) list.sort((a, b) => (timeOf.get(a) ?? "").localeCompare(timeOf.get(b) ?? "") || Number(a.id) - Number(b.id));
+  for (const [, list] of byNote) list.sort(inSetOrder);
   return { list, byNote, sets };
 }
 

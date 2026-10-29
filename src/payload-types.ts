@@ -449,6 +449,7 @@ export interface Media {
    * The day or event it was taken at: it appears wherever its set does, with no tags of its own needed.
    */
   set?: (number | null) | PhotoSet;
+  position?: number | null;
   /**
    * A few words describing the photo, for people who cannot see it.
    */
@@ -1415,6 +1416,7 @@ export interface ArticlesSelect<T extends boolean = true> {
 export interface MediaSelect<T extends boolean = true> {
   partOf?: T;
   set?: T;
+  position?: T;
   alt?: T;
   caption?: T;
   credit?: T;
