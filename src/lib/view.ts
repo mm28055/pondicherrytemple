@@ -47,11 +47,50 @@ function excerpt(text: string, max = 180) {
   return text.length > max ? text.slice(0, max).replace(/\s+\S*$/, "") + "…" : text;
 }
 
+/* A row says each thing once: on a day whose note has no title of its own
+   (its title only the temple and the occasion, "Vedapuriswara Koyil
+   Brahmotsavam Day 4"), the temple stays in the line above, the title is
+   the occasion, and the opening words that say it again are left out. */
+
+/** As a pattern: the words of `text`, whatever is between them. */
+const wordsOf = (text: string) =>
+  text
+    .split(/[^\p{L}\p{N}]+/u)
+    .filter(Boolean)
+    .map((w) => w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
+    .join("[^\\p{L}\\p{N}]+");
+/** `text` without `lead` at its start (and what follows it, like ": "), when
+    it starts with it and more is left; `sentence`: only a whole sentence
+    ("Brahmotsavam Day 4. We saw…", not "Brahmotsavam Day 4 began…"). */
+function withoutLead(text: string, lead: string, sentence = false) {
+  const words = wordsOf(lead);
+  if (!words) return text;
+  const after = sentence ? "\\s*[.:!–—]+\\s*" : "(?:\\s*[:,;–—-]\\s*|\\s+)";
+  const rest = text.replace(new RegExp(`^\\s*${words}${after}`, "iu"), "");
+  return rest.trim() ? rest : text;
+}
+/** Whether `text` has the words of `part` in it, in order. */
+const hasWords = (text: string, part: string) =>
+  Boolean(wordsOf(part)) && new RegExp(`(^|[^\\p{L}\\p{N}])${wordsOf(part)}(?![\\p{L}\\p{N}])`, "iu").test(text);
+
 export function noteRow(n: FieldNote, temples: Temple[], calendar: CalendarSystem): NoteRowData {
   const d = dateParts(n.date);
   const tagged = n.temples.map((id) => temples.find((t) => t.id === id)).filter((t) => t !== undefined);
   const places = tagged.map((t) => t.knownAs ?? t.name);
   const placesShort = tagged.map((t) => t.shortName ?? t.knownAs ?? t.name);
+  // the title without its temple's name in front (the line above has it)
+  // (the longest of its names it starts with, and only that: not "Vedapuriswara" out of "Vedapuriswara Koyil's…")
+  const names = tagged.flatMap((t) => [t.knownAs, t.name, t.shortName]).filter((s): s is string => Boolean(s));
+  const lead = names
+    .sort((a, b) => b.length - a.length)
+    .find((name) => new RegExp(`^\\s*${wordsOf(name)}(?![\\p{L}\\p{N}])`, "iu").test(n.title));
+  // only from a title that is the temple and the occasion: "Vedapuriswara gets ready…" keeps its temple
+  const rest = lead ? withoutLead(n.title, lead) : n.title;
+  const title = rest !== n.title && hasWords(rest, n.occasion) ? rest : n.title;
+  // the occasion in the line above only when the title does not say it
+  const occasion = hasWords(title, n.occasion) ? "" : n.occasion;
+  // the opening words, when they are the title or the occasion again ("Brahmotsavam Day 4. We saw…")
+  const opening = withoutLead(withoutLead(n.excerpt, title, true), n.occasion, true);
   return {
     id: n.id,
     href: `/field-notes/${n.id}`,
@@ -61,10 +100,10 @@ export function noteRow(n: FieldNote, temples: Temple[], calendar: CalendarSyste
     day: d.day,
     shortMonth: `${d.shortMonth} ${d.year}`,
     local: localMonth(calendar, n.date),
-    where: [places.join(", "), n.occasion].filter(Boolean).join(" · "),
-    whereShort: [placesShort.join(", "), n.occasion].filter(Boolean).join(" · "),
-    title: n.title,
-    excerpt: excerpt(n.excerpt),
+    where: [places.join(", "), occasion].filter(Boolean).join(" · "),
+    whereShort: [placesShort.join(", "), occasion].filter(Boolean).join(" · "),
+    title,
+    excerpt: excerpt(opening),
     by: "", // always Deepa or Arun: lists of field notes leave out who wrote each one
     picture: n.lead && { src: n.lead.src, alt: n.lead.alt },
     longExcerpt: n.summary,

@@ -417,7 +417,7 @@ export function PhotoWall({ photos: given, pack, total, layout, seeAll, filters 
             <img key={photo.id} src={photo.src} alt={photo.alt || photo.caption || ""} />
             <figcaption>
               {note && <span className="photo-viewer-note">{note}</span>}
-              {/* its date, where it was, then who took it (not "12 of 2,600": no help in so many) */}
+              {/* its date, where it was, what for, then who took it (not "12 of 2,600": no help in so many) */}
               {photo.dated && <span className="caps">{formatDate(photo.date)}</span>}
               {photo.tags.length > 0 && (
                 <span className="photo-viewer-tags">
@@ -428,6 +428,10 @@ export function PhotoWall({ photos: given, pack, total, layout, seeAll, filters 
                     </Fragment>
                   ))}
                 </span>
+              )}
+              {/* the occasion, in its shortest form (unless a festival named the same is linked already) */}
+              {photo.short && !photo.tags.some((t) => t.label.toLowerCase() === photo.short!.toLowerCase()) && (
+                <span className="caps">{photo.short}</span>
               )}
               {photo.caption && <span className="photo-viewer-caption">{photo.caption}</span>}
               {photo.credit && <span className="photo-viewer-credit">{photo.credit}</span>}

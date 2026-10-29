@@ -49,7 +49,7 @@ export const FieldNotes: CollectionConfig = {
   admin: {
     group: 'Add to the site',
     useAsTitle: 'title',
-    defaultColumns: ['title', 'date', 'temples', '_status'],
+    defaultColumns: ['title', 'occasion', 'date', 'temples', '_status'],
     description: 'Everything recorded at the temples: what happened, in words, photographs and videos.',
     preview: previewURL('field-notes'),
     components: draftButtons,
@@ -76,7 +76,13 @@ export const FieldNotes: CollectionConfig = {
     ],
   },
   fields: [
-    { name: 'title', type: 'text', required: true },
+    {
+      name: 'title',
+      type: 'text',
+      admin: {
+        description: 'Optional: left empty, the occasion is its title (for a day with nothing more to say than "Brahmotsavam Day 4").',
+      },
+    },
     {
       type: 'row',
       fields: [
@@ -168,7 +174,7 @@ export const FieldNotes: CollectionConfig = {
         { name: 'link', type: 'text', label: 'Original post', admin: { readOnly: true } },
       ],
     },
-    slugField('title', { withDate: true }),
+    slugField(['title', 'occasion'], { withDate: true }),
     regionField,
     reviewField,
     createdByField,

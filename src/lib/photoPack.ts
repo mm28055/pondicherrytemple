@@ -19,6 +19,7 @@ type Group = [
   set: number,
   occasion: number,
   place: number,
+  short: number,
 ];
 // id, group, width, height, the files' shared start, then each one's end, alt, caption, credit, featured, focus
 type Row = [number, number, number, number, number, string, string, string, number, number, number, 0 | 1, number?, number?];
@@ -57,6 +58,7 @@ export function packPhotos(list: Photo[]): PhotoPack {
       w(p.set),
       w(p.occasion),
       w(p.place),
+      w(p.short),
     ];
     const key = JSON.stringify(g);
     if (!groupOf.has(key)) groupOf.set(key, groups.push(g) - 1);
@@ -85,7 +87,7 @@ export function packPhotos(list: Photo[]): PhotoPack {
 export function unpackPhotos({ base, words, groups, photos }: PhotoPack): Photo[] {
   const w = (i: number) => (i < 0 ? undefined : words[i]);
   return photos.map(([id, g, width, height, shared, src, small, medium, alt, caption, credit, featured, fx, fy]) => {
-    const [temples, observances, deities, tags, date, dated, note, set, occasion, place] = groups[g];
+    const [temples, observances, deities, tags, date, dated, note, set, occasion, place, short] = groups[g];
     const start = base + (w(shared) ?? "");
     return {
       id: String(id),
@@ -109,6 +111,7 @@ export function unpackPhotos({ base, words, groups, photos }: PhotoPack): Photo[
       set: w(set),
       occasion: w(occasion),
       place: w(place),
+      short: w(short),
     };
   });
 }

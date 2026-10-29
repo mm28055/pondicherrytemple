@@ -180,7 +180,10 @@ export interface UserAuthOperations {
  */
 export interface FieldNote {
   id: number;
-  title: string;
+  /**
+   * Optional: left empty, the occasion is its title (for a day with nothing more to say than "Brahmotsavam Day 4").
+   */
+  title?: string | null;
   date: string;
   occasion: string;
   /**
@@ -451,6 +454,9 @@ export interface Media {
    */
   alt?: string | null;
   caption?: string | null;
+  /**
+   * Who took it. Shown with the photo, except the team’s own (Photograph: Deepa, Photograph: Arunaditya), which are kept here but not shown.
+   */
   credit?: string | null;
   /**
    * Optional. The day the photo was taken, so it is grouped under the right year. Photos in a field note take the note’s date.
@@ -758,6 +764,10 @@ export interface Region {
 export interface PhotoSet {
   id: number;
   title: string;
+  /**
+   * The occasion in a few words, beside each photo in the viewer ("Brahmotsavam Day 5"). Empty: the title up to its first comma, and no further than "Day 5".
+   */
+  short?: string | null;
   /**
    * The day they were taken. Empty where it is not known.
    */
@@ -1470,6 +1480,7 @@ export interface MediaSelect<T extends boolean = true> {
  */
 export interface PhotoSetsSelect<T extends boolean = true> {
   title?: T;
+  short?: T;
   date?: T;
   temples?: T;
   observances?: T;

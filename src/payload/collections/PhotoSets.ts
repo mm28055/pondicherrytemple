@@ -36,13 +36,23 @@ export const PhotoSets: CollectionConfig = {
     {
       type: 'row',
       fields: [
-        { name: 'title', type: 'text', required: true, admin: { width: '65%' } },
+        { name: 'title', type: 'text', required: true, admin: { width: '45%' } },
+        {
+          name: 'short',
+          type: 'text',
+          label: 'Short name',
+          admin: {
+            width: '30%',
+            description:
+              'The occasion in a few words, beside each photo in the viewer ("Brahmotsavam Day 5"). Empty: the title up to its first comma, and no further than "Day 5".',
+          },
+        },
         {
           name: 'date',
           type: 'date',
           index: true,
           admin: {
-            width: '35%',
+            width: '25%',
             date: { pickerAppearance: 'dayOnly', displayFormat: 'd MMMM yyyy' },
             description: 'The day they were taken. Empty where it is not known.',
           },

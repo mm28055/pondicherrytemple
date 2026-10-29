@@ -221,6 +221,8 @@ export interface Photo extends Picture {
       set's photographs. */
   occasion?: string;
   place?: string;
+  /** The occasion in its shortest form ("Brahmotsavam Day 5"), for the photo viewer. */
+  short?: string;
   /** The newest field note it appears in. */
   note?: { href: string; title: string };
 }

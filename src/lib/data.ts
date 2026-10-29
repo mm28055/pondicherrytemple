@@ -358,7 +358,8 @@ function toFieldNote(n: P.FieldNote, L: Lookups, full: boolean): FieldNote {
     temples: slugs(n.temples, L.templeSlug),
     observances: slugs(n.observances, L.observanceSlug),
     occasion: n.occasion,
-    title: n.title,
+    // left empty on a day with nothing more to say than its occasion
+    title: n.title?.trim() || n.occasion,
     authors: n.authors ?? [],
     excerpt: openingText(n.body),
     // For the Field Notes page, which shows as much as fits beside the photograph.
@@ -529,6 +530,23 @@ const illustrations = cache(async () => {
    chosen for the set and those of its notes. A set of Pondicherry's Hindu
    Ethos takes only the tags chosen for it. Photos in a set show on the
    Photographs page even with no tags at all. */
+
+/** A set's occasion in its shortest form, for the photo viewer, where its
+    "Short name" is not filled in: up to the first comma, and no further than
+    "Day 5" ("Navaratri Day 9, Saraswati Alankaram": "Navaratri Day 9"); a
+    month's name kept with what follows it ("Adi, Friday1": "Adi Friday1"),
+    and a day's number with what comes before ("Andu Vizha, Day 2"); of
+    two things done, the first. */
+const MONTH_FIRST = /^(?:adi|aadi|aavani|avani|purattasi|aippasi|karthigai|margazhi|thai|masi|panguni|chithirai|vaikasi|aani)$/i;
+function shortOccasion(title: string) {
+  const parts = title.split(",").map((p) => p.trim()).filter(Boolean);
+  let first = parts[0] ?? "";
+  if (parts[1] && (MONTH_FIRST.test(first) || /^day \d+$/i.test(parts[1]))) first = `${first} ${parts[1]}`;
+  first = first.match(/^(.*?\bday \d+)\b/i)?.[1] ?? first;
+  // and of two, the first ("Pournami Abhishekam and Satyanarayana Puja")
+  return first.split(/\s+and\s+/i)[0];
+}
+
 async function buildPhotoData() {
   const L = await lookups();
   const notes = await rawNotes();
@@ -619,9 +637,10 @@ async function buildPhotoData() {
       date: dayOf(taken ?? m.createdAt),
       dated: Boolean(taken),
       featured: Boolean(m.featured),
-      note: note ? { href: `/field-notes/${note.slug}`, title: note.title } : undefined,
+      note: note ? { href: `/field-notes/${note.slug}`, title: note.title?.trim() || note.occasion } : undefined,
       set: inSet ? String(inSet.set.id) : undefined,
       occasion: inSet?.set.title || undefined,
+      short: inSet ? inSet.set.short?.trim() || shortOccasion(inSet.set.title) : undefined,
       place: inSet ? placeOf(inSet.temples) : undefined,
     };
     out.push(photo);

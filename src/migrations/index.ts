@@ -42,6 +42,9 @@ import * as migration_20261022_112350_regular_rituals_by_nakshatram from './2026
 import * as migration_20261022_115438_rels_indexes from './20261022_115438_rels_indexes';
 import * as migration_20261028_165722_photo_sets from './20261028_165722_photo_sets';
 import * as migration_20261029_120000_photo_credits from './20261029_120000_photo_credits';
+import * as migration_20261029_175900_photo_set_short_names from './20261029_175900_photo_set_short_names';
+import * as migration_20261029_180000_spellings from './20261029_180000_spellings';
+import * as migration_20261029_180100_nandhikeswara_addresses from './20261029_180100_nandhikeswara_addresses';
 
 export const migrations = [
   {
@@ -263,5 +266,20 @@ export const migrations = [
     up: migration_20261029_120000_photo_credits.up,
     down: migration_20261029_120000_photo_credits.down,
     name: '20261029_120000_photo_credits',
+  },
+  {
+    up: migration_20261029_175900_photo_set_short_names.up,
+    down: migration_20261029_175900_photo_set_short_names.down,
+    name: '20261029_175900_photo_set_short_names',
+  },
+  {
+    up: migration_20261029_180000_spellings.up,
+    down: migration_20261029_180000_spellings.down,
+    name: '20261029_180000_spellings',
+  },
+  {
+    up: migration_20261029_180100_nandhikeswara_addresses.up,
+    down: migration_20261029_180100_nandhikeswara_addresses.down,
+    name: '20261029_180100_nandhikeswara_addresses',
   },
 ];

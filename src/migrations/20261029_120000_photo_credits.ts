@@ -1,6 +1,8 @@
-import { MigrateUpArgs, MigrateDownArgs } from '@payloadcms/db-postgres'
+import { MigrateUpArgs, MigrateDownArgs, sql } from '@payloadcms/db-postgres'
 
-export async function up({ payload, req }: MigrateUpArgs): Promise<void> {
+export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
+  // (a column of photo sets added later, 20261029_175900, which reading them through Payload needs)
+  await db.execute(sql`ALTER TABLE "photo_sets" ADD COLUMN IF NOT EXISTS "short" varchar;`)
   await photoCreditsData({ payload, req })
 }
 

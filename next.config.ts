@@ -15,6 +15,9 @@ const nextConfig: NextConfig = {
       { source: "/temples", destination: "/pondicherry", permanent: false },
       // A temple's History page became "The Temple and its Stories" (October 2026).
       { source: "/:region/:temple/history", destination: "/:region/:temple/temple-and-its-stories", permanent: true },
+      // Nandhikeswara, spelled so in its addresses too (October 2026): the old ones lead to the new.
+      { source: "/:region/nandikeswara/:rest*", destination: "/:region/nandhikeswara/:rest*", permanent: true },
+      { source: "/field-notes/:date(\\d{4}-\\d{2}-\\d{2})-nandikeswara-:rest", destination: "/field-notes/:date-nandhikeswara-:rest", permanent: true },
     ];
   },
 

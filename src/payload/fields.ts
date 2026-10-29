@@ -12,8 +12,9 @@ export function slugify(text: string): string {
 }
 
 /** The web address of a page. Made from the title (and, for field notes, the
-    date) the first time it is saved; after that it stays put, so links keep working. */
-export function slugField(from: string, { withDate = false } = {}): Field {
+    date) the first time it is saved; after that it stays put, so links keep working.
+    Given several fields, made from the first of them filled in. */
+export function slugField(from: string | string[], { withDate = false } = {}): Field {
   return {
     name: 'slug',
     type: 'text',
@@ -28,7 +29,7 @@ export function slugField(from: string, { withDate = false } = {}): Field {
       beforeValidate: [
         ({ value, data }) => {
           if (typeof value === 'string' && value.trim()) return slugify(value)
-          const title = data?.[from]
+          const title = [from].flat().map((k) => data?.[k]).find((v) => typeof v === 'string' && v.trim())
           if (typeof title !== 'string' || !title.trim()) return value
           const date = withDate && data?.date ? `${String(data.date).slice(0, 10)}-` : ''
           return slugify(date + title) || `item-${Date.now()}`
