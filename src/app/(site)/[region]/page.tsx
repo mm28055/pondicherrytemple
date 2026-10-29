@@ -18,7 +18,7 @@ import { seeded } from "@/lib/mahotsavam";
 import type { Temple } from "@/content/types";
 import { TodayTamil } from "@/components/TodayTamil";
 import { calendarEvents } from "@/lib/calendarEvents";
-import { formatDate } from "@/lib/calendar";
+import { formatDate, formatDays } from "@/lib/calendar";
 import { onePerEvent, photoCount } from "@/lib/photoPack";
 
 type Props = { params: Promise<{ region: string }> };
@@ -182,7 +182,7 @@ export default async function RegionPage({ params }: Props) {
                   <div className="temple-row plain">
                     <div>
                       <div className="temple-name">{e.title}</div>
-                      {e.date && <div className="temple-sub">{formatDate(e.date)}</div>}
+                      {e.dates.length > 0 && <div className="temple-sub">{formatDays(e.dates)}</div>}
                     </div>
                   </div>
                 </div>

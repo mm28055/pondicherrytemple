@@ -173,3 +173,16 @@ export function dateParts(isoDate: string) {
   const [y, m, d] = isoDate.split("-").map(Number);
   return { day: d, month: MONTHS[m - 1], shortMonth: MONTHS[m - 1].slice(0, 3), year: y };
 }
+
+/** Days together, as on an Ethos card: "17 & 18 September 2026", "30 August &
+    2 September 2026", "17, 18 & 19 September 2026". */
+export function formatDays(days: string[]): string {
+  const parts = days.map((d) => ({ d, day: Number(d.slice(8, 10)), month: d.slice(0, 7), year: d.slice(0, 4) }));
+  if (parts.length <= 1) return parts[0] ? formatDate(parts[0].d) : "";
+  const sameMonth = parts.every((p) => p.month === parts[0].month);
+  const sameYear = parts.every((p) => p.year === parts[0].year);
+  const each = parts.map((p, i) =>
+    i === parts.length - 1 ? formatDate(p.d) : sameMonth ? String(p.day) : sameYear ? formatDate(p.d).replace(/ \d{4}$/, "") : formatDate(p.d)
+  );
+  return `${each.slice(0, -1).join(", ")} & ${each.at(-1)}`;
+}

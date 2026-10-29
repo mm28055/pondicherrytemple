@@ -123,23 +123,24 @@ export const STRIP_PHOTOS = 200;
 /** One photograph from each of the latest days or events of a list in order,
     newest first (a set's, or a day's), chosen at random among its own, up to
     `n`: so a strip or row shows that many events, not one event's many
-    photographs alike. Chosen afresh each time the page is built. */
+    photographs alike. With fewer than `n` events, a second from each in
+    turn, then a third, and so on, so a row with few events is still full.
+    Chosen afresh each time the page is built. */
 export function onePerEvent(list: Photo[], n: number): Photo[] {
-  const out: Photo[] = [];
-  let run: Photo[] = [];
-  const pick = () => {
-    if (run.length) out.push(run[Math.floor(Math.random() * run.length)]);
-    run = [];
-  };
+  const events: Photo[][] = [];
   for (const p of list) {
-    if (run.length && (run[0].date !== p.date || run[0].set !== p.set)) {
-      pick();
-      if (out.length >= n) return out;
-    }
-    run.push(p);
+    const last = events.at(-1);
+    if (last && last[0].date === p.date && last[0].set === p.set) last.push(p);
+    else if (events.length === n) break;
+    else events.push([p]);
   }
-  if (out.length < n) pick();
-  return out;
+  // each event's photographs in a random order, then one from each, round by round
+  const shuffled = events.map((e) => [...e].sort(() => Math.random() - 0.5));
+  const chosen = new Set<Photo>();
+  for (let round = 0; chosen.size < n && shuffled.some((e) => e.length > round); round++)
+    for (const e of shuffled) if (e[round] && chosen.size < n) chosen.add(e[round]);
+  // in the list's order, newest first
+  return list.filter((p) => chosen.has(p));
 }
 
 /** The first few photographs a "lead" wall shows (those marked "Show first"

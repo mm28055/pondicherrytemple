@@ -599,6 +599,14 @@ async function buildPhotoData() {
   const out: Photo[] = [];
   const byNote = new Map<string, Photo[]>();
   const timeOf = new Map<Photo, string>(); // when the camera says each was taken, for the order within a day
+  // the sets of each day at each temple: a photo in no set (a film's still) is
+  // shown with the one set of its day at its temple, as part of that event
+  const setsOfDay = new Map<string, Set<typeof sets extends Map<unknown, infer V> ? V : never>>();
+  for (const entry of sets.values())
+    for (const t of entry.temples) {
+      const key = `${entry.day}|${L.templeKey.get(t)}`;
+      setsOfDay.set(key, (setsOfDay.get(key) ?? new Set()).add(entry));
+    }
   for (const m of await rawPhotos()) {
     const picture = toPicture(m);
     if (!picture) continue;
@@ -615,6 +623,13 @@ async function buildPhotoData() {
     if (!inSet && !temples.size && !observances.size) continue;
     const note = [...notes].sort((a, b) => b.date.localeCompare(a.date))[0];
     const taken = m.takenOn ?? inSet?.day ?? note?.date;
+    const ofDay = inSet
+      ? undefined
+      : (() => {
+          const found = new Set([...temples].flatMap((key) => [...(setsOfDay.get(`${taken ? dayOf(taken) : ""}|${key}`) ?? [])]));
+          return taken && found.size === 1 ? [...found][0] : undefined;
+        })();
+    const event = inSet ?? ofDay;
     const photo: Photo = {
       ...picture,
       id: String(m.id),
@@ -638,10 +653,10 @@ async function buildPhotoData() {
       dated: Boolean(taken),
       featured: Boolean(m.featured),
       note: note ? { href: `/field-notes/${note.slug}`, title: note.title?.trim() || note.occasion } : undefined,
-      set: inSet ? String(inSet.set.id) : undefined,
-      occasion: inSet?.set.title || undefined,
-      short: inSet ? inSet.set.short?.trim() || shortOccasion(inSet.set.title) : undefined,
-      place: inSet ? placeOf(inSet.temples) : undefined,
+      set: event ? String(event.set.id) : undefined,
+      occasion: event?.set.title || undefined,
+      short: event ? event.set.short?.trim() || shortOccasion(event.set.title) : undefined,
+      place: event ? placeOf(event.temples) : undefined,
     };
     out.push(photo);
     if (m.takenAt) timeOf.set(photo, m.takenAt);
@@ -1293,15 +1308,28 @@ export async function getPhotosForNote(noteId: string): Promise<Photo[]> {
 
 /** The photo sets of Pondicherry's Hindu Ethos in a region, newest first,
     each with its photographs. */
-export async function getEthosSets(regionId: string): Promise<{ id: string; title: string; date?: string; photos: Photo[] }[]> {
+export async function getEthosSets(regionId: string): Promise<{ id: string; title: string; dates: string[]; photos: Photo[] }[]> {
   const L = await lookups();
   const { list, sets } = await photoData();
-  return [...sets.values()]
-    .filter(({ set }) => set.ethos && L.regionOf(set.region) === regionId)
-    .map(({ set, day }) => ({ id: String(set.id), title: set.title, date: day, photos: list.filter((p) => p.set === String(set.id)) }))
-    .filter((s) => s.photos.length > 0)
-    .sort((a, b) => (b.date ?? "").localeCompare(a.date ?? ""));
+  // sets of the same name, one card (each kept in its own folder: "Vinayaka
+  // Pandals" on the 17th and the 18th), its photographs those of all of them
+  const cards = new Map<string, { id: string; title: string; dates: string[]; photos: Photo[] }>();
+  for (const { set, day } of sets.values()) {
+    if (!set.ethos || L.regionOf(set.region) !== regionId) continue;
+    const photos = list.filter((p) => p.set === String(set.id));
+    if (!photos.length) continue;
+    const key = set.title.trim().toLowerCase();
+    const card = cards.get(key) ?? { id: String(set.id), title: set.title, dates: [], photos: [] };
+    if (day && !card.dates.includes(day)) card.dates.push(day);
+    card.photos.push(...photos);
+    cards.set(key, card);
+  }
+  const order = new Map(list.map((p, i) => [p.id, i]));
+  return [...cards.values()]
+    .map((c) => ({ ...c, dates: c.dates.sort(), photos: c.photos.sort((a, b) => order.get(a.id)! - order.get(b.id)!) }))
+    .sort((a, b) => (b.dates.at(-1) ?? "").localeCompare(a.dates.at(-1) ?? ""));
 }
+
 
 /** Every photograph that may be shown. */
 export async function getPhotos(): Promise<Photo[]> {

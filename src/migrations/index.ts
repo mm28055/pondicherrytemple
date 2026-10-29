@@ -45,6 +45,7 @@ import * as migration_20261029_120000_photo_credits from './20261029_120000_phot
 import * as migration_20261029_175900_photo_set_short_names from './20261029_175900_photo_set_short_names';
 import * as migration_20261029_180000_spellings from './20261029_180000_spellings';
 import * as migration_20261029_180100_nandhikeswara_addresses from './20261029_180100_nandhikeswara_addresses';
+import * as migration_20261029_200000_ethos_revisions from './20261029_200000_ethos_revisions';
 
 export const migrations = [
   {
@@ -281,5 +282,10 @@ export const migrations = [
     up: migration_20261029_180100_nandhikeswara_addresses.up,
     down: migration_20261029_180100_nandhikeswara_addresses.down,
     name: '20261029_180100_nandhikeswara_addresses',
+  },
+  {
+    up: migration_20261029_200000_ethos_revisions.up,
+    down: migration_20261029_200000_ethos_revisions.down,
+    name: '20261029_200000_ethos_revisions',
   },
 ];
