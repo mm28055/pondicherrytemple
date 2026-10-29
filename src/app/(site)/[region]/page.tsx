@@ -19,7 +19,7 @@ import type { Temple } from "@/content/types";
 import { TodayTamil } from "@/components/TodayTamil";
 import { calendarEvents } from "@/lib/calendarEvents";
 import { formatDate } from "@/lib/calendar";
-import { photoCount } from "@/lib/photoPack";
+import { onePerEvent, photoCount } from "@/lib/photoPack";
 
 type Props = { params: Promise<{ region: string }> };
 
@@ -38,12 +38,12 @@ export default async function RegionPage({ params }: Props) {
 
   // the temples listed on this page (a temple can be left off it in the admin)
   const temples = (await getTemples(region.id)).filter((t) => t.listed);
-  // a temple's latest photographs (newest first) and how many it has; stand-ins
-  // for a temple with none yet
+  // a temple's latest events, one photograph of each (newest first), and how
+  // many photographs it has; stand-ins for a temple with none yet
   const latest = async (t: Temple) => {
     const own = await getPhotosForTemple(t.region, t.id);
     return own.length
-      ? { t, photos: own.slice(0, 12), total: own.length }
+      ? { t, photos: onePerEvent(own, 12), total: own.length }
       : {
           t,
           photos: await getDummyPhotos(`latest-${t.id}`, 12),
@@ -51,7 +51,7 @@ export default async function RegionPage({ params }: Props) {
         };
   };
   // each temple by its name, its proper name and its street alone, and a row of
-  // its latest photographs
+  // its latest events
   const withPages = await Promise.all(temples.filter(hasPage).map(latest));
   const others = temples.filter((t) => !hasPage(t));
 

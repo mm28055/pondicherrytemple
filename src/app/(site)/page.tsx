@@ -12,7 +12,7 @@ import {
   getRegion,
   getTemples,
 } from "@/lib/data";
-import { STRIP_PHOTOS } from "@/lib/photoPack";
+import { onePerEvent, STRIP_PHOTOS } from "@/lib/photoPack";
 import { articleRow, filmRow, noteRow, observanceRow } from "@/lib/view";
 import { ObservanceRow, TempleRow, Where } from "@/components/Rows";
 import { TodayTamil } from "@/components/TodayTamil";
@@ -56,12 +56,10 @@ export default async function HomePage() {
   // for the pop-up behind "Today": every day recorded, as the calendar shows it
   const todayEvents = await calendarEvents(await getOccasions());
 
-  // the strip of photographs under the masthead: the newest first, all of
-  // them in turn
-  // (as they come, the newest first; and only the newest STRIP_PHOTOS:
-  // thousands would weigh the page down)
-  const stripPhotos = (await getPhotos())
-    .slice(0, STRIP_PHOTOS)
+  // the strip of photographs under the masthead: one from each of the
+  // latest events, the newest first, all of them in turn
+  // (only the latest STRIP_PHOTOS events: thousands would weigh the page down)
+  const stripPhotos = onePerEvent(await getPhotos(), STRIP_PHOTOS)
     .map(({ id, small, alt, focus, width, height }) => ({ id, small, alt, focus, width, height }));
 
   return (

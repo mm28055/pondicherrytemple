@@ -116,9 +116,31 @@ export function unpackPhotos({ base, words, groups, photos }: PhotoPack): Photo[
   });
 }
 
-/** How many of the newest photographs the strips of the home and Field
-    Notes pages go through. */
+/** How many photographs the strips of the home and Field Notes pages go
+    through: one from each of the latest events. */
 export const STRIP_PHOTOS = 200;
+
+/** One photograph from each of the latest days or events of a list in order,
+    newest first (a set's, or a day's), chosen at random among its own, up to
+    `n`: so a strip or row shows that many events, not one event's many
+    photographs alike. Chosen afresh each time the page is built. */
+export function onePerEvent(list: Photo[], n: number): Photo[] {
+  const out: Photo[] = [];
+  let run: Photo[] = [];
+  const pick = () => {
+    if (run.length) out.push(run[Math.floor(Math.random() * run.length)]);
+    run = [];
+  };
+  for (const p of list) {
+    if (run.length && (run[0].date !== p.date || run[0].set !== p.set)) {
+      pick();
+      if (out.length >= n) return out;
+    }
+    run.push(p);
+  }
+  if (out.length < n) pick();
+  return out;
+}
 
 /** The first few photographs a "lead" wall shows (those marked "Show first"
     first), so a page carries only those, not all of them. */

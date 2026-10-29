@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { getFieldNotes, getPhotos, getRegion, getSectionIntro, getTemples } from "@/lib/data";
-import { STRIP_PHOTOS } from "@/lib/photoPack";
+import { onePerEvent, STRIP_PHOTOS } from "@/lib/photoPack";
 import { FIELD_KIND_LABELS } from "@/content/labels";
 import type { FieldKind } from "@/content/types";
 import { noteRow } from "@/lib/view";
@@ -28,12 +28,10 @@ export default async function FieldNotesPage() {
     .map((k) => ({ kind: k, label: FIELD_KIND_LABELS[k].many, count: notes.filter((n) => n.kind === k).length }))
     .filter((k) => k.count > 0);
 
-  // the home page's strip of photographs, the same in every way: the newest
-  // first, all of them in turn
-  // (as they come, the newest first; and only the newest STRIP_PHOTOS:
-  // thousands would weigh the page down)
-  const stripPhotos = (await getPhotos())
-    .slice(0, STRIP_PHOTOS)
+  // the home page's strip of photographs, the same in every way: one from
+  // each of the latest events, the newest first, all of them in turn
+  // (only the latest STRIP_PHOTOS events: thousands would weigh the page down)
+  const stripPhotos = onePerEvent(await getPhotos(), STRIP_PHOTOS)
     .map(({ id, small, alt, focus, width, height }) => ({ id, small, alt, focus, width, height }));
 
   return (
