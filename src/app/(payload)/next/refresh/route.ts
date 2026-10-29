@@ -1,12 +1,13 @@
 import config from '@payload-config'
-import { revalidatePath, revalidateTag } from 'next/cache'
+import { revalidateTag } from 'next/cache'
 import { getPayload } from 'payload'
 import { PHOTOS_TAG, SITE_CONTENT_TAG } from '@/lib/siteCache'
 
 /* The whole site refreshed, as when anything is saved in the admin
    (payload/revalidate): for after a script has changed the database from
    outside the site (bringing photographs in, which refreshes nothing as it
-   goes). With the CRON_SECRET, or by an admin who is signed in. */
+   goes). Each page keeps being shown as it was until it has been rebuilt.
+   With the CRON_SECRET, or by an admin who is signed in. */
 
 export const dynamic = 'force-dynamic'
 
@@ -20,8 +21,7 @@ export async function POST(request: Request) {
       return new Response('Only an admin can run this.', { status: 403 })
     }
   }
-  revalidateTag(SITE_CONTENT_TAG, { expire: 0 })
-  revalidateTag(PHOTOS_TAG, { expire: 0 })
-  revalidatePath('/', 'layout')
+  revalidateTag(SITE_CONTENT_TAG, 'max')
+  revalidateTag(PHOTOS_TAG, 'max')
   return Response.json({ refreshed: true })
 }

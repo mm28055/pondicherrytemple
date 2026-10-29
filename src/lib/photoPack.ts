@@ -121,6 +121,25 @@ export const STRIP_PHOTOS = 200;
     first), so a page carries only those, not all of them. */
 export const leadPhotos = (list: Photo[], n = 6) => [...list.filter((p) => p.featured), ...list.filter((p) => !p.featured)].slice(0, n);
 
+/** The latest day or event of a list in order, newest first (a temple's):
+    its photographs, those marked "Show first" first, and what to head them
+    with, its date and occasion. With fewer than `n`, the event before it
+    too, so the large-photo layout is kept full. */
+export function latestEvent(list: Photo[], n = 6) {
+  const events: Photo[][] = [];
+  for (const p of list) {
+    const last = events[events.length - 1];
+    if (last && last[0].date === p.date && last[0].set === p.set) last.push(p);
+    else if (events.length === 2) break;
+    else events.push([p]);
+  }
+  const shown = events[0] && events[0].length < n && events[1] ? events.slice(0, 2) : events.slice(0, 1);
+  return {
+    photos: shown.flatMap((e) => leadPhotos(e, n)).slice(0, n),
+    heads: shown.map(([p]) => ({ date: p.dated ? p.date : undefined, occasion: p.occasion })),
+  };
+}
+
 /** A count of photographs, the same wherever one is given: exact to 999,
     then 1.2K, 12K. */
 export function photoCount(n: number): string {

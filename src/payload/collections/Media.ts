@@ -55,7 +55,7 @@ export const Media: CollectionConfig = {
   labels: { singular: 'Photo, video or file', plural: 'Photos & videos' },
   admin: {
     group: 'Add to the site',
-    defaultColumns: ['filename', 'caption', 'consent', 'temples', 'observances'],
+    defaultColumns: ['filename', 'set', 'credit', 'takenAt', 'caption'],
     description:
       'Every photo, video, recording and document. Drag several files in at once to upload them together.',
   },
@@ -115,7 +115,15 @@ export const Media: CollectionConfig = {
       },
     },
     { name: 'caption', type: 'text', admin: { condition: (data) => !inFilm(data) } },
-    { name: 'credit', type: 'text', admin: { condition: (data) => !inFilm(data), placeholder: 'e.g. Photograph: Arunaditya' } },
+    {
+      name: 'credit',
+      type: 'text',
+      admin: {
+        condition: (data) => !inFilm(data),
+        placeholder: 'e.g. Courtesy Sriram Sharma',
+        description: 'Who took it. Shown with the photo, except the team’s own (Photograph: Deepa, Photograph: Arunaditya), which are kept here but not shown.',
+      },
+    },
     {
       name: 'takenOn',
       type: 'date',

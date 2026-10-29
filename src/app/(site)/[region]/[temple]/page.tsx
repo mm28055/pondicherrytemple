@@ -25,7 +25,9 @@ import { articleRow, filmTile, noteRow, templesOf } from "@/lib/view";
 import { Drawings } from "@/components/Drawings";
 import { FilmWall } from "@/components/FilmWall";
 import { PhotoWall } from "@/components/PhotoWall";
-import { leadPhotos } from "@/lib/photoPack";
+import type { Photo } from "@/content/types";
+import { latestEvent, leadPhotos } from "@/lib/photoPack";
+import { formatDate } from "@/lib/calendar";
 import { NoteRow } from "@/components/Rows";
 import { TempleYear } from "@/components/TempleYear";
 import { ShowMore } from "@/components/ShowMore";
@@ -150,7 +152,7 @@ export default async function TemplePage({ params }: Props) {
           {photos.length > 0 && (
             <section id="photographs">
               <h2 className="sub-head">Photographs</h2>
-              <PhotoWall photos={leadPhotos(photos)} total={photos.length} layout="lead" seeAll={own.length ? `/${region.id}/${t.id}/photographs` : undefined} />
+              <LatestPhotos own={own} stand={photos} seeAll={`/${region.id}/${t.id}/photographs`} />
             </section>
           )}
 
@@ -229,7 +231,7 @@ async function AroundTemplePage({ regionId, regionName, templeId }: { regionId: 
         )}
         <section id="photographs">
           <h2 className="sub-head">Photographs</h2>
-          <PhotoWall photos={leadPhotos(photos)} total={photos.length} layout="lead" seeAll={own.length ? `/${regionId}/${t.id}/photographs` : undefined} />
+          <LatestPhotos own={own} stand={photos} seeAll={`/${regionId}/${t.id}/photographs`} />
         </section>
         {films.length > 0 && (
           <section>
@@ -239,5 +241,25 @@ async function AroundTemplePage({ regionId, regionName, templeId }: { regionId: 
         )}
       </div>
     </div>
+  );
+}
+
+/** A temple's photographs on its page: its latest day or event (or two, when
+    the latest has only a few), headed with each one's date and occasion,
+    and the way to all of them (or stand-ins, without a head, until it has
+    photographs of its own). */
+function LatestPhotos({ own, stand, seeAll }: { own: Photo[]; stand: Photo[]; seeAll: string }) {
+  if (!own.length) return <PhotoWall photos={leadPhotos(stand)} total={stand.length} layout="lead" />;
+  const { photos, heads } = latestEvent(own);
+  return (
+    <>
+      {heads.map((head, i) => (
+        <div key={i} className="photo-group-head">
+          <span className="date">{head.date ? formatDate(head.date) : "Day not known"}</span>
+          {head.occasion && <span>{head.occasion}</span>}
+        </div>
+      ))}
+      <PhotoWall photos={photos} total={own.length} layout="lead" seeAll={seeAll} />
+    </>
   );
 }

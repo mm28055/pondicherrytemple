@@ -1,12 +1,15 @@
-import { revalidatePath, revalidateTag } from 'next/cache'
+import { revalidateTag } from 'next/cache'
 import type { CollectionAfterChangeHook, CollectionAfterDeleteHook, GlobalAfterChangeHook, PayloadRequest } from 'payload'
 import { PHOTOS_TAG, SITE_CONTENT_TAG } from '../lib/siteCache'
 
 /* When anything is saved or deleted, the whole site is refreshed: pages are
    built ahead of time, and what they read from the database is kept between
-   visits (lib/data), so this clears both, and the next visit to each page
-   rebuilds it from the database, once. The site is small, so refreshing
-   everything is simplest.
+   visits (lib/data), so this marks both out of date. The next visit to each
+   page is still given the page as it was, at once, while it is rebuilt from
+   the database behind it; the visit after that has the change. (Clearing
+   them outright had the first visitor to each page wait seconds for it.)
+   Pages are marked through what they read, by its tags. The site is small,
+   so refreshing everything is simplest.
    Not for a draft saved (by hand, or autosaved every two seconds while a
    field note or film is written): the public site shows only what is
    published, so nothing it shows has changed, and refreshing the site at
@@ -17,10 +20,9 @@ import { PHOTOS_TAG, SITE_CONTENT_TAG } from '../lib/siteCache'
 function refresh(context: Record<string, unknown>, collection?: string) {
   if (context.skipRevalidate) return
   try {
-    revalidateTag(SITE_CONTENT_TAG, { expire: 0 })
+    revalidateTag(SITE_CONTENT_TAG, 'max')
     // the photographs, read apart from the rest (lib/siteCache)
-    if (collection === 'media' || collection === 'photo-sets') revalidateTag(PHOTOS_TAG, { expire: 0 })
-    revalidatePath('/', 'layout')
+    if (collection === 'media' || collection === 'photo-sets') revalidateTag(PHOTOS_TAG, 'max')
   } catch {
     // not running inside Next.js
   }

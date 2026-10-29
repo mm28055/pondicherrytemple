@@ -41,6 +41,7 @@ import * as migration_20261022_110352_kannika_mahalakshmi_fridays from './202610
 import * as migration_20261022_112350_regular_rituals_by_nakshatram from './20261022_112350_regular_rituals_by_nakshatram';
 import * as migration_20261022_115438_rels_indexes from './20261022_115438_rels_indexes';
 import * as migration_20261028_165722_photo_sets from './20261028_165722_photo_sets';
+import * as migration_20261029_120000_photo_credits from './20261029_120000_photo_credits';
 
 export const migrations = [
   {
@@ -257,5 +258,10 @@ export const migrations = [
     up: migration_20261028_165722_photo_sets.up,
     down: migration_20261028_165722_photo_sets.down,
     name: '20261028_165722_photo_sets'
+  },
+  {
+    up: migration_20261029_120000_photo_credits.up,
+    down: migration_20261029_120000_photo_credits.down,
+    name: '20261029_120000_photo_credits',
   },
 ];

@@ -285,9 +285,15 @@ function toPicture(ref: number | P.Media | null | undefined): Picture | undefine
     height: large?.height ?? ref.height ?? 0,
     alt: ref.alt ?? "",
     caption: ref.caption ?? undefined,
-    credit: ref.credit ?? undefined,
+    credit: shownCredit(ref.credit),
   };
 }
+
+/** The team's own photographs are not credited on the site: their credit
+    is kept with each photo (who took it), but shown only for anyone else's. */
+const TEAM_CREDITS = ["Photograph: Deepa", "Photograph: Arunaditya"];
+const shownCredit = (credit?: string | null) =>
+  credit && !TEAM_CREDITS.includes(credit.trim()) ? credit : undefined;
 
 const toRegion = (r: P.Region, L: Lookups): Region => ({
   id: r.slug ?? "",

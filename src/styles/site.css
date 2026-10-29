@@ -1619,6 +1619,8 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
 /* over each day's or event's photos: its day · temple · what it was · its field note, as .caps */
 .photo-group-head { font-family: var(--display); font-weight: 600; font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); padding: 14px 0 10px; scroll-margin-top: 130px; /* (clear of the bars kept at the top) */ }
 .photo-rows > div > .photo-group-head:first-child { padding-top: 0; }
+.photo-group-head + .photo-wall { padding-top: 0; } /* (a temple's latest, headed on its page) */
+.photo-group-head:has(+ .photo-group-head) { padding-bottom: 2px; } .photo-group-head + .photo-group-head { padding-top: 0; } /* (two events, one line each) */
 .photo-group-head > * + *::before { content: " · "; color: var(--muted); }
 .photo-group-head .note { color: var(--muted); }
 .photo-group-head .note:hover { color: var(--ink); }
