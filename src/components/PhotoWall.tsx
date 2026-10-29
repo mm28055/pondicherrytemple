@@ -417,12 +417,8 @@ export function PhotoWall({ photos: given, pack, total, layout, seeAll, filters 
             <img key={photo.id} src={photo.src} alt={photo.alt || photo.caption || ""} />
             <figcaption>
               {note && <span className="photo-viewer-note">{note}</span>}
-              <span className="caps">
-                {open! + 1} of {order.length}
-                {photo.dated && ` · ${formatDate(photo.date)}`}
-              </span>
-              {photo.caption && <span className="photo-viewer-caption">{photo.caption}</span>}
-              {photo.credit && <span className="photo-viewer-credit">{photo.credit}</span>}
+              {/* its date, where it was, then who took it (not "12 of 2,600": no help in so many) */}
+              {photo.dated && <span className="caps">{formatDate(photo.date)}</span>}
               {photo.tags.length > 0 && (
                 <span className="photo-viewer-tags">
                   {photo.tags.map((t, i) => (
@@ -433,6 +429,8 @@ export function PhotoWall({ photos: given, pack, total, layout, seeAll, filters 
                   ))}
                 </span>
               )}
+              {photo.caption && <span className="photo-viewer-caption">{photo.caption}</span>}
+              {photo.credit && <span className="photo-viewer-credit">{photo.credit}</span>}
               {photo.note && (
                 <Link className="arrow-link" href={photo.note.href}>
                   From the field note: {photo.note.title}
