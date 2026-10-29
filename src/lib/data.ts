@@ -603,13 +603,16 @@ async function buildPhotoData() {
   const placeIn = new Map<Photo, number>(); // its place in its set, as arranged in the admin's photo grid
   // the sets of each day at each temple: a photo in no set (a film's still) is
   // shown with the one set of its day at its temple, as part of that event
+  // (of a day divided into several sets, the first of them that has photos)
   const setsOfDay = new Map<string, Set<typeof sets extends Map<unknown, infer V> ? V : never>>();
   for (const entry of sets.values())
     for (const t of entry.temples) {
       const key = `${entry.day}|${L.templeKey.get(t)}`;
       setsOfDay.set(key, (setsOfDay.get(key) ?? new Set()).add(entry));
     }
-  for (const m of await rawPhotos()) {
+  const raw = await rawPhotos();
+  const filled = new Set(raw.map((m) => idOf(m.set)));
+  for (const m of raw) {
     const picture = toPicture(m);
     if (!picture) continue;
     const inSet = sets.get(idOf(m.set) ?? -1);
@@ -631,8 +634,9 @@ async function buildPhotoData() {
     const ofDay = inSet
       ? undefined
       : (() => {
-          const found = new Set([...temples].flatMap((key) => [...(setsOfDay.get(`${taken ? dayOf(taken) : ""}|${key}`) ?? [])]));
-          return taken && found.size === 1 ? [...found][0] : undefined;
+          const found = [...new Set([...temples].flatMap((key) => [...(setsOfDay.get(`${taken ? dayOf(taken) : ""}|${key}`) ?? [])]))];
+          const withPhotos = found.filter((e) => filled.has(e.set.id)).sort((a, b) => a.set.id - b.set.id);
+          return taken && found.length === 1 ? found[0] : taken ? withPhotos[0] : undefined;
         })();
     const event = inSet ?? ofDay;
     const photo: Photo = {
@@ -672,8 +676,9 @@ async function buildPhotoData() {
   // photos in the order they were taken (by the camera's time, else as
   // numbered by the camera and brought in)
   // and each day's events kept together (two sets of one name, one event:
-  // lib/photoPack, eventOf), in the order they began; within an event, set
-  // by set, each as arranged in its photo grid, if it has been
+  // lib/photoPack, eventOf), in the order they began (or, a day divided into
+  // several sets, in their places in it: "Place in its day"); within an
+  // event, set by set, each as arranged in its photo grid, if it has been
   const began = new Map<string, string>();
   const setBegan = new Map<string, string>();
   for (const p of out) {
@@ -681,7 +686,13 @@ async function buildPhotoData() {
     if (p.set && !(began.get(eventOf(p))! <= t)) began.set(eventOf(p), t);
     if (p.set && !(setBegan.get(p.set)! <= t)) setBegan.set(p.set, t);
   }
-  const startOf = (p: Photo) => (p.set ? `${began.get(eventOf(p))}|${eventOf(p)}` : "");
+  const dayPlace = new Map<string, number>();
+  for (const p of out) {
+    const n = p.set ? sets.get(Number(p.set))?.set.dayOrder : undefined;
+    if (typeof n === "number" && !(dayPlace.get(eventOf(p))! <= n)) dayPlace.set(eventOf(p), n);
+  }
+  const place = (p: Photo) => (dayPlace.has(eventOf(p)) ? String(dayPlace.get(eventOf(p))).padStart(4, "0") : "~");
+  const startOf = (p: Photo) => (p.set ? `${place(p)}|${began.get(eventOf(p))}|${eventOf(p)}` : "");
   const inSetOrder = (a: Photo, b: Photo) =>
     (a.set && b.set ? `${setBegan.get(a.set)}|${a.set}`.localeCompare(`${setBegan.get(b.set)}|${b.set}`) : 0) ||
     (a.set && a.set === b.set ? (placeIn.get(a) ?? Infinity) - (placeIn.get(b) ?? Infinity) : 0) ||

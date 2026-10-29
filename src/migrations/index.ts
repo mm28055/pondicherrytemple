@@ -48,6 +48,9 @@ import * as migration_20261029_180100_nandhikeswara_addresses from './20261029_1
 import * as migration_20261029_200000_ethos_revisions from './20261029_200000_ethos_revisions';
 import * as migration_20261029_210000_set_names_from_notes from './20261029_210000_set_names_from_notes';
 import * as migration_20261029_220000_photo_positions from './20261029_220000_photo_positions';
+import * as migration_20261029_230000_published_spellings from './20261029_230000_published_spellings';
+import * as migration_20261029_230500_set_day_order from './20261029_230500_set_day_order';
+import * as migration_20261029_231000_thiruvahindrapuram_sets from './20261029_231000_thiruvahindrapuram_sets';
 
 export const migrations = [
   {
@@ -299,5 +302,20 @@ export const migrations = [
     up: migration_20261029_220000_photo_positions.up,
     down: migration_20261029_220000_photo_positions.down,
     name: '20261029_220000_photo_positions',
+  },
+  {
+    up: migration_20261029_230000_published_spellings.up,
+    down: migration_20261029_230000_published_spellings.down,
+    name: '20261029_230000_published_spellings',
+  },
+  {
+    up: migration_20261029_230500_set_day_order.up,
+    down: migration_20261029_230500_set_day_order.down,
+    name: '20261029_230500_set_day_order',
+  },
+  {
+    up: migration_20261029_231000_thiruvahindrapuram_sets.up,
+    down: migration_20261029_231000_thiruvahindrapuram_sets.down,
+    name: '20261029_231000_thiruvahindrapuram_sets',
   },
 ];

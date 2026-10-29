@@ -7,7 +7,9 @@ import { withCopyright } from '../../lib/copyrightExif'
 /* In a photo set's form: its photos as small pictures, to see at a glance.
    - Dragged into the order the site shows them in (saved with "Save order").
    - Clicked to choose them (shift-click for a run of them), and the chosen
-     deleted together, with no photo opened one by one.
+     deleted together, with no photo opened one by one, or moved together to
+     another set of the same day and temple (dragged onto its name, or its
+     name clicked): a day divided into the parts of what happened.
    - More added, as many at once as wanted (dropped on the grid, or "Add
      photos"): each made ready in this browser as the import makes them
      (upright, at most 2400 pixels long, the camera's time kept, credited
@@ -91,6 +93,9 @@ export function PhotoGrid() {
   const [dragging, setDragging] = useState<number | null>(null)
   const [dropOn, setDropOn] = useState(false)
   const [asking, setAsking] = useState(false) // "Delete them for good?" shown
+  // the other sets of its day at its temples, to move photos to
+  const [others, setOthers] = useState<{ id: number; title: string; count: number }[]>([])
+  const [dropSet, setDropSet] = useState<number | null>(null)
   const lastClicked = useRef<number | null>(null)
   const input = useRef<HTMLInputElement>(null)
 
@@ -102,7 +107,34 @@ export function PhotoGrid() {
     const body = (await res.json()) as { docs?: Photo[] }
     setPhotos((body.docs ?? []).sort(inOrder))
     setOrder(null)
-  }, [id])
+    if (!date) return setOthers([])
+    const day = new Date(new Date(date).getTime() + 5.5 * 3600e3).toISOString().slice(0, 10)
+    const from = new Date(`${day}T00:00:00+05:30`)
+    const sq = new URLSearchParams({
+      'where[date][greater_than_equal]': from.toISOString(),
+      'where[date][less_than]': new Date(from.getTime() + 864e5).toISOString(),
+      'where[id][not_equals]': String(id),
+      depth: '0',
+      limit: '50',
+      joins: 'false',
+      'select[title]': 'true',
+      'select[temples]': 'true',
+      'select[dayOrder]': 'true',
+    })
+    const sets = ((await (await fetch(`/api/photo-sets?${sq}`, { credentials: 'include' })).json()) as { docs?: { id: number; title: string; temples?: number[]; dayOrder?: number | null }[] }).docs ?? []
+    // in their places in the day, those with none after
+    sets.sort((a, b) => (a.dayOrder ?? Infinity) - (b.dayOrder ?? Infinity) || a.id - b.id)
+    const mine = (templeIds ?? []).map((t) => (typeof t === 'object' ? t.id : t))
+    const near = sets.filter((x) => !mine.length || (x.temples ?? []).some((t) => mine.includes(t)))
+    setOthers(
+      await Promise.all(
+        near.map(async (x) => {
+          const n = (await (await fetch(`/api/media?where[set][equals]=${x.id}&limit=1&depth=0&select[id]=true`, { credentials: 'include' })).json()) as { totalDocs?: number }
+          return { id: x.id, title: x.title, count: n.totalDocs ?? 0 }
+        })
+      )
+    )
+  }, [id, date, JSON.stringify(templeIds)])
   useEffect(() => {
     load()
   }, [load])
@@ -154,6 +186,34 @@ export function PhotoGrid() {
     } catch (e) {
       setStatus(`The order was not saved: ${(e as Error).message}`)
     }
+    setBusy(false)
+  }
+
+  // the chosen (or the one dragged) moved to another set, placed after its own
+  const moveToSet = async (target: { id: number; title: string }, ids = [...chosen]) => {
+    if (!ids.length) return
+    setBusy(true)
+    let done = 0
+    try {
+      for (let i = 0; i < ids.length; i += 25) {
+        setStatus(`Moving… ${done} of ${ids.length}`)
+        const part = ids.slice(i, i + 25)
+        const q = new URLSearchParams(part.map((pid, k) => [`where[id][in][${k}]`, String(pid)]))
+        const res = await fetch(`/api/media?${q}`, {
+          method: 'PATCH',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ set: target.id, position: null }),
+        })
+        if (!res.ok) throw new Error(((await res.json()) as { errors?: { message?: string }[] }).errors?.[0]?.message ?? res.statusText)
+        done += part.length
+      }
+      setStatus(`${done} photo${done === 1 ? '' : 's'} moved to “${target.title}”.`)
+    } catch (e) {
+      setStatus(`Stopped after ${done}: ${(e as Error).message}`)
+    }
+    setChosen(new Set())
+    await load()
     setBusy(false)
   }
 
@@ -335,6 +395,45 @@ export function PhotoGrid() {
         Drag a photo to move it (the chosen ones move together), then Save order. Click photos to choose them; shift-click chooses a run. Drop files here to
         add them.
       </p>
+      {others.length > 0 && (
+        <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 8, margin: '0 0 12px', fontSize: 13 }}>
+          <span style={{ color: 'var(--theme-elevation-500)' }}>
+            {chosen.size ? `Move the ${chosen.size} chosen to:` : 'Other sets of this day (drag photos onto one to move them there):'}
+          </span>
+          {others.map((o) => (
+            <button
+              key={o.id}
+              type="button"
+              className="btn btn--style-secondary btn--size-small"
+              style={{
+                margin: 0,
+                outline: dropSet === o.id ? '2px dashed var(--theme-success-500)' : undefined,
+                outlineOffset: 2,
+              }}
+              disabled={busy}
+              title={chosen.size ? `Move the chosen photos to “${o.title}”` : `Drop photos here to move them to “${o.title}”`}
+              onClick={() => chosen.size && moveToSet(o)}
+              onDragOver={(e) => {
+                if (dragging === null) return
+                e.preventDefault()
+                setDropSet(o.id)
+              }}
+              onDragLeave={() => setDropSet(null)}
+              onDrop={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                setDropSet(null)
+                if (dragging === null) return
+                // the photo dragged, with the chosen if it is one of them
+                moveToSet(o, chosen.has(dragging) ? [...chosen] : [dragging])
+                setDragging(null)
+              }}
+            >
+              {o.title} ({o.count})
+            </button>
+          ))}
+        </div>
+      )}
       {status && <p style={{ margin: '0 0 12px', fontSize: 14 }}>{status}</p>}
       <div
         style={{

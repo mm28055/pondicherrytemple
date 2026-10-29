@@ -1283,6 +1283,8 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
 }
 /* a festival's page: the side column (where we've seen it) narrower */
 .two-col.obs-cols { grid-template-columns: minmax(0, 1fr) clamp(220px, 21vw, 290px); }
+/* a temple in and around the town: its field notes, and its films in a column at the right */
+.two-col.around-cols { padding-block: 0; }
 .seen details > summary { list-style: none; cursor: pointer; display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
 .seen details > summary::-webkit-details-marker { display: none; }
 .seen details > summary::after { content: "+"; font-family: var(--display); font-weight: 600; font-size: 20px; color: var(--ochre); line-height: 1; }
@@ -1517,10 +1519,14 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
 .video-tile:hover .play { background: var(--ochre); }
 .video-tile:hover .play::after { border-left-color: var(--chalk); }
 .video-title { font-weight: 600; font-size: 19px; line-height: 1.25; }
-/* A temple page's Films: three to a row (two on a phone), smaller type to suit */
+/* A temple page's Films: three to a row (two on a phone), smaller type to suit;
+   across the page, below the right column (.temple-wide), the same size, as many to a row as fit */
 .temple-body .video-wall { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px 16px; }
-.temple-body .video-title { font-size: 16.5px; }
-.temple-body .video-where { font-size: 14px; }
+.temple-wide .video-wall { grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr)); gap: 28px 16px; }
+:is(.temple-body, .temple-wide) .video-title { font-size: 16.5px; }
+:is(.temple-body, .temple-wide) .video-where { font-size: 14px; }
+/* the parts of a temple's page across it, under its two columns (components/TempleColumns) */
+.temple-wide { padding-bottom: clamp(24px, 3vw, 40px); }
 @media (max-width: 560px) {
   .temple-body .video-wall { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px 12px; }
 }

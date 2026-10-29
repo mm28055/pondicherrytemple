@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import {
   getDummyPhotos,
   getEthosSets,
+  isAround,
   getOccasions,
   getPhotosForTemple,
   getRegion,
@@ -43,11 +44,12 @@ export default async function RegionPage({ params }: Props) {
   const latest = async (t: Temple) => {
     const own = await getPhotosForTemple(t.region, t.id);
     return own.length
-      ? { t, photos: onePerEvent(own, 12), total: own.length }
+      ? { t, photos: onePerEvent(own, 12), total: own.length, stand: false }
       : {
           t,
           photos: await getDummyPhotos(`latest-${t.id}`, 12),
           total: 24 + Math.floor(seeded(`count-${t.id}`)() * 100),
+          stand: true,
         };
   };
   // each temple by its name, its proper name and its street alone, and a row of
@@ -65,8 +67,10 @@ export default async function RegionPage({ params }: Props) {
           .map(latest),
       )
     : [];
-  const toPhotos = (t: Temple, total: number) => ({
-    href: `/${t.region}/${t.id}#photographs`,
+  // to the temple's own Photographs page (a temple in and around the town has
+  // all its photographs on its page itself, at its foot; stand-ins, its page)
+  const toPhotos = (t: Temple, total: number, stand: boolean) => ({
+    href: isAround(t) || stand ? `/${t.region}/${t.id}#photographs` : `/${t.region}/${t.id}/photographs`,
     total,
     title: `All ${photoCount(total)} photographs of ${t.knownAs ?? t.name}`,
   });
@@ -92,10 +96,10 @@ export default async function RegionPage({ params }: Props) {
 
         <section className="section temple-list">
           {/* each temple's name, and its photographs in line with it */}
-          {withPages.map(({ t, photos, total }) => (
+          {withPages.map(({ t, photos, total, stand }) => (
             <div key={t.id} className="temple-entry">
               <TempleRow temple={t} formal />
-              {/* its last photo, dimmed, counts the rest: a link to the Photographs on the temple's page */}
+              {/* its last photo, dimmed, counts the rest: a link to the temple's Photographs page */}
               {photos.length > 0 && (
                 <PhotoWall
                   photos={photos}
@@ -103,7 +107,7 @@ export default async function RegionPage({ params }: Props) {
                   note="Latest from this temple"
                   reveal
                   addressable={false}
-                  moreLink={toPhotos(t, total)}
+                  moreLink={toPhotos(t, total, stand)}
                 />
               )}
             </div>
@@ -140,7 +144,7 @@ export default async function RegionPage({ params }: Props) {
               </p>
             </div>
             <div className="temple-cards">
-              {aroundTemples.map(({ t, photos, total }) => (
+              {aroundTemples.map(({ t, photos, total, stand }) => (
                 <div key={t.id} className="temple-card">
                   <PhotoWall
                     photos={photos}
@@ -148,7 +152,7 @@ export default async function RegionPage({ params }: Props) {
                     note="Latest from this temple"
                     reveal
                     addressable={false}
-                    moreLink={toPhotos(t, total)}
+                    moreLink={toPhotos(t, total, stand)}
                   />
                   <TempleRow temple={t} formal />
                 </div>

@@ -782,6 +782,10 @@ export interface PhotoSet {
    */
   observances?: (number | Observance)[] | null;
   /**
+   * Where a day is divided into several sets, their order on the site: 1 first, 2 next, and so on. Empty: by the time their photos were taken.
+   */
+  dayOrder?: number | null;
+  /**
    * A card of its own in the section "Pondicherry's Hindu Ethos" on the Temples page.
    */
   ethos?: boolean | null;
@@ -1486,6 +1490,7 @@ export interface PhotoSetsSelect<T extends boolean = true> {
   date?: T;
   temples?: T;
   observances?: T;
+  dayOrder?: T;
   ethos?: T;
   fieldNote?: T;
   photos?: T;

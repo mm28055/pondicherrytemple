@@ -6,6 +6,7 @@ import {
   getFieldNotesForTemple,
   getFilmsForTemple,
   getIllustrationsForTemple,
+  getPhotoFilters,
   getPhotosForTemple,
   getRegion,
   getRegions,
@@ -26,12 +27,13 @@ import { Drawings } from "@/components/Drawings";
 import { FilmWall } from "@/components/FilmWall";
 import { PhotoWall } from "@/components/PhotoWall";
 import type { Photo } from "@/content/types";
-import { latestEvent, leadPhotos } from "@/lib/photoPack";
+import { latestEvent, leadPhotos, packPhotos } from "@/lib/photoPack";
 import { formatDate } from "@/lib/calendar";
 import { NoteRow } from "@/components/Rows";
 import { TempleYear } from "@/components/TempleYear";
 import { ShowMore } from "@/components/ShowMore";
 import { TempleLayout } from "@/components/TempleLayout";
+import { TempleColumns } from "@/components/TempleColumns";
 import { ReservedLink } from "@/components/ReservedLink";
 import { TEMPLE_STORIES_PUBLISHED } from "@/lib/festivals";
 
@@ -55,7 +57,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 /* A temple's page. The header: the name, and the temple's plan as a card at
    the right that hangs over the line below. Then two columns: on the left the
-   introduction, a link to "The Temple and its Stories", field notes, photographs, films and articles;
+   introduction, a link to "The Temple and its Stories", field notes, films, photographs and articles;
    on the right its drawings and the ritual year, month by month, newest
    first: the festivals seen in each. (First designed on the Chetty Koil page, October 2026.) */
 export default async function TemplePage({ params }: Props) {
@@ -108,87 +110,111 @@ export default async function TemplePage({ params }: Props) {
         )}
       </header>
 
-      <div
+      {/* two columns; the films, photographs and articles across the page
+          where they begin below the end of the right column (components/TempleColumns) */}
+      <TempleColumns
         className={plan ? "two-col temple-body below-layout" : "two-col temple-body"}
-      >
-        <div className="stack">
-          {/* on a phone, where the Ritual Year comes after everything else: the page's parts, a tap away */}
-          <nav className="page-parts" aria-label="On this page">
-            <a href="#ritual-year">Ritual Year ↓</a>
-            {notes.length > 0 && <a href="#field-notes">Field notes ↓</a>}
-            {photos.length > 0 && <a href="#photographs">Photographs ↓</a>}
-            {films.length > 0 && <a href="#films">Films ↓</a>}
-            {articles.length > 0 && <a href="#articles">Articles ↓</a>}
-          </nav>
+        main={
+          <>
+            {/* on a phone, where the Ritual Year comes after everything else: the page's parts, a tap away */}
+            <nav className="page-parts" aria-label="On this page">
+              <a href="#ritual-year">Ritual Year ↓</a>
+              {notes.length > 0 && <a href="#field-notes">Field notes ↓</a>}
+              {films.length > 0 && <a href="#films">Films ↓</a>}
+              {photos.length > 0 && <a href="#photographs">Photographs ↓</a>}
+              {articles.length > 0 && <a href="#articles">Articles ↓</a>}
+            </nav>
 
-          {/* its introduction (Admin → Temples); a note in its place until it is written */}
-          {t.intro ? (
-            <Html className="prose" html={t.intro} />
-          ) : (
-            <p className="note-line">An introduction to the temple is being written.</p>
-          )}
+            {/* its introduction (Admin → Temples); a note in its place until it is written */}
+            {t.intro ? (
+              <Html className="prose" html={t.intro} />
+            ) : (
+              <p className="note-line">An introduction to the temple is being written.</p>
+            )}
 
-          {hasStories && (
-            // held in reserve until published: plain words, "(coming soon)", to the public
-            <ReservedLink
-              className="arrow-link"
-              href={`/${region.id}/${t.id}/temple-and-its-stories`}
-              published={TEMPLE_STORIES_PUBLISHED}
-            >
-              Explore the temple&apos;s history and stories
-            </ReservedLink>
-          )}
+            {hasStories && (
+              // held in reserve until published: plain words, "(coming soon)", to the public
+              <ReservedLink
+                className="arrow-link"
+                href={`/${region.id}/${t.id}/temple-and-its-stories`}
+                published={TEMPLE_STORIES_PUBLISHED}
+              >
+                Explore the temple&apos;s history and stories
+              </ReservedLink>
+            )}
 
-          {notes.length > 0 && (
-            <section id="field-notes">
-              <h2 className="sub-head">Field notes</h2>
-              {/* on a phone, the latest five, the rest a tap away, so the Ritual Year is not far below */}
-              <ShowMore shown={5} label={`All ${notes.length} field notes`}>
-                {notes.map((r) => (
-                  <NoteRow key={r.id} row={r} />
-                ))}
-              </ShowMore>
+            {notes.length > 0 && (
+              <section id="field-notes">
+                <h2 className="sub-head">Field notes</h2>
+                {/* on a phone, the latest five, the rest a tap away, so the Ritual Year is not far below */}
+                <ShowMore shown={5} label={`All ${notes.length} field notes`}>
+                  {notes.map((r) => (
+                    <NoteRow key={r.id} row={r} />
+                  ))}
+                </ShowMore>
+              </section>
+            )}
+          </>
+        }
+        lower={[
+          // its films, then its photographs
+          ...(films.length > 0
+            ? [
+                {
+                  id: "films",
+                  node: (
+                    <section id="films">
+                      <h2 className="sub-head">Films</h2>
+                      <FilmWall tiles={films} />
+                    </section>
+                  ),
+                },
+              ]
+            : []),
+          ...(photos.length > 0
+            ? [
+                {
+                  id: "photographs",
+                  node: (
+                    <section id="photographs">
+                      <h2 className="sub-head">Photographs</h2>
+                      <LatestPhotos own={own} stand={photos} seeAll={`/${region.id}/${t.id}/photographs`} />
+                    </section>
+                  ),
+                },
+              ]
+            : []),
+          ...(articles.length > 0
+            ? [
+                {
+                  id: "articles",
+                  node: (
+                    <section id="articles">
+                      <h2 className="sub-head">Articles</h2>
+                      {articles.map((r) => (
+                        <NoteRow key={r.id} row={r} />
+                      ))}
+                    </section>
+                  ),
+                },
+              ]
+            : []),
+        ]}
+        aside={
+          <>
+            {otherDrawings.length > 0 && <Drawings items={otherDrawings} />}
+
+            <section id="ritual-year">
+              <h2 className="sub-head">The Ritual Year</h2>
+              <p className="note-line" style={{ marginBottom: 18 }}>
+                What we have been present for, month by month. By the end of the year, this is the
+                temple&apos;s ritual calendar.
+              </p>
+              <TempleYear year={year} />
             </section>
-          )}
-
-          {photos.length > 0 && (
-            <section id="photographs">
-              <h2 className="sub-head">Photographs</h2>
-              <LatestPhotos own={own} stand={photos} seeAll={`/${region.id}/${t.id}/photographs`} />
-            </section>
-          )}
-
-          {films.length > 0 && (
-            <section id="films">
-              <h2 className="sub-head">Films</h2>
-              <FilmWall tiles={films} />
-            </section>
-          )}
-
-          {articles.length > 0 && (
-            <section id="articles">
-              <h2 className="sub-head">Articles</h2>
-              {articles.map((r) => (
-                <NoteRow key={r.id} row={r} />
-              ))}
-            </section>
-          )}
-        </div>
-
-        {/* A column that scrolls with the page. */}
-        <aside className="stack">
-          {otherDrawings.length > 0 && <Drawings items={otherDrawings} />}
-
-          <section id="ritual-year">
-            <h2 className="sub-head">The Ritual Year</h2>
-            <p className="note-line" style={{ marginBottom: 18 }}>
-              What we have been present for, month by month. By the end of the year, this is the
-              temple&apos;s ritual calendar.
-            </p>
-            <TempleYear year={year} />
-          </section>
-        </aside>
-      </div>
+          </>
+        }
+      />
     </div>
   );
 }
@@ -196,7 +222,9 @@ export default async function TemplePage({ params }: Props) {
 /** A temple in and around the town: part of the story, not at the centre of
     the documentation. A simpler page, for now just its field notes,
     photographs and films (stand-in photographs until it has its own). To be
-    designed. */
+    designed. Few photographs: all of them on the page itself, as on a
+    temple's own Photographs page (each day or event under its heading,
+    newest or oldest first), with no page of their own to go to. */
 async function AroundTemplePage({ regionId, regionName, templeId }: { regionId: string; regionName: string; templeId: string }) {
   const t = (await getTemple(regionId, templeId))!;
   // the town these temples are around: its temples, for the notes' tags
@@ -209,6 +237,7 @@ async function AroundTemplePage({ regionId, regionName, templeId }: { regionId: 
   const films = (await getFilmsForTemple(regionId, t.id)).map((f) => filmTile(f, allTemples));
   const own = await getPhotosForTemple(regionId, t.id);
   const photos = own.length ? own : await getDummyPhotos(t.id, 6);
+  const filters = own.length ? await getPhotoFilters(own, ["observances", "years"]) : [];
 
   return (
     <div className="wrap">
@@ -225,24 +254,46 @@ async function AroundTemplePage({ regionId, regionName, templeId }: { regionId: 
         </div>
       </header>
       <div className="stack around-temple">
-        {notes.length > 0 && (
-          <section>
-            <h2 className="sub-head">Field notes</h2>
-            {notes.map((r) => (
-              <NoteRow key={r.id} row={r} />
-            ))}
-          </section>
+        {/* its films above its photographs: beside its field notes, in a column at the right, if it has any */}
+        {notes.length > 0 && films.length > 0 ? (
+          <div className="two-col around-cols">
+            <section>
+              <h2 className="sub-head">Field notes</h2>
+              {notes.map((r) => (
+                <NoteRow key={r.id} row={r} />
+              ))}
+            </section>
+            <section id="films">
+              <h2 className="sub-head">Films</h2>
+              <FilmWall tiles={films} />
+            </section>
+          </div>
+        ) : (
+          <>
+            {notes.length > 0 && (
+              <section>
+                <h2 className="sub-head">Field notes</h2>
+                {notes.map((r) => (
+                  <NoteRow key={r.id} row={r} />
+                ))}
+              </section>
+            )}
+            {films.length > 0 && (
+              <section id="films">
+                <h2 className="sub-head">Films</h2>
+                <FilmWall tiles={films} />
+              </section>
+            )}
+          </>
         )}
         <section id="photographs">
           <h2 className="sub-head">Photographs</h2>
-          <LatestPhotos own={own} stand={photos} seeAll={`/${regionId}/${t.id}/photographs`} />
+          {own.length ? (
+            <PhotoWall pack={packPhotos(own)} layout="all" filters={filters} heads={{ here: t.shortName ?? t.knownAs ?? t.name }} />
+          ) : (
+            <LatestPhotos own={own} stand={photos} seeAll="" />
+          )}
         </section>
-        {films.length > 0 && (
-          <section>
-            <h2 className="sub-head">Films</h2>
-            <FilmWall tiles={films} />
-          </section>
-        )}
       </div>
     </div>
   );

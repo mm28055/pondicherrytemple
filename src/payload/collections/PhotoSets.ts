@@ -103,6 +103,16 @@ export const PhotoSets: CollectionConfig = {
       ],
     },
     {
+      name: 'dayOrder',
+      type: 'number',
+      label: 'Place in its day',
+      min: 1,
+      admin: {
+        description:
+          'Where a day is divided into several sets, their order on the site: 1 first, 2 next, and so on. Empty: by the time their photos were taken.',
+      },
+    },
+    {
       name: 'ethos',
       type: 'checkbox',
       label: "Pondicherry's Hindu Ethos",

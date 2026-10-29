@@ -140,7 +140,7 @@ export function FilmWall({
               </span>
               <span className="caps">{t.date}</span>
               <span className="video-title">{t.title}</span>
-              {t.where && <span className="video-where">{t.where}</span>}
+              {/* (its temples are not shown under its title: they place it, on their pages and in the filters) */}
             </button>
           ))}
         </div>
