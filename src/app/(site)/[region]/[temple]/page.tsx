@@ -93,6 +93,8 @@ export default async function TemplePage({ params }: Props) {
           <h1 className="temple-title">{t.knownAs ?? t.name}</h1>
           <div className="temple-facts caps">
             {t.knownAs && t.knownAs !== t.name && <span>{t.name}</span>}
+            {/* the red mark between them, as on the home page: a lingam on its base */}
+            {t.knownAs && t.knownAs !== t.name && t.street && <span className="lingam" aria-hidden="true" />}
             {t.street && <span>{t.street}</span>}
           </div>
         </div>
@@ -217,6 +219,8 @@ async function AroundTemplePage({ regionId, regionName, templeId }: { regionId: 
         <h1 className="temple-title">{t.knownAs ?? t.name}</h1>
         <div className="temple-facts caps">
           {t.knownAs && t.knownAs !== t.name && <span>{t.name}</span>}
+          {/* the red mark between them, as on the home page: a lingam on its base */}
+          {t.knownAs && t.knownAs !== t.name && t.street && <span className="lingam" aria-hidden="true" />}
           {t.street && <span>{t.street}</span>}
         </div>
       </header>
