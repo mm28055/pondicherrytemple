@@ -1627,12 +1627,16 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
 .photo-group-head + .photo-wall { padding-top: 0; } /* (a temple's latest, headed on its page) */
 .photo-group-head:has(+ .photo-group-head) { padding-bottom: 2px; } .photo-group-head + .photo-group-head { padding-top: 0; } /* (two events, one line each) */
 .photo-group-head > * + *::before { content: " · "; color: var(--muted); }
-.photo-group-head .note { color: var(--muted); }
-.photo-group-head .note:hover { color: var(--ink); }
-/* on a phone, one line: the field note left out, and what is too long cut short */
+/* its field note: as the site's other names that open a page (a temple, a
+   festival, a day's note), darker than the words around it, red when pointed at */
+.photo-group-head .note { color: var(--ink); transition: color 0.15s; }
+.photo-group-head .note:hover,
+.photo-group-head .note:focus-visible { color: var(--ochre); }
+/* on a phone, one line, what is too long cut short; the field note on a short line of its own under it */
 @media (max-width: 560px) {
   .photo-group-head { font-size: 11.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 10px 0 8px; }
-  .photo-group-head .note { display: none; }
+  .photo-group-head .note { display: block; overflow: hidden; text-overflow: ellipsis; padding-top: 3px; }
+  .photo-group-head .note::before { content: none; }
 }
 @media (max-width: 900px) { .photo-rows { --h: 200px; } }
 @media (max-width: 560px) { .photo-rows { --h: 130px; padding-top: 18px; } }
@@ -1660,11 +1664,12 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
 .filter-bar-item > .filter-bar-btn { display: inline-flex; align-items: baseline; min-width: 0; }
 .filter-bar-item > .filter-bar-btn b { overflow: hidden; text-overflow: ellipsis; min-width: 0; }
 /* over a wall of photos on the stripes: the bar as wide as the photos (so it
-   covers them when stuck), its words, line and dropdown within the page's
-   margins, in line with the header (components/FilterBar) */
+   covers them when stuck), its words and line within the page's margins,
+   in line with the header (components/FilterBar) */
 .filter-bar.on-stripes { border-bottom: 0; }
 .filter-bar.on-stripes .filter-bar-line { margin: 0 var(--past-r) 0 var(--past-l); border-bottom: 1px solid var(--rule); }
-.filter-bar.on-stripes .filters.filter-bar-panel { left: var(--past-l); right: var(--past-r); }
+/* its dropdown as wide as the photos, its choices the same space in from either edge */
+.filter-bar.on-stripes .filters.filter-bar-panel { left: 0; right: 0; padding-inline: max(var(--past-l), var(--past-r), 20px); }
 /* a chosen temple: on a phone, by its shortest name */
 .filter-bar-short { display: none; }
 @media (max-width: 640px) {
