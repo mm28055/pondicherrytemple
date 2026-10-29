@@ -49,7 +49,7 @@ export default async function TemplePhotosPage({ params }: Props) {
         <h1 className="temple-title">{t.knownAs ?? t.name}</h1>
       </header>
       <section className="section">
-        <PhotoWall pack={packPhotos(photos)} layout="all" filters={filters} heads={{}} />
+        <PhotoWall pack={packPhotos(photos)} layout="all" filters={filters} heads={{ here: t.shortName ?? t.knownAs ?? t.name }} />
       </section>
     </div>
   );

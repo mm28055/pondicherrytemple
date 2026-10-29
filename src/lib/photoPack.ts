@@ -116,6 +116,13 @@ export function unpackPhotos({ base, words, groups, photos }: PhotoPack): Photo[
   });
 }
 
+/** The day or event a photograph is of: its set's, as named on the day at
+    its temples, so two sets of one day, temple and name (a morning's and an
+    evening's folder of one occasion) are one event, under one heading; else
+    its day's. */
+export const eventOf = (p: Photo) =>
+  `${p.dated ? p.date : ""}|${p.set ? `${p.place ?? ""}|${(p.occasion ?? p.set).trim().toLowerCase()}` : ""}`;
+
 /** How many photographs the strips of the home and Field Notes pages go
     through: one from each of the latest events. */
 export const STRIP_PHOTOS = 200;
@@ -130,7 +137,7 @@ export function onePerEvent(list: Photo[], n: number): Photo[] {
   const events: Photo[][] = [];
   for (const p of list) {
     const last = events.at(-1);
-    if (last && last[0].date === p.date && last[0].set === p.set) last.push(p);
+    if (last && eventOf(last[0]) === eventOf(p)) last.push(p);
     else if (events.length === n) break;
     else events.push([p]);
   }
@@ -155,7 +162,7 @@ export function latestEvent(list: Photo[], n = 6) {
   const events: Photo[][] = [];
   for (const p of list) {
     const last = events[events.length - 1];
-    if (last && last[0].date === p.date && last[0].set === p.set) last.push(p);
+    if (last && eventOf(last[0]) === eventOf(p)) last.push(p);
     else if (events.length === 2) break;
     else events.push([p]);
   }

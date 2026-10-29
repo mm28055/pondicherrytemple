@@ -48,6 +48,7 @@ import { SECTION_INTROS, type SectionName } from "@/payload/sectionIntros";
 import { seeded } from "./mahotsavam";
 import { monthDates, monthYearOf, TAMIL_MONTHS, tamilMonthOf, type TamilMonth } from "./calendar";
 import { festivalPath } from "./festivals";
+import { eventOf } from "./photoPack";
 import type { TithiKey } from "./tithiNames";
 import type { SpecialIconKey } from "./specialIcons";
 
@@ -616,8 +617,11 @@ async function buildPhotoData() {
     const observances = new Set(slugs(m.observances, L.observanceSlug));
     inSet?.temples.forEach((t) => L.templeKey.has(t) && temples.add(L.templeKey.get(t)!));
     inSet?.observances.forEach((o) => observances.add(o));
+    // a photo of its own temple (or set's) is that temple's alone: a note of
+    // two temples does not put it on the other's page too
+    const ownTemples = temples.size > 0;
     for (const n of notes) {
-      slugs(n.temples, L.templeKey).forEach((t) => temples.add(t));
+      if (!ownTemples) slugs(n.temples, L.templeKey).forEach((t) => temples.add(t));
       slugs(n.observances, L.observanceSlug).forEach((o) => observances.add(o));
     }
     if (!inSet && !temples.size && !observances.size) continue;
@@ -665,13 +669,14 @@ async function buildPhotoData() {
   // newest day first, those of no known day after all the rest; a day's
   // photos in the order they were taken (by the camera's time, else as
   // numbered by the camera and brought in)
-  // and each day's sets kept together, in the order they began
+  // and each day's events kept together (two sets of one name, one event:
+  // lib/photoPack, eventOf), in the order they began
   const began = new Map<string, string>();
   for (const p of out) {
     const t = timeOf.get(p) ?? "~";
-    if (p.set && !(began.get(p.set)! <= t)) began.set(p.set, t);
+    if (p.set && !(began.get(eventOf(p))! <= t)) began.set(eventOf(p), t);
   }
-  const startOf = (p: Photo) => (p.set ? `${began.get(p.set)}|${p.set.padStart(8, "0")}` : "");
+  const startOf = (p: Photo) => (p.set ? `${began.get(eventOf(p))}|${eventOf(p)}` : "");
   const list = out.sort(
     (a, b) =>
       Number(b.dated) - Number(a.dated) ||

@@ -7,7 +7,7 @@ import type { Photo, PhotoFilter } from "@/content/types";
 import { formatDate } from "@/lib/calendar";
 import { stripeRows, stripeWidth, useStripeFit } from "@/lib/stripes";
 import { FilterBar } from "@/components/FilterBar";
-import { photoCount, unpackPhotos, type PhotoPack } from "@/lib/photoPack";
+import { eventOf, photoCount, unpackPhotos, type PhotoPack } from "@/lib/photoPack";
 
 const PAGE = 30;
 /** How many the "lead" layout shows: one large, five small. */
@@ -46,7 +46,9 @@ type Props = {
   addressable?: boolean;
   /** "all": a line over each day's or event's photographs: its day and what
       it was, and, as asked, its temple and its field note's title */
-  heads?: { temple?: boolean; note?: boolean };
+  /** `here`: the temple whose page it is (its shortest name), named only on
+      a heading of another temple's photographs shown there too */
+  heads?: { temple?: boolean; note?: boolean; here?: string };
   /** "row": shown as it scrolls into view, as the temple's name beside it is */
   reveal?: boolean;
 };
@@ -56,7 +58,7 @@ const monthLabel = (ym: string) =>
   new Date(`${ym}-15T12:00:00Z`).toLocaleDateString("en-GB", { month: "long", year: "numeric", timeZone: "UTC" });
 
 /** The photos of one day or event, together (a photo set's, or a day's). */
-const groupOf = (p: Photo) => `${p.dated ? p.date : ""}|${p.set ?? ""}`;
+const groupOf = eventOf;
 /** The photos in runs of one day or event each, in order. */
 function runs(list: Photo[]): Photo[][] {
   const out: Photo[][] = [];
@@ -324,7 +326,7 @@ export function PhotoWall({ photos: given, pack, total, layout, seeAll, filters 
                       <Fragment key={`head-${p.id}`}>
                         <div id={`photos-${p.id}`} className="photo-group-head" style={{ paddingLeft: fit.back }}>
                           <span className="date">{p.dated ? formatDate(p.date) : "Day not known"}</span>
-                          {heads.temple && p.place && <span>{p.place}</span>}
+                          {p.place && (heads.temple || (heads.here && p.place !== heads.here)) && <span>{p.place}</span>}
                           {p.occasion && <span>{p.occasion}</span>}
                           {heads.note && p.note && (
                             <Link className="note" href={p.note.href}>
