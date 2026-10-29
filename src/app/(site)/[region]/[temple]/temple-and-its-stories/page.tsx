@@ -51,7 +51,7 @@ export default async function TempleStoriesPage({ params }: Props) {
           const d = dateParts(e.date);
           const local = localMonth(region.calendar, e.date);
           return (
-            <article key={e.id} className="story-row">
+            <article key={e.id} className={e.picture ? "story-row" : "story-row no-picture"}>
               <div className="date-stamp" aria-hidden="true">
                 <span className="d">{d.day}</span>
                 <span className="m">
@@ -65,7 +65,7 @@ export default async function TempleStoriesPage({ params }: Props) {
                 {e.named && <p className="entry-name caps">{e.named.name}</p>}
                 <Html className="prose rich" html={e.body} />
               </div>
-              {e.picture ? (
+              {e.picture && (
                 <figure className="story-picture">
                   <img
                     src={e.picture.src}
@@ -82,10 +82,6 @@ export default async function TempleStoriesPage({ params }: Props) {
                     </figcaption>
                   )}
                 </figure>
-              ) : (
-                <div className="story-picture empty" aria-hidden="true">
-                  <span className="caps">Photograph to come</span>
-                </div>
               )}
             </article>
           );

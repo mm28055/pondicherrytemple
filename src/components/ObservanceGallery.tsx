@@ -120,12 +120,10 @@ function Card({ it, lead = false, linked }: { it: GalleryItem; lead?: boolean; l
             }
           />
         ) : (
-          <>
-            <span className="gallery-stand-in" lang="ta" aria-hidden="true">
-              {row.tamil ?? row.name}
-            </span>
-            <span className="gallery-to-come">Photograph to come</span>
-          </>
+          // its name in Tamil, faint, where a photograph would be (not "to come": there may be none)
+          <span className="gallery-stand-in" lang="ta" aria-hidden="true">
+            {row.tamil ?? row.name}
+          </span>
         )}
       </span>
       <span className="gallery-text">

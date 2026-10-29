@@ -472,21 +472,14 @@ a:focus-visible, button:focus-visible {
 }
 .story-row .kicker { margin: 0 0 6px; }
 .story-title { font-weight: 600; font-size: clamp(22px, 2.2vw, 28px); line-height: 1.2; margin-bottom: 12px; }
-/* Its picture at the right, or a placeholder until one is chosen in the admin */
+/* Its picture at the right, if it has one; if not, its words across where it would be */
 .story-picture { margin: 0; }
 .story-picture img { display: block; width: 100%; height: auto; }
 .story-picture figcaption { font-size: 15px; color: var(--ink-2); margin-top: 8px; }
-.story-picture.empty, .row-picture.empty {
-  aspect-ratio: 4 / 3;
-  display: grid;
-  place-items: center;
-  background: var(--chalk-2);
-  border: 1px dashed var(--rule);
-}
-.story-picture.empty .caps, .row-picture.empty .caps { color: var(--muted); font-size: 11px; }
+.story-row.no-picture > div:nth-child(2) { grid-column: 2 / -1; }
 
 /* The Field Notes page: each note's first photograph at the right, the same
-   size and placeholder as on a temple's Stories page */
+   size as on a temple's Stories page (a note with none, words only) */
 .note-row.with-picture { grid-template-columns: 110px minmax(0, 1fr) minmax(180px, 300px); }
 /* The words beside the picture: the picture sets the row's height (the text
    column is size-contained), and the words fill down to "Read more →", which
@@ -521,7 +514,18 @@ a:focus-visible, button:focus-visible {
 .row-more::after { content: " →"; }
 .note-row:hover .row-more { color: var(--ochre-deep); }
 .row-picture { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
-.row-picture.empty { display: grid; }
+/* A note with no photograph: words only, across where the photograph would
+   be, sized by themselves; six lines at most, ending on a whole one, then
+   "Read more →" (not a box saying a photograph is to come: there may be none) */
+.note-row.no-picture > div:nth-child(2) { grid-column: 2 / -1; container-type: normal; padding-right: 0; }
+.note-row.no-picture .row-excerpt.fill {
+  max-width: 72ch;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 6;
+  line-clamp: 6;
+}
+.note-row.no-picture .row-more { margin-top: 0; padding-top: 14px; }
 
 /* ---------- Sections ---------- */
 /* Sections: half the space they once had; the last one keeps a full space
@@ -1881,6 +1885,7 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
   .note-row, .story-row { grid-template-columns: minmax(0, 1fr); gap: 10px; padding-block: 22px; }
   .note-row.with-picture { grid-template-columns: minmax(0, 1fr); }
   .story-row .story-picture, .note-row.with-picture .row-picture { grid-column: auto; max-width: none; }
+  .note-row.no-picture > div:nth-child(2), .story-row.no-picture > div:nth-child(2) { grid-column: auto; }
   .date-stamp { display: flex; align-items: baseline; gap: 10px; }
   .date-stamp .d { font-size: 40px; }
   .date-stamp .m { margin-top: 0; }
@@ -2709,10 +2714,6 @@ a.gallery-card:hover .gallery-pic img { transform: scale(1.04); } /* only a card
   position: absolute; inset: 0; display: grid; place-items: center; padding: 12px;
   font-family: var(--tamil); font-weight: 700; font-size: clamp(30px, 3.4vw, 54px); line-height: 1.1; text-align: center;
   color: var(--ochre); opacity: 0.22;
-}
-.gallery-to-come {
-  position: absolute; left: 12px; bottom: 10px;
-  font-family: var(--display); font-weight: 600; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted);
 }
 .gallery-text { display: flex; flex-direction: column; gap: 2px; padding-top: 12px; }
 /* the Tamil name and the English, side by side, a small red dot between */

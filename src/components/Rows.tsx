@@ -4,7 +4,8 @@ import type { NoteRowData, ObservanceRowData } from "@/lib/view";
 import type { Temple } from "@/content/types";
 
 /** A field note, interview, video… or an article: date stamp, then what it is.
-    `withPicture` adds its photograph at the right, or a placeholder. */
+    `withPicture` adds its photograph at the right; a note with none is words
+    only, across the width the photograph would have taken. */
 export function NoteRow({
   row,
   withPicture = false,
@@ -15,7 +16,7 @@ export function NoteRow({
   return (
     <Link
       className={
-        withPicture ? "note-row with-picture reveal" : "note-row reveal"
+        withPicture ? `note-row with-picture${row.picture ? "" : " no-picture"} reveal` : "note-row reveal"
       }
       href={row.href}
     >
@@ -42,19 +43,9 @@ export function NoteRow({
         )}
         {row.by && <p className="row-by">{row.by}</p>}
       </div>
-      {withPicture &&
-        (row.picture ? (
-          <img
-            className="row-picture"
-            src={row.picture.src}
-            alt={row.picture.alt}
-            loading="lazy"
-          />
-        ) : (
-          <span className="row-picture empty" aria-hidden="true">
-            <span className="caps">Photograph to come</span>
-          </span>
-        ))}
+      {withPicture && row.picture && (
+        <img className="row-picture" src={row.picture.src} alt={row.picture.alt} loading="lazy" />
+      )}
     </Link>
   );
 }
