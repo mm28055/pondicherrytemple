@@ -201,8 +201,9 @@ const rawPhotos = cache(async () => {
       sort: "id",
       limit: PHOTO_PART,
       page,
+      // (prefix: the folder some files are kept in, as a film's still uploaded with it, without which its address leads nowhere)
       select: {
-        filename: true, url: true, width: true, height: true, focalX: true, focalY: true,
+        filename: true, prefix: true, url: true, width: true, height: true, focalX: true, focalY: true,
         alt: true, caption: true, credit: true, consent: true, featured: true, takenOn: true, takenAt: true, position: true,
         temples: true, observances: true, set: true, createdAt: true,
         sizes: {
@@ -1331,7 +1332,7 @@ export async function getPhotosForNote(noteId: string): Promise<Photo[]> {
   return (await photoData()).byNote.get(noteId) ?? [];
 }
 
-/** The photo sets of Pondicherry's Hindu Ethos in a region, newest first,
+/** The photo sets of the Town's Cultural and Spiritual Ethos in a region, newest first,
     each with its photographs. */
 export async function getEthosSets(regionId: string): Promise<{ id: string; title: string; dates: string[]; photos: Photo[] }[]> {
   const L = await lookups();

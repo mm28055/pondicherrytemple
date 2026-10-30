@@ -12,7 +12,7 @@ import { refresh, refreshHooks } from '../revalidate'
    - on the pages of that day's festivals and rituals at its temples (from
      "The year so far"), and of any chosen here;
    - always on the Photographs page;
-   - ticked "Pondicherry's Hindu Ethos": a card of its own in that section of
+   - ticked "The Town's Cultural and Spiritual Ethos": a card of its own in that section of
      the Temples page. */
 export const PhotoSets: CollectionConfig = {
   slug: 'photo-sets',
@@ -115,9 +115,9 @@ export const PhotoSets: CollectionConfig = {
     {
       name: 'ethos',
       type: 'checkbox',
-      label: "Pondicherry's Hindu Ethos",
+      label: "The Town's Cultural and Spiritual Ethos",
       defaultValue: false,
-      admin: { description: 'A card of its own in the section "Pondicherry\'s Hindu Ethos" on the Temples page.' },
+      admin: { description: 'A card of its own in the section "The Town\'s Cultural and Spiritual Ethos" on the Temples page.' },
     },
     {
       name: 'fieldNote',

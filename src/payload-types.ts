@@ -786,7 +786,7 @@ export interface PhotoSet {
    */
   dayOrder?: number | null;
   /**
-   * A card of its own in the section "Pondicherry's Hindu Ethos" on the Temples page.
+   * A card of its own in the section "The Town's Cultural and Spiritual Ethos" on the Temples page.
    */
   ethos?: boolean | null;
   /**

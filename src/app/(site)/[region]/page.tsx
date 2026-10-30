@@ -75,7 +75,7 @@ export default async function RegionPage({ params }: Props) {
     title: `All ${photoCount(total)} photographs of ${t.knownAs ?? t.name}`,
   });
 
-  // Pondicherry's Hindu Ethos: the town's photo sets of that name, each a card
+  // The Town's Cultural and Spiritual Ethos: the town's photo sets of that name, each a card
   const ethos = await getEthosSets(region.id);
 
   // today's date, as on the home page, for the box in the header
@@ -162,7 +162,7 @@ export default async function RegionPage({ params }: Props) {
         </section>
       )}
 
-      {/* Pondicherry's Hindu Ethos: as the temples in and around it, past the
+      {/* The Town's Cultural and Spiritual Ethos: as the temples in and around it, past the
           wall's stripes, each a card, a row of its photographs (a press opens
           them, to go through them all) over its name and day. */}
       {ethos.length > 0 && (
@@ -170,7 +170,9 @@ export default async function RegionPage({ params }: Props) {
           <div className="stripes around-wall" aria-hidden="true" />
           <div className="wrap">
             <div className="around-head">
-              <h2>{region.name}&apos;s Hindu Ethos</h2>
+              <h2>
+                The Town&apos;s Cultural and Spiritual Ethos <span lang="ta">ஊரின் ஆன்மிக மரபு</span>
+              </h2>
             </div>
             <div className="temple-cards">
               {ethos.map((e) => (
