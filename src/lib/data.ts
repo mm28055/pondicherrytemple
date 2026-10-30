@@ -201,9 +201,9 @@ const rawPhotos = cache(async () => {
       sort: "id",
       limit: PHOTO_PART,
       page,
-      // (prefix: the folder some files are kept in, as a film's still uploaded with it, without which its address leads nowhere)
+      // (prefix, _objectKey: the folder some files are kept in, as a film's still uploaded with it, without which its address leads nowhere)
       select: {
-        filename: true, prefix: true, url: true, width: true, height: true, focalX: true, focalY: true,
+        filename: true, prefix: true, _objectKey: true, url: true, width: true, height: true, focalX: true, focalY: true,
         alt: true, caption: true, credit: true, consent: true, featured: true, takenOn: true, takenAt: true, position: true,
         temples: true, observances: true, set: true, createdAt: true,
         sizes: {
