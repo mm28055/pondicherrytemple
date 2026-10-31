@@ -1380,6 +1380,11 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
 .note-meta a:hover { color: var(--ochre); }
 
 .note-body { max-width: 720px; margin-inline: auto; padding: clamp(18px, 2.5vw, 32px) var(--gutter) clamp(36px, 5vw, 64px); }
+/* the next day's note of the same event, below the first, after a line like the one under the header */
+.note-next { border-top: 2px solid var(--ink); padding-top: clamp(18px, 3vw, 36px); }
+.note-next .note-title { font-size: clamp(28px, 3.6vw, 46px); }
+.note-next .note-title a:hover { color: var(--ochre); }
+.note-next .note-meta { margin: 0 0 clamp(18px, 2.5vw, 28px); }
 .note-body p { font-size: 20px; line-height: 1.72; margin-bottom: 1.1em; }
 .note-body h3 {
   font-family: var(--display);
@@ -2386,6 +2391,11 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
 .day-events > li:last-child { border-bottom: 0; padding-bottom: 0; } /* the card ends on its last entry, not on a rule */
 .day-events .cal-tags { margin-top: 8px; }
 .day-events .cal-tags :is(a, .fl) { font-size: 11.5px; }
+/* the day's schedule: each time, and beside it what was to happen then */
+.cal-schedule { margin-top: 10px; display: grid; gap: 3px; font-size: 14px; line-height: 1.4; color: var(--ink-2); }
+.cal-schedule > div { display: grid; grid-template-columns: 7.5em 1fr; gap: 10px; }
+.cal-schedule dt { font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
+.cal-schedule dd { margin: 0; }
 .day-none { margin-top: 16px; font-style: italic; color: var(--muted); }
 .cal-moon { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; color: var(--ink-2); }
 .cal-moon [lang="ta"] { font-family: var(--tamil); }

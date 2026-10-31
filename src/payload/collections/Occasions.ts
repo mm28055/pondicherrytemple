@@ -54,6 +54,25 @@ export const Occasions: CollectionConfig = {
     },
     observancesField({ description: 'The festivals and rituals it involved.' }),
     {
+      name: 'schedule',
+      type: 'array',
+      label: 'The day’s schedule',
+      labels: { singular: 'Time', plural: 'Times' },
+      admin: {
+        description: 'Optional: what was to happen when, as the patrikai or the board gave it. Shown in the calendar’s pop-up for the day.',
+        initCollapsed: true,
+      },
+      fields: [
+        {
+          type: 'row',
+          fields: [
+            { name: 'time', type: 'text', required: true, admin: { width: '25%', placeholder: 'e.g. 7 PM' } },
+            { name: 'what', type: 'text', required: true, admin: { width: '75%', placeholder: 'e.g. Garuda Sevai veethi purappadu' } },
+          ],
+        },
+      ],
+    },
+    {
       name: 'fieldNote',
       type: 'relationship',
       relationTo: 'field-notes',

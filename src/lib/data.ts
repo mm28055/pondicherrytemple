@@ -349,6 +349,7 @@ const toOccasion = (o: P.Occasion, L: Lookups): Occasion => ({
   observances: slugs(o.observances, L.observanceSlug),
   note: L.noteSlug.get(idOf(o.fieldNote) ?? -1),
   tbc: Boolean(o.tbc),
+  schedule: (o.schedule ?? []).map(({ time, what }) => ({ time, what })),
 });
 
 function toFieldNote(n: P.FieldNote, L: Lookups, full: boolean): FieldNote {
@@ -1333,29 +1334,58 @@ export async function getPhotosForNote(noteId: string): Promise<Photo[]> {
 }
 
 /** The photo sets of the Town's Cultural and Spiritual Ethos in a region, newest first,
-    each with its photographs. */
-export async function getEthosSets(regionId: string): Promise<{ id: string; title: string; dates: string[]; photos: Photo[] }[]> {
+    each with its photographs, and the field notes written of it, in the
+    order of their days (a card's name opens them). */
+export async function getEthosSets(
+  regionId: string
+): Promise<{ id: string; title: string; dates: string[]; photos: Photo[]; notes: string[] }[]> {
   const L = await lookups();
   const { list, sets } = await photoData();
   // sets of the same name, one card (each kept in its own folder: "Vinayaka
   // Pandals" on the 17th and the 18th), its photographs those of all of them
-  const cards = new Map<string, { id: string; title: string; dates: string[]; photos: Photo[] }>();
-  for (const { set, day } of sets.values()) {
+  const cards = new Map<string, { id: string; title: string; dates: string[]; photos: Photo[]; notes: P.FieldNote[] }>();
+  for (const { set, day, notes } of sets.values()) {
     if (!set.ethos || L.regionOf(set.region) !== regionId) continue;
     const photos = list.filter((p) => p.set === String(set.id));
     if (!photos.length) continue;
     const key = set.title.trim().toLowerCase();
-    const card = cards.get(key) ?? { id: String(set.id), title: set.title, dates: [], photos: [] };
+    const card = cards.get(key) ?? { id: String(set.id), title: set.title, dates: [], photos: [], notes: [] };
     if (day && !card.dates.includes(day)) card.dates.push(day);
     card.photos.push(...photos);
+    for (const n of notes) if (!card.notes.includes(n)) card.notes.push(n);
     cards.set(key, card);
   }
   const order = new Map(list.map((p, i) => [p.id, i]));
   return [...cards.values()]
-    .map((c) => ({ ...c, dates: c.dates.sort(), photos: c.photos.sort((a, b) => order.get(a.id)! - order.get(b.id)!) }))
+    .map((c) => ({
+      ...c,
+      dates: c.dates.sort(),
+      photos: c.photos.sort((a, b) => order.get(a.id)! - order.get(b.id)!),
+      notes: c.notes.sort((a, b) => a.date.localeCompare(b.date)).map((n) => n.slug!),
+    }))
     .sort((a, b) => (b.dates.at(-1) ?? "").localeCompare(a.dates.at(-1) ?? ""));
 }
 
+
+/** The notes after this one of the same event of the town (an Ethos card of
+    several days, "Vinayaka Pandals" on the 17th and the 18th), in the order of
+    their days: shown under it, its card opening them all. */
+export async function getEventNotesAfter(slug: string): Promise<FieldNote[]> {
+  const { sets } = await photoData();
+  const byTitle = new Map<string, Set<string>>();
+  for (const { set, notes } of sets.values()) {
+    if (!set.ethos) continue;
+    const key = `${set.region ?? ""}|${set.title.trim().toLowerCase()}`;
+    const here = byTitle.get(key) ?? new Set<string>();
+    for (const n of notes) if (n.slug) here.add(n.slug);
+    byTitle.set(key, here);
+  }
+  const event = [...byTitle.values()].find((s) => s.has(slug) && s.size > 1);
+  if (!event) return [];
+  const all = (await Promise.all([...event].map((s) => getFieldNote(s)))).filter((n): n is FieldNote => n !== null);
+  const self = all.find((n) => n.id === slug);
+  return all.filter((n) => self && n.date > self.date).sort((a, b) => a.date.localeCompare(b.date));
+}
 
 /** Every photograph that may be shown. */
 export async function getPhotos(): Promise<Photo[]> {

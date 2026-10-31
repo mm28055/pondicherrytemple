@@ -18,6 +18,10 @@ const nextConfig: NextConfig = {
       // Nandhikeswara, spelled so in its addresses too (October 2026): the old ones lead to the new.
       { source: "/:region/nandikeswara/:rest*", destination: "/:region/nandhikeswara/:rest*", permanent: true },
       { source: "/field-notes/:date(\\d{4}-\\d{2}-\\d{2})-nandikeswara-:rest", destination: "/field-notes/:date-nandhikeswara-:rest", permanent: true },
+      // Spelled as the second Database Log spells them (October 2026): the old addresses lead to the new.
+      { source: "/festivals-and-rituals/adi-masam/:rest*", destination: "/festivals-and-rituals/aadi-masam/:rest*", permanent: true },
+      { source: "/festivals-and-rituals/agni-vasantha-thiruvizha/:rest*", destination: "/festivals-and-rituals/agni-vasanta-thiruvizha/:rest*", permanent: true },
+      { source: "/:region/goubert-market-vinayaka/:rest*", destination: "/:region/varasiddhi-veeravinayaka/:rest*", permanent: true },
     ];
   },
 

@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
   getDummyPhotos,
   getEthosSets,
+  getFieldNotesForTemple,
   isAround,
   getOccasions,
   getPhotosForTemple,
@@ -41,15 +43,19 @@ export default async function RegionPage({ params }: Props) {
   const temples = (await getTemples(region.id)).filter((t) => t.listed);
   // a temple's latest events, one photograph of each (newest first), and how
   // many photographs it has; stand-ins for a temple with none yet
+  // (and the day of its latest photograph or field note, for ordering the temples in and around)
   const latest = async (t: Temple) => {
     const own = await getPhotosForTemple(t.region, t.id);
+    const notes = await getFieldNotesForTemple(t.region, t.id);
+    const last = [...own.filter((p) => p.dated).map((p) => p.date), ...notes.map((n) => n.date)].sort().at(-1) ?? "";
     return own.length
-      ? { t, photos: onePerEvent(own, 12), total: own.length, stand: false }
+      ? { t, photos: onePerEvent(own, 12), total: own.length, stand: false, last }
       : {
           t,
           photos: await getDummyPhotos(`latest-${t.id}`, 12),
           total: 24 + Math.floor(seeded(`count-${t.id}`)() * 100),
           stand: true,
+          last,
         };
   };
   // each temple by its name, its proper name and its street alone, and a row of
@@ -60,12 +66,15 @@ export default async function RegionPage({ params }: Props) {
   // Temples outside the town live in their own region, "In and around <town>"
   // (address in-and-around-<town>), and are listed at the foot of the town's page.
   const around = await getRegion(`in-and-around-${region.id}`);
+  // the most recently visited first: by the day of its latest photograph or field note
   const aroundTemples = around
-    ? await Promise.all(
-        (await getTemples(around.id))
-          .filter((t) => t.listed && hasPage(t))
-          .map(latest),
-      )
+    ? (
+        await Promise.all(
+          (await getTemples(around.id))
+            .filter((t) => t.listed && hasPage(t))
+            .map(latest),
+        )
+      ).sort((a, b) => b.last.localeCompare(a.last))
     : [];
   // to the temple's own Photographs page (a temple in and around the town has
   // all its photographs on its page itself, at its foot; stand-ins, its page)
@@ -164,7 +173,8 @@ export default async function RegionPage({ params }: Props) {
 
       {/* The Town's Cultural and Spiritual Ethos: as the temples in and around it, past the
           wall's stripes, each a card, a row of its photographs (a press opens
-          them, to go through them all) over its name and day. */}
+          them, to go through them all) over its name and day, which opens its
+          field note when it has one. */}
       {ethos.length > 0 && (
         <section className="around ethos" id="hindu-ethos">
           <div className="stripes around-wall" aria-hidden="true" />
@@ -185,12 +195,22 @@ export default async function RegionPage({ params }: Props) {
                     moreLink={{ total: e.photos.length, title: `All ${photoCount(e.photos.length)} photographs` }}
                     reveal
                   />
-                  <div className="temple-row plain">
-                    <div>
-                      <div className="temple-name">{e.title}</div>
-                      {e.dates.length > 0 && <div className="temple-sub">{formatDays(e.dates)}</div>}
+                  {/* its name opens its field note (those of all its days), when there is one */}
+                  {e.notes.length > 0 ? (
+                    <Link className="temple-row plain" href={`/field-notes/${e.notes[0]}`}>
+                      <div>
+                        <div className="temple-name">{e.title}</div>
+                        {e.dates.length > 0 && <div className="temple-sub">{formatDays(e.dates)}</div>}
+                      </div>
+                    </Link>
+                  ) : (
+                    <div className="temple-row plain">
+                      <div>
+                        <div className="temple-name">{e.title}</div>
+                        {e.dates.length > 0 && <div className="temple-sub">{formatDays(e.dates)}</div>}
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </div>
               ))}
             </div>

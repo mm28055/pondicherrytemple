@@ -42,6 +42,8 @@ export interface CalendarEvent {
   observances: { label: string; href?: string }[];
   /** Still to be confirmed: shown fainter, marked "TBC". */
   tbc?: boolean;
+  /** What was to happen when, as the patrikai or the board gave it. */
+  schedule?: { time: string; what: string }[];
 }
 
 const WEEK = [
@@ -123,7 +125,7 @@ function GreatName({ g, plain }: { g: { name: string; tamil: string }; plain: st
 }
 
 /** The temple, what happened, and the festivals it was part of — each its own
-    link — and the field note about it. */
+    link — the day's schedule, and the field note about it. */
 function item(e: CalendarEvent) {
   return (
     <>
@@ -150,6 +152,16 @@ function item(e: CalendarEvent) {
             </FestivalLink>
           ))}
         </span>
+      )}
+      {e.schedule && e.schedule.length > 0 && (
+        <dl className="cal-schedule">
+          {e.schedule.map((s, i) => (
+            <div key={i}>
+              <dt>{s.time}</dt>
+              <dd>{s.what}</dd>
+            </div>
+          ))}
+        </dl>
       )}
       {e.noteHref && (
         <Link className="cal-read arrow-link" href={e.noteHref}>

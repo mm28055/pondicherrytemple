@@ -105,6 +105,8 @@ export interface Occasion {
   note?: string; // the field note written about it, if any
   /** Recorded, but the date or the event still to be confirmed. */
   tbc: boolean;
+  /** What was to happen when, as the patrikai or the board gave it. */
+  schedule: { time: string; what: string }[];
 }
 
 /* ---------- Content ---------- */

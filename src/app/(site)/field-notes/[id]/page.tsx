@@ -6,6 +6,7 @@ import {
   getFieldNote,
   getFieldNotes,
   getFieldNotesForTemple,
+  getEventNotesAfter,
   getPhotosForNote,
   getObservancesById,
   getRegion,
@@ -60,14 +61,22 @@ export default async function FieldNotePage({ params }: Props) {
 
   // the photographs beside the text: its own (those of its photo sets, the
   // same day at its temples), in the order taken
-  const photos = (await getPhotosForNote(note.id)).map(({ id, medium, alt, focus, width, height }) => ({
-    id,
-    medium,
-    alt,
-    focus,
-    width,
-    height,
-  }));
+  const photosOf = async (slug: string) =>
+    (await getPhotosForNote(slug)).map(({ id, medium, alt, focus, width, height }) => ({ id, medium, alt, focus, width, height }));
+
+  // the notes of the following days of the same event of the town (its card
+  // on the Temples page opens them all), each below the one before, their
+  // photographs after these in the column beside
+  const following = await Promise.all(
+    (await getEventNotesAfter(note.id)).map(async (n) => ({
+      note: n,
+      local: localMonth(region.calendar, n.date),
+      observances: await getObservancesById(n.observances),
+    }))
+  );
+  const photos = (await Promise.all([note.id, ...following.map((f) => f.note.id)].map(photosOf)))
+    .flat()
+    .filter((p, i, all) => all.findIndex((x) => x.id === p.id) === i);
 
   return (
     <>
@@ -123,6 +132,30 @@ export default async function FieldNotePage({ params }: Props) {
               </figure>
             ))}
           </article>
+
+          {following.map(({ note: n, local, observances }) => (
+            <article key={n.id} className="note-body note-next">
+              <div className="note-dateline">
+                <time className="date" dateTime={n.date}>
+                  {formatDate(n.date)}
+                </time>
+                {local && <span className="local">{local}</span>}
+              </div>
+              <h2 className="note-title">
+                <Link href={`/field-notes/${n.id}`}>{n.title}</Link>
+              </h2>
+              {observances.length > 0 && (
+                <div className="note-meta caps">
+                  {observances.map((o) => (
+                    <FestivalLink key={o.id} id={o.id}>
+                      {o.name}
+                    </FestivalLink>
+                  ))}
+                </div>
+              )}
+              {n.body && <Html className="rich" html={n.body} />}
+            </article>
+          ))}
 
           {related.length > 0 && (
             <div className="note-foot">

@@ -24,6 +24,7 @@ export async function calendarEvents(occasions: Occasion[]): Promise<CalendarEve
         label: o.label,
         noteHref: o.note ? `/field-notes/${o.note}` : undefined,
         tbc: o.tbc,
+        schedule: o.schedule,
         observances: (await getObservancesById(o.observances)).map((x) => ({
           label: x.name,
           href: festivalPath(x.id),

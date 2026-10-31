@@ -830,6 +830,16 @@ export interface Occasion {
    */
   observances?: (number | Observance)[] | null;
   /**
+   * Optional: what was to happen when, as the patrikai or the board gave it. Shown in the calendar’s pop-up for the day.
+   */
+  schedule?:
+    | {
+        time: string;
+        what: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
    * Optional. Linked from the year so far.
    */
   fieldNote?: (number | null) | FieldNote;
@@ -1574,6 +1584,13 @@ export interface OccasionsSelect<T extends boolean = true> {
   label?: T;
   tbc?: T;
   observances?: T;
+  schedule?:
+    | T
+    | {
+        time?: T;
+        what?: T;
+        id?: T;
+      };
   fieldNote?: T;
   region?: T;
   createdBy?: T;
