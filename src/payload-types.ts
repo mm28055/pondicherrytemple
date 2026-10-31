@@ -830,6 +830,10 @@ export interface Occasion {
    */
   observances?: (number | Observance)[] | null;
   /**
+   * Still in the calendar and the year so far; not listed under its month in the Ritual Year (like the eve of a festival).
+   */
+  notInYear?: boolean | null;
+  /**
    * Optional: what was to happen when, as the patrikai or the board gave it. Shown in the calendar’s pop-up for the day.
    */
   schedule?:
@@ -1584,6 +1588,7 @@ export interface OccasionsSelect<T extends boolean = true> {
   label?: T;
   tbc?: T;
   observances?: T;
+  notInYear?: T;
   schedule?:
     | T
     | {

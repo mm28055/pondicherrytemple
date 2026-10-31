@@ -350,6 +350,7 @@ const toOccasion = (o: P.Occasion, L: Lookups): Occasion => ({
   note: L.noteSlug.get(idOf(o.fieldNote) ?? -1),
   tbc: Boolean(o.tbc),
   schedule: (o.schedule ?? []).map(({ time, what }) => ({ time, what })),
+  notInYear: Boolean(o.notInYear),
 });
 
 function toFieldNote(n: P.FieldNote, L: Lookups, full: boolean): FieldNote {
@@ -1037,7 +1038,8 @@ export type TempleYearEntry = {
 export type TempleYearMonth = { month: TamilMonth; festivals: TempleYearEntry[] };
 export type TempleRitualYear = { months: TempleYearMonth[]; regular: TempleYearEntry[] };
 export async function getTempleRitualYear(regionId: string, templeId: string): Promise<TempleRitualYear> {
-  const seen = await getOccasionsForTemple(regionId, templeId);
+  // (a day left out of it in the admin, like the eve of a festival, is not counted)
+  const seen = (await getOccasionsForTemple(regionId, templeId)).filter((o) => !o.notInYear);
   const all = await getObservancesById([...new Set(seen.flatMap((o) => o.observances))]);
   const byId = new Map(all.map((o) => [o.id, o]));
   const WEEKDAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];

@@ -107,6 +107,8 @@ export interface Occasion {
   tbc: boolean;
   /** What was to happen when, as the patrikai or the board gave it. */
   schedule: { time: string; what: string }[];
+  /** Left out of the temple's Ritual Year (still in the calendar). */
+  notInYear?: boolean;
 }
 
 /* ---------- Content ---------- */

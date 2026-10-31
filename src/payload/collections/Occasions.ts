@@ -54,6 +54,12 @@ export const Occasions: CollectionConfig = {
     },
     observancesField({ description: 'The festivals and rituals it involved.' }),
     {
+      name: 'notInYear',
+      type: 'checkbox',
+      label: 'Leave out of the temple’s Ritual Year',
+      admin: { description: 'Still in the calendar and the year so far; not listed under its month in the Ritual Year (like the eve of a festival).' },
+    },
+    {
       name: 'schedule',
       type: 'array',
       label: 'The day’s schedule',

@@ -194,7 +194,10 @@ function weekdayOf(short: string) {
     and `after` beside it), and what follows; a link to its festival's or
     ritual's page when it has one. */
 function Entry({ e, className, after, children }: { e: TempleYearEntry; className: string; after: string | null; children?: ReactNode }) {
-  const ta = e.tamil ?? e.observance?.tamil;
+  // its own Tamil; else its festival's, when it goes by that festival's name
+  // (a day under a name of its own, "Aani Utthiram", is not "Abhishekam")
+  const named = e.name && e.name !== e.observance?.name;
+  const ta = e.tamil ?? (named ? undefined : e.observance?.tamil);
   return (
     <FestivalLink id={e.observance?.id} className={className}>
       {ta && (

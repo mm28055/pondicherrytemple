@@ -54,6 +54,9 @@ import * as migration_20261029_231000_thiruvahindrapuram_sets from './20261029_2
 import * as migration_20261031_120000_occasion_schedule from './20261031_120000_occasion_schedule';
 import * as migration_20261031_120500_database_log_2 from './20261031_120500_database_log_2';
 import * as migration_20261031_121000_plain_note_text from './20261031_121000_plain_note_text';
+import * as migration_20261031_135500_occasion_not_in_year from './20261031_135500_occasion_not_in_year';
+import * as migration_20261031_140000_ritual_year_kinds from './20261031_140000_ritual_year_kinds';
+import * as migration_20261031_141000_first_friday from './20261031_141000_first_friday';
 
 export const migrations = [
   {
@@ -335,5 +338,20 @@ export const migrations = [
     up: migration_20261031_121000_plain_note_text.up,
     down: migration_20261031_121000_plain_note_text.down,
     name: '20261031_121000_plain_note_text',
+  },
+  {
+    up: migration_20261031_135500_occasion_not_in_year.up,
+    down: migration_20261031_135500_occasion_not_in_year.down,
+    name: '20261031_135500_occasion_not_in_year',
+  },
+  {
+    up: migration_20261031_140000_ritual_year_kinds.up,
+    down: migration_20261031_140000_ritual_year_kinds.down,
+    name: '20261031_140000_ritual_year_kinds',
+  },
+  {
+    up: migration_20261031_141000_first_friday.up,
+    down: migration_20261031_141000_first_friday.down,
+    name: '20261031_141000_first_friday',
   },
 ];
