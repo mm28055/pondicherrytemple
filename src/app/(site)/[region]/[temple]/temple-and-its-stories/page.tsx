@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { BackLink } from "@/components/BackLink";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getRegion, getTemple, getTempleStories, hasPage } from "@/lib/data";
@@ -37,9 +38,9 @@ export default async function TempleStoriesPage({ params }: Props) {
   return (
     <div className="wrap">
       <header className="page-head tight-head">
-        <Link className="crumb" href={`/${region.id}/${t.id}`}>
+        <BackLink className="crumb" href={`/${region.id}/${t.id}`}>
           ← Back to the temple
-        </Link>
+        </BackLink>
         <div className="stories-title">
           <h1 className="temple-title">The Temple &amp; its Stories</h1>
           <div className="kicker">{t.knownAs ?? t.name}</div>

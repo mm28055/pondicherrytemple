@@ -129,7 +129,9 @@ export function TempleYear({ year }: { year: TempleRitualYear }) {
           count: many(festivals, "festival", "festivals"),
           panel: (
             <div>
-              {year.months.map(({ month, festivals: these }) => (
+              {/* only the months with something recorded in them */}
+              {festivals === 0 && none}
+              {year.months.filter(({ festivals: these }) => these.length > 0).map(({ month, festivals: these }) => (
                 <section key={month.slug} className="year-month">
                   <MonthHead month={month} />
                   {these.length === 0 ? (

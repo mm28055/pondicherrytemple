@@ -834,6 +834,10 @@ export interface Occasion {
    */
   notInYear?: boolean | null;
   /**
+   * Optional, shown in italics: e.g. “as part of the Veerabhadraswamy Chowdambika Koyil’s Aadi Peruvizha”.
+   */
+  yearNote?: string | null;
+  /**
    * Optional: what was to happen when, as the patrikai or the board gave it. Shown in the calendar’s pop-up for the day.
    */
   schedule?:
@@ -1589,6 +1593,7 @@ export interface OccasionsSelect<T extends boolean = true> {
   tbc?: T;
   observances?: T;
   notInYear?: T;
+  yearNote?: T;
   schedule?:
     | T
     | {

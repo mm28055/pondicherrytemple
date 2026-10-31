@@ -25,7 +25,7 @@ import {
 } from "@/lib/calendar";
 import { HIDDEN_TITHIS, TITHI_NAMES, type TithiKey } from "@/lib/tithiNames";
 import type { SpecialIconKey } from "@/lib/specialIcons";
-import { NAKSHATRAS } from "@/lib/nakshatraNames";
+import { NAKSHATRAS, nakshatraName } from "@/lib/nakshatraNames";
 import { NakshatraIcon } from "@/components/NakshatraIcon";
 import { SpecialIcon, TithiIcon } from "@/components/TithiIcon";
 
@@ -464,7 +464,7 @@ export function DayDialog({
                         </span>
                       </span>
                       <span className="day-text">
-                        <GreatName g={m} plain={NAKSHATRAS[m.nakshatra!].name} />
+                        <GreatName g={m} plain={nakshatraName(m.nakshatra!)} />
                       </span>
                     </span>
                   ))}
@@ -482,7 +482,7 @@ export function DayDialog({
                       </span>
                       <span className="day-text">
                         {i > 0 && <span className="cal-nak-then">then </span>}
-                        <span className="cal-nak-name">{NAKSHATRAS[k].name}</span>
+                        <span className="cal-nak-name">{nakshatraName(k)}</span>
                       </span>
                     </span>
                   ))}
@@ -621,7 +621,7 @@ export function MonthCalendar({
               {/* the day's nakshatras: the one at sunrise, then any that begin before the next */}
               <ul className="cal-naks">
                 {(nakshatras[day] ?? []).map((k) => (
-                  <li key={k} title={NAKSHATRAS[k].name} className={special[day]?.includes(k) || nakMarks(great, day).some((m) => m.nakshatra === k) ? "special" : undefined}>
+                  <li key={k} title={nakshatraName(k)} className={special[day]?.includes(k) || nakMarks(great, day).some((m) => m.nakshatra === k) ? "special" : undefined}>
                     {special[day]?.includes(k) || nakMarks(great, day).some((m) => m.nakshatra === k) ? (
                       <span className="cal-nak-mark great halo">
                         {nakFace(swap, great, day, k)}
@@ -629,7 +629,7 @@ export function MonthCalendar({
                     ) : (
                       <NakshatraIcon n={k} />
                     )}
-                    <span className="cal-nak-name">{NAKSHATRAS[k].name}</span>
+                    <span className="cal-nak-name">{nakshatraName(k)}</span>
                   </li>
                 ))}
               </ul>
@@ -645,7 +645,7 @@ export function MonthCalendar({
                     </span>
                   )}
                   {(special[day] ?? []).map((k) => (
-                    <span key={`n${k}`} className="cal-nak-mark great halo" title={NAKSHATRAS[k].name}>
+                    <span key={`n${k}`} className="cal-nak-mark great halo" title={nakshatraName(k)}>
                       {swap[day]?.[k] ? <SpecialIcon k={swap[day][k]} /> : <NakshatraIcon n={k} />}
                     </span>
                   ))}

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { BackLink } from "@/components/BackLink";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import {
@@ -43,9 +44,9 @@ export default async function TemplePhotosPage({ params }: Props) {
   return (
     <div className="wrap">
       <header className="page-head">
-        <Link className="crumb" href={`/${region.id}/${t.id}`}>
+        <BackLink className="crumb" href={`/${region.id}/${t.id}`}>
           ← {t.knownAs ?? t.name}
-        </Link>
+        </BackLink>
         <h1 className="temple-title">{t.knownAs ?? t.name}</h1>
       </header>
       <section className="section">

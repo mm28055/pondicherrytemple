@@ -9,11 +9,14 @@ type Shape = { stars: [number, number][]; lines: [number, number][]; marks?: [nu
 
 const chain = (n: number): [number, number][] => Array.from({ length: n - 1 }, (_, i) => [i, i + 1]);
 
-export const NAKSHATRAS: { name: string; tamil: string; shape: Shape }[] = [
+/* `name` is also what the admin keeps (a special nakshatra's, a tithi's), so
+   it stays as it was; `shown`, where the site spells it otherwise. */
+export const NAKSHATRAS: { name: string; shown?: string; tamil: string; shape: Shape }[] = [
   { name: "Asvini", tamil: "அசுவினி", shape: { stars: [[57, 403], [88, 381], [121, 358]], lines: chain(3) } },
   { name: "Bharani", tamil: "பரணி", shape: { stars: [[199, 351], [274, 351], [239, 396], [239, 433]], lines: [[0, 1], [0, 2], [1, 2], [2, 3]] } },
   {
     name: "Karthikai",
+    shown: "Kartthikai",
     tamil: "கார்த்திகை",
     shape: { stars: [[341, 381], [360, 397], [367, 380], [381, 386], [387, 366], [410, 350], [408, 376], [435, 376]], lines: [[3, 4], [5, 6]] },
   },
@@ -51,6 +54,9 @@ export const NAKSHATRAS: { name: string; tamil: string; shape: Shape }[] = [
   { name: "Revathi", tamil: "ரேவதி", shape: { stars: [[1184, 1021], [1206, 1007], [1230, 992], [1268, 968]], lines: chain(4) } },
 ];
 
+
+/** A nakshatra's name as the site shows it. */
+export const nakshatraName = (k: number) => NAKSHATRAS[k].shown ?? NAKSHATRAS[k].name;
 /** A nakshatra's stars fitted into a 100 × 100 square, centred, with room for the dots. */
 export function fitted(shape: Shape) {
   const all = [...shape.stars, ...(shape.marks ?? [])];

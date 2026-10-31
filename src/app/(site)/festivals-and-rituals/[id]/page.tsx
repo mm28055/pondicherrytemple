@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { BackLink } from "@/components/BackLink";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
@@ -143,9 +144,9 @@ export default async function ObservancePage({ params }: Props) {
   return (
     <div className="wrap">
       <header className="page-head">
-        <Link className="crumb" href="/festivals-and-rituals">
+        <BackLink className="crumb" href="/festivals-and-rituals">
           ← Festivals &amp; rituals
-        </Link>
+        </BackLink>
         <div className="kicker">
           {o.kind === "festival" ? "Festival" : "Ritual"}
         </div>

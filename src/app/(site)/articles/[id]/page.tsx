@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { BackLink } from "@/components/BackLink";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getArticle, getArticles, getObservancesById, getTemple } from "@/lib/data";
@@ -31,9 +32,9 @@ export default async function ArticlePage({ params }: Props) {
     <>
       <div className="wrap">
         <header className="note-head">
-          <Link className="crumb" href="/articles">
+          <BackLink className="crumb" href="/articles">
             ← Articles
-          </Link>
+          </BackLink>
           <div className="note-dateline">
             <time className="date" dateTime={a.date}>
               {formatDate(a.date)}

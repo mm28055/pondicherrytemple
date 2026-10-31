@@ -60,7 +60,7 @@ export const SpecialTithis: CollectionConfig = {
       name: 'nakshatram',
       type: 'select',
       label: 'On the day of this nakshatram (optional)',
-      options: NAKSHATRAS.map((n) => ({ label: n.name, value: n.name })),
+      options: NAKSHATRAS.map((n) => ({ label: n.shown ?? n.name, value: n.name })),
       admin: {
         description:
           'For a day kept on its nakshatram, like Thai Pusam (Poosam) or Karthigai Deepam (Karthikai): the circle goes on the day nearest the tithi (up to two days either side) whose evening, from sunset to midnight, this nakshatram holds in. When that is the tithi’s own day, its moon or icon is circled; on another day, the nakshatram’s icon is.',

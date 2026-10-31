@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { BackLink } from "@/components/BackLink";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
@@ -89,9 +90,9 @@ export default async function TemplePage({ params }: Props) {
     <div className="wrap">
       <header className="page-head temple-head">
         <div>
-          <Link className="crumb" href={`/${region.id}`}>
+          <BackLink className="crumb" href={`/${region.id}`}>
             ← {templesOf(region.name)}
-          </Link>
+          </BackLink>
           <h1 className="temple-title">{t.knownAs ?? t.name}</h1>
           <div className="temple-facts caps">
             {t.knownAs && t.knownAs !== t.name && <span>{t.name}</span>}
@@ -242,9 +243,9 @@ async function AroundTemplePage({ regionId, regionName, templeId }: { regionId: 
   return (
     <div className="wrap">
       <header className="page-head">
-        <Link className="crumb" href={`/${town}#${regionId}`}>
+        <BackLink className="crumb" href={`/${town}#${regionId}`}>
           ← {regionName}
-        </Link>
+        </BackLink>
         <h1 className="temple-title">{t.knownAs ?? t.name}</h1>
         <div className="temple-facts caps">
           {t.knownAs && t.knownAs !== t.name && <span>{t.name}</span>}

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { BackLink } from "@/components/BackLink";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getObservance, getPhotoFilters, getPhotosForObservance } from "@/lib/data";
@@ -31,9 +32,9 @@ export default async function ObservancePhotosPage({ params }: Props) {
   return (
     <div className="wrap">
       <header className="page-head">
-        <Link className="crumb" href={`/festivals-and-rituals/${o.id}`}>
+        <BackLink className="crumb" href={`/festivals-and-rituals/${o.id}`}>
           ← {o.name}
-        </Link>
+        </BackLink>
         {o.tamil && (
           <p className="tamil-title" lang="ta">
             {o.tamil}

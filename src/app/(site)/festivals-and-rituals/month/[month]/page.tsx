@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { BackLink } from "@/components/BackLink";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { CSSProperties } from "react";
@@ -106,9 +107,9 @@ export default async function MonthPage({ params }: Props) {
       <header className="page-head month-head">
         <div className="month-topline">
           {/* back to the year's chart, which the month belongs to */}
-          <Link className="crumb" href="/calendar">
+          <BackLink className="crumb" href="/calendar">
             ← Calendar
-          </Link>
+          </BackLink>
         </div>
         <div className="month-head-text">
           <p className="tamil-title" lang="ta">

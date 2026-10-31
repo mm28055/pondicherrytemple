@@ -351,6 +351,7 @@ const toOccasion = (o: P.Occasion, L: Lookups): Occasion => ({
   tbc: Boolean(o.tbc),
   schedule: (o.schedule ?? []).map(({ time, what }) => ({ time, what })),
   notInYear: Boolean(o.notInYear),
+  yearNote: o.yearNote?.trim() || undefined,
 });
 
 function toFieldNote(n: P.FieldNote, L: Lookups, full: boolean): FieldNote {
@@ -1115,6 +1116,8 @@ export async function getTempleRitualYear(regionId: string, templeId: string): P
 
   const whatOf = new Map<string, What>();
   const datesOf = new Map<string, Set<string>>();
+  // a line below its name, given to one of its days in the admin
+  const aboutOf = new Map<string, string>();
   for (const o of seen) {
     const what = dayOf(o);
     if (!what) continue;
@@ -1125,6 +1128,7 @@ export async function getTempleRitualYear(regionId: string, templeId: string): P
     const ownName = what.name !== undefined;
     if (((what.recurs ?? what.observance.recurs) !== "yearly" || ownName) && isRegular(o)) continue;
     whatOf.set(what.key, what);
+    if (o.yearNote) aboutOf.set(what.key, o.yearNote);
     datesOf.set(what.key, (datesOf.get(what.key) ?? new Set<string>()).add(o.date));
   }
   const DAY = 86400000;
@@ -1152,7 +1156,7 @@ export async function getTempleRitualYear(regionId: string, templeId: string): P
       const entries = months.get(tamilMonthOf(first))!;
       const had = entries.find((x) => x.key === id);
       if (had) had.days += run.length;
-      else entries.push({ key: id, observance, name, recurs, when, days: run.length, start: Date.parse(run[0]) - Date.parse(first) });
+      else entries.push({ key: id, observance, name, recurs, when, about: aboutOf.get(id), days: run.length, start: Date.parse(run[0]) - Date.parse(first) });
     }
   }
   // what comes every month or every week comes in each of them: listed under

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { BackLink } from "@/components/BackLink";
 import type { Metadata } from "next";
 import { getPhotoFilters, getPhotos } from "@/lib/data";
 import { PhotoWall } from "@/components/PhotoWall";
@@ -19,9 +20,9 @@ export default async function PhotographsPage() {
   return (
     <div className="wrap">
       <header className="page-head landing-head">
-        <Link className="crumb" href="/field-notes">
+        <BackLink className="crumb" href="/field-notes">
           ← Field notes
-        </Link>
+        </BackLink>
         <h1 className="page-title">Photographs</h1>
       </header>
       <section className="section">

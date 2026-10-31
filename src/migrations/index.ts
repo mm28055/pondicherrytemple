@@ -57,6 +57,8 @@ import * as migration_20261031_121000_plain_note_text from './20261031_121000_pl
 import * as migration_20261031_135500_occasion_not_in_year from './20261031_135500_occasion_not_in_year';
 import * as migration_20261031_140000_ritual_year_kinds from './20261031_140000_ritual_year_kinds';
 import * as migration_20261031_141000_first_friday from './20261031_141000_first_friday';
+import * as migration_20261031_150000_occasion_year_note from './20261031_150000_occasion_year_note';
+import * as migration_20261031_150500_alagu_sevai from './20261031_150500_alagu_sevai';
 
 export const migrations = [
   {
@@ -353,5 +355,15 @@ export const migrations = [
     up: migration_20261031_141000_first_friday.up,
     down: migration_20261031_141000_first_friday.down,
     name: '20261031_141000_first_friday',
+  },
+  {
+    up: migration_20261031_150000_occasion_year_note.up,
+    down: migration_20261031_150000_occasion_year_note.down,
+    name: '20261031_150000_occasion_year_note',
+  },
+  {
+    up: migration_20261031_150500_alagu_sevai.up,
+    down: migration_20261031_150500_alagu_sevai.down,
+    name: '20261031_150500_alagu_sevai',
   },
 ];

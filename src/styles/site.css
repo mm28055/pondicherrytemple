@@ -294,6 +294,16 @@ a:focus-visible, button:focus-visible {
   margin-bottom: 8px;
 }
 .crumb:hover { color: var(--ochre); }
+/* the same link, kept in sight under the header once the page is scrolled past it (BackLink) */
+:root { --crumb-h: 36px; }
+.crumb-float { position: fixed; top: var(--nav-h); left: 0; right: 0; z-index: 45; height: var(--crumb-h); display: flex; align-items: center; background: var(--chalk); border-bottom: 1px solid var(--rule); }
+.crumb-float .wrap { width: 100%; }
+.crumb-float .crumb { margin: 0; }
+/* a bar that stays under the header (the photographs' filters) moves below it */
+.crumb-floating .filter-bar { top: calc(var(--nav-h) + var(--crumb-h)); }
+@media (min-width: 901px) {
+  .crumb-floating .side-sticky { top: calc(var(--nav-h) + var(--crumb-h) + 24px); max-height: calc(100vh - var(--nav-h) - var(--crumb-h) - 48px); }
+}
 
 /* A festival or ritual: the Tamil name is the headline */
 .tamil-title {

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { BackLink } from "@/components/BackLink";
 import Link from "next/link";
 import { getLineBegins } from "@/lib/data";
 import { RitualYear } from "@/components/RitualYear";
@@ -21,9 +22,9 @@ export default async function CalendarPage() {
   return (
     <div className="wrap">
       <header className="page-head landing-head calendar-head">
-        <Link className="crumb" href="/festivals-and-rituals">
+        <BackLink className="crumb" href="/festivals-and-rituals">
           ← Festivals &amp; rituals
-        </Link>
+        </BackLink>
         <h1 className="page-title">Calendar</h1>
       </header>
 

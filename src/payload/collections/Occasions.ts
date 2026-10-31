@@ -60,6 +60,12 @@ export const Occasions: CollectionConfig = {
       admin: { description: 'Still in the calendar and the year so far; not listed under its month in the Ritual Year (like the eve of a festival).' },
     },
     {
+      name: 'yearNote',
+      type: 'text',
+      label: 'In the Ritual Year, a line below its name',
+      admin: { description: 'Optional, shown in italics: e.g. “as part of the Veerabhadraswamy Chowdambika Koyil’s Aadi Peruvizha”.' },
+    },
+    {
       name: 'schedule',
       type: 'array',
       label: 'The day’s schedule',

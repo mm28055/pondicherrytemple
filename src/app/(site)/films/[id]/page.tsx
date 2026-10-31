@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { BackLink } from "@/components/BackLink";
 import { FilmVideo } from "@/components/FilmVideo";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -33,9 +34,9 @@ export default async function FilmPage({ params }: Props) {
   return (
     <div className="wrap">
       <header className="note-head">
-        <Link className="crumb" href="/films">
+        <BackLink className="crumb" href="/films">
           ← Films
-        </Link>
+        </BackLink>
         <div className="note-dateline">
           <time className="date" dateTime={film.date}>
             {formatDate(film.date)}

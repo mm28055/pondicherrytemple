@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { BackLink } from "@/components/BackLink";
 import { FilmVideo } from "@/components/FilmVideo";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -82,9 +83,9 @@ export default async function FieldNotePage({ params }: Props) {
     <>
       <div className="wrap">
         <header className="note-head">
-          <Link className="crumb" href="/field-notes">
+          <BackLink className="crumb" href="/field-notes">
             ← Field notes
-          </Link>
+          </BackLink>
           <div className="note-dateline">
             <time className="date" dateTime={note.date}>
               {formatDate(note.date)}

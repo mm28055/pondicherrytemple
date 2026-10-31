@@ -109,6 +109,8 @@ export interface Occasion {
   schedule: { time: string; what: string }[];
   /** Left out of the temple's Ritual Year (still in the calendar). */
   notInYear?: boolean;
+  /** A line below its name in the Ritual Year. */
+  yearNote?: string;
 }
 
 /* ---------- Content ---------- */

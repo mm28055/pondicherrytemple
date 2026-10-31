@@ -44,7 +44,7 @@ export const SpecialNakshatras: CollectionConfig = {
           name: 'nakshatram',
           type: 'select',
           required: true,
-          options: NAKSHATRAS.map((n) => ({ label: n.name, value: n.name })),
+          options: NAKSHATRAS.map((n) => ({ label: n.shown ?? n.name, value: n.name })),
           admin: { width: '50%' },
         },
       ],
