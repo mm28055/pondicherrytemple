@@ -7,6 +7,7 @@ import { Footer } from "@/components/Footer";
 import { RevealManager } from "@/components/RevealManager";
 import { DialogBack } from "@/components/DialogBack";
 import { LandAtTop } from "@/components/LandAtTop";
+import { PageNames } from "@/components/PageNames";
 import { NoImageSave } from "@/components/NoImageSave";
 
 /* The public site. (The admin, under /admin, has its own layout in (payload).) */
@@ -73,6 +74,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
         <RevealManager />
         <DialogBack />
         <LandAtTop />
+        <PageNames />
         <NoImageSave />
       </body>
     </html>

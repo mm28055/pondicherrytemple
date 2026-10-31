@@ -70,6 +70,8 @@ export function Nav() {
     <header className="nav" ref={bar}>
       <div className="stripes" aria-hidden="true" />
       <div className="wrap nav-inner">
+        {/* the page's way back, once it is scrolled past its own (BackLink) */}
+        <div className="nav-back" id="nav-back" />
         <Link className="brand" href="/" aria-label="Sthalam — home">
           <span>
             <span className="brand-word">Sthalam</span>

@@ -59,6 +59,8 @@ import * as migration_20261031_140000_ritual_year_kinds from './20261031_140000_
 import * as migration_20261031_141000_first_friday from './20261031_141000_first_friday';
 import * as migration_20261031_150000_occasion_year_note from './20261031_150000_occasion_year_note';
 import * as migration_20261031_150500_alagu_sevai from './20261031_150500_alagu_sevai';
+import * as migration_20261031_160000_chetty_brahmotsavam from './20261031_160000_chetty_brahmotsavam';
+import * as migration_20261031_161000_ritual_year_days from './20261031_161000_ritual_year_days';
 
 export const migrations = [
   {
@@ -365,5 +367,15 @@ export const migrations = [
     up: migration_20261031_150500_alagu_sevai.up,
     down: migration_20261031_150500_alagu_sevai.down,
     name: '20261031_150500_alagu_sevai',
+  },
+  {
+    up: migration_20261031_160000_chetty_brahmotsavam.up,
+    down: migration_20261031_160000_chetty_brahmotsavam.down,
+    name: '20261031_160000_chetty_brahmotsavam',
+  },
+  {
+    up: migration_20261031_161000_ritual_year_days.up,
+    down: migration_20261031_161000_ritual_year_days.down,
+    name: '20261031_161000_ritual_year_days',
   },
 ];

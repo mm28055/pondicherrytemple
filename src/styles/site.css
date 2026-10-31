@@ -294,15 +294,35 @@ a:focus-visible, button:focus-visible {
   margin-bottom: 8px;
 }
 .crumb:hover { color: var(--ochre); }
-/* the same link, kept in sight under the header once the page is scrolled past it (BackLink) */
-:root { --crumb-h: 36px; }
-.crumb-float { position: fixed; top: var(--nav-h); left: 0; right: 0; z-index: 45; height: var(--crumb-h); display: flex; align-items: center; background: var(--chalk); border-bottom: 1px solid var(--rule); }
-.crumb-float .wrap { width: 100%; }
-.crumb-float .crumb { margin: 0; }
-/* a bar that stays under the header (the photographs' filters) moves below it */
-.crumb-floating .filter-bar { top: calc(var(--nav-h) + var(--crumb-h)); }
-@media (min-width: 901px) {
-  .crumb-floating .side-sticky { top: calc(var(--nav-h) + var(--crumb-h) + 24px); max-height: calc(100vh - var(--nav-h) - var(--crumb-h) - 48px); }
+/* the same way back, in the header once the page is scrolled past it
+   (BackLink, into Nav's slot before the wordmark): a round arrow, and the
+   page's name beside it in the crumb's small capitals */
+/* folded away (no width) until shown, then opening out as the wordmark slides aside */
+.nav-back {
+  display: flex; align-items: center; min-width: 0; overflow: hidden;
+  max-width: 0; opacity: 0; margin-right: -24px; /* the row's gap, taken back while folded */
+  transition: max-width 0.5s cubic-bezier(0.45, 0, 0.25, 1), margin-right 0.5s cubic-bezier(0.45, 0, 0.25, 1), opacity 0.35s ease;
+}
+.nav-back.shown { max-width: var(--open-w, 22em); opacity: 1; margin-right: -6px; transition-delay: 0s, 0s, 0.1s; }
+@media (prefers-reduced-motion: reduce) { .nav-back { transition: none; } }
+.nav-back-link { display: flex; flex: none; align-items: center; gap: 10px; color: var(--muted); } /* its own width as it opens, not reflowed */
+.nav-back-arrow {
+  flex: none; width: 34px; height: 34px; border-radius: 50%; border: 1.5px solid var(--rule);
+  display: grid; place-items: center;
+  font-family: var(--display); font-weight: 700; font-size: 18px; line-height: 1; color: var(--ink);
+  transition: border-color 0.15s, color 0.15s;
+}
+.nav-back-name {
+  font-family: var(--display); font-weight: 600; font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; line-height: 1.25;
+  max-width: 12em; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+}
+.nav-back-link:hover, .nav-back-link:hover .nav-back-arrow { color: var(--ochre); border-color: var(--ochre); }
+/* the wordmark always just after it (at the left while it is folded away); on a phone, a little smaller beside it */
+.nav-inner .brand { margin-right: auto; }
+.brand-word { transition: font-size 0.5s cubic-bezier(0.45, 0, 0.25, 1); }
+@media (max-width: 900px) {
+  .nav-back-name { max-width: 7.5em; font-size: 11px; }
+  .nav-inner:has(.nav-back.shown) .brand-word { font-size: 22px; }
 }
 
 /* A festival or ritual: the Tamil name is the headline */
