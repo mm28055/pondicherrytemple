@@ -107,7 +107,8 @@ export default async function MonthPage({ params }: Props) {
       <header className="page-head month-head">
         <div className="month-topline">
           {/* back to the year's chart, which the month belongs to */}
-          <BackLink className="crumb" href="/calendar">
+          {/* always the Calendar, however many months were gone through */}
+          <BackLink className="crumb" href="/calendar" always>
             ← Calendar
           </BackLink>
         </div>

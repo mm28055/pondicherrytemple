@@ -2360,9 +2360,13 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
 /* its top kept in one place from day to day (not centred on each, which made
    the card and its × jump as the days' heights changed) */
 .day-dialog.stepped { margin: 6vh auto auto; max-height: 88vh; }
-/* and its arrows with it, level with the large number, not halfway down a card whose height changes */
-.day-dialog.stepped .day-step { top: 55px; }
-@media (max-width: 560px) { .day-dialog.stepped .day-step { top: 50px; } }
+/* and its arrows with it: level with the line under the day's head (measured,
+   MonthCalendar), one at each end of it, so that it reads as a double arrow */
+.day-dialog.stepped .day-step { top: var(--rule-y, 55px); }
+.day-dialog:focus { outline: none; }
+/* drawn, so that the point of each is exactly at its middle, on the line */
+.day-step svg { display: block; margin: auto; width: 16px; height: 34px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+@media (max-width: 560px) { .day-step svg { width: 13px; height: 28px; } }
 .day-dialog.stepped a { -webkit-user-drag: none; }
 .day-dialog.dragging { cursor: grabbing; user-select: none; }
 .day-step {
@@ -2396,7 +2400,9 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
   .day-dialog.stepped .day-num { font-size: 56px; }
   .day-dialog.stepped .day-head { gap: 12px; }
 }
-.day-close { position: absolute; top: 6px; right: 12px; border: 0; background: none; cursor: pointer; font-size: 30px; line-height: 1; color: var(--ink); }
+/* the × in the very corner, small and grey (a finger's width to tap, all the same) */
+.day-close { position: absolute; top: 0; right: 0; width: 36px; height: 36px; border: 0; background: none; cursor: pointer; font-size: 22px; line-height: 1; color: var(--muted); transition: color 0.15s; }
+.day-close:hover { color: var(--ink); }
 .day-head { display: flex; gap: 18px; align-items: flex-start; padding-bottom: 14px; border-bottom: 2px solid var(--m, var(--ink)); }
 .day-head > span:last-child { display: flex; flex-direction: column; gap: 4px; }
 /* the large number, its top level with the tops of the capitals in "May 2026,
@@ -2590,6 +2596,8 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
   .cal-wd [lang="ta"] { display: none; }
   .cal-day,
   .cal-day.has { min-height: 58px; padding: 4px 4px 4px 5px; gap: 3px; background: #fff; border-color: var(--rule); box-shadow: none; }
+  /* a day with field notes in the month's colour, faded, as on a computer */
+  .cal-day.has { background: color-mix(in srgb, var(--m) 12%, #fff); border-color: color-mix(in srgb, var(--m) 40%, #fff); }
   .cal-top { justify-content: space-between; align-items: baseline; }
   .cal-num { font-size: 19px; line-height: 1; }
   .cal-ta { font-size: 10px; line-height: 1; }
@@ -2602,8 +2610,9 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
   .cal-icons .nak-icon { display: block; width: 11px; height: 11px; }
   .cal-icons .cal-moon .dot { width: 9px; height: 9px; border-color: var(--ink-2); }
   .cal-icons .cal-moon.new .dot { background: var(--ink-2); }
-  .cal-dots { display: flex; height: 8px; }
-  .cal-dots i { width: 8px; height: 8px; border-radius: 50%; box-shadow: 0 0 0 1.5px #fff; }
+  /* its notes, one short dash each, overlapping (a line, not to be taken for the moon's circle) */
+  .cal-dots { display: flex; align-items: center; height: 4px; }
+  .cal-dots i { width: 9px; height: 4px; border-radius: 2px; box-shadow: 0 0 0 1.5px color-mix(in srgb, var(--m) 12%, #fff); }
   .cal-dots i + i { margin-left: -3px; }
   /* the first in the month colour, the others paler shades of it */
   .cal-dots i:nth-child(1) { background: var(--m); }

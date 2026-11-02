@@ -10,8 +10,9 @@ type Navigation = { currentEntry: Entry | null; entries: () => Entry[]; traverse
 
 /** The page of this site this one was come to from, in the tab's history
     (passing over places within this page: #photographs, a photograph
-    opened), if the browser tells (the Navigation API). */
-function cameFrom(): { key: string; path: string } | null {
+    opened), if the browser tells (the Navigation API); not the admin. With
+    `to`, that page itself, the latest time it was in the tab's history. */
+function cameFrom(to?: string): { key: string; path: string } | null {
   const nav = (window as unknown as { navigation?: Navigation }).navigation;
   const here = nav?.currentEntry;
   if (!nav || !here) return null;
@@ -20,6 +21,11 @@ function cameFrom(): { key: string; path: string } | null {
     if (!x.url) return null;
     const u = new URL(x.url);
     if (u.origin !== window.location.origin) return null;
+    if (to) {
+      if (u.pathname === to) return { key: x.key, path: u.pathname };
+      continue;
+    }
+    if (u.pathname.startsWith("/admin")) return null;
     if (u.pathname !== now) return { key: x.key, path: u.pathname };
   }
   return null;
@@ -29,9 +35,22 @@ function cameFrom(): { key: string; path: string } | null {
     to from, named as that page is ("← Kannika Parameswari Koyil"), as the
     browser's Back would (and so where that page was scrolled to: see
     LandAtTop); from anywhere else, or opened by itself, to `href`, in its
-    own words ("← Field notes"). Once the page is scrolled past it, the same
-    link stays in sight, in a bar under the site's header (site.css, .crumb-float). */
-export function BackLink({ href, className, children }: { href: string; className?: string; children: ReactNode }) {
+    own words ("← Field notes"). With `always`, to `href` alone, in its own
+    words, wherever it was come from (a month of the calendar, however many
+    months were gone through: the Calendar), as it was if it is in the
+    tab's history. Once the page is scrolled past it, the same link stays in
+    sight, in a bar under the site's header (site.css, .crumb-float). */
+export function BackLink({
+  href,
+  className,
+  children,
+  always = false,
+}: {
+  href: string;
+  className?: string;
+  children: ReactNode;
+  always?: boolean;
+}) {
   const pathname = usePathname();
   const own = useRef<HTMLAnchorElement>(null);
   const [floating, setFloating] = useState(false);
@@ -39,13 +58,13 @@ export function BackLink({ href, className, children }: { href: string; classNam
   // where it goes back to, and that page's name (once known)
   useEffect(() => {
     const find = () => {
-      const b = cameFrom();
-      setBack(b ? { ...b, name: pageName(b.path) } : null);
+      const b = cameFrom(always ? href : undefined);
+      setBack(b ? { ...b, name: always ? undefined : pageName(b.path) } : null);
     };
     find();
     window.addEventListener(PAGE_NAMES_EVENT, find);
     return () => window.removeEventListener(PAGE_NAMES_EVENT, find);
-  }, [pathname]);
+  }, [pathname, always, href]);
 
   useEffect(() => {
     const el = own.current;
@@ -61,7 +80,7 @@ export function BackLink({ href, className, children }: { href: string; classNam
 
   const onClick = (e: MouseEvent<HTMLAnchorElement>) => {
     if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
-    const b = cameFrom();
+    const b = cameFrom(always ? href : undefined);
     if (!b) return;
     e.preventDefault();
     (window as unknown as { navigation: Navigation }).navigation.traverseTo(b.key);

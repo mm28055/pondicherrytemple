@@ -5,6 +5,7 @@ import { FestivalLink } from "@/components/FestivalLink";
 import { inGlide, startGlide } from "@/components/MonthSwipe";
 import {
   useEffect,
+  useLayoutEffect,
   useRef,
   useState,
   type CSSProperties,
@@ -210,7 +211,30 @@ export function DayDialog({
   const dialog = useRef<HTMLDialogElement>(null);
   const body = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    if (day && !dialog.current?.open) dialog.current?.showModal();
+    if (!day || dialog.current?.open) return;
+    dialog.current?.showModal();
+    // the pop-up itself in focus, not its first button (the ×, which a tap had shown ringed)
+    dialog.current?.focus();
+  }, [day]);
+  // the arrows to the day before and after level with the line under the day's head,
+  // wherever that falls on the day shown (site.css, .day-step)
+  useLayoutEffect(() => {
+    const d = dialog.current;
+    const head = d?.querySelector<HTMLElement>(".day-head");
+    if (!d || !head) return;
+    const place = () => {
+      const y = head.getBoundingClientRect().bottom - d.getBoundingClientRect().top + d.scrollTop - 1;
+      d.style.setProperty("--rule-y", `${y}px`);
+    };
+    place();
+    // (opened only after this, on its first day: measured again once it is)
+    const frame = requestAnimationFrame(place);
+    const ro = new ResizeObserver(place);
+    ro.observe(head);
+    return () => {
+      cancelAnimationFrame(frame);
+      ro.disconnect();
+    };
   }, [day]);
   const month = day ? TAMIL_MONTHS.find((m) => m.slug === tamilMonthOf(day))! : null;
   const dayOfMonth = day && month ? daysBetween(monthDates(month.slug, monthYearOf(day)).first, day).length : 0;
@@ -357,6 +381,7 @@ export function DayDialog({
   return (
     <dialog
       ref={dialog}
+      tabIndex={-1}
       className={`day-dialog${days ? " stepped" : ""}${className ? ` ${className}` : ""}`}
       style={{ ...(month ? ({ "--m": month.colour } as CSSProperties) : {}), ...style }}
       onClose={() => {
@@ -389,7 +414,9 @@ export function DayDialog({
                 disabled={!before}
                 aria-label="The day before"
               >
-                ‹
+                <svg viewBox="0 0 12 26" aria-hidden="true">
+                  <polyline points="10,2 2,13 10,24" />
+                </svg>
               </button>
               <button
                 type="button"
@@ -398,7 +425,9 @@ export function DayDialog({
                 disabled={!after}
                 aria-label="The day after"
               >
-                ›
+                <svg viewBox="0 0 12 26" aria-hidden="true">
+                  <polyline points="2,2 10,13 2,24" />
+                </svg>
               </button>
             </>
           )}
