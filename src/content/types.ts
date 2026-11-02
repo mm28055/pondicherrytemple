@@ -304,7 +304,6 @@ export interface Book {
 
 export interface HomePageText {
   headline: string;
-  headlineItalic: boolean;
   opening: string; // HTML
   quoteLabel?: string;
   quote?: string;

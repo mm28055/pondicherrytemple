@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getRegion, getTemple, getTempleStories, hasPage } from "@/lib/data";
 import { ENTRY_TOPIC_LABELS } from "@/content/labels";
-import { dateParts, localMonth } from "@/lib/calendar";
+import { dateParts, localDate } from "@/lib/calendar";
 import { Html } from "@/components/Prose";
 import { seesTempleStories } from "@/lib/festivals-access";
 
@@ -50,7 +50,7 @@ export default async function TempleStoriesPage({ params }: Props) {
       <div className="temple-stories">
         {pieces.map((e) => {
           const d = dateParts(e.date);
-          const local = localMonth(region.calendar, e.date);
+          const local = localDate(region.calendar, e.date);
           return (
             <article key={e.id} className={e.picture ? "story-row" : "story-row no-picture"}>
               <div className="date-stamp" aria-hidden="true">

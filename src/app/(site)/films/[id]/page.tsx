@@ -4,7 +4,7 @@ import { FilmVideo } from "@/components/FilmVideo";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getFilm, getFilms, getObservancesById, getRegion, getTemple, hasPage } from "@/lib/data";
-import { formatDate, localMonth } from "@/lib/calendar";
+import { formatDate, localDate } from "@/lib/calendar";
 import { Html } from "@/components/Prose";
 import { FestivalLink } from "@/components/FestivalLink";
 
@@ -29,7 +29,7 @@ export default async function FilmPage({ params }: Props) {
     (t) => t !== null
   );
   const observances = await getObservancesById(film.observances);
-  const local = localMonth(region.calendar, film.date);
+  const local = localDate(region.calendar, film.date);
 
   return (
     <div className="wrap">

@@ -147,8 +147,9 @@ export default async function TemplePage({ params }: Props) {
             {notes.length > 0 && (
               <section id="field-notes">
                 <h2 className="sub-head">Field notes</h2>
-                {/* on a phone, the latest five, the rest a tap away, so the Ritual Year is not far below */}
-                <ShowMore shown={5} label={`All ${notes.length} field notes`}>
+                {/* on a phone, the latest five, the rest a tap away, so the Ritual Year is not far below;
+                    on a wider screen, those beside the Ritual Year, so its films and photographs come up after */}
+                <ShowMore shown={5} label={`All ${notes.length} field notes`} fewer="Fewer field notes" beside=":scope > aside">
                   {notes.map((r) => (
                     <NoteRow key={r.id} row={r} />
                   ))}

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
-import { stripeWidth, useStripeFit } from "@/lib/stripes";
+import { useStripeFit } from "@/lib/stripes";
 import { useOneLine } from "@/lib/oneLine";
 
 export type BarFilter = {
@@ -16,9 +16,8 @@ export type BarFilter = {
     order, which stays under the menu as the page scrolls. Once something is
     chosen the dropdown shows it in place of its name, with a × to clear it.
     A dropdown closes on a choice, a click elsewhere, Escape, or scrolling
-    on. With `stripes`, the bar is as wide as rows of photos hung from the
-    stripes at the top of the page (lib/stripes), so that stuck under the
-    menu it covers them; but its words and its line keep to the page's
+    on. With `stripes`, the bar is as wide as the rows of photos below
+    it (lib/stripes), so that stuck under the menu it covers them; but its words and its line keep to the page's
     margins, in line with the header above it. With `jump`, one more
     dropdown, which narrows nothing: a choice goes to that place in the
     photographs (a month: its first day). */
@@ -49,7 +48,7 @@ export function FilterBar({
   useLayoutEffect(() => {
     const w = top.current?.offsetWidth;
     if (!stripes || !fit || !w) return setPast(null);
-    setPast({ l: Math.max(0, fit.back), r: Math.max(0, stripeWidth(fit.units) - fit.back - w), w });
+    setPast({ l: 0, r: Math.max(0, fit.width(fit.units) - w), w });
   }, [stripes, fit]);
   const line = useRef<HTMLDivElement>(null);
   // kept to one line, measured again whenever a choice changes

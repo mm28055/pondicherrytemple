@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import { FestivalLink } from "@/components/FestivalLink";
-import { Fragment, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import type { Photo, PhotoFilter } from "@/content/types";
 import { formatDate } from "@/lib/calendar";
-import { stripeRows, stripeWidth, useStripeFit } from "@/lib/stripes";
+import { stripeRows, useStripeFit } from "@/lib/stripes";
 import { FilterBar } from "@/components/FilterBar";
 import { Zoomable } from "@/components/Zoomable";
 import { eventOf, photoCount, unpackPhotos, type PhotoPack } from "@/lib/photoPack";
@@ -87,8 +87,8 @@ export function PhotoWall({ photos: given, pack, total, layout, seeAll, filters 
   const [opened, setOpened] = useState<Set<string>>(new Set());
 
   const more = useRef<HTMLDivElement>(null);
-  // the page of all of them: rows hung from the stripes at the top of the
-  // page, each photo as wide as suits it (lib/stripes)
+  // the page of all of them: rows from margin to margin, each photo as wide
+  // as suits it, in whole stripes (lib/stripes)
   const wall = useRef<HTMLDivElement>(null);
   const fit = useStripeFit(wall);
   const dialog = useRef<HTMLDialogElement>(null);
@@ -292,13 +292,13 @@ export function PhotoWall({ photos: given, pack, total, layout, seeAll, filters 
         <>
           <div ref={wall} className="photo-rows">
             {fit && (
-              <div style={{ width: stripeWidth(fit.units), marginLeft: -fit.back }}>
+              <div style={{ "--gap": `${fit.gap}px` } as CSSProperties}>
                 {(() => {
                   let i = 0;
                   const rowsOf = (list: Photo[]) =>
                     stripeRows(list, fit.units, fit.h).map((row) => (
                       <div key={row[0].p.id} className="photo-row">
-                        {row.map(({ p, units }) => tile(p, i++, false, stripeWidth(units)))}
+                        {row.map(({ p, units }) => tile(p, i++, false, fit.width(units)))}
                       </div>
                     ));
                   if (!heads) return rowsOf(order.slice(0, limit));
@@ -325,7 +325,7 @@ export function PhotoWall({ photos: given, pack, total, layout, seeAll, filters 
                       });
                     return (
                       <Fragment key={`head-${p.id}`}>
-                        <div id={`photos-${p.id}`} className="photo-group-head" style={{ paddingLeft: fit.back }}>
+                        <div id={`photos-${p.id}`} className="photo-group-head">
                           <span className="date">{p.dated ? formatDate(p.date) : "Day not known"}</span>
                           {p.place && (heads.temple || (heads.here && p.place !== heads.here)) && <span>{p.place}</span>}
                           {p.occasion && <span>{p.occasion}</span>}
@@ -338,7 +338,7 @@ export function PhotoWall({ photos: given, pack, total, layout, seeAll, filters 
                         {rows.map((row, r) => (
                           <div key={row[0].p.id} className="photo-row">
                             {row.map(({ p: c, units }, k) => {
-                              const width = stripeWidth(units);
+                              const width = fit.width(units);
                               if ("fewer" in c)
                                 return (
                                   <button

@@ -48,9 +48,9 @@ function rows(photos: NotePhoto[], units: number, height: number, seed: string):
   return out;
 }
 
-/** Beside a field note's text: photographs down the left of the page, hung
-    from the stripes at the top of the page (each photo spans whole red
-    stripes, the gaps are white ones), as long as the text. On a narrow
+/** Beside a field note's text: photographs down the left of the page, from
+    its margin, each as wide as whole stripes at the top of the
+    page (the gaps a white one's width), as long as the text. On a narrow
     screen, a few rows under the text. The note's own photographs (those of
     its photo sets), in the order taken, as many as fit. */
 export function NotePhotos({ photos, seed }: { photos: NotePhoto[]; seed: string }) {
@@ -65,10 +65,11 @@ export function NotePhotos({ photos, seed }: { photos: NotePhoto[]; seed: string
     const measure = () => {
       const r = el.getBoundingClientRect();
       const narrow = window.matchMedia("(max-width: 900px)").matches;
-      const back = ((r.left % STRIPE) + STRIPE) % STRIPE;
+      // beside the text: from the page's margin, as wide as whole stripes
+      // go short of the text; under it, from the red stripe at or before
+      // the margin to the one at or after the other, never past the window
+      const back = narrow ? ((r.left % STRIPE) + STRIPE) % STRIPE : 0;
       const start = r.left - back;
-      // beside the text: end on a red stripe short of it; under it, the
-      // red stripe at or after the margin, never past the window
       let units = narrow
         ? Math.ceil((r.right - start - GAP) / STRIPE)
         : Math.floor((r.right - BESIDE - start - GAP) / STRIPE);

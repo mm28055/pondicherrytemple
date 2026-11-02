@@ -16,7 +16,7 @@ import {
   hasPage,
 } from "@/lib/data";
 import { FIELD_KIND_LABELS } from "@/content/labels";
-import { formatDate, localMonth } from "@/lib/calendar";
+import { formatDate, localDate } from "@/lib/calendar";
 import { noteRow } from "@/lib/view";
 import { Html } from "@/components/Prose";
 import { NoteRow } from "@/components/Rows";
@@ -45,7 +45,7 @@ export default async function FieldNotePage({ params }: Props) {
     (t) => t !== null
   );
   const observances = await getObservancesById(note.observances);
-  const local = localMonth(region.calendar, note.date);
+  const local = localDate(region.calendar, note.date);
 
   // more from the same temple(s)
   const related = (await Promise.all(temples.map((t) => getFieldNotesForTemple(region.id, t.id))))
@@ -71,7 +71,7 @@ export default async function FieldNotePage({ params }: Props) {
   const following = await Promise.all(
     (await getEventNotesAfter(note.id)).map(async (n) => ({
       note: n,
-      local: localMonth(region.calendar, n.date),
+      local: localDate(region.calendar, n.date),
       observances: await getObservancesById(n.observances),
     }))
   );

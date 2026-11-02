@@ -3,7 +3,7 @@
 
 import type { Article, CalendarSystem, FieldNote, Film, Observance, Temple } from "@/content/types";
 import { FIELD_KIND_LABELS } from "@/content/labels";
-import { dateParts, formatDate, localMonth } from "./calendar";
+import { dateParts, formatDate, localDate } from "./calendar";
 import { festivalPath } from "@/lib/festivals";
 
 export interface NoteRowData {
@@ -99,7 +99,7 @@ export function noteRow(n: FieldNote, temples: Temple[], calendar: CalendarSyste
     date: n.date,
     day: d.day,
     shortMonth: `${d.shortMonth} ${d.year}`,
-    local: localMonth(calendar, n.date),
+    local: localDate(calendar, n.date),
     where: [places.join(", "), occasion].filter(Boolean).join(" · "),
     whereShort: [placesShort.join(", "), occasion].filter(Boolean).join(" · "),
     title,
@@ -120,7 +120,7 @@ export function articleRow(a: Article, calendar: CalendarSystem): NoteRowData {
     date: a.date,
     day: d.day,
     shortMonth: `${d.shortMonth} ${d.year}`,
-    local: localMonth(calendar, a.date),
+    local: localDate(calendar, a.date),
     where: "",
     title: a.title,
     excerpt: a.teaser,
@@ -169,7 +169,7 @@ export function filmRow(f: Film, temples: Temple[], calendar: CalendarSystem): N
     date: f.date,
     day: d.day,
     shortMonth: `${d.shortMonth} ${d.year}`,
-    local: localMonth(calendar, f.date),
+    local: localDate(calendar, f.date),
     where: placesOf(f.temples, temples),
     title: f.title,
     excerpt: excerpt(f.excerpt),

@@ -1,18 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import type { Photo } from "@/content/types";
-import { idealUnits, stripeWidth, useStripeFit } from "@/lib/stripes";
+import { idealUnits, useStripeFit } from "@/lib/stripes";
 
-/* The stripes at the top of the page are 20px red, 20px white, from the left
-   edge of the window. The strip of photographs hangs from them: each photo
-   spans whole red stripes (40n + 20px wide), as many as suit its shape, and
-   the 20px between photos falls under a white one. The strip starts on the
-   last red stripe at or before the page's margin and ends on the first red
-   one at or after the other margin (so it lines up, more or less, with the
-   text above and below), and is filled exactly: the last photo takes what is
-   left. On a phone, too narrow for that, there are two rows, as many photos
+/* The stripes at the top of the page are 20px red, 20px white. The strip
+   of photographs is measured in them: each photo whole red stripes wide
+   (40n + 20px), as many as suit its shape, with a white one's width between
+   photos; the whole drawn from the page's margin to the other, in line with
+   the text above and below (lib/stripes), and filled exactly: the last
+   photo takes what is left. On a phone, too narrow for that, there are two rows, as many photos
    in each as fit, and the last a narrow one. Every so often the whole strip
    blinks, slowly, to the next photos. */
 const EVERY = 9000; // ms between changes
@@ -125,7 +123,7 @@ export function HomeStrip({ photos }: { photos: StripPhoto[] }) {
     <div ref={box} className="home-strip">
       <div
         className={`home-strip-track${faded ? " faded" : ""}`}
-        style={fit ? { width: stripeWidth(fit.units), marginLeft: -fit.back } : undefined}
+        style={fit ? ({ "--gap": `${fit.gap}px` } as CSSProperties) : undefined}
         aria-live="off"
       >
         {shown?.rows.map((row, r) => (
@@ -138,7 +136,7 @@ export function HomeStrip({ photos }: { photos: StripPhoto[] }) {
                   key={`${p.id}-${i}`}
                   className={last ? "home-strip-photo home-strip-all" : "home-strip-photo"}
                   href={last ? "/photographs" : `/photographs?photo=${p.id}`}
-                  style={{ width: stripeWidth(units) }}
+                  style={{ width: fit?.width(units) }}
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={p.small} alt={last ? "" : p.alt} style={{ objectPosition: `${p.focus[0]}% ${p.focus[1]}%` }} />

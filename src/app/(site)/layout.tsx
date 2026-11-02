@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Anek_Devanagari, Anek_Latin, Anek_Tamil, Newsreader } from "next/font/google";
+import { Anek_Devanagari, Anek_Latin, Anek_Tamil, Baloo_2 } from "next/font/google";
 import { draftMode } from "next/headers";
 import "@/styles/site.css";
 import { Nav } from "@/components/Nav";
@@ -39,11 +39,10 @@ const anekDevanagari = Anek_Devanagari({
   preload: false,
 });
 
-const newsreader = Newsreader({
+// for reading: round and open, beside Anek's headings (it has no italic)
+const baloo = Baloo_2({
   subsets: ["latin", "latin-ext"],
-  style: ["normal", "italic"],
-  axes: ["opsz"],
-  variable: "--font-newsreader",
+  variable: "--font-baloo",
   display: "swap",
 });
 
@@ -61,7 +60,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
   // An editor pressed "Preview" in the admin: the site is showing unpublished drafts.
   const { isEnabled: previewing } = await draftMode();
   return (
-    <html lang="en" className={`${anekLatin.variable} ${anekTamil.variable} ${anekDevanagari.variable} ${newsreader.variable}`}>
+    <html lang="en" className={`${anekLatin.variable} ${anekTamil.variable} ${anekDevanagari.variable} ${baloo.variable}`}>
       <body>
         {previewing && (
           <div className="preview-bar">

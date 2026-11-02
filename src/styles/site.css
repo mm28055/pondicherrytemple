@@ -4,7 +4,7 @@
    Drawn from the temple wall: lime-white, red ochre (kaavi) and
    lamp-black, with the red-and-white wall stripes as the signature.
    Type: Anek Latin + Anek Tamil (one family) for display, condensed;
-   Newsreader for reading. Structure comes from rules and lists, not
+   Baloo 2 for reading. Structure comes from rules and lists, not
    boxes.
    ============================================================ */
 
@@ -27,7 +27,7 @@
   --display: var(--font-anek-latin), "Arial Narrow", system-ui, sans-serif;
   --tamil: var(--font-anek-tamil), "Noto Sans Tamil", "Latha", sans-serif;
   --devanagari: var(--font-anek-devanagari), "Noto Sans Devanagari", "Nirmala UI", sans-serif;
-  --text: var(--font-newsreader), Georgia, "Times New Roman", serif;
+  --text: var(--font-baloo), system-ui, sans-serif;
 
   --gutter: clamp(16px, 4vw, 40px);
   --max: 1240px;
@@ -51,6 +51,11 @@ body {
 
 img, video { max-width: 100%; display: block; }
 a { color: inherit; text-decoration: none; }
+
+/* Baloo 2 has no italic: nothing on the site is slanted. A stressed word
+   is set semibold; an aside (a caption, a credit, the Tamil date, a note
+   that nothing is here yet) small and grey; an English gloss in ink-2 */
+em, i { font-style: normal; font-weight: 600; }
 /* images not saved by a long press (phones) nor dragged out (components/NoImageSave) */
 img, svg image { -webkit-touch-callout: none; -webkit-user-drag: none; }
 ul, ol { list-style: none; }
@@ -70,11 +75,13 @@ a:focus-visible, button:focus-visible {
 .stripes.tall { height: 40px; }
 
 /* ---------- Shared type ---------- */
+/* every small line in capitals (the menu, a way back, tags, section heads,
+   previous and next, the footer's heads) in this one style */
 .kicker {
   font-family: var(--display);
   font-weight: 600;
-  font-size: 13px;
-  letter-spacing: 0.14em;
+  font-size: 12.5px;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--ochre);
 }
@@ -82,7 +89,7 @@ a:focus-visible, button:focus-visible {
 .caps {
   font-family: var(--display);
   font-weight: 600;
-  font-size: 13px;
+  font-size: 12.5px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--muted);
@@ -146,16 +153,17 @@ a:focus-visible, button:focus-visible {
 .nav-links a {
   font-family: var(--display);
   font-weight: 600;
-  font-size: 15px;
-  letter-spacing: 0.05em;
+  font-size: 12.5px;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--ink-2);
   padding: 6px 0;
   border-bottom: 2px solid transparent;
   transition: color 0.15s, border-color 0.15s;
 }
-.nav-links a:hover { color: var(--ochre); }
 .nav-links a.active { color: var(--ink); border-bottom-color: var(--ochre); }
+/* pointed at, every one turns red: the page you are on too */
+.nav-links a:hover { color: var(--ochre); }
 /* A dropdown under a label (Festivals & Rituals: the Calendar; Field Notes:
    Photographs), dark against the page, appearing straight below the label,
    centred on it (at least as wide; wider only when its word is longer), when
@@ -207,22 +215,26 @@ a:focus-visible, button:focus-visible {
     left: 0;
     right: 0;
     flex-direction: column;
-    align-items: flex-start;
+    align-items: flex-end;
+    text-align: right;
     gap: 0;
     background: var(--chalk);
     border-bottom: 2px solid var(--ink);
     padding: 8px var(--gutter) 20px;
   }
   .nav-links.open li { width: 100%; }
-  .nav-links.open a { display: block; font-size: 19px; padding: 7px 0; border-bottom: none; }
-  /* in the phone menu, each sits beneath its label, indented (the Calendar
-     beneath Festivals & Rituals, Photographs beneath Field Notes) */
+  /* the computer's menu style, one size up to be tapped: the pages beneath at the same size;
+     each 44px tall, as the guidelines for a finger ask (Apple's, WCAG's enhanced target size) */
+  .nav-links.open a { display: block; font-size: 15px; padding: 10px 0; border-bottom: none; }
+  /* in the phone menu (set to the right, under the menu button), each sits
+     beneath its label, in its lighter grey (the Calendar beneath Festivals &
+     Rituals, Photographs beneath Field Notes) */
   /* simply there, as the menu opens: none of the computer's fading in or
      centring (which a tap, held as a "hover", would otherwise set off) */
-  .nav-links.open .nav-sub { position: static; padding: 0 0 4px; opacity: 1; visibility: visible; transform: none !important; transition: none; }
+  .nav-links.open .nav-sub { position: static; padding: 0; opacity: 1; visibility: visible; transform: none !important; transition: none; }
   .nav-links.open .nav-sub li { background: none; border-bottom: 0; }
-  .nav-links.open .nav-sub a { color: var(--ink-2); font-size: 16px; text-align: left; padding: 0 0 4px 18px; }
-  .nav-links.open .nav-sub a.active { color: var(--ochre); }
+  .nav-links.open .nav-sub a { color: var(--ink-2); font-size: 15px; text-align: right; padding: 10px 0; }
+  .nav-links.open .nav-sub a:is(:hover, .active) { color: var(--ochre); }
 }
 
 /* ---------- Page heads ---------- */
@@ -287,42 +299,22 @@ a:focus-visible, button:focus-visible {
   display: inline-block;
   font-family: var(--display);
   font-weight: 600;
-  font-size: 13px;
-  letter-spacing: 0.12em;
+  font-size: 12.5px;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--muted);
   margin-bottom: 8px;
 }
 .crumb:hover { color: var(--ochre); }
-/* the same way back, in the header once the page is scrolled past it
-   (BackLink, into Nav's slot before the wordmark): a round arrow, and the
-   page's name beside it in the crumb's small capitals */
-/* folded away (no width) until shown, then opening out as the wordmark slides aside */
-.nav-back {
-  display: flex; align-items: center; min-width: 0; overflow: hidden;
-  max-width: 0; opacity: 0; margin-right: -24px; /* the row's gap, taken back while folded */
-  transition: max-width 0.5s cubic-bezier(0.45, 0, 0.25, 1), margin-right 0.5s cubic-bezier(0.45, 0, 0.25, 1), opacity 0.35s ease;
-}
-.nav-back.shown { max-width: var(--open-w, 22em); opacity: 1; margin-right: -6px; transition-delay: 0s, 0s, 0.1s; }
-@media (prefers-reduced-motion: reduce) { .nav-back { transition: none; } }
-.nav-back-link { display: flex; flex: none; align-items: center; gap: 10px; color: var(--muted); } /* its own width as it opens, not reflowed */
-.nav-back-arrow {
-  flex: none; width: 34px; height: 34px; border-radius: 50%; border: 1.5px solid var(--rule);
-  display: grid; place-items: center;
-  font-family: var(--display); font-weight: 700; font-size: 18px; line-height: 1; color: var(--ink);
-  transition: border-color 0.15s, color 0.15s;
-}
-.nav-back-name {
-  font-family: var(--display); font-weight: 600; font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; line-height: 1.25;
-  max-width: 12em; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
-}
-.nav-back-link:hover, .nav-back-link:hover .nav-back-arrow { color: var(--ochre); border-color: var(--ochre); }
-/* the wordmark always just after it (at the left while it is folded away); on a phone, a little smaller beside it */
-.nav-inner .brand { margin-right: auto; }
-.brand-word { transition: font-size 0.5s cubic-bezier(0.45, 0, 0.25, 1); }
-@media (max-width: 900px) {
-  .nav-back-name { max-width: 7.5em; font-size: 11px; }
-  .nav-inner:has(.nav-back.shown) .brand-word { font-size: 22px; }
+/* the same link, kept in sight under the header once the page is scrolled past it (BackLink) */
+:root { --crumb-h: 36px; }
+.crumb-float { position: fixed; top: var(--nav-h); left: 0; right: 0; z-index: 45; height: var(--crumb-h); display: flex; align-items: center; background: var(--chalk); }
+.crumb-float .wrap { width: 100%; }
+.crumb-float .crumb { margin: 0; display: block; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* a bar that stays under the header (the photographs' filters) moves below it */
+.crumb-floating .filter-bar { top: calc(var(--nav-h) + var(--crumb-h)); }
+@media (min-width: 901px) {
+  .crumb-floating .side-sticky { top: calc(var(--nav-h) + var(--crumb-h) + 24px); max-height: calc(100vh - var(--nav-h) - var(--crumb-h) - 48px); }
 }
 
 /* A festival or ritual: the Tamil name is the headline */
@@ -338,8 +330,8 @@ a:focus-visible, button:focus-visible {
 }
 
 .name-title {
-  font-style: italic;
-  font-weight: 500;
+  font-family: var(--display);
+  font-weight: 700;
   font-size: clamp(26px, 3.2vw, 40px);
   line-height: 1.2;
   margin-top: 4px;
@@ -349,7 +341,8 @@ a:focus-visible, button:focus-visible {
 
 /* A temple: its name is the headline */
 .temple-title {
-  font-weight: 600;
+  font-family: var(--display);
+  font-weight: 700;
   font-size: clamp(40px, 6.4vw, 88px);
   line-height: 1.02;
   letter-spacing: -0.015em;
@@ -592,24 +585,21 @@ a:focus-visible, button:focus-visible {
 
 .sub-head {
   font-family: var(--display);
-  font-weight: 800;
-  font-variation-settings: "wdth" 75;
-  font-size: 24px;
-  letter-spacing: 0.02em;
+  font-weight: 600;
+  font-size: 12.5px;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   border-bottom: 2px solid var(--ink);
   padding-bottom: 8px;
 }
 
 .note-line {
-  font-style: italic;
   color: var(--muted);
   font-size: 16px;
   margin-top: 10px;
 }
 
 .empty {
-  font-style: italic;
   font-size: 21px;
   color: var(--ink-2);
   max-width: 30em;
@@ -639,34 +629,34 @@ a:focus-visible, button:focus-visible {
 .date-stamp .m {
   display: block;
   font-family: var(--display);
-  font-weight: 700;
-  font-size: 13px;
-  letter-spacing: 0.12em;
+  font-weight: 600;
+  font-size: 12.5px;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   margin-top: 8px;
 }
 
 .date-stamp .t {
   display: block;
-  font-style: italic;
-  font-size: 15px;
+  font-size: 16px;
   color: var(--muted);
 }
 
 .row-meta { margin-bottom: 6px; }
-.row-meta .kind { color: var(--ochre); }
+.row-meta .kind { color: var(--muted); }
 
 .row-title {
+  font-family: var(--display);
   font-weight: 600;
-  font-size: clamp(22px, 2.4vw, 28px);
+  font-size: 20px;
   line-height: 1.2;
   transition: color 0.15s;
 }
 
 .note-row:hover .row-title { color: var(--ochre); }
 
-.row-excerpt { color: var(--ink-2); font-size: 17px; margin-top: 8px; max-width: 62ch; }
-.row-by { font-style: italic; color: var(--muted); font-size: 15.5px; margin-top: 8px; }
+.row-excerpt { color: var(--ink-2); font-size: 16px; margin-top: 8px; max-width: 62ch; }
+.row-by { color: var(--muted); font-size: 16px; margin-top: 8px; }
 
 /* ---------- Rows: festivals and rituals ---------- */
 .obs-row {
@@ -688,7 +678,7 @@ a:focus-visible, button:focus-visible {
 }
 
 .obs-row .obs-name { font-weight: 600; font-size: 21px; line-height: 1.25; }
-.obs-row .obs-gloss { font-style: italic; color: var(--ink-2); font-size: 17px; }
+.obs-row .obs-gloss { color: var(--ink-2); font-size: 17px; }
 .obs-row:hover .obs-tamil { color: var(--ochre); }
 
 .obs-row.compact { grid-template-columns: minmax(0, 1fr) auto; }
@@ -705,7 +695,8 @@ a:focus-visible, button:focus-visible {
 }
 
 .temple-row .temple-name {
-  font-weight: 600;
+  font-family: var(--display);
+  font-weight: 700;
   font-size: clamp(24px, 2.8vw, 34px);
   line-height: 1.15;
   transition: color 0.15s;
@@ -777,15 +768,14 @@ a.temple-row:hover .temple-name { color: var(--ochre); }
 }
 
 .home-opening h1 {
-  font-weight: 500;
+  font-family: var(--display);
+  font-weight: 700;
   font-size: clamp(28px, 3.2vw, 42px);
   line-height: 1.12;
   text-wrap: balance;
   margin-bottom: 20px;
 }
 
-/* ticked "Show the headline in italics" in the admin */
-.home-opening h1.italic { font-style: italic; }
 
 .home-name { --latin: clamp(20px, 2.6vw, 32px); --gap: 28px; display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px var(--gap); margin-top: 4px; clip-path: inset(-20px -40px -20px 0); } /* clipped at the left only: there the red dot of a gloss wrapped onto its own line falls, and is hidden */
 
@@ -851,7 +841,7 @@ a.temple-row:hover .temple-name { color: var(--ochre); }
   line-height: 1.2;
 }
 
-.today-en { font-style: italic; font-size: 20px; color: var(--ink-2); margin-top: 6px; }
+.today-en { font-size: 20px; color: var(--ink-2); margin-top: 6px; }
 
 .today .caps { color: var(--ink-2); margin-top: 6px; }
 /* the whole of it opens today, in the calendar's pop-up */
@@ -871,8 +861,8 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
    white ones (components/HomeStrip). Every so often it blinks, slowly, to the
    next photos. */
 .home-strip { --h: 120px; padding-top: clamp(18px, 2.5vw, 28px); }
-.home-strip-track { display: flex; flex-direction: column; gap: 20px; overflow: hidden; transition: opacity 1.2s ease-in-out; }
-.home-strip-row { display: flex; gap: 20px; height: var(--h); }
+.home-strip-track { display: flex; flex-direction: column; gap: var(--gap, 20px); overflow: hidden; transition: opacity 1.2s ease-in-out; }
+.home-strip-row { display: flex; gap: var(--gap, 20px); height: var(--h); }
 .home-strip-track.faded { opacity: 0; }
 .home-strip-photo { flex: none; display: block; height: 100%; background: var(--rule); }
 .home-strip-photo img { width: 100%; height: 100%; object-fit: cover; display: block; transition: opacity 0.2s; }
@@ -901,7 +891,7 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
 .home-strip-all:hover > span { transform: scale(1.08); }
 /* on a phone, hung from the white stripes (lib/stripes), and closer under
    the masthead */
-@media (max-width: 640px) { .home-strip { --h: 96px; --phase: 20px; padding-top: 16px; } }
+@media (max-width: 640px) { .home-strip { --h: 96px; padding-top: 16px; } }
 
 .home-opening {
   display: grid;
@@ -945,8 +935,9 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
 
 .home-latest .latest-title {
   display: block;
-  font-size: 21px;
-  font-weight: 500;
+  font-family: var(--display);
+  font-size: 20px;
+  font-weight: 600;
   line-height: 1.25;
   margin-top: 4px;
   transition: color 0.15s;
@@ -1042,8 +1033,8 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
 /* A single line from a longer passage, with a link to the whole */
 .voice-line { padding-block: clamp(48px, 6vw, 80px); }
 
+.voice-line blockquote { border-left: 3px solid var(--ochre); padding-left: 18px; }
 .voice-line blockquote p {
-  font-style: italic;
   font-size: clamp(24px, 3vw, 36px);
   line-height: 1.35;
   max-width: 28em;
@@ -1175,9 +1166,9 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
 .ritual-switch button:hover:not(.on) { background: var(--chalk-2); }
 .ritual-switch .ta { display: block; font-family: var(--tamil); font-weight: 700; font-size: 16px; line-height: 1.2; }
 .ritual-switch .en { display: block; font-family: var(--display); font-weight: 600; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; margin-top: 2px; }
-.ritual-switch .n { display: block; font-style: italic; font-size: 11.5px; color: var(--muted); margin-top: 1px; }
+.ritual-switch .n { display: block; font-size: 11.5px; color: var(--muted); margin-top: 1px; }
 .ritual-switch .on { background: var(--ink); color: var(--chalk); }
-.ritual-switch .on .n { color: var(--on-night-dim); }
+.ritual-switch .on .n { color: color-mix(in srgb, var(--on-night) 82%, var(--on-night-dim)); }
 /* Its parts, each on one pale ground (a month's festivals; each heading's
    rituals, its set too), every entry marked by a red line at its left. The
    year: under each month its festivals, the bigger utsavams, named as in the
@@ -1197,7 +1188,7 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
 .year-regular-list .fl { display: block; padding: 0 0 1px 10px; border-left: 3px solid var(--ochre); }
 .year-regular-list .t { display: block; font-family: var(--tamil); font-weight: 700; font-size: 15.5px; line-height: 1.3; transition: color 0.15s; }
 .year-regular-list .caps { display: block; font-size: 10.5px; margin-top: 1px; }
-.year-when { display: block; font-style: italic; font-size: 12.5px; line-height: 1.35; color: var(--muted); margin-top: 2px; }
+.year-when { display: block; font-size: 12.5px; line-height: 1.35; color: var(--muted); margin-top: 2px; }
 /* a regular ritual's few words at the temple, below its timing: upright, so as not to be taken for it */
 .year-regular-about { display: block; margin-top: 5px; font-size: 13.5px; line-height: 1.45; color: var(--ink-2); }
 /* a set (the Pancha Paruva Utsavam): its own, after the rest, under its name */
@@ -1205,12 +1196,12 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
 .year-set-head { margin: 0 0 10px; display: flex; align-items: baseline; flex-wrap: wrap; column-gap: 8px; }
 .year-set-head .t { font-family: var(--tamil); font-weight: 700; font-size: 15.5px; line-height: 1.3; }
 .year-set-head .caps { font-size: 10.5px; color: var(--ink-2); }
-.year-about { display: block; margin-top: 6px; font-style: italic; font-size: 14px; line-height: 1.45; color: var(--muted); }
+.year-about { display: block; margin-top: 6px; font-size: 14px; line-height: 1.45; color: var(--muted); }
 /* the month we are in: its heading in a band of its own colour, as on the calendar, marked "Now" */
 .year-month h3.now { background: var(--m); border-bottom-color: var(--m); color: var(--chalk); padding: 6px 10px 5px; }
 .year-now { font-size: 0.7em; letter-spacing: 0.08em; color: var(--lamp); }
 /* a month with nothing recorded in it yet */
-.year-none { padding-block: 12px; font-style: italic; font-size: 14px; color: var(--muted); border-bottom: 1px solid var(--rule); }
+.year-none { padding-block: 12px; font-size: 14px; color: var(--muted); border-bottom: 1px solid var(--rule); }
 
 /* Drawings, on temple and festival pages. A drawing always fills the width it
    is given — the whole page for a wide one, the main column for a tall one
@@ -1231,7 +1222,7 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
 }
 
 .drawing-title { font-weight: 600; }
-.drawing-caption { font-weight: 400; font-style: italic; }
+.drawing-caption { font-weight: 400; color: var(--muted); }
 
 .drawing-row {
   display: grid;
@@ -1247,7 +1238,7 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
 
 .entry figure { margin-bottom: 16px; }
 .entry figure img { display: block; width: 100%; height: auto; }
-.entry figcaption { font-size: 15px; font-style: italic; color: var(--muted); margin-top: 6px; }
+.entry figcaption { font-size: 16px; color: var(--muted); margin-top: 6px; }
 
 .entry-title { font-weight: 600; font-size: 25px; line-height: 1.2; }
 .entry-name { margin-top: 4px; }
@@ -1290,10 +1281,10 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
   cursor: help;
 }
 .cal-line.tbc,
-.when li:has(.tbc-mark) { font-style: italic; color: var(--muted); }
+.when li:has(.tbc-mark) { color: var(--muted); }
 .cal-line.tbc .cal-place { color: var(--muted); }
 .cal-evs .tbc-mark { font-size: 8px; padding: 0 2px; margin-right: 3px; vertical-align: 1px; }
-.tbc-key { font-size: 14px; font-style: italic; color: var(--muted); margin-top: 10px; }
+.tbc-key { font-size: 14px; color: var(--muted); margin-top: 10px; }
 .tbc-key .tbc-mark { font-style: normal; }
 
 /* the explainer: plain questions and answers */
@@ -1356,10 +1347,10 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
 .note-step { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; border-top: 2px solid var(--ink); padding-block: 22px clamp(48px, 6vw, 80px); }
 .note-step-link { display: flex; flex-direction: column; gap: 6px; }
 .note-step-link.next { text-align: right; align-items: flex-end; }
-.note-step-label { font-family: var(--display); font-weight: 700; font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ochre); }
-.note-step-title { font-size: 21px; line-height: 1.25; font-weight: 500; color: var(--ink); text-wrap: balance; transition: color 0.15s; }
-.note-step-date { font-family: var(--display); font-weight: 600; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
-.note-step-link:hover .note-step-title { color: var(--ochre); }
+.note-step-label { font-family: var(--display); font-weight: 600; font-size: 12.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); transition: color 0.15s; }
+.note-step-title { font-family: var(--display); font-size: 20px; line-height: 1.25; font-weight: 600; color: var(--ink); text-wrap: balance; transition: color 0.15s; }
+.note-step-date { font-family: var(--display); font-weight: 600; font-size: 12.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+.note-step-link:hover :is(.note-step-title, .note-step-label) { color: var(--ochre); }
 .note-photos { position: relative; }
 .note-photos-col,
 .note-photos-frame { position: absolute; top: clamp(18px, 2.5vw, 32px); bottom: clamp(36px, 5vw, 64px); left: 0; }
@@ -1393,20 +1384,21 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
   color: var(--ochre);
 }
 
-.note-dateline .local { font-style: italic; color: var(--muted); font-size: 18px; }
+.note-dateline .local { color: var(--muted); font-size: 16px; }
 
 .note-title {
-  font-weight: 600;
-  font-size: clamp(34px, 5vw, 64px);
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: clamp(32px, 4.4vw, 54px);
   line-height: 1.08;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.005em;
   max-width: 17em;
   text-wrap: balance;
 }
 
 .note-meta { display: flex; flex-wrap: wrap; gap: 8px 22px; margin-top: 20px; }
 .note-meta a,
-.note-meta .fl { color: var(--ink); border-bottom: 1px solid var(--ochre); }
+.note-meta .fl { color: var(--ink); }
 .note-meta a:hover { color: var(--ochre); }
 
 .note-body { max-width: 720px; margin-inline: auto; padding: clamp(18px, 2.5vw, 32px) var(--gutter) clamp(36px, 5vw, 64px); }
@@ -1415,7 +1407,7 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
 .note-next .note-title { font-size: clamp(28px, 3.6vw, 46px); }
 .note-next .note-title a:hover { color: var(--ochre); }
 .note-next .note-meta { margin: 0 0 clamp(18px, 2.5vw, 28px); }
-.note-body p { font-size: 20px; line-height: 1.72; margin-bottom: 1.1em; }
+.note-body p { font-size: 19px; line-height: 1.72; margin-bottom: 1.1em; }
 .note-body h3 {
   font-family: var(--display);
   font-weight: 800;
@@ -1426,7 +1418,7 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
   margin: 1.8em 0 0.6em;
 }
 .note-body h2 { font-weight: 600; font-size: 30px; line-height: 1.2; margin: 1.6em 0 0.5em; }
-.note-body li { font-size: 20px; line-height: 1.72; }
+.note-body li { font-size: 19px; line-height: 1.72; }
 
 /* Text from the admin's editor: lists, quotations, and the photos, videos
    and recordings placed in it */
@@ -1436,7 +1428,6 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
   margin: 1.4em 0;
   padding-left: 1em;
   border-left: 3px solid var(--ochre);
-  font-style: italic;
   color: var(--ink-2);
 }
 .rich hr { border: 0; height: 10px; background: var(--stripe); margin: 2em 0; }
@@ -1444,7 +1435,7 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
 .rich-media { margin: 1.6em 0; }
 .rich-media img, .rich-media video { display: block; width: 100%; height: auto; }
 .rich-media audio { width: 100%; }
-.rich-media figcaption { font-size: 15px; color: var(--muted); margin-top: 8px; font-style: italic; }
+.rich-media figcaption { font-size: 16px; color: var(--muted); margin-top: 8px; }
 .rich-media .credit { font-style: normal; }
 .prose li { font-size: 19.5px; line-height: 1.7; }
 .entry-body li { font-size: 18.5px; line-height: 1.65; }
@@ -1464,7 +1455,7 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
 
 .media { margin-block: 8px 32px; }
 .media video { display: block; width: 100%; height: auto; background: var(--ink); }
-.media figcaption { font-size: 15px; color: var(--muted); margin-top: 8px; font-style: italic; }
+.media figcaption { font-size: 16px; color: var(--muted); margin-top: 8px; }
 .media audio { width: 100%; }
 
 .photos {
@@ -1474,7 +1465,7 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
   margin-block: 8px 32px;
 }
 .photos img { display: block; width: 100%; height: auto; }
-.photos figcaption { font-size: 14px; color: var(--muted); margin-top: 6px; font-style: italic; }
+.photos figcaption { font-size: 16px; color: var(--muted); margin-top: 6px; }
 
 .note-foot { max-width: 720px; margin-inline: auto; padding: 0 var(--gutter) clamp(56px, 7vw, 88px); }
 
@@ -1566,7 +1557,7 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
   .temple-body .video-wall { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px 12px; }
 }
 .video-tile:hover .video-title { color: var(--ochre); }
-.video-where { font-size: 15.5px; color: var(--muted); font-style: italic; }
+.video-where { font-size: 16px; color: var(--muted); }
 
 /* A film opened over the page: the film sized to the screen, its words beside it */
 .film-viewer {
@@ -1603,7 +1594,7 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
 }
 .film-viewer-text .caps { color: var(--on-night-dim); }
 .film-viewer-title { font-weight: 600; font-size: 28px; line-height: 1.2; margin: 8px 0 6px; }
-.film-viewer-by { font-style: italic; color: var(--on-night-dim); font-size: 16px; margin-bottom: 14px; }
+.film-viewer-by { color: var(--on-night-dim); font-size: 16px; margin-bottom: 14px; }
 .film-viewer .film-text p { font-size: 17.5px; line-height: 1.6; color: var(--on-night); }
 .film-viewer .rich a { color: var(--lamp); }
 .film-viewer-links { display: flex; flex-wrap: wrap; gap: 14px 28px; margin-top: 18px; }
@@ -1663,7 +1654,7 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
    page; each photo spans whole red stripes, the gaps (across and down) are
    white ones (lib/stripes) */
 .photo-rows { --h: 260px; padding-top: 24px; min-height: var(--h); }
-.photo-row { display: flex; gap: 20px; height: var(--h); margin-bottom: 20px; }
+.photo-row { display: flex; gap: var(--gap, 20px); height: var(--h); margin-bottom: var(--gap, 20px); }
 .photo-row .photo-tile { flex: none; height: 100%; aspect-ratio: auto; }
 /* at the end of a day's or event's photos, opened: the way back to fewer of them */
 /* (the day's first photo, dimmed as the "+46" one is, the words over it) */
@@ -1804,11 +1795,11 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
 .photo-viewer-caption { font-size: 17px; }
 /* a line over the photo's own details: where these photos are from ("Latest from this temple") */
 .photo-viewer-note { font-family: var(--display); font-weight: 700; font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ochre); }
-.photo-viewer-credit { font-style: italic; color: var(--on-night-dim); font-size: 15px; }
+.photo-viewer-credit { color: var(--on-night-dim); font-size: 16px; }
 .photo-viewer-tags { font-size: 15px; color: var(--on-night-dim); }
 .photo-viewer-tags a,
-.photo-viewer-tags .fl { color: var(--on-night); border-bottom: 1px solid var(--on-night-dim); }
-.photo-viewer-tags a:hover { color: var(--lamp); border-bottom-color: var(--lamp); }
+.photo-viewer-tags .fl { color: var(--on-night); }
+.photo-viewer-tags a:hover { color: var(--lamp); }
 @media (max-width: 860px) {
   .photo-viewer-inner { padding: 64px 12px 24px; }
   .photo-viewer-inner img { max-height: calc(100dvh - 200px); }
@@ -1855,7 +1846,7 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
   color: var(--ochre);
 }
 
-.book-parts h2 { font-weight: 600; font-size: 28px; line-height: 1.2; }
+.book-parts h2 { font-family: var(--display); font-weight: 700; font-size: 28px; line-height: 1.2; }
 .book-parts p { color: var(--ink-2); font-size: 18px; max-width: 36em; margin-top: 6px; }
 .book-parts .arrow-link { display: inline-block; margin-top: 12px; font-size: 13.5px; }
 
@@ -1884,7 +1875,7 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
 }
 
 .team li { padding-block: 18px; border-bottom: 1px solid var(--rule); }
-.team .who { font-weight: 600; font-size: 22px; }
+.team .who { font-family: var(--display); font-weight: 600; font-size: 22px; }
 .team .role { margin-top: 2px; }
 .team p { color: var(--ink-2); font-size: 17px; margin-top: 8px; }
 
@@ -1904,9 +1895,9 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
 
 .site-footer h4 {
   font-family: var(--display);
-  font-weight: 700;
-  font-size: 13px;
-  letter-spacing: 0.14em;
+  font-weight: 600;
+  font-size: 12.5px;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--on-night);
   margin-bottom: 12px;
@@ -2017,7 +2008,7 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
   transition: color 0.15s;
 }
 .rasi-month .caps { color: var(--ink); font-size: 14px; }
-.rasi-span { font-style: italic; color: var(--muted); font-size: clamp(11.5px, 1vw, 14.5px); white-space: nowrap; } /* "mid-November to mid-December" on one line */
+.rasi-span { color: var(--muted); font-size: clamp(11.5px, 1vw, 14.5px); white-space: nowrap; } /* "mid-November to mid-December" on one line */
 .rasi-month.now { background: var(--ink); color: var(--chalk); }
 .rasi-month.now .caps { color: var(--chalk); }
 .rasi-month.now .rasi-span { color: var(--on-night-dim); }
@@ -2034,7 +2025,7 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
   text-align: center;
   padding: 28px clamp(20px, 4vw, 56px);
 }
-.rasi-centre p { font-style: italic; font-size: 18px; line-height: 1.5; color: var(--ink-2); max-width: 14em; margin-top: 8px; }
+.rasi-centre p { font-size: 18px; line-height: 1.5; color: var(--ink-2); max-width: 14em; margin-top: 8px; }
 @media (max-width: 860px) {
   /* a phone: the months in order, one under the other */
   .rasi { grid-template-columns: minmax(0, 1fr); grid-auto-rows: auto; }
@@ -2138,7 +2129,7 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
 }
 .month-obs:hover .obs-tamil { color: var(--ochre); }
 .month-obs .obs-name { font-weight: 600; font-size: 20px; line-height: 1.25; }
-.month-obs .obs-gloss { font-style: italic; color: var(--ink-2); font-size: 16.5px; }
+.month-obs .obs-gloss { color: var(--ink-2); font-size: 16.5px; }
 .month-seen li { font-size: 16.5px; line-height: 1.45; padding-block: 3px; }
 .month-seen time {
   font-family: var(--display);
@@ -2183,7 +2174,7 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
 }
 .month-obs-more::after { content: " →"; }
 .month-obs:hover .month-obs-more { color: var(--m); }
-.month-unseen { font-style: italic; color: var(--muted); font-size: 16px; align-self: center; }
+.month-unseen { color: var(--muted); font-size: 16px; align-self: center; }
 .month-link { border-bottom: 1px solid var(--rule); }
 .month-link:hover { color: var(--ochre); }
 @media (max-width: 700px) {
@@ -2426,7 +2417,7 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
 .cal-schedule > div { display: grid; grid-template-columns: 7.5em 1fr; gap: 10px; }
 .cal-schedule dt { font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
 .cal-schedule dd { margin: 0; }
-.day-none { margin-top: 16px; font-style: italic; color: var(--muted); }
+.day-none { margin-top: 16px; color: var(--muted); }
 .cal-moon { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; color: var(--ink-2); }
 .cal-moon [lang="ta"] { font-family: var(--tamil); }
 .cal-moon .dot { width: 11px; height: 11px; border-radius: 50%; border: 1.5px solid var(--ink); flex: none; }
@@ -2478,7 +2469,7 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
 .cal-naks li.special { color: var(--ink); }
 .cal-naks .cal-nak-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .cal-naks .nak-icon { width: 14px; height: 14px; color: var(--m); }
-.cal-nak-then { font-style: italic; color: var(--muted); }
+.cal-nak-then { color: var(--muted); }
 /* In a day's box: words may break, and each entry is at most three lines */
 .cal-evs { hyphens: manual; overflow-wrap: anywhere; }
 .cal-evs > li { font-size: 13.5px; line-height: 1.3; padding-top: 2px; }
@@ -2511,7 +2502,7 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
   .cal-ta { font-size: 11px; }
 }
 /* "+ N more": the size of the festival names above it */
-.cal-more { font-style: italic; color: var(--muted); font-size: 10.5px; line-height: 1.3; }
+.cal-more { color: var(--muted); font-size: 10.5px; line-height: 1.3; }
 .cal-evs > li.cal-more { font-size: 10.5px; line-height: 1.25; margin-top: 1px; }
 .cal-evs a:hover,
 .cal-list a:hover { color: var(--m); }
@@ -2785,7 +2776,7 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
 .gallery-find { display: flex; align-items: center; gap: 7px; width: min(220px, 100%); color: var(--muted); transition: color 0.15s; }
 .gallery-find:focus-within { color: var(--ochre); }
 .gallery-find svg { flex: none; }
-.gallery-find input { flex: 1; min-width: 0; padding: 4px 0 3px; border: 0; background: none; font: inherit; font-size: 14.5px; font-style: italic; color: var(--ink); outline: none; }
+.gallery-find input { flex: 1; min-width: 0; padding: 4px 0 3px; border: 0; background: none; font: inherit; font-size: 14.5px; color: var(--ink); outline: none; }
 .gallery-find input::placeholder { color: var(--muted); }
 .gallery-count { font-family: var(--display); font-weight: 600; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
 
@@ -2806,8 +2797,8 @@ a.gallery-card:hover .gallery-pic img { transform: scale(1.04); } /* only a card
 .gallery-dot { width: 5px; height: 6px; align-self: baseline; flex: none; }
 .gallery-tamil { font-family: var(--tamil); font-weight: 700; font-size: 22px; line-height: 1.2; transition: color 0.15s; }
 a.gallery-card:hover .gallery-tamil { color: var(--ochre); }
-.gallery-name { font-weight: 600; font-size: 21px; line-height: 1.2; } /* as tall as the Tamil beside it */
-.gallery-gloss { font-style: italic; color: var(--ink-2); font-size: 15.5px; line-height: 1.4; }
+.gallery-name { font-family: var(--display); font-weight: 600; font-size: 21px; line-height: 1.2; } /* as tall as the Tamil beside it */
+.gallery-gloss { color: var(--ink-2); font-size: 15.5px; line-height: 1.4; }
 /* festival or ritual: small red letters under every entry */
 .gallery-kind { margin-bottom: 4px; font-family: var(--display); font-weight: 700; font-size: 11.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ochre); }
 .gallery-seen { color: var(--muted); margin-top: 6px; }
@@ -2862,7 +2853,7 @@ a.gallery-card.lead:hover .gallery-tamil { color: #f0a98f; } /* as its "festival
 }
 /* the name in English letters and what it means, side by side, a red dot between, of a height */
 .elements-line { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 12px; margin-top: 2px; padding-bottom: 12px; border-bottom: 2px solid var(--ink); }
-.elements-en { font-style: italic; font-weight: 500; font-size: clamp(21px, 2vw, 26px); line-height: 1.2; }
+.elements-en { font-weight: 500; font-size: clamp(21px, 2vw, 26px); line-height: 1.2; }
 .elements-dot { width: 6px; height: 7px; align-self: baseline; flex: none; }
 .elements-gloss { font-family: var(--display); font-weight: 400; font-size: clamp(15px, 1.45vw, 19px); letter-spacing: 0.09em; text-transform: uppercase; line-height: 1.2; color: var(--ochre); }
 /* bookmarks to the three parts */
@@ -2872,7 +2863,7 @@ a.gallery-card.lead:hover .gallery-tamil { color: #f0a98f; } /* as its "festival
 .elements-marks a:hover { color: var(--ochre); }
 .elements-part { scroll-margin-top: 96px; }
 html:has(.elements-marks) { scroll-behavior: smooth; }
-.to-be-written { font-style: italic; color: var(--muted); margin-top: 14px; }
+.to-be-written { color: var(--muted); margin-top: 14px; }
 .overview { margin-top: 16px; }
 
 /* The elements of the mahotsavam: three parts, each a list of rites. Each rite
@@ -2940,7 +2931,7 @@ body { container: page / inline-size; }
 .banner-caption {
   position: absolute; left: 0; right: 0; bottom: 0; padding: 40px var(--gutter) 16px;
   background: linear-gradient(transparent, rgba(22, 17, 14, 0.6));
-  color: var(--chalk); font-style: italic; font-size: 15px;
+  color: var(--chalk); font-size: 15px;
 }
 .banner-step {
   position: absolute; top: 50%; transform: translateY(-50%);
@@ -3013,7 +3004,7 @@ span.month-obs .month-obs-more { display: none; }
 /* its dropdowns shallower than on Photographs and Films, so the calendar under them shows */
 /* a word on what to do, at the band's right: as the Calendar's "Open a
    month…"; "Click" with a mouse, "Tap" on a touch screen */
-.drop-band-note { margin-left: auto; font-style: italic; font-size: 15px; color: var(--muted); text-align: right; }
+.drop-band-note { margin-left: auto; font-size: 16px; color: var(--muted); text-align: right; }
 .drop-band-note .on-touch { display: none; }
 /* not on a phone */
 @media (max-width: 700px) { .drop-band-note { display: none; } }
@@ -3066,7 +3057,7 @@ span.month-obs .month-obs-more { display: none; }
 .varam-temples { color: var(--muted); }
 .varam-temples a:hover { color: var(--mt); }
 .varam-what .cal-tags { margin-top: 6px; }
-.varam-none { margin-top: 16px; font-style: italic; color: var(--muted); }
+.varam-none { margin-top: 16px; color: var(--muted); }
 /* then what the day is like, in the site's reading measure */
 .varam-character { max-width: 38em; margin-top: 26px; }
 .varam-character h3 { margin-bottom: 10px; font-size: 13px; color: var(--ink-2); }
@@ -3180,7 +3171,7 @@ span.month-obs .month-obs-more { display: none; }
 
 
 /* a film (or a field note's video) whose file cannot be had: a plain line in its place */
-.film-unavailable { display: flex; align-items: center; justify-content: center; min-height: 160px; padding: 24px; background: var(--chalk-2); color: var(--ink-2); font-style: italic; text-align: center; }
+.film-unavailable { display: flex; align-items: center; justify-content: center; min-height: 160px; padding: 24px; background: var(--chalk-2); color: var(--ink-2); text-align: center; }
 .film-unavailable.tile { position: absolute; inset: 0; min-height: 0; padding: 8px; font-family: var(--display); font-style: normal; font-weight: 700; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
 
 /* ---------- A temple's page, on a phone ----------
@@ -3189,9 +3180,26 @@ span.month-obs .month-obs-more { display: none; }
    everything else there: near the top, the page's parts as a line of links,
    the header's line above them and a thin rule below, the Ritual Year
    first, in red; the field notes, the latest five, the rest a tap away. On a wider
-   screen, the Ritual Year is beside them: no links, every field note. */
+   screen, the Ritual Year is beside them: no links, the field notes down to where it ends. */
 .page-parts { display: none; }
-.more-button { display: none; }
+/* the rest of a list a tap away (ShowMore): a temple's field notes, on a phone the latest
+   five, on a wider screen down to where its Ritual Year ends */
+.more-button {
+  display: inline-block;
+  margin-top: 18px;
+  background: none;
+  border: 0;
+  border-bottom: 2px solid var(--ochre);
+  padding: 0 0 3px;
+  cursor: pointer;
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+.more-button:hover { color: var(--ochre); }
 #ritual-year, #field-notes, #photographs, #films, #articles { scroll-margin-top: 84px; }
 @media (max-width: 900px) {
   .page-parts {
@@ -3219,20 +3227,4 @@ span.month-obs .month-obs-more { display: none; }
   .temple-body > aside > * { order: 2; }
   .temple-body > aside > :first-child { margin-top: clamp(20px, 2.5vw, 30px); }
   .temple-body > .stack > :is(#photographs, #films, #articles) { order: 3; }
-  .more-rest:not(.open) { display: none; }
-  .more-button {
-    display: inline-block;
-    margin-top: 18px;
-    background: none;
-    border: 0;
-    border-bottom: 2px solid var(--ochre);
-    padding: 0 0 3px;
-    cursor: pointer;
-    font-family: var(--display);
-    font-weight: 700;
-    font-size: 15px;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--ink);
-  }
 }

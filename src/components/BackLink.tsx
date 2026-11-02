@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState, type MouseEvent, type ReactNode } from "react";
-import { createPortal } from "react-dom";
 import { PAGE_NAMES_EVENT, pageName } from "@/components/PageNames";
 
 type Entry = { url: string | null; key: string; index: number };
@@ -31,17 +30,12 @@ function cameFrom(): { key: string; path: string } | null {
     browser's Back would (and so where that page was scrolled to: see
     LandAtTop); from anywhere else, or opened by itself, to `href`, in its
     own words ("← Field notes"). Once the page is scrolled past it, the same
-    way back is in the site's header, a round arrow and the page's name
-    beside the wordmark (Nav's #nav-back; site.css, .nav-back). */
+    link stays in sight, in a bar under the site's header (site.css, .crumb-float). */
 export function BackLink({ href, className, children }: { href: string; className?: string; children: ReactNode }) {
   const pathname = usePathname();
   const own = useRef<HTMLAnchorElement>(null);
   const [floating, setFloating] = useState(false);
   const [back, setBack] = useState<{ key: string; path: string; name?: string } | null>(null);
-  // its own words, without the arrow ("Field notes"), for the header when it goes to `href`
-  const [ownWords, setOwnWords] = useState("");
-  useEffect(() => setOwnWords((own.current?.textContent ?? "").replace(/^\s*←\s*/, "")), []);
-
   // where it goes back to, and that page's name (once known)
   useEffect(() => {
     const find = () => {
@@ -74,35 +68,26 @@ export function BackLink({ href, className, children }: { href: string; classNam
   };
   const words = back?.name ? <>← {back.name}</> : children;
   const to = back ? back.path : href;
-  // in the header: its words without the arrow (the round button is the arrow)
-  const name = back?.name ?? ownWords;
-  // the header's slot holds it all along, folded away; it opens, smoothly,
-  // once the page is scrolled past the link above (site.css, .nav-back.shown)
-  const [slot, setSlot] = useState<HTMLElement | null>(null);
-  useEffect(() => setSlot(document.getElementById("nav-back")), []);
+  // with it out of sight, the bar under the header shown: a bar that stays under the
+  // header too (the photographs' filters) moves below it (site.css, .crumb-floating)
   useEffect(() => {
-    if (!slot) return;
-    // it opens to its own width exactly, so the slide is even all the way
-    const link = slot.firstElementChild as HTMLElement | null;
-    if (link) slot.style.setProperty("--open-w", `${link.scrollWidth}px`);
-    slot.classList.toggle("shown", floating);
-    return () => slot.classList.remove("shown");
-  }, [slot, floating, name]);
+    document.documentElement.classList.toggle("crumb-floating", floating);
+    return () => document.documentElement.classList.remove("crumb-floating");
+  }, [floating]);
   return (
     <>
       <Link ref={own} className={className} href={to} onClick={onClick}>
         {words}
       </Link>
-      {slot &&
-        createPortal(
-          <Link className="nav-back-link" href={to} onClick={onClick} title={name} tabIndex={floating ? undefined : -1} aria-hidden={!floating}>
-            <span className="nav-back-arrow" aria-hidden="true">
-              ←
-            </span>
-            <span className="nav-back-name">{name}</span>
-          </Link>,
-          slot
-        )}
+      {floating && (
+        <div className="crumb-float">
+          <div className="wrap">
+            <Link className="crumb" href={to} onClick={onClick}>
+              {words}
+            </Link>
+          </div>
+        </div>
+      )}
     </>
   );
 }

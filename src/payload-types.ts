@@ -1854,7 +1854,6 @@ export interface HomePage {
    * The large heading.
    */
   headline: string;
-  headlineItalic?: boolean | null;
   /**
    * Shown under the heading, beside "Just added". Keep it to two short paragraphs.
    */
@@ -2014,7 +2013,6 @@ export interface Varam {
  */
 export interface HomePageSelect<T extends boolean = true> {
   headline?: T;
-  headlineItalic?: T;
   opening?: T;
   quoteLabel?: T;
   quote?: T;

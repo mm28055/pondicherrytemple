@@ -2,43 +2,52 @@
 
 import { type RefObject, useLayoutEffect, useState } from "react";
 
-/* The stripes at the top of the page are 20px red, 20px white, from the left
-   edge of the window. Rows of photographs hang from them (the home page's
-   strip, the Photographs page): each photo spans whole red stripes (40n +
-   20px wide), and the 20px between photos falls under a white one. */
+/* The stripes at the top of the page are 20px red, 20px white. Rows of
+   photographs are measured in them (the home page's strip, the Photographs
+   page): each photo whole red stripes wide (40n + 20px), with a white one's
+   width between photos; the whole row then drawn to the page's width, from
+   margin to margin, a little larger or smaller than the stripes. */
 export const STRIPE = 40;
 
 /** A photo `units` stripes wide, in pixels. */
 export const stripeWidth = (units: number) => units * STRIPE + STRIPE / 2;
 
-/** Where a row of photos in `box` goes: from the red stripe at or before the
-    page's margin (`back` pixels out past it) to the red one at or after the
-    other margin, never past the window; `units` stripes long. Also the
-    box's `--h` (the height of its photos), if set. A box with `--phase:
-    20px` hangs its photos from the white stripes instead (the gaps then
-    under red ones). Measured in the browser,
-    and again when the window changes size. */
+export type StripeFit = {
+  /** how many stripes long a row is */
+  units: number;
+  /** the height of its photos: the box's `--h`, if set */
+  h: number;
+  /** how much the stripes are drawn larger (or smaller) to fill the page's width */
+  k: number;
+  /** a photo `units` stripes wide, as drawn */
+  width: (units: number) => number;
+  /** the space between photos, as drawn */
+  gap: number;
+};
+
+/** The row of photos in `box`: as many stripes as come nearest its width,
+    drawn to fill it exactly. Measured in the browser, and again when the
+    window changes size. */
 export function useStripeFit(box: RefObject<HTMLElement | null>) {
-  const [fit, setFit] = useState<{ back: number; units: number; h: number }>();
+  const [fit, setFit] = useState<StripeFit>();
   useLayoutEffect(() => {
     const el = box.current;
     if (!el) return;
     const measure = () => {
-      const r = el.getBoundingClientRect();
-      const style = getComputedStyle(el);
-      const phase = parseFloat(style.getPropertyValue("--phase")) || 0;
-      let back = (((r.left - phase) % STRIPE) + STRIPE) % STRIPE;
-      // never off the left of the window: then the stripe after it
-      if (r.left - back < 0) back -= STRIPE;
-      const start = r.left - back;
-      let units = Math.ceil((r.right - start - STRIPE / 2) / STRIPE);
-      if (start + stripeWidth(units) > document.documentElement.clientWidth) units -= 1;
-      const h = parseFloat(style.getPropertyValue("--h")) || 120;
-      setFit((f) => (f && f.back === back && f.units === units && f.h === h ? f : { back, units, h }));
+      const w = el.getBoundingClientRect().width;
+      const h = parseFloat(getComputedStyle(el).getPropertyValue("--h")) || 120;
+      const units = Math.max(1, Math.round((w - STRIPE / 2) / STRIPE));
+      const k = w / stripeWidth(units);
+      setFit((f) =>
+        f && f.units === units && f.h === h && f.k === k
+          ? f
+          : { units, h, k, width: (u: number) => stripeWidth(u) * k, gap: (STRIPE / 2) * k }
+      );
     };
     measure();
     const ro = new ResizeObserver(measure);
     ro.observe(document.documentElement);
+    ro.observe(el);
     return () => ro.disconnect();
   }, [box]);
   return fit;

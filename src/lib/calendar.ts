@@ -1,39 +1,19 @@
 /* Local calendar labels. Dates are stored as ordinary ISO dates everywhere;
-   a region's local month is only ever a display label, so adding a region
-   with a different calendar means adding a table here — nothing else.
-
-   Tamil solar months for 2026, by start date. Chithirai (14 Apr) and
-   Vaikasi (15 May) are confirmed in the running log ("Varsha Pirappu",
-   "Masam Pirappu"); the others are the usual sankranti dates and should be
-   checked against a panchangam before they matter. */
+   a region's local date is only ever a display label, so adding a region
+   with a different calendar means adding its reckoning here — nothing else.
+   The Tamil date is worked out from the sun (lib/tamilDate), as the home
+   page's date for today is. */
 
 import type { CalendarSystem } from "@/content/types";
+import { tamilDate } from "./tamilDate";
 
-const TAMIL_2026: { start: string; month: string }[] = [
-  { start: "2026-02-13", month: "Masi" },
-  { start: "2026-03-15", month: "Panguni" },
-  { start: "2026-04-14", month: "Chithirai" },
-  { start: "2026-05-15", month: "Vaikasi" },
-  { start: "2026-06-15", month: "Aani" },
-  { start: "2026-07-17", month: "Aadi" },
-  { start: "2026-08-17", month: "Aavani" },
-  { start: "2026-09-17", month: "Purattasi" },
-  { start: "2026-10-17", month: "Aippasi" },
-  { start: "2026-11-16", month: "Karthigai" },
-  { start: "2026-12-16", month: "Margazhi" },
-];
-
-/** The local month a date falls in, or null if outside the known table. */
-export function localMonth(calendar: CalendarSystem, isoDate: string): string | null {
+/** The local date of a date: its month and the day in it ("Aippasi 10"). */
+export function localDate(calendar: CalendarSystem, isoDate: string): string | null {
   if (calendar !== "tamil") return null;
-  let found: string | null = null;
-  for (const m of TAMIL_2026) {
-    if (isoDate >= m.start) found = m.month;
-    else break;
-  }
-  // Dates before the table, or beyond a year after its last entry, get no label
-  if (isoDate < TAMIL_2026[0].start || isoDate >= "2027-01-15") return null;
-  return found;
+  const [y, m, d] = isoDate.slice(0, 10).split("-").map(Number);
+  if (!y || !m || !d) return null;
+  const t = tamilDate(y, m, d);
+  return `${t.month.en} ${t.day}`;
 }
 
 /* The ritual year: the twelve Tamil solar months, one timeless year. Each
