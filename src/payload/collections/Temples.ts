@@ -189,8 +189,14 @@ export const Temples: CollectionConfig = {
         {
           label: 'Photographs',
           description:
-            'Photos tagged with this temple. "Add new" uploads one already tagged. Photos in its field notes are shown on the page too, without being listed here.',
+            'Every photo tagged with this temple. Those of its photo sets and field notes are tagged by themselves, as they are saved.',
           fields: [
+            {
+              // its photos as small pictures: dragged into order, chosen to delete or take off, more added
+              name: 'photoGrid',
+              type: 'ui',
+              admin: { components: { Field: { path: '/components/admin/TaggedPhotoGrid#TaggedPhotoGrid', clientProps: { kind: 'temples' } } } },
+            },
             {
               name: 'photographs',
               type: 'join',
@@ -199,7 +205,7 @@ export const Temples: CollectionConfig = {
               where: { mimeType: { contains: 'image' } },
               defaultSort: '-createdAt',
               defaultLimit: 50,
-              admin: { defaultColumns: ['filename', 'caption', 'observances', 'featured', 'consent'] },
+              admin: { hidden: true, defaultColumns: ['filename', 'caption', 'observances', 'featured', 'consent'] },
             },
           ],
         },

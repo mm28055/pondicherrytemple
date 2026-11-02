@@ -7,6 +7,7 @@ import { fileURLToPath } from 'url'
 import { canUpdateOwn, isEditor, isLoggedIn } from '../access'
 import { createdByField } from '../fields'
 import { refreshHooks } from '../revalidate'
+import { tagPhotoOfSet } from '../photoTagHooks'
 
 const dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -67,7 +68,7 @@ export const Media: CollectionConfig = {
     update: canUpdateOwn,
     delete: isEditor,
   },
-  hooks: { ...refreshHooks, beforeChange: [refuseHevc] },
+  hooks: { ...refreshHooks, beforeChange: [refuseHevc, tagPhotoOfSet] },
   upload: {
     // On this laptop: MEDIA_DIR (see .env). With R2 keys in .env: Cloudflare R2.
     staticDir: process.env.MEDIA_DIR || path.resolve(dirname, '../../../.data/media'),
@@ -206,7 +207,8 @@ export const Media: CollectionConfig = {
         position: 'sidebar',
         // photos only, and not a film's still (videos' tags are never read; a still stays out of Photographs)
         condition: (data) => isImage(data) && !inFilm(data),
-        description: 'A photo tagged here appears in the Photographs section of each temple’s page.',
+        description:
+          'A photo tagged here appears in the Photographs section of each temple’s page. Filled in by itself from its photo set and its field notes; add or take off by hand.',
       },
     },
     {
@@ -219,7 +221,7 @@ export const Media: CollectionConfig = {
         position: 'sidebar',
         condition: (data) => isImage(data) && !inFilm(data),
         description:
-          'A photo tagged here appears in the Photographs section of each festival’s or ritual’s page. Photos in a field note appear there by themselves.',
+          'A photo tagged here appears in the Photographs section of each festival’s or ritual’s page. Filled in by itself from its photo set, its day (“The year so far”) and its field notes; add or take off by hand.',
       },
     },
     createdByField,

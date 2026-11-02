@@ -5,7 +5,8 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { withCopyright } from '../../lib/copyrightExif'
 
 /* In a photo set's form: its photos as small pictures, to see at a glance.
-   - Dragged into the order the site shows them in (saved with "Save order").
+   - Dragged into the order the site shows them in, or put newest or oldest
+     first by when each was taken (saved with "Save order").
    - Clicked to choose them (shift-click for a run of them), and the chosen
      deleted together, with no photo opened one by one, or moved together to
      another set of the same day and temple (dragged onto its name, or its
@@ -29,12 +30,12 @@ type Photo = {
 }
 
 const MAX = 2400
-const AT_ONCE = 3
+export const AT_ONCE = 3
 // Deepa's camera runs this far ahead of Arunaditya's (scripts/import-photos)
 const DEEPA_AHEAD_MS = 40 * 60 * 1000
-const isDeepas = (name: string) => /^IMG/i.test(name)
+export const isDeepas = (name: string) => /^IMG/i.test(name)
 
-const slugify = (text: string) =>
+export const slugify = (text: string) =>
   text
     .normalize('NFKD')
     .replace(/[\u0300-\u036f]/g, '')
@@ -48,7 +49,7 @@ const inOrder = (a: Photo, b: Photo) =>
   a.id - b.id
 
 /** When the camera says it was taken: the earliest time in the file's details, in Pondicherry's time. */
-async function takenAtOf(file: File): Promise<string | undefined> {
+export async function takenAtOf(file: File): Promise<string | undefined> {
   const head = new TextDecoder('latin1').decode(await file.slice(0, 256 * 1024).arrayBuffer())
   const stamp = (head.match(/\d{4}:\d\d:\d\d \d\d:\d\d:\d\d/g) ?? []).filter((t) => !t.startsWith('0000')).sort()[0]
   if (!stamp) return undefined
@@ -58,7 +59,7 @@ async function takenAtOf(file: File): Promise<string | undefined> {
 }
 
 /** The photo upright, at most MAX pixels long, as a JPEG. */
-async function shrink(file: File): Promise<Blob> {
+export async function shrink(file: File): Promise<Blob> {
   const bitmap = await createImageBitmap(file, { imageOrientation: 'from-image' })
   const scale = Math.min(1, MAX / Math.max(bitmap.width, bitmap.height))
   const canvas = document.createElement('canvas')
@@ -76,7 +77,7 @@ async function shrink(file: File): Promise<Blob> {
   throw new Error('too large even made smaller')
 }
 
-const minutes = (ms: number) => {
+export const minutes = (ms: number) => {
   const m = Math.round(ms / 60000)
   return m < 1 ? 'under a minute' : m === 1 ? 'about a minute' : `about ${m} minutes`
 }
@@ -167,6 +168,17 @@ export function PhotoGrid() {
     const at = rest.indexOf(target) + (ids.indexOf(target) > from ? 1 : 0)
     rest.splice(at, 0, ...moving)
     setOrder(rest)
+  }
+
+  // put in order by when each was taken (those not known at the end), to be saved with Save order
+  const byDate = (newest: boolean) => {
+    const when = (p: Photo) => p.takenAt ?? ''
+    const sorted = [...shown].sort((a, b) => {
+      const x = when(a), y = when(b)
+      if (!x || !y) return (x ? 0 : 1) - (y ? 0 : 1) || a.id - b.id
+      return (newest ? y.localeCompare(x) : x.localeCompare(y)) || a.id - b.id
+    })
+    setOrder(sorted.map((p) => p.id))
   }
 
   const saveOrder = async () => {
@@ -328,6 +340,12 @@ export function PhotoGrid() {
         <strong style={{ marginRight: 8 }}>Photos{photos ? ` (${photos.length})` : ''}</strong>
         <button type="button" className="btn btn--style-primary btn--size-small" style={button} disabled={busy} onClick={() => input.current?.click()}>
           Add photos
+        </button>
+        <button type="button" className="btn btn--style-secondary btn--size-small" style={button} disabled={busy || shown.length < 2} onClick={() => byDate(true)}>
+          Newest first
+        </button>
+        <button type="button" className="btn btn--style-secondary btn--size-small" style={button} disabled={busy || shown.length < 2} onClick={() => byDate(false)}>
+          Oldest first
         </button>
         {order && (
           <>

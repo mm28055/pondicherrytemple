@@ -2,6 +2,7 @@ import { APIError, type CollectionConfig } from 'payload'
 import { canCreateContent, canUpdateContent, isEditor } from '../access'
 import { createdByField, observancesField, regionField, templesField } from '../fields'
 import { refresh, refreshHooks } from '../revalidate'
+import { tagSetPhotos } from '../photoTagHooks'
 
 /* The photographs of one visit: a temple's day (or event), as they were kept
    in their folder (temple / date_event / photos). Its photos belong where it
@@ -31,7 +32,7 @@ export const PhotoSets: CollectionConfig = {
     update: canUpdateContent,
     delete: isEditor,
   },
-  hooks: refreshHooks,
+  hooks: { ...refreshHooks, afterChange: [...refreshHooks.afterChange, tagSetPhotos] },
   endpoints: [
     {
       // the set's photos in the order arranged in its photo grid: each one's

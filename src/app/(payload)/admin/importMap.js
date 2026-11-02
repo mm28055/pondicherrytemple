@@ -14,6 +14,7 @@ import { BoldFeatureClient as BoldFeatureClient_e70f5e05f09f93e00b997edb1ef0c864
 import { ItalicFeatureClient as ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { HeadingFeatureClient as HeadingFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { ParagraphFeatureClient as ParagraphFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
+import { TaggedPhotoGrid as TaggedPhotoGrid_61da307bd3649d561afa0b0fd9dcdfe0 } from '../../../components/admin/TaggedPhotoGrid'
 import { ListMemory as ListMemory_fb2c77e6804535814322756672416b63 } from '../../../components/admin/ListMemory'
 import { PublishButton as PublishButton_85c066c9e85977a669a8719b5844b2d5 } from '../../../components/admin/PublishButton'
 import { FrameButton as FrameButton_da55e7d810ad53350e323c365df87b57 } from '../../../components/admin/FrameButton'
@@ -43,6 +44,7 @@ export const importMap = {
   "@payloadcms/richtext-lexical/client#ItalicFeatureClient": ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/client#HeadingFeatureClient": HeadingFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/client#ParagraphFeatureClient": ParagraphFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
+  "/components/admin/TaggedPhotoGrid#TaggedPhotoGrid": TaggedPhotoGrid_61da307bd3649d561afa0b0fd9dcdfe0,
   "/components/admin/ListMemory#ListMemory": ListMemory_fb2c77e6804535814322756672416b63,
   "/components/admin/PublishButton#PublishButton": PublishButton_85c066c9e85977a669a8719b5844b2d5,
   "/components/admin/FrameButton#FrameButton": FrameButton_da55e7d810ad53350e323c365df87b57,

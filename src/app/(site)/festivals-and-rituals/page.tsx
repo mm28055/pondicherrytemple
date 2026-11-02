@@ -3,7 +3,7 @@ import {
   countTemplesForObservance,
   getObservances,
   getOccasionsForObservance,
-  getPhotosForObservance,
+  getOrderedPhotosForObservance,
   getSectionIntro,
 } from "@/lib/data";
 import { observanceRow } from "@/lib/view";
@@ -26,9 +26,9 @@ export const metadata: Metadata = {
 export default async function ObservancesPage() {
   const all = await Promise.all(
     (await getObservances()).map(async (o) => {
-      // its photograph: one marked featured, if any; else the first
-      const photos = await getPhotosForObservance(o.id);
-      const p = photos.find((x) => x.featured) ?? photos[0];
+      // its photograph: the first put in order by hand in the admin; else one marked featured, if any; else the first
+      const { photos, ordered } = await getOrderedPhotosForObservance(o.id);
+      const p = (ordered ? undefined : photos.find((x) => x.featured)) ?? photos[0];
       return {
         o,
         row: observanceRow(o, await countTemplesForObservance(o.id)),

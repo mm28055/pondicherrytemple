@@ -52,6 +52,8 @@ type Props = {
   heads?: { temple?: boolean; note?: boolean; here?: string };
   /** "row": shown as it scrolls into view, as the temple's name beside it is */
   reveal?: boolean;
+  /** "lead": in the order given (put in order by hand), not those marked "Show first" first */
+  asGiven?: boolean;
 };
 
 /** "2026-10" → "October 2026" */
@@ -77,7 +79,7 @@ const valuesOf = (p: Photo, key: PhotoFilter["key"]) => (key === "years" ? [p.da
     whole and as large as the screen allows, with its caption and where it
     belongs; the arrows (or a swipe) go through all of them. An open photo has
     its own address, so it can be sent to someone, and Back closes it. */
-export function PhotoWall({ photos: given, pack, total, layout, seeAll, filters = [], note, addressable = true, moreLink, heads, reveal = false }: Props) {
+export function PhotoWall({ photos: given, pack, total, layout, seeAll, filters = [], note, addressable = true, moreLink, heads, reveal = false, asGiven = false }: Props) {
   const photos = useMemo(() => (pack ? unpackPhotos(pack) : (given ?? [])), [pack, given]);
   const [chosen, setChosen] = useState<Partial<Record<PhotoFilter["key"], string>>>({});
   const [oldestFirst, setOldestFirst] = useState(false);
@@ -97,13 +99,13 @@ export function PhotoWall({ photos: given, pack, total, layout, seeAll, filters 
   // the photos in the order they are shown, and stepped through
   const order = useMemo(() => {
     if (layout === "strip") return photos;
-    if (layout === "lead") return [...photos.filter((p) => p.featured), ...photos.filter((p) => !p.featured)];
+    if (layout === "lead") return asGiven ? photos : [...photos.filter((p) => p.featured), ...photos.filter((p) => !p.featured)];
     const shown = photos.filter((p) =>
       Object.entries(chosen).every(([key, id]) => !id || valuesOf(p, key as PhotoFilter["key"]).includes(id))
     );
     // oldest first: the days and events turned round, each one's photos still in the order taken
     return oldestFirst ? runs(shown).reverse().flat() : shown;
-  }, [photos, chosen, oldestFirst, layout]);
+  }, [photos, chosen, oldestFirst, layout, asGiven]);
 
   // the days and events, each one's photos together
   const groups = useMemo(() => runs(order), [order]);

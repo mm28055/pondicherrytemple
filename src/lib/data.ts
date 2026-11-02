@@ -526,15 +526,12 @@ const illustrations = cache(async () => {
   return (await rawDrawings()).map((d) => toIllustration(d, L)).filter((d): d is Illustration => d !== null);
 });
 
-/* A photo shows wherever it is tagged itself, and wherever each visible
-   field note it is in is tagged. A photo in a photo set shows where its set
-   does: at the set's temples; beside the field note chosen for the set, or
-   else each one of the same day at one of its temples (so a note's photos
-   come by themselves the day it is published); and at the festivals and
-   rituals of that day at its temples, from "The year so far", with those
-   chosen for the set and those of its notes. A set of Pondicherry's Hindu
-   Ethos takes only the tags chosen for it. Photos in a set show on the
-   Photographs page even with no tags at all. */
+/* A photo shows at the temples and festivals it is tagged with, its own tags
+   alone (filled in from its set, its day and its field notes as each is
+   saved: lib/photoTags). A photo in a photo set goes beside the field note
+   chosen for the set, or else each one of the same day at one of its
+   temples (so a note's photos come by themselves the day it is published).
+   Photos in a set show on the Photographs page even with no tags at all. */
 
 /** A set's occasion in its shortest form, for the photo viewer, where its
     "Short name" is not filled in: up to the first comma, and no further than
@@ -585,9 +582,7 @@ async function buildPhotoData() {
             ? n.id === chosen
             : (Boolean(day) && dayOf(n.date) === day && ids(n.temples).some((t) => temples.includes(t))) || named.includes(n.id))
       );
-      const observances = new Set(slugs(s.observances, L.observanceSlug));
-      if (!s.ethos) for (const o of dayHere) slugs(o.observances, L.observanceSlug).forEach((x) => observances.add(x));
-      return [s.id, { set: s, day, temples, notes: setNotes, observances }] as const;
+      return [s.id, { set: s, day, temples, notes: setNotes }] as const;
     })
   );
 
@@ -621,17 +616,10 @@ async function buildPhotoData() {
     if (!picture) continue;
     const inSet = sets.get(idOf(m.set) ?? -1);
     const notes = [...(notesWith.get(m.id) ?? []), ...(inSet?.notes ?? [])].filter((n, i, all) => all.indexOf(n) === i);
+    // its temples and festivals: its own tags alone (filled in from its set,
+    // its day and its notes as they are saved: lib/photoTags)
     const temples = new Set(slugs(m.temples, L.templeKey));
     const observances = new Set(slugs(m.observances, L.observanceSlug));
-    inSet?.temples.forEach((t) => L.templeKey.has(t) && temples.add(L.templeKey.get(t)!));
-    inSet?.observances.forEach((o) => observances.add(o));
-    // a photo of its own temple (or set's) is that temple's alone: a note of
-    // two temples does not put it on the other's page too
-    const ownTemples = temples.size > 0;
-    for (const n of notes) {
-      if (!ownTemples) slugs(n.temples, L.templeKey).forEach((t) => temples.add(t));
-      slugs(n.observances, L.observanceSlug).forEach((o) => observances.add(o));
-    }
     if (!inSet && !temples.size && !observances.size) continue;
     const note = [...notes].sort((a, b) => b.date.localeCompare(a.date))[0];
     const taken = m.takenOn ?? inSet?.day ?? note?.date;
@@ -1333,10 +1321,49 @@ export async function getPhotosForTemple(regionId: string, templeId: string): Pr
   return (await photos()).filter((p) => p.temples.includes(`${regionId}/${templeId}`));
 }
 
+/* The order a festival's, temple's or field note's photographs are put in by
+   hand, in its form's photo grid (lib/photoOrders): those come first, in it. */
+const photoOrders = cache(async () =>
+  new Map(
+    (await find({ ...base, collection: "photo-orders", depth: 0 })).docs.map((d) => [
+      d.of,
+      (Array.isArray(d.ids) ? d.ids : []).map(String),
+    ]),
+  ),
+);
+
+/** A list of photos with those put in order first, in that order; and
+    whether there was an order. */
+async function inPhotoOrder(list: Photo[], of: string) {
+  const ids = (await photoOrders()).get(of);
+  if (!ids?.length) return { photos: list, ordered: false };
+  const at = new Map(ids.map((id, i) => [id, i]));
+  const placed = list.filter((p) => at.has(p.id)).sort((a, b) => at.get(a.id)! - at.get(b.id)!);
+  return { photos: [...placed, ...list.filter((p) => !at.has(p.id))], ordered: placed.length > 0 };
+}
+
+/** A festival's photographs for its own page, in the order put in by hand, if any. */
+export async function getOrderedPhotosForObservance(observanceId: string) {
+  const o = (await rawObservances()).find((x) => x.slug === observanceId);
+  const list = await getPhotosForObservance(observanceId);
+  return o ? inPhotoOrder(list, `observances:${o.id}`) : { photos: list, ordered: false };
+}
+
+/** A temple's photographs for its own page, in the order put in by hand, if any. */
+export async function getOrderedPhotosForTemple(regionId: string, templeId: string) {
+  const L = await lookups();
+  const t = (await rawTemples()).find((x) => x.slug === templeId && L.regionOf(x.region) === regionId);
+  const list = await getPhotosForTemple(regionId, templeId);
+  return t ? inPhotoOrder(list, `temples:${t.id}`) : { photos: list, ordered: false };
+}
+
 /** A field note's photographs: those of its photo sets (the same day, at
-    its temples), and any put in the note itself; in the order taken. */
+    its temples), and any put in the note itself; in the order taken, or
+    as put in order by hand. */
 export async function getPhotosForNote(noteId: string): Promise<Photo[]> {
-  return (await photoData()).byNote.get(noteId) ?? [];
+  const list = (await photoData()).byNote.get(noteId) ?? [];
+  const n = (await rawNotes()).find((x) => x.slug === noteId);
+  return n ? (await inPhotoOrder(list, `field-notes:${n.id}`)).photos : list;
 }
 
 /** The photo sets of the Town's Cultural and Spiritual Ethos in a region, newest first,

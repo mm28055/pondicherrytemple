@@ -8,6 +8,7 @@ import {
   getFilmsForTemple,
   getIllustrationsForTemple,
   getPhotoFilters,
+  getOrderedPhotosForTemple,
   getPhotosForTemple,
   getRegion,
   getRegions,
@@ -77,6 +78,8 @@ export default async function TemplePage({ params }: Props) {
   const films = (await getFilmsForTemple(region.id, t.id)).map((f) => filmTile(f, allTemples));
   const drawings = await getIllustrationsForTemple(region.id, t.id);
   const own = await getPhotosForTemple(region.id, t.id);
+  // as put in order by hand in the admin, if they have been
+  const byHand = await getOrderedPhotosForTemple(region.id, t.id);
   // stand-ins until it has photographs of its own
   const photos = own.length ? own : await getDummyPhotos(t.id, 6);
   // Its histories, the place, its people, its stories and songs: on a page of their own.
@@ -180,7 +183,7 @@ export default async function TemplePage({ params }: Props) {
                   node: (
                     <section id="photographs">
                       <h2 className="sub-head">Photographs</h2>
-                      <LatestPhotos own={own} stand={photos} seeAll={`/${region.id}/${t.id}/photographs`} />
+                      <LatestPhotos own={own} stand={photos} seeAll={`/${region.id}/${t.id}/photographs`} byHand={byHand} />
                     </section>
                   ),
                 },
@@ -238,6 +241,7 @@ async function AroundTemplePage({ regionId, regionName, templeId }: { regionId: 
   );
   const films = (await getFilmsForTemple(regionId, t.id)).map((f) => filmTile(f, allTemples));
   const own = await getPhotosForTemple(regionId, t.id);
+  const byHand = await getOrderedPhotosForTemple(regionId, t.id);
   const photos = own.length ? own : await getDummyPhotos(t.id, 6);
   const filters = own.length ? await getPhotoFilters(own, ["observances", "years"]) : [];
 
@@ -293,7 +297,7 @@ async function AroundTemplePage({ regionId, regionName, templeId }: { regionId: 
           {own.length ? (
             <PhotoWall pack={packPhotos(own)} layout="all" filters={filters} heads={{ here: t.shortName ?? t.knownAs ?? t.name }} />
           ) : (
-            <LatestPhotos own={own} stand={photos} seeAll="" />
+            <LatestPhotos own={own} stand={photos} seeAll="" byHand={byHand} />
           )}
         </section>
       </div>
@@ -304,9 +308,21 @@ async function AroundTemplePage({ regionId, regionName, templeId }: { regionId: 
 /** A temple's photographs on its page: its latest day or event (or two, when
     the latest has only a few), headed with each one's date and occasion,
     and the way to all of them (or stand-ins, without a head, until it has
-    photographs of its own). */
-function LatestPhotos({ own, stand, seeAll }: { own: Photo[]; stand: Photo[]; seeAll: string }) {
+    photographs of its own). Put in order by hand in the admin: the first
+    of them, in that order, without a head. */
+function LatestPhotos({
+  own,
+  stand,
+  seeAll,
+  byHand,
+}: {
+  own: Photo[];
+  stand: Photo[];
+  seeAll: string;
+  byHand: { photos: Photo[]; ordered: boolean };
+}) {
   if (!own.length) return <PhotoWall photos={leadPhotos(stand)} total={stand.length} layout="lead" />;
+  if (byHand.ordered) return <PhotoWall photos={byHand.photos.slice(0, 6)} total={own.length} layout="lead" seeAll={seeAll} asGiven />;
   const { photos, heads } = latestEvent(own);
   return (
     <>

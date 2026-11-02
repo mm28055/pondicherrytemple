@@ -72,6 +72,7 @@ export interface Config {
     articles: Article;
     media: Media;
     'photo-sets': PhotoSet;
+    'photo-orders': PhotoOrder;
     temples: Temple;
     'temple-pieces': TemplePiece;
     occasions: Occasion;
@@ -110,6 +111,7 @@ export interface Config {
     articles: ArticlesSelect<false> | ArticlesSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     'photo-sets': PhotoSetsSelect<false> | PhotoSetsSelect<true>;
+    'photo-orders': PhotoOrdersSelect<false> | PhotoOrdersSelect<true>;
     temples: TemplesSelect<false> | TemplesSelect<true>;
     'temple-pieces': TemplePiecesSelect<false> | TemplePiecesSelect<true>;
     occasions: OccasionsSelect<false> | OccasionsSelect<true>;
@@ -480,11 +482,11 @@ export interface Media {
    */
   consent?: ('not-needed' | 'given' | 'withhold') | null;
   /**
-   * A photo tagged here appears in the Photographs section of each temple’s page.
+   * A photo tagged here appears in the Photographs section of each temple’s page. Filled in by itself from its photo set and its field notes; add or take off by hand.
    */
   temples?: (number | Temple)[] | null;
   /**
-   * A photo tagged here appears in the Photographs section of each festival’s or ritual’s page. Photos in a field note appear there by themselves.
+   * A photo tagged here appears in the Photographs section of each festival’s or ritual’s page. Filled in by itself from its photo set, its day (“The year so far”) and its field notes; add or take off by hand.
    */
   observances?: (number | Observance)[] | null;
   createdBy?: (number | null) | User;
@@ -968,6 +970,25 @@ export interface Article {
   _status?: ('draft' | 'published') | null;
 }
 /**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "photo-orders".
+ */
+export interface PhotoOrder {
+  id: number;
+  of: string;
+  ids:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * A nakshatram kept specially in a Tamil month, like Purattasi Thiruvonam. Set once, it is marked on the month calendars every year: on the day the nakshatram holds at sunrise.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1246,6 +1267,10 @@ export interface PayloadLockedDocument {
         value: number | PhotoSet;
       } | null)
     | ({
+        relationTo: 'photo-orders';
+        value: number | PhotoOrder;
+      } | null)
+    | ({
         relationTo: 'temples';
         value: number | Temple;
       } | null)
@@ -1515,6 +1540,16 @@ export interface PhotoSetsSelect<T extends boolean = true> {
   folder?: T;
   region?: T;
   createdBy?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "photo-orders_select".
+ */
+export interface PhotoOrdersSelect<T extends boolean = true> {
+  of?: T;
+  ids?: T;
   updatedAt?: T;
   createdAt?: T;
 }

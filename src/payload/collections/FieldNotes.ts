@@ -11,6 +11,7 @@ import {
 } from '../fields'
 import { draftButtons, previewURL } from '../preview'
 import { refreshHooks } from '../revalidate'
+import { tagNotePhotos } from '../photoTagHooks'
 
 /* A field note is simply: a title, a date, the temples and festivals it is
    about, the text, photographs and videos. What kind of note it is (a note,
@@ -64,7 +65,7 @@ export const FieldNotes: CollectionConfig = {
   },
   hooks: {
     ...refreshHooks,
-    afterChange: [...refreshHooks.afterChange, markFiles],
+    afterChange: [...refreshHooks.afterChange, markFiles, tagNotePhotos],
     beforeChange: [
       ({ data, originalDoc }) => {
         const videos = count(data.videos ?? originalDoc?.videos)
@@ -130,6 +131,12 @@ export const FieldNotes: CollectionConfig = {
       label: 'Photographs',
       filterOptions: { mimeType: { contains: 'image' } },
       admin: { description: 'Drag photos in — several at once is fine. They are shown together after the text.' },
+    },
+    {
+      // every photo shown with the note (its photo sets', and its own) as small pictures: dragged into order, chosen to delete, more added
+      name: 'photoGrid',
+      type: 'ui',
+      admin: { components: { Field: { path: '/components/admin/TaggedPhotoGrid#TaggedPhotoGrid', clientProps: { kind: 'field-notes' } } } },
     },
     {
       name: 'videos',

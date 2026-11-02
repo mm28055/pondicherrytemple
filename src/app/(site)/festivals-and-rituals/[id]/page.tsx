@@ -8,7 +8,7 @@ import {
   getIllustrationsForObservance,
   getObservance,
   getPhotos,
-  getPhotosForObservance,
+  getOrderedPhotosForObservance,
   getOccasionsForObservance,
   getRegion,
   getTemple,
@@ -85,12 +85,12 @@ export default async function ObservancePage({ params }: Props) {
   const strips = isMahotsavam
     ? Object.fromEntries(MAHOTSAVAM_PARTS.flatMap((p) => p.rites).map((r) => [r, dummyStrip(r, allPhotos)]))
     : {};
-  // the banner: its own photographs first (a featured one first of all), then
-  // others, to eight
-  const own = await getPhotosForObservance(o.id);
+  // the banner: its own photographs first (as put in order by hand in the
+  // admin; else a featured one first of all), then others, to eight
+  const byHand = await getOrderedPhotosForObservance(o.id);
+  const own = byHand.photos;
   const bannerPhotos = [
-    ...own.filter((p) => p.featured),
-    ...own.filter((p) => !p.featured),
+    ...(byHand.ordered ? own : [...own.filter((p) => p.featured), ...own.filter((p) => !p.featured)]),
     ...dummyStrip(o.id + " banner", allPhotos.filter((p) => !own.includes(p)).filter((p) => p.width >= p.height)).concat(allPhotos),
   ]
     .filter((p, i, all) => all.indexOf(p) === i)

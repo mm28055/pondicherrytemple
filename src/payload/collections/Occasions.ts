@@ -3,6 +3,7 @@ import { canUpdateOwn, isEditor, isLoggedIn } from '../access'
 import { createdByField, observancesField, regionField } from '../fields'
 import { listMemory } from '../preview'
 import { refreshHooks } from '../revalidate'
+import { tagOccasionPhotos } from '../photoTagHooks'
 
 export const Occasions: CollectionConfig = {
   slug: 'occasions',
@@ -17,7 +18,7 @@ export const Occasions: CollectionConfig = {
       "Every occasion the team was present for. These make each temple's 'year so far', and the 'where we've seen it' list on festival pages.",
   },
   access: { read: () => true, create: isLoggedIn, update: canUpdateOwn, delete: isEditor },
-  hooks: refreshHooks,
+  hooks: { ...refreshHooks, afterChange: [...refreshHooks.afterChange, tagOccasionPhotos] },
   fields: [
     {
       type: 'row',

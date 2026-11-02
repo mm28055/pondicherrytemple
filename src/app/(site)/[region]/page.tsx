@@ -39,8 +39,12 @@ export default async function RegionPage({ params }: Props) {
   const region = await getRegion((await params).region);
   if (!region) notFound();
 
-  // the temples listed on this page (a temple can be left off it in the admin)
-  const temples = (await getTemples(region.id)).filter((t) => t.listed);
+  // the temples listed on this page (a temple can be left off it in the admin),
+  // by the name they are shown under, from Z to A
+  const shownName = (t: Temple) => t.knownAs ?? t.name;
+  const temples = (await getTemples(region.id))
+    .filter((t) => t.listed)
+    .sort((a, b) => shownName(b).localeCompare(shownName(a)));
   // a temple's latest events, one photograph of each (newest first), and how
   // many photographs it has; stand-ins for a temple with none yet
   // (and the day of its latest photograph or field note, for ordering the temples in and around)
