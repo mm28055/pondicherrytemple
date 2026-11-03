@@ -1,4 +1,8 @@
+import fs from "fs";
+import path from "path";
 import Link from "next/link";
+import { Fragment } from "react";
+import { DownTo } from "@/components/DownTo";
 import {
   countTemplesForObservance,
   getFieldNotesForTemple,
@@ -19,7 +23,14 @@ import { TodayTamil } from "@/components/TodayTamil";
 import { calendarEvents } from "@/lib/calendarEvents";
 import { Html } from "@/components/Prose";
 import { HomeStrip } from "@/components/HomeStrip";
+import { HomeMark } from "@/components/HomeTamil";
 import { plainWithScripts } from "@/lib/richtext";
+
+/* The film: for now a test clip, only where one has been put in public/_test
+   (on this computer, to try it; never committed). With none, the name stays
+   black and the opening has no film, as before. */
+const TEST_FILM = "/_test/home-sthalam.mov";
+const film = fs.existsSync(path.join(process.cwd(), "public", TEST_FILM)) ? TEST_FILM : undefined;
 
 export default async function HomePage() {
   const words = await getHomePage();
@@ -27,7 +38,8 @@ export default async function HomePage() {
   const temples = await getTemples(region.id);
 
   // Just added: the newest things, whatever they are. No upkeep.
-  const latest = (await getLatest(4)).map((l) =>
+  // as many as reach down to the film beside them (DownTo), at least four
+  const latest = (await getLatest(16)).map((l) =>
     l.type === "field-note"
       ? noteRow(l.item, temples, region.calendar)
       : l.type === "film"
@@ -66,18 +78,7 @@ export default async function HomePage() {
     <>
       <div className="wrap">
         <section className="home-hero">
-          <div className="home-mark">
-            <p className="home-tamil" lang="ta">
-              ஸ்தலம்
-            </p>
-            <p className="home-name">
-              <span className="home-latin">Sthalam</span>
-              <span className="home-gloss">
-                {/* the red mark between them: a lingam on its base */}
-                <span className="home-lingam" aria-hidden="true" />a sacred site
-              </span>
-            </p>
-          </div>
+          <HomeMark video={film} />
           <TodayTamil events={todayEvents} />
         </section>
 
@@ -89,6 +90,12 @@ export default async function HomePage() {
           <div>
             <h1>{words?.headline}</h1>
             {words?.opening && <Html html={words.opening} />}
+            {/* the film, as it is, after the words (until there is one, an empty box its size) */}
+            {film ? (
+              <video className="home-opening-film" src={film} controls playsInline preload="metadata" />
+            ) : (
+              <div className="home-opening-film placeholder" aria-hidden="true" />
+            )}
             <Link className="more-link" href="/about#idea">
               About Sthalam
             </Link>
@@ -102,9 +109,9 @@ export default async function HomePage() {
                 All field notes
               </Link>
             </div>
-            <ul>
+            <DownTo target=".home-opening-film" min={4}>
               {latest.map((r) => (
-                <li key={r.id}>
+                <Fragment key={r.id}>
                   <Link href={r.href}>
                     <span className="caps">
                       {/* what it is — a film, an article — unless it is a plain field note */}
@@ -119,9 +126,9 @@ export default async function HomePage() {
                     </span>
                     <span className="latest-title">{r.title}</span>
                   </Link>
-                </li>
+                </Fragment>
               ))}
-            </ul>
+            </DownTo>
           </aside>
         </section>
       </div>

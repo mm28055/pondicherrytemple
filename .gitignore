@@ -31,3 +31,6 @@ Thumbs.db
 
 # Claude's per-laptop settings
 .claude/settings.local.json
+
+# a test clip for the home page, on this computer only
+/public/_test/

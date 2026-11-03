@@ -749,9 +749,11 @@ a.temple-row:hover .temple-name { color: var(--ochre); }
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   grid-template-areas: "mark today";
-  gap: 18px clamp(32px, 5vw, 80px);
+  --hero-gap: clamp(32px, 5vw, 80px);
+  --hero-foot: clamp(18px, 2.5vw, 32px);
+  gap: 18px var(--hero-gap);
   align-items: end;
-  padding-block: clamp(18px, 3vw, 40px) clamp(18px, 2.5vw, 32px);
+  padding-block: clamp(18px, 3vw, 40px) var(--hero-foot);
   border-bottom: 2px solid var(--ink);
 }
 
@@ -766,6 +768,40 @@ a.temple-row:hover .temple-name { color: var(--ochre); }
   font-size: clamp(72px, 26cqi, 232px);
   line-height: 1.1;
 }
+
+/* the video through its letters and its play button (HomeTamil): the video
+   under the whole name (until it comes in, nothing: the letters black by
+   themselves); over it a layer the page's own colour holding the letters and the button, blended
+   "lighten", so the letters (darker than anything under them) let the video
+   through and the rest (lighter than all of the video, which is kept a
+   little below it) stays the page's colour exactly; and the line "Sthalam ·
+   a sacred site" over all of it, as it is */
+.home-mark.with-video { position: relative; isolation: isolate; }
+.home-mark-video { position: absolute; left: 0; top: 0; width: calc(100% + var(--reach, 0px)); max-width: none; height: 100%; object-fit: cover; opacity: 0; filter: brightness(0.94); transition: opacity 1.6s ease-in-out; }
+.home-mark.shown .home-mark-video { opacity: 1; }
+.with-video .home-mark-window { position: relative; margin-right: calc(-1 * var(--reach, 0px)); padding-right: var(--reach, 0px); background: var(--chalk); mix-blend-mode: lighten; }
+/* on a computer, out towards the rule of "Today" beside it, the play button in that corner, as far
+   from the rule as from the line under it all (the name's own width, by which ஸ்தலம் is sized, kept) */
+@media (min-width: 901px) { .home-mark.with-video { --reach: calc(var(--hero-gap) - var(--hero-foot) - var(--lift, 0px)); } }
+.with-video .home-mark-window .home-name { visibility: hidden; }
+.home-mark.with-video > .home-name { position: absolute; left: 0; right: 0; bottom: 0; z-index: 1; }
+/* the play button in the corner, at the end of the line, in black (so the video through it),
+   coming in with the video */
+/* its circle standing on the line "a sacred site" stands on (--lift, measured: HomeTamil) */
+.home-play { position: absolute; right: 0; bottom: var(--lift, 0px); width: 20px; height: 20px; padding: 0; border: 0; background: none; cursor: pointer; color: var(--ink); opacity: 0; scale: 0.7; pointer-events: none; transition: opacity 1.6s ease-in-out, scale 1.6s cubic-bezier(0.2, 0.8, 0.2, 1); }
+.home-mark.shown .home-play { opacity: 1; scale: 1; pointer-events: auto; }
+.home-play svg { display: block; width: 100%; height: 100%; }
+/* small to see, a finger's width to tap */
+.home-play::after { content: ""; position: absolute; inset: -12px; }
+.home-play circle { fill: none; stroke: currentColor; stroke-width: 5; }
+.home-play path { fill: currentColor; stroke: currentColor; stroke-width: 2; stroke-linejoin: round; }
+.home-play:focus-visible { outline-offset: 4px; border-radius: 50%; }
+@media (max-width: 640px) { .home-play { width: 15px; height: 15px; } }
+/* the film, with its sound, in a pop-up */
+.home-film { margin: auto; padding: 0; border: 0; background: #000; width: min(1100px, 94vw); box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5); overflow: visible; }
+.home-film::backdrop { background: rgba(12, 10, 8, 0.86); }
+.home-film video { display: block; width: 100%; max-height: 84vh; background: #000; }
+.home-film .day-close { top: -40px; right: -6px; color: #fff; font-size: 30px; }
 
 .home-opening h1 {
   font-family: var(--display);
@@ -910,6 +946,9 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
 }
 
 .home-opening p + p { margin-top: 1em; }
+/* the film after the words, as wide as they are */
+.home-opening-film { display: block; width: 100%; max-width: 36em; font-size: clamp(18px, 1.5vw, 20px); aspect-ratio: 16 / 9; margin-top: 1.4em; background: var(--night); }
+.home-opening-film.placeholder { background: var(--rule); }
 
 .more-link {
   display: inline-block;

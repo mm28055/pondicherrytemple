@@ -1544,7 +1544,8 @@ export async function getHomePage(): Promise<HomePageText | null> {
   const L = await lookups();
   return {
     headline: g.headline,
-    opening: toHTML(g.opening, L.paths),
+    // (without the blank lines an editor leaves at its end, which stood as a gap before what follows)
+    opening: toHTML(g.opening, L.paths).replace(/(\s*<p>(\s|&nbsp;|<br\s*\/?>)*<\/p>)+\s*$/, ""),
     quoteLabel: g.quoteLabel || undefined,
     quote: g.quote ?? undefined,
     quoteBy: g.quoteBy || undefined,
