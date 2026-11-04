@@ -170,7 +170,7 @@ export default async function TemplePage({ params }: Props) {
                   id: "films",
                   node: (
                     <section id="films">
-                      <h2 className="sub-head">Films</h2>
+                      <h2 className="sub-head large">Films</h2>
                       <FilmWall tiles={films} />
                     </section>
                   ),
@@ -183,7 +183,7 @@ export default async function TemplePage({ params }: Props) {
                   id: "photographs",
                   node: (
                     <section id="photographs">
-                      <h2 className="sub-head">Photographs</h2>
+                      <h2 className="sub-head large">Photographs</h2>
                       <LatestPhotos own={own} stand={photos} seeAll={`/${region.id}/${t.id}/photographs`} byHand={byHand} />
                     </section>
                   ),
@@ -267,7 +267,7 @@ async function AroundTemplePage({ regionId, regionName, templeId }: { regionId: 
               ))}
             </section>
             <section id="films">
-              <h2 className="sub-head">Films</h2>
+              <h2 className="sub-head large">Films</h2>
               <FilmWall tiles={films} />
             </section>
           </div>
@@ -283,14 +283,14 @@ async function AroundTemplePage({ regionId, regionName, templeId }: { regionId: 
             )}
             {films.length > 0 && (
               <section id="films">
-                <h2 className="sub-head">Films</h2>
+                <h2 className="sub-head large">Films</h2>
                 <FilmWall tiles={films} />
               </section>
             )}
           </>
         )}
         <section id="photographs">
-          <h2 className="sub-head">Photographs</h2>
+          <h2 className="sub-head large">Photographs</h2>
           {own.length ? (
             <PhotoWall pack={packPhotos(own)} layout="all" filters={filters} heads={{ here: t.shortName ?? t.knownAs ?? t.name }} />
           ) : (

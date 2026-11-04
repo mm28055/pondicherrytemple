@@ -1300,8 +1300,8 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
   padding-bottom: 6px;
 }
 
-/* a temple's "Field notes" and "Ritual Cycles": as a month's name, in black */
-#all-field-notes, #ritual-cycles {
+/* a temple's "Field notes", "Ritual Cycles", "Films" and "Photographs": as a month's name, in black */
+#all-field-notes, #ritual-cycles, .sub-head.large {
   font-family: var(--display);
   font-weight: 800;
   font-variation-settings: "wdth" 75;
