@@ -7,6 +7,7 @@ import { getFilm, getFilms, getObservancesById, getRegion, getTemple, hasPage } 
 import { formatDate, localDate } from "@/lib/calendar";
 import { Html } from "@/components/Prose";
 import { FestivalLink } from "@/components/FestivalLink";
+import { titleFit } from "@/lib/titleFit";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -43,7 +44,7 @@ export default async function FilmPage({ params }: Props) {
           </time>
           {local && <span className="local">{local}</span>}
         </div>
-        <h1 className="note-title">{film.title}</h1>
+        <h1 className="note-title" style={titleFit(film.title)}>{film.title}</h1>
         <div className="note-meta caps">
           {temples.map((t) =>
             hasPage(t) ? (

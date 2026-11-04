@@ -13,6 +13,7 @@ import {
 } from "@/lib/data";
 import { PhotoWall } from "@/components/PhotoWall";
 import { packPhotos } from "@/lib/photoPack";
+import { titleFit } from "@/lib/titleFit";
 
 type Props = { params: Promise<{ region: string; temple: string }> };
 
@@ -47,7 +48,7 @@ export default async function TemplePhotosPage({ params }: Props) {
         <BackLink className="crumb" href={`/${region.id}/${t.id}`}>
           ← {t.knownAs ?? t.name}
         </BackLink>
-        <h1 className="temple-title">{t.knownAs ?? t.name}</h1>
+        <h1 className="temple-title" style={titleFit(t.knownAs ?? t.name)}>{t.knownAs ?? t.name}</h1>
       </header>
       <section className="section">
         <PhotoWall pack={packPhotos(photos)} layout="all" filters={filters} heads={{ here: t.shortName ?? t.knownAs ?? t.name }} />

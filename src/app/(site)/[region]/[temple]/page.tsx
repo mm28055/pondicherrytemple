@@ -38,6 +38,7 @@ import { TempleLayout } from "@/components/TempleLayout";
 import { TempleColumns } from "@/components/TempleColumns";
 import { ReservedLink } from "@/components/ReservedLink";
 import { TEMPLE_STORIES_PUBLISHED } from "@/lib/festivals";
+import { titleFit } from "@/lib/titleFit";
 
 type Props = { params: Promise<{ region: string; temple: string }> };
 
@@ -96,7 +97,7 @@ export default async function TemplePage({ params }: Props) {
           <BackLink className="crumb" href={`/${region.id}`}>
             ← {templesOf(region.name)}
           </BackLink>
-          <h1 className="temple-title">{t.knownAs ?? t.name}</h1>
+          <h1 className="temple-title" style={titleFit(t.knownAs ?? t.name)}>{t.knownAs ?? t.name}</h1>
           <div className="temple-facts caps">
             {t.knownAs && t.knownAs !== t.name && <span>{t.name}</span>}
             {/* the red mark between them, as on the home page: a lingam on its base */}
@@ -122,7 +123,7 @@ export default async function TemplePage({ params }: Props) {
           <>
             {/* on a phone, where the Ritual Year comes after everything else: the page's parts, a tap away */}
             <nav className="page-parts" aria-label="On this page">
-              <a href="#ritual-year">Ritual Year ↓</a>
+              <a href="#ritual-year">Ritual Cycles ↓</a>
               {notes.length > 0 && <a href="#field-notes">Field notes ↓</a>}
               {films.length > 0 && <a href="#films">Films ↓</a>}
               {photos.length > 0 && <a href="#photographs">Photographs ↓</a>}
@@ -210,11 +211,7 @@ export default async function TemplePage({ params }: Props) {
             {otherDrawings.length > 0 && <Drawings items={otherDrawings} />}
 
             <section id="ritual-year">
-              <h2 className="sub-head">The Ritual Year</h2>
-              <p className="note-line" style={{ marginBottom: 18 }}>
-                What we have been present for, month by month. By the end of the year, this is the
-                temple&apos;s ritual calendar.
-              </p>
+              <h2 id="ritual-cycles" className="sub-head">Ritual Cycles</h2>
               <TempleYear year={year} />
             </section>
           </>
@@ -251,7 +248,7 @@ async function AroundTemplePage({ regionId, regionName, templeId }: { regionId: 
         <BackLink className="crumb" href={`/${town}#${regionId}`}>
           ← {regionName}
         </BackLink>
-        <h1 className="temple-title">{t.knownAs ?? t.name}</h1>
+        <h1 className="temple-title" style={titleFit(t.knownAs ?? t.name)}>{t.knownAs ?? t.name}</h1>
         <div className="temple-facts caps">
           {t.knownAs && t.knownAs !== t.name && <span>{t.name}</span>}
           {/* the red mark between them, as on the home page: a lingam on its base */}

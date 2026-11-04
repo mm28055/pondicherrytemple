@@ -25,6 +25,7 @@
 
   /* the variables below are set on <html> by next/font */
   --display: var(--font-anek-latin), "Arial Narrow", system-ui, sans-serif;
+  --title-face: var(--font-special-gothic), system-ui, sans-serif; /* page, temple, field note and festival titles, wherever they appear */
   --tamil: var(--font-anek-tamil), "Noto Sans Tamil", "Latha", sans-serif;
   --devanagari: var(--font-anek-devanagari), "Noto Sans Devanagari", "Nirmala UI", sans-serif;
   --text: var(--font-baloo), system-ui, sans-serif;
@@ -261,7 +262,7 @@ a:focus-visible, button:focus-visible {
 }
 @media (max-width: 640px) {
   .page-head.landing-head { padding-bottom: 14px; }
-  .page-head.landing-head:has(> .page-title:last-child) { padding-bottom: 19px; }
+  .page-head.landing-head:has(> .page-title:last-child) { padding-bottom: 21px; }
   /* the Festivals & Rituals search, its own line at the foot on a phone */
   .page-head.landing-head.gallery-head { padding-bottom: 13px; }
 }
@@ -271,15 +272,16 @@ a:focus-visible, button:focus-visible {
 .page-head .kicker { margin-bottom: 8px; }
 
 .page-title {
-  font-family: var(--display);
-  font-weight: 800;
-  font-variation-settings: "wdth" 75;
-  font-size: clamp(54px, 11vw, 148px);
-  line-height: 0.86;
-  letter-spacing: -0.005em;
+  font-family: var(--title-face);
+  font-weight: 700;
+  font-size: min(clamp(54px, 11vw, 148px), calc((100vw - 50px) / 7.4)); /* (PHOTOGRAPHS, the longest, within a phone's width) */
+  line-height: 1.02;
+  letter-spacing: -0.01em;
   text-transform: uppercase;
   text-wrap: balance;
+  margin-block: -0.08em; /* the taller line takes no more room above or below: the header-to-rule spacing stands */
 }
+.page-head .page-title:last-child { margin-bottom: -0.08em; }
 
 /* the opening words of each menu page (Temples, Festivals & Rituals, Field
    Notes, Articles, Films, About, the Book): the size of the home page's
@@ -330,7 +332,7 @@ a:focus-visible, button:focus-visible {
 }
 
 .name-title {
-  font-family: var(--display);
+  font-family: var(--title-face);
   font-weight: 700;
   font-size: clamp(26px, 3.2vw, 40px);
   line-height: 1.2;
@@ -341,9 +343,9 @@ a:focus-visible, button:focus-visible {
 
 /* A temple: its name is the headline */
 .temple-title {
-  font-family: var(--display);
+  font-family: var(--title-face);
   font-weight: 700;
-  font-size: clamp(40px, 6.4vw, 88px);
+  font-size: min(clamp(40px, 6.4vw, 88px), calc((100vw - 50px) / (var(--long, 1) * 0.58))); /* --long, the title's longest word (titleFit): a long name still fits a phone */
   line-height: 1.02;
   letter-spacing: -0.015em;
   text-wrap: balance;
@@ -646,7 +648,7 @@ a:focus-visible, button:focus-visible {
 .row-meta .kind { color: var(--muted); }
 
 .row-title {
-  font-family: var(--display);
+  font-family: var(--title-face);
   font-weight: 600;
   font-size: 20px;
   line-height: 1.2;
@@ -695,7 +697,7 @@ a:focus-visible, button:focus-visible {
 }
 
 .temple-row .temple-name {
-  font-family: var(--display);
+  font-family: var(--title-face);
   font-weight: 700;
   font-size: clamp(24px, 2.8vw, 34px);
   line-height: 1.15;
@@ -974,7 +976,7 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
 
 .home-latest .latest-title {
   display: block;
-  font-family: var(--display);
+  font-family: var(--title-face);
   font-size: 20px;
   font-weight: 600;
   line-height: 1.25;
@@ -1298,6 +1300,17 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
   padding-bottom: 6px;
 }
 
+/* a temple's "Field notes" and "Ritual Cycles": as a month's name, in black */
+#all-field-notes, #ritual-cycles {
+  font-family: var(--display);
+  font-weight: 800;
+  font-variation-settings: "wdth" 75;
+  font-size: 22px;
+  letter-spacing: 0.04em;
+  padding-bottom: 6px;
+}
+#ritual-cycles { margin-bottom: 12px; }
+
 
 /* A date still to be confirmed (TBC): fainter, in italics, marked. In the
    temples' Ritual Year, the calendar and its day pop-up, and the festival
@@ -1387,7 +1400,7 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
 .note-step-link { display: flex; flex-direction: column; gap: 6px; }
 .note-step-link.next { text-align: right; align-items: flex-end; }
 .note-step-label { font-family: var(--display); font-weight: 600; font-size: 12.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); transition: color 0.15s; }
-.note-step-title { font-family: var(--display); font-size: 20px; line-height: 1.25; font-weight: 600; color: var(--ink); text-wrap: balance; transition: color 0.15s; }
+.note-step-title { overflow-wrap: anywhere; font-family: var(--title-face); font-size: 20px; line-height: 1.25; font-weight: 600; color: var(--ink); text-wrap: balance; transition: color 0.15s; }
 .note-step-date { font-family: var(--display); font-weight: 600; font-size: 12.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
 .note-step-link:hover :is(.note-step-title, .note-step-label) { color: var(--ochre); }
 .note-photos { position: relative; }
@@ -1432,9 +1445,9 @@ button.home-strip-photo:focus-visible { outline: 3px solid var(--ochre); outline
 .note-dateline .local { color: var(--muted); font-size: 16px; }
 
 .note-title {
-  font-family: var(--display);
+  font-family: var(--title-face);
   font-weight: 700;
-  font-size: clamp(32px, 4.4vw, 54px);
+  font-size: min(clamp(32px, 4.4vw, 54px), calc((100vw - 50px) / (var(--long, 1) * 0.58)));
   line-height: 1.08;
   letter-spacing: -0.005em;
   max-width: 17em;
@@ -1449,7 +1462,7 @@ button.home-strip-photo:focus-visible { outline: 3px solid var(--ochre); outline
 .note-body { max-width: 720px; margin-inline: auto; padding: clamp(18px, 2.5vw, 32px) var(--gutter) clamp(36px, 5vw, 64px); }
 /* the next day's note of the same event, below the first, after a line like the one under the header */
 .note-next { border-top: 2px solid var(--ink); padding-top: clamp(18px, 3vw, 36px); }
-.note-next .note-title { font-size: clamp(28px, 3.6vw, 46px); }
+.note-next .note-title { font-size: min(clamp(28px, 3.6vw, 46px), calc((100vw - 50px) / (var(--long, 1) * 0.58))); }
 .note-next .note-title a:hover { color: var(--ochre); }
 .note-next .note-meta { margin: 0 0 clamp(18px, 2.5vw, 28px); }
 .note-body p { font-size: 19px; line-height: 1.72; margin-bottom: 1.1em; }
@@ -2891,7 +2904,7 @@ a.gallery-card:hover .gallery-pic img { transform: scale(1.04); } /* only a card
 .gallery-dot { width: 5px; height: 6px; align-self: baseline; flex: none; }
 .gallery-tamil { font-family: var(--tamil); font-weight: 700; font-size: 22px; line-height: 1.2; transition: color 0.15s; }
 a.gallery-card:hover .gallery-tamil { color: var(--ochre); }
-.gallery-name { font-family: var(--display); font-weight: 600; font-size: 21px; line-height: 1.2; } /* as tall as the Tamil beside it */
+.gallery-name { font-family: var(--title-face); font-weight: 600; font-size: 21px; line-height: 1.2; } /* as tall as the Tamil beside it */
 .gallery-gloss { color: var(--ink-2); font-size: 15.5px; line-height: 1.4; }
 /* festival or ritual: small red letters under every entry */
 .gallery-kind { margin-bottom: 4px; font-family: var(--display); font-weight: 700; font-size: 11.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ochre); }

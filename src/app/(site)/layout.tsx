@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Anek_Devanagari, Anek_Latin, Anek_Tamil, Baloo_2 } from "next/font/google";
+import { Anek_Devanagari, Anek_Latin, Anek_Tamil, Baloo_2, Special_Gothic } from "next/font/google";
 import { draftMode } from "next/headers";
 import "@/styles/site.css";
 import { Nav } from "@/components/Nav";
@@ -46,6 +46,13 @@ const baloo = Baloo_2({
   display: "swap",
 });
 
+// the titles of pages, temples and field notes, wherever they appear
+const specialGothic = Special_Gothic({
+  subsets: ["latin", "latin-ext"],
+  variable: "--font-special-gothic",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   title: {
     default: "Sthalam — The Temple Documentation Project",
@@ -60,7 +67,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
   // An editor pressed "Preview" in the admin: the site is showing unpublished drafts.
   const { isEnabled: previewing } = await draftMode();
   return (
-    <html lang="en" className={`${anekLatin.variable} ${anekTamil.variable} ${anekDevanagari.variable} ${baloo.variable}`}>
+    <html lang="en" className={`${anekLatin.variable} ${anekTamil.variable} ${anekDevanagari.variable} ${baloo.variable} ${specialGothic.variable}`}>
       <body>
         {previewing && (
           <div className="preview-bar">

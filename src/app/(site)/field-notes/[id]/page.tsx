@@ -23,6 +23,7 @@ import { FestivalLink } from "@/components/FestivalLink";
 import { NotePhotos } from "@/components/NotePhotos";
 import { NoteRow } from "@/components/Rows";
 import { packPhotos } from "@/lib/photoPack";
+import { titleFit } from "@/lib/titleFit";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -94,7 +95,7 @@ export default async function FieldNotePage({ params }: Props) {
             </time>
             {local && <span className="local">{local}</span>}
           </div>
-          <h1 className="note-title">{note.title}</h1>
+          <h1 className="note-title" style={titleFit(note.title)}>{note.title}</h1>
           <div className="note-meta caps">
             {note.kind !== "note" && <span>{FIELD_KIND_LABELS[note.kind].one}</span>}
             {temples.map((t) =>
@@ -145,7 +146,7 @@ export default async function FieldNotePage({ params }: Props) {
                 </time>
                 {local && <span className="local">{local}</span>}
               </div>
-              <h2 className="note-title">
+              <h2 className="note-title" style={titleFit(n.title)}>
                 <Link href={`/field-notes/${n.id}`}>{n.title}</Link>
               </h2>
               {observances.length > 0 && (

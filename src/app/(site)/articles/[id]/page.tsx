@@ -6,6 +6,7 @@ import { getArticle, getArticles, getObservancesById, getTemple } from "@/lib/da
 import { formatDate } from "@/lib/calendar";
 import { Html } from "@/components/Prose";
 import { FestivalLink } from "@/components/FestivalLink";
+import { titleFit } from "@/lib/titleFit";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -40,7 +41,7 @@ export default async function ArticlePage({ params }: Props) {
               {formatDate(a.date)}
             </time>
           </div>
-          <h1 className="note-title">{a.title}</h1>
+          <h1 className="note-title" style={titleFit(a.title)}>{a.title}</h1>
           <div className="note-meta caps">
             <span>By {a.author}</span>
             {temples.map((t) => (
