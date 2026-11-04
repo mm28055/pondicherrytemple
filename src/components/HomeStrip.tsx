@@ -47,7 +47,7 @@ function fill(photos: StripPhoto[], from: number, units: number, h: number): { s
 /** On a phone: as many photos as fit in `pitch` stripes (each at least 2
     wide, with its gap 3), from photo `from` on; the stripes over go one at
     a time to the photo most cropped from its own shape. */
-function pack(photos: StripPhoto[], from: number, pitch: number, h: number): Placed[] {
+export function pack<P extends StripPhoto>(photos: P[], from: number, pitch: number, h: number): { p: P; units: number }[] {
   const set = Array.from({ length: Math.max(1, Math.floor(pitch / 3)) }, (_, k) => {
     const p = photos[(from + k) % photos.length];
     return { p, units: 2, ideal: Math.max(2, idealUnits(p, h)) };

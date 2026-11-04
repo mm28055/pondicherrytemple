@@ -458,6 +458,10 @@ export interface Media {
   alt?: string | null;
   caption?: string | null;
   /**
+   * For the few photos that need it: about 100 words, shown beside the photo when it is opened large.
+   */
+  description?: string | null;
+  /**
    * Who took it. Shown with the photo, except the team’s own (Photograph: Deepa, Photograph: Arunaditya), which are kept here but not shown.
    */
   credit?: string | null;
@@ -1466,6 +1470,7 @@ export interface MediaSelect<T extends boolean = true> {
   position?: T;
   alt?: T;
   caption?: T;
+  description?: T;
   credit?: T;
   takenOn?: T;
   takenAt?: T;

@@ -200,6 +200,8 @@ export interface Picture {
     because it is in a field note that is. */
 export interface Photo extends Picture {
   id: string;
+  /** About 100 words, for the few photos that have them: beside it in the viewer. */
+  description?: string;
   /** Smaller copies: `small` (480 px) for the grid, `medium` (960 px) for
       the large lead photo. */
   small: string;

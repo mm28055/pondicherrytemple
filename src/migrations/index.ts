@@ -64,6 +64,7 @@ import * as migration_20261031_161000_ritual_year_days from './20261031_161000_r
 import * as migration_20261102_120000_no_headline_italic from './20261102_120000_no_headline_italic';
 import * as migration_20261102_125000_photo_orders from './20261102_125000_photo_orders';
 import * as migration_20261102_130000_photo_tags from './20261102_130000_photo_tags';
+import * as migration_20261104_180000_photo_description from './20261104_180000_photo_description';
 
 export const migrations = [
   {
@@ -395,5 +396,10 @@ export const migrations = [
     up: migration_20261102_130000_photo_tags.up,
     down: migration_20261102_130000_photo_tags.down,
     name: '20261102_130000_photo_tags',
+  },
+  {
+    up: migration_20261104_180000_photo_description.up,
+    down: migration_20261104_180000_photo_description.down,
+    name: '20261104_180000_photo_description',
   },
 ];

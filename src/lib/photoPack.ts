@@ -21,8 +21,8 @@ type Group = [
   place: number,
   short: number,
 ];
-// id, group, width, height, the files' shared start, then each one's end, alt, caption, credit, featured, focus
-type Row = [number, number, number, number, number, string, string, string, number, number, number, 0 | 1, number?, number?];
+// id, group, width, height, the files' shared start, then each one's end, alt, caption, credit, featured, focus, description
+type Row = [number, number, number, number, number, string, string, string, number, number, number, 0 | 1, number?, number?, number?];
 
 export type PhotoPack = { base: string; words: string[]; groups: Group[]; photos: Row[] };
 
@@ -78,7 +78,8 @@ export function packPhotos(list: Photo[]): PhotoPack {
       w(p.credit),
       p.featured ? 1 : 0,
     ];
-    if (p.focus[0] !== 50 || p.focus[1] !== 50) row.push(p.focus[0], p.focus[1]);
+    if (p.focus[0] !== 50 || p.focus[1] !== 50 || p.description) row.push(p.focus[0], p.focus[1]);
+    if (p.description) row.push(w(p.description));
     return row;
   });
   return { base, words, groups, photos };
@@ -86,7 +87,7 @@ export function packPhotos(list: Photo[]): PhotoPack {
 
 export function unpackPhotos({ base, words, groups, photos }: PhotoPack): Photo[] {
   const w = (i: number) => (i < 0 ? undefined : words[i]);
-  return photos.map(([id, g, width, height, shared, src, small, medium, alt, caption, credit, featured, fx, fy]) => {
+  return photos.map(([id, g, width, height, shared, src, small, medium, alt, caption, credit, featured, fx, fy, description]) => {
     const [temples, observances, deities, tags, date, dated, note, set, occasion, place, short] = groups[g];
     const start = base + (w(shared) ?? "");
     return {
@@ -98,6 +99,7 @@ export function unpackPhotos({ base, words, groups, photos }: PhotoPack): Photo[
       height,
       alt: w(alt) ?? "",
       caption: w(caption),
+      description: description === undefined ? undefined : words[description],
       credit: w(credit),
       focus: [fx ?? 50, fy ?? 50],
       temples: temples.map((i) => words[i]),

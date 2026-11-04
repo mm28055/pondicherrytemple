@@ -31,8 +31,11 @@ type Props = {
       small photos, under the name of a rite; given seeAll, one row only, its
       last tile (the next photo, dimmed) a link to all of them. "row": one
       row of photos, each its own shape, filling the width exactly (as on
-      the home page), under a temple's name on the Temples page. */
-  layout: "lead" | "all" | "strip" | "row";
+      the home page), under a temple's name on the Temples page. "own": laid
+      out by `render` (a field note's), with the same viewer. */
+  layout: "lead" | "all" | "strip" | "row" | "own";
+  /** "own": draws the photos; `open` opens the one at that place in the list */
+  render?: (photos: Photo[], open: (i: number) => void) => ReactNode;
   seeAll?: string;
   /** Rows of buttons to narrow the photos: by temple, festival, deity, year. */
   filters?: PhotoFilter[];
@@ -79,7 +82,7 @@ const valuesOf = (p: Photo, key: PhotoFilter["key"]) => (key === "years" ? [p.da
     whole and as large as the screen allows, with its caption and where it
     belongs; the arrows (or a swipe) go through all of them. An open photo has
     its own address, so it can be sent to someone, and Back closes it. */
-export function PhotoWall({ photos: given, pack, total, layout, seeAll, filters = [], note, addressable = true, moreLink, heads, reveal = false, asGiven = false }: Props) {
+export function PhotoWall({ photos: given, pack, total, layout, seeAll, filters = [], note, addressable = true, moreLink, heads, reveal = false, asGiven = false, render }: Props) {
   const photos = useMemo(() => (pack ? unpackPhotos(pack) : (given ?? [])), [pack, given]);
   const [chosen, setChosen] = useState<Partial<Record<PhotoFilter["key"], string>>>({});
   const [oldestFirst, setOldestFirst] = useState(false);
@@ -98,7 +101,7 @@ export function PhotoWall({ photos: given, pack, total, layout, seeAll, filters 
 
   // the photos in the order they are shown, and stepped through
   const order = useMemo(() => {
-    if (layout === "strip") return photos;
+    if (layout === "strip" || layout === "own") return photos;
     if (layout === "lead") return asGiven ? photos : [...photos.filter((p) => p.featured), ...photos.filter((p) => !p.featured)];
     const shown = photos.filter((p) =>
       Object.entries(chosen).every(([key, id]) => !id || valuesOf(p, key as PhotoFilter["key"]).includes(id))
@@ -199,12 +202,29 @@ export function PhotoWall({ photos: given, pack, total, layout, seeAll, filters 
   useEffect(() => {
     const d = dialog.current;
     if (!d) return;
-    if (open !== null && !d.open) d.showModal();
-    else if (open === null && d.open) d.close();
+    if (open !== null && !d.open) {
+      d.showModal();
+      // held by the viewer itself, not by something that goes with the photo
+      d.focus();
+    } else if (open === null && d.open) d.close();
     document.documentElement.style.overflow = open !== null ? "hidden" : "";
   }, [open]);
 
   useEffect(() => () => void (document.documentElement.style.overflow = ""), []);
+
+  // the cursor keys go on through the photos wherever the focus is (a click on
+  // the photo, or on a button that went with the last photo, leaves it nowhere)
+  useEffect(() => {
+    if (open === null) return;
+    const key = (e: KeyboardEvent) => {
+      if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return; // (Alt+← is the browser's Back)
+      if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+      e.preventDefault();
+      step(e.key === "ArrowRight" ? 1 : -1);
+    };
+    window.addEventListener("keydown", key);
+    return () => window.removeEventListener("keydown", key);
+  }, [open, step]);
 
   // fetch the next and previous photos ahead, so stepping is instant
   useEffect(() => {
@@ -257,7 +277,9 @@ export function PhotoWall({ photos: given, pack, total, layout, seeAll, filters 
         />
       )}
 
-      {layout === "row" ? (
+      {layout === "own" ? (
+        render?.(order, show)
+      ) : layout === "row" ? (
         <PhotoRow photos={order} tile={tile} more={moreLink} open={show} reveal={reveal} />
       ) : layout === "strip" ? (
         seeAll ? (
@@ -396,13 +418,10 @@ export function PhotoWall({ photos: given, pack, total, layout, seeAll, filters 
         className="film-viewer photo-viewer"
         data-own-history={addressable ? "" : undefined}
         aria-label={photo?.caption ?? "Photograph"}
+        tabIndex={-1}
         onCancel={(e) => {
           e.preventDefault();
           close();
-        }}
-        onKeyDown={(e) => {
-          if (e.key === "ArrowRight") step(1);
-          if (e.key === "ArrowLeft") step(-1);
         }}
         onClick={(e) => e.target === e.currentTarget && close()}
         // a swipe sideways goes to the next photo; a swipe down closes it
@@ -418,7 +437,7 @@ export function PhotoWall({ photos: given, pack, total, layout, seeAll, filters 
         }}
       >
         {photo && (
-          <figure className="photo-viewer-inner" onClick={(e) => e.target === e.currentTarget && close()}>
+          <figure className={`photo-viewer-inner${photo.description ? " has-text" : ""}`} onClick={(e) => e.target === e.currentTarget && close()}>
             <Zoomable key={photo.id}>
               <img src={photo.src} alt={photo.alt || photo.caption || ""} />
             </Zoomable>
@@ -448,6 +467,7 @@ export function PhotoWall({ photos: given, pack, total, layout, seeAll, filters 
                 </Link>
               )}
             </figcaption>
+            {photo.description && <p className="photo-viewer-text">{photo.description}</p>}
           </figure>
         )}
         <button className="film-viewer-close" onClick={close} aria-label="Close">

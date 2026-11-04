@@ -19,9 +19,10 @@ import { FIELD_KIND_LABELS } from "@/content/labels";
 import { formatDate, localDate } from "@/lib/calendar";
 import { noteRow } from "@/lib/view";
 import { Html } from "@/components/Prose";
-import { NoteRow } from "@/components/Rows";
 import { FestivalLink } from "@/components/FestivalLink";
 import { NotePhotos } from "@/components/NotePhotos";
+import { NoteRow } from "@/components/Rows";
+import { packPhotos } from "@/lib/photoPack";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -47,12 +48,11 @@ export default async function FieldNotePage({ params }: Props) {
   const observances = await getObservancesById(note.observances);
   const local = localDate(region.calendar, note.date);
 
-  // more from the same temple(s)
-  const related = (await Promise.all(temples.map((t) => getFieldNotesForTemple(region.id, t.id))))
-    .flat()
-    .filter((n, i, all) => n.id !== note.id && all.findIndex((x) => x.id === n.id) === i)
-    .slice(0, 3)
-    .map((n) => noteRow(n, allTemples, region.calendar));
+  // more from the temple (the first, if several): five, then its page for all of them
+  const temple = temples[0];
+  const related = temple
+    ? (await getFieldNotesForTemple(region.id, temple.id)).filter((n) => n.id !== note.id)
+    : [];
 
   // the notes before and after this one, by date (the list is newest first)
   const all = await getFieldNotes();
@@ -61,9 +61,11 @@ export default async function FieldNotePage({ params }: Props) {
   const newer = at > 0 ? all[at - 1] : undefined;
 
   // the photographs beside the text: its own (those of its photo sets, the
-  // same day at its temples), in the order taken
+  // same day at its temples), in the order taken; the viewer's link to their
+  // field note left out where that is this page
+  const here = `/field-notes/${note.id}`;
   const photosOf = async (slug: string) =>
-    (await getPhotosForNote(slug)).map(({ id, medium, alt, focus, width, height }) => ({ id, medium, alt, focus, width, height }));
+    (await getPhotosForNote(slug)).map((p) => (p.note?.href === here ? { ...p, note: undefined } : p));
 
   // the notes of the following days of the same event of the town (its card
   // on the Temples page opens them all), each below the one before, their
@@ -115,9 +117,10 @@ export default async function FieldNotePage({ params }: Props) {
       </div>
 
       {/* the text in a column at the right, ending where the line above
-          ends; the photographs down the left beside it */}
+          ends; the photographs down the left beside it (on a phone, in rows
+          above the text) */}
       <div className="wrap note-layout">
-        <NotePhotos photos={photos} seed={note.id} />
+        <NotePhotos pack={packPhotos(photos)} seed={note.id} />
         <div className="note-text">
           <article className="note-body">
             {note.body && <Html className="rich" html={note.body} />}
@@ -158,12 +161,17 @@ export default async function FieldNotePage({ params }: Props) {
             </article>
           ))}
 
-          {related.length > 0 && (
+          {temple && related.length > 0 && (
             <div className="note-foot">
-              <h2 className="sub-head">More from here</h2>
-              {related.map((r) => (
-                <NoteRow key={r.id} row={r} />
+              <h2 className="sub-head">More from {temple.knownAs ?? temple.name}</h2>
+              {related.slice(0, 5).map((n) => (
+                <NoteRow key={n.id} row={noteRow(n, allTemples, region.calendar)} />
               ))}
+              {related.length > 5 && (
+                <Link className="more-button" href={`/${temple.region}/${temple.id}#all-field-notes`}>
+                  See all field notes →
+                </Link>
+              )}
             </div>
           )}
 

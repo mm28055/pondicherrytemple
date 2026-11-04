@@ -12,6 +12,7 @@ export function ShowMore({
   label,
   fewer = "Fewer",
   beside,
+  openAt,
   children,
 }: {
   shown: number;
@@ -19,6 +20,8 @@ export function ShowMore({
   fewer?: string;
   /** the column beside the list, by a selector from its section: its foot is where the list folds */
   beside?: string;
+  /** opened from the start when the page is come to at this #address */
+  openAt?: string;
   children: ReactNode[];
 }) {
   const [open, setOpen] = useState(false);
@@ -29,6 +32,10 @@ export function ShowMore({
   // measured again (with every row out) whenever the column beside, or the window, changes size
   const [tick, setTick] = useState(0);
   const sideOf = () => (beside ? mark.current?.parentElement?.closest(".temple-body")?.querySelector<HTMLElement>(beside) : null);
+
+  useLayoutEffect(() => {
+    if (openAt && window.location.hash === `#${openAt}`) setOpen(true);
+  }, [openAt]);
 
   useLayoutEffect(() => {
     const phone = window.innerWidth <= 900;

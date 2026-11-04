@@ -1376,8 +1376,8 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
 /* ---------- A field note ---------- */
 /* The text in a column at the right, two thirds of the page, ending where
    the line under the heading ends; the photographs down the left beside it
-   (components/NotePhotos). On a narrow screen, the photographs under the
-   text. */
+   (components/NotePhotos). On a narrow screen, the photographs above the
+   text, in rows as on the Field Notes page. */
 .note-layout { display: grid; grid-template-columns: minmax(0, 1fr) 67%; }
 .note-layout .note-body,
 .note-layout .note-foot { max-width: none; margin: 0; padding-inline: 0; }
@@ -1396,12 +1396,18 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
 .note-photos-frame { right: 0; visibility: hidden; }
 .note-photos-col { display: flex; flex-direction: column; gap: 20px; }
 .note-photos-row { display: flex; gap: 20px; flex: none; }
-.note-photos-row img { height: 100%; flex: none; object-fit: cover; background: var(--rule); display: block; }
+.note-photos-photo { flex: none; display: block; height: 100%; padding: 0; border: 0; background: var(--rule); cursor: zoom-in; }
+.note-photos-photo img { width: 100%; height: 100%; object-fit: cover; display: block; transition: opacity 0.2s; }
+.note-photos-photo:hover img { opacity: 0.85; }
+.note-photos-photo:focus-visible { outline: 3px solid var(--ochre); outline-offset: 2px; }
+/* the Field Notes page's strip, three rows of it, its place kept while it is measured */
+.note-strip { --h: 96px; padding-top: 16px; scroll-margin-top: 84px; }
+button.home-strip-photo { padding: 0; border: 0; cursor: zoom-in; }
+button.home-strip-all { cursor: pointer; }
+button.home-strip-photo:focus-visible { outline: 3px solid var(--ochre); outline-offset: -3px; }
 @media (max-width: 900px) {
   .note-layout { grid-template-columns: minmax(0, 1fr); }
-  .note-photos { order: 2; margin-bottom: 48px; }
-  .note-photos-col { position: static; }
-  .note-photos-frame { display: none; }
+  .note-photos { min-height: calc(var(--rows, 0) * 96px + (var(--rows, 0) - 1) * 20px + 16px); }
 }
 .note-head { padding-block: clamp(18px, 3vw, 36px) clamp(16px, 2.5vw, 28px); border-bottom: 2px solid var(--ink); }
 
@@ -1507,7 +1513,6 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
 .photos figcaption { font-size: 16px; color: var(--muted); margin-top: 6px; }
 
 .note-foot { max-width: 720px; margin-inline: auto; padding: 0 var(--gutter) clamp(56px, 7vw, 88px); }
-
 /* ---------- Field notes filter ---------- */
 .filters { display: flex; flex-wrap: wrap; gap: 8px 24px; padding-block: 18px 2px; }
 
@@ -1792,9 +1797,39 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
   gap: 14px;
   height: 100%;
   margin: 0;
-  padding: 32px 88px;
+  padding: 32px 112px;
 }
 .photo-viewer-inner img { max-width: 100%; max-height: calc(100dvh - 150px); object-fit: contain; }
+.photo-viewer:focus { outline: none; }
+/* Previous and Next: all the height of the screen at either side (under the
+   ×), so a press near the arrow does not land outside it and close the photo */
+.photo-viewer .film-viewer-step {
+  top: 72px;
+  bottom: 0;
+  width: 112px;
+  padding: 0;
+  transform: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.photo-viewer .film-viewer-step.prev { left: 0; }
+.photo-viewer .film-viewer-step.next { right: 0; }
+.photo-viewer .film-viewer-step:hover { background: rgba(255, 255, 255, 0.06); }
+/* a photo with a description: the words beside it */
+.photo-viewer-inner.has-text { grid-template-columns: minmax(0, 1fr) minmax(260px, 24em); gap: 14px 40px; }
+.photo-viewer-text {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  align-self: center;
+  justify-self: start;
+  max-height: calc(100dvh - 64px);
+  overflow-y: auto;
+  font-size: 17px;
+  line-height: 1.6;
+  color: var(--on-night);
+  white-space: pre-line;
+}
 /* an image opened over the page, zoomed within its own frame (components/Zoomable):
    its bar of tools over its foot, shown while the pointer is on it */
 .zoomable { position: relative; min-width: 0; max-width: 100%; }
@@ -1842,6 +1877,14 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
 @media (max-width: 860px) {
   .photo-viewer-inner { padding: 64px 12px 24px; }
   .photo-viewer-inner img { max-height: calc(100dvh - 200px); }
+  /* at the top, beside each other, each a good thumb's width (a swipe does the same) */
+  .photo-viewer .film-viewer-step { top: 0; bottom: auto; width: 72px; height: 60px; font-size: 44px; }
+  .photo-viewer .film-viewer-step.prev { left: 0; }
+  .photo-viewer .film-viewer-step.next { left: 72px; right: auto; }
+  .photo-viewer .film-viewer-step:hover { background: none; }
+  /* a photo with a description: the words under it, the viewer scrolling */
+  .photo-viewer-inner.has-text { grid-template-columns: minmax(0, 1fr); height: auto; min-height: 100%; }
+  .photo-viewer-text { grid-column: 1; grid-row: auto; justify-self: center; max-width: 36em; max-height: none; overflow: visible; }
 }
 
 /* A film's own page: the film, and its words beside it */
@@ -3248,7 +3291,7 @@ span.month-obs .month-obs-more { display: none; }
   color: var(--ink);
 }
 .more-button:hover { color: var(--ochre); }
-#ritual-year, #field-notes, #photographs, #films, #articles { scroll-margin-top: 84px; }
+#ritual-year, #field-notes, #all-field-notes, #photographs, #films, #articles { scroll-margin-top: 84px; }
 @media (max-width: 900px) {
   .page-parts {
     display: flex;

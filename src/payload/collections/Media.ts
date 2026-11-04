@@ -129,6 +129,14 @@ export const Media: CollectionConfig = {
     },
     { name: 'caption', type: 'text', admin: { condition: (data) => !inFilm(data) } },
     {
+      name: 'description',
+      type: 'textarea',
+      admin: {
+        condition: (data) => !inFilm(data),
+        description: 'For the few photos that need it: about 100 words, shown beside the photo when it is opened large.',
+      },
+    },
+    {
       name: 'credit',
       type: 'text',
       admin: {

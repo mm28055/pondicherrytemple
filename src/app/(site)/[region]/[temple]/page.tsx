@@ -149,10 +149,10 @@ export default async function TemplePage({ params }: Props) {
 
             {notes.length > 0 && (
               <section id="field-notes">
-                <h2 className="sub-head">Field notes</h2>
+                <h2 id="all-field-notes" className="sub-head">Field notes</h2>
                 {/* on a phone, the latest five, the rest a tap away, so the Ritual Year is not far below;
                     on a wider screen, those beside the Ritual Year, so its films and photographs come up after */}
-                <ShowMore shown={5} label={`All ${notes.length} field notes`} fewer="Fewer field notes" beside=":scope > aside">
+                <ShowMore shown={5} label={`All ${notes.length} field notes`} fewer="Fewer field notes" beside=":scope > aside" openAt="all-field-notes">
                   {notes.map((r) => (
                     <NoteRow key={r.id} row={r} />
                   ))}
@@ -264,7 +264,7 @@ async function AroundTemplePage({ regionId, regionName, templeId }: { regionId: 
         {notes.length > 0 && films.length > 0 ? (
           <div className="two-col around-cols">
             <section>
-              <h2 className="sub-head">Field notes</h2>
+              <h2 id="all-field-notes" className="sub-head">Field notes</h2>
               {notes.map((r) => (
                 <NoteRow key={r.id} row={r} />
               ))}
@@ -278,7 +278,7 @@ async function AroundTemplePage({ regionId, regionName, templeId }: { regionId: 
           <>
             {notes.length > 0 && (
               <section>
-                <h2 className="sub-head">Field notes</h2>
+                <h2 id="all-field-notes" className="sub-head">Field notes</h2>
                 {notes.map((r) => (
                   <NoteRow key={r.id} row={r} />
                 ))}

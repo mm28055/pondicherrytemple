@@ -204,7 +204,7 @@ const rawPhotos = cache(async () => {
       // (prefix, _objectKey: the folder some files are kept in, as a film's still uploaded with it, without which its address leads nowhere)
       select: {
         filename: true, prefix: true, _objectKey: true, url: true, width: true, height: true, focalX: true, focalY: true,
-        alt: true, caption: true, credit: true, consent: true, featured: true, takenOn: true, takenAt: true, position: true,
+        alt: true, caption: true, description: true, credit: true, consent: true, featured: true, takenOn: true, takenAt: true, position: true,
         temples: true, observances: true, set: true, createdAt: true,
         sizes: {
           thumbnail: { url: true, filename: true },
@@ -634,6 +634,7 @@ async function buildPhotoData() {
     const photo: Photo = {
       ...picture,
       id: String(m.id),
+      description: m.description?.trim() || undefined,
       small: m.sizes?.thumbnail?.url ?? picture.src,
       medium: m.sizes?.card?.url ?? picture.src,
       focus: [m.focalX ?? 50, m.focalY ?? 50],
