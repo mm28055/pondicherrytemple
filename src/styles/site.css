@@ -1799,7 +1799,7 @@ button.home-strip-photo:focus-visible { outline: 3px solid var(--ochre); outline
   margin: 0;
   padding: 32px 112px;
 }
-.photo-viewer-inner img { max-width: 100%; max-height: calc(100dvh - 150px); object-fit: contain; }
+.photo-viewer-inner img { max-width: 100%; max-height: calc(100dvh - 194px); object-fit: contain; }
 .photo-viewer:focus { outline: none; }
 /* Previous and Next: all the height of the screen at either side (under the
    ×), so a press near the arrow does not land outside it and close the photo */
@@ -1844,6 +1844,9 @@ button.home-strip-photo:focus-visible { outline: 3px solid var(--ochre); outline
 }
 .zoomable:hover .zoomable-tools, .zoomable-tools:focus-within { opacity: 1; }
 @media (hover: none) { .zoomable-tools { opacity: 1; } }
+/* in the photo viewer, under the photo, not on it, and always there (centred
+   on it, however narrow the photo is) */
+.photo-viewer .zoomable-tools { position: relative; left: 50%; bottom: auto; width: max-content; margin-top: 8px; background: none; opacity: 1; }
 .zoomable-tools button {
   display: grid; place-items: center; min-width: 30px; height: 30px; padding: 0 6px;
   background: none; border: 0; border-radius: 3px; color: inherit; cursor: pointer;
@@ -1876,7 +1879,7 @@ button.home-strip-photo:focus-visible { outline: 3px solid var(--ochre); outline
 .photo-viewer-tags a:hover { color: var(--lamp); }
 @media (max-width: 860px) {
   .photo-viewer-inner { padding: 64px 12px 24px; }
-  .photo-viewer-inner img { max-height: calc(100dvh - 200px); }
+  .photo-viewer-inner img { max-height: calc(100dvh - 244px); }
   /* at the top, beside each other, each a good thumb's width (a swipe does the same) */
   .photo-viewer .film-viewer-step { top: 0; bottom: auto; width: 72px; height: 60px; font-size: 44px; }
   .photo-viewer .film-viewer-step.prev { left: 0; }
