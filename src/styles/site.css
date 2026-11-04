@@ -1004,8 +1004,10 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
 .today-more-short, .today-civil-short { display: none; }
 /* the Temples page on a phone: the date without its "Today" */
 @media (max-width: 640px) {
-  .with-today .today .kicker { display: none; }
-  .with-today .today-tamil { font-size: 17px; line-height: 1.25; }
+  .with-today .today .kicker, .with-today .today-en { display: none; }
+  .with-today .today-tamil { font-size: 19px; line-height: 1.2; }
+  .with-today .today .caps { margin-top: 4px; }
+  .with-today .today-more { margin-top: 6px; }
 }
 
 /* A page's header with today's date in it (the Temples page): on a computer
