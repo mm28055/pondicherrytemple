@@ -254,7 +254,7 @@ a:focus-visible, button:focus-visible {
    and 5px more on a phone, the title's line leaving less room under its
    letters than a paragraph's does. */
 .page-head.landing-head { padding-bottom: calc(clamp(18px, 2.5vw, 32px) + 3px); }
-.page-head.landing-head:has(> .page-title:last-child) { padding-bottom: calc(clamp(18px, 2.5vw, 32px) + 2px); }
+.page-head.landing-head:has(> .page-title:last-child) { padding-bottom: calc(clamp(18px, 2.5vw, 32px) + 7px); }
 /* (a tablet: the home page's date under its name, its last line "Full calendar") */
 @media (min-width: 641px) and (max-width: 900px) {
   .page-head.landing-head { padding-bottom: clamp(18px, 2.5vw, 32px); }
@@ -262,7 +262,7 @@ a:focus-visible, button:focus-visible {
 }
 @media (max-width: 640px) {
   .page-head.landing-head { padding-bottom: 14px; }
-  .page-head.landing-head:has(> .page-title:last-child) { padding-bottom: 21px; }
+  .page-head.landing-head:has(> .page-title:last-child) { padding-bottom: 22px; }
   /* the Festivals & Rituals search, its own line at the foot on a phone */
   .page-head.landing-head.gallery-head { padding-bottom: 13px; }
 }
@@ -274,7 +274,7 @@ a:focus-visible, button:focus-visible {
 .page-title {
   font-family: var(--title-face);
   font-weight: 700;
-  font-size: min(clamp(54px, 11vw, 148px), calc((100vw - 50px) / 7.4)); /* (PHOTOGRAPHS, the longest, within a phone's width) */
+  font-size: min(96px, 8.3vw); /* (FESTIVALS & RITUALS, the longest, on one line) */
   line-height: 1.02;
   letter-spacing: -0.01em;
   text-transform: uppercase;
@@ -1300,7 +1300,7 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
   padding-bottom: 6px;
 }
 
-/* a temple's "Field notes", "Ritual Cycles", "Films" and "Photographs": as a month's name, in black */
+/* a temple's "Field notes", "Ritual Cycles", "Films", "Photographs" and "Articles": as a month's name, in black */
 #all-field-notes, #ritual-cycles, .sub-head.large {
   font-family: var(--display);
   font-weight: 800;

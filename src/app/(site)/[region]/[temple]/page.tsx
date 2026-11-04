@@ -196,7 +196,7 @@ export default async function TemplePage({ params }: Props) {
                   id: "articles",
                   node: (
                     <section id="articles">
-                      <h2 className="sub-head">Articles</h2>
+                      <h2 className="sub-head large">Articles</h2>
                       {articles.map((r) => (
                         <NoteRow key={r.id} row={r} />
                       ))}
