@@ -65,6 +65,8 @@ import * as migration_20261102_120000_no_headline_italic from './20261102_120000
 import * as migration_20261102_125000_photo_orders from './20261102_125000_photo_orders';
 import * as migration_20261102_130000_photo_tags from './20261102_130000_photo_tags';
 import * as migration_20261104_180000_photo_description from './20261104_180000_photo_description';
+import * as migration_20261104_190000_note_plain_letters from './20261104_190000_note_plain_letters';
+import * as migration_20261104_191000_site_plain_letters from './20261104_191000_site_plain_letters';
 
 export const migrations = [
   {
@@ -401,5 +403,15 @@ export const migrations = [
     up: migration_20261104_180000_photo_description.up,
     down: migration_20261104_180000_photo_description.down,
     name: '20261104_180000_photo_description',
+  },
+  {
+    up: migration_20261104_190000_note_plain_letters.up,
+    down: migration_20261104_190000_note_plain_letters.down,
+    name: '20261104_190000_note_plain_letters',
+  },
+  {
+    up: migration_20261104_191000_site_plain_letters.up,
+    down: migration_20261104_191000_site_plain_letters.down,
+    name: '20261104_191000_site_plain_letters',
   },
 ];
