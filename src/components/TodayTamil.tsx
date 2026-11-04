@@ -13,7 +13,7 @@ const MONTHS = ["January", "February", "March", "April", "May", "June", "July", 
    the day it was built. A click opens today in the calendar's pop-up,
    dropping down from just under the Tamil date. */
 export function TodayTamil({ events }: { events: CalendarEvent[] }) {
-  const [today, setToday] = useState<{ t: TamilDate; civil: string; iso: string } | null>(null);
+  const [today, setToday] = useState<{ t: TamilDate; civil: string; short: string; iso: string } | null>(null);
   const [open, setOpen] = useState(false);
   const [place, setPlace] = useState<CSSProperties | undefined>();
   const box = useRef<HTMLElement>(null);
@@ -24,6 +24,7 @@ export function TodayTamil({ events }: { events: CalendarEvent[] }) {
     setToday({
       t: tamilDate(y, m, d),
       civil: `${WEEKDAYS[weekday]}, ${d} ${MONTHS[m - 1]} ${y}`,
+      short: `${WEEKDAYS[weekday].slice(0, 3)}, ${d} ${MONTHS[m - 1].slice(0, 3)}`,
       iso: `${y}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`,
     });
   }, []);
@@ -51,9 +52,14 @@ export function TodayTamil({ events }: { events: CalendarEvent[] }) {
         {today.t.month.ta} {today.t.day}
       </span>
       <span className="today-en">
-        {today.t.day} {today.t.month.en}, {today.t.year} year
+        {today.t.day} {today.t.month.en}
+        <span className="today-year">, {today.t.year} year</span>
       </span>
-      <span className="caps">{today.civil}</span>
+      <span className="caps">
+        <span className="today-civil-long">{today.civil}</span>
+        {/* "Wed, 4 Nov" in the small box beside a page's title */}
+        <span className="today-civil-short">{today.short}</span>
+      </span>
     </>
   );
 
