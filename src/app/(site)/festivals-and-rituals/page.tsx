@@ -17,12 +17,13 @@ export const metadata: Metadata = {
 };
 
 
-/** The festivals and rituals, led by their photographs, for everyone. Until
-    their own pages are published (lib/festivals), only someone signed in to
-    the admin can open them; to the public the same cards are not links, and
-    the introduction ends "(coming soon)" (?as=public shows a team member that version).
-    Built ahead, the same for everyone: whether the visitor is signed in is
-    asked in their browser (lib/team), by the cards and by ReservedSoon. */
+/** The festivals and rituals, led by their photographs. Until their own pages
+    are published (lib/festivals), that gallery is for someone signed in to the
+    admin; the public sees their names listed A to Z, the festivals on the left,
+    the rituals on the right, with "Coming soon" under the title (?as=public
+    shows a team member that version). Built ahead, the same for everyone:
+    whether the visitor is signed in is asked in their browser (lib/team), by
+    the gallery and by ReservedSoon. */
 export default async function ObservancesPage() {
   const all = await Promise.all(
     (await getObservances()).map(async (o) => {
@@ -39,6 +40,32 @@ export default async function ObservancesPage() {
   );
   const intro = await getSectionIntro("observances");
 
+  // The public's lists: A to Z by the English name, in Tamil with the English beneath
+  const names = [...all].sort((a, b) => a.o.name.localeCompare(b.o.name));
+  const list = (kind: "festival" | "ritual", label: string) => (
+    <div>
+      <h2 className="sub-head large">{label}</h2>
+      <ul className="name-list" aria-label={label}>
+        {names
+          .filter(({ o }) => o.kind === kind)
+          .map(({ o }) => (
+            <li key={o.id} className={kind}>
+              <span className="name-list-ta" lang="ta">
+                {o.tamil ?? o.name}
+              </span>
+              {o.tamil && <span className="name-list-en">{o.name}</span>}
+            </li>
+          ))}
+      </ul>
+    </div>
+  );
+  const lists = (
+    <section className="section name-lists">
+      {list("festival", "Festivals")}
+      {list("ritual", "Rituals")}
+    </section>
+  );
+
   // The page: the most seen leads, the rest, festivals and
   // rituals together, A to Z, led by their photographs
   const sorted = all.sort((a, b) => b.seen - a.seen || a.o.name.localeCompare(b.o.name));
@@ -51,14 +78,13 @@ export default async function ObservancesPage() {
       <ObservanceGallery
         lead={lead}
         items={rest}
+        lists={lists}
         head={
           <>
             <div className="kicker">The ritual year</div>
             <h1 className="page-title">Festivals &amp; Rituals</h1>
-            <p className="page-lede">
-              {intro}
-              <ReservedSoon />
-            </p>
+            <ReservedSoon />
+            <p className="page-lede">{intro}</p>
           </>
         }
       />

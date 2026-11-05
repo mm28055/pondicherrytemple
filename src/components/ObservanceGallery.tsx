@@ -21,17 +21,20 @@ export type GalleryItem = {
     "ritual"); while searching, every match takes its place in the mosaic.
     The mosaic is two columns of photographs, each at its own shape, none
     smaller than a square. Each card opens its festival's page; while those
-    pages are held back (`linked` false, the public), the cards are not
-    links (the page's introduction says "(coming soon)"). */
+    pages are held back (`linked` false, the public), the page shows `lists`
+    instead of the gallery (its introduction says "(coming soon)"). */
 export function ObservanceGallery({
   lead,
   items,
   head,
+  lists,
 }: {
   lead: GalleryItem;
   items: GalleryItem[];
   /** the page's heading and introduction: the search sits under them, on the right */
   head: ReactNode;
+  /** what the public sees in the gallery's place while the pages are held back */
+  lists: ReactNode;
 }) {
   // whether the cards open their festivals' pages: for everyone once published;
   // until then, for someone signed in to the admin (asked in the browser, lib/team)
@@ -49,6 +52,14 @@ export function ObservanceGallery({
         .filter(matches)
         .sort((a, b) => a.row.name.localeCompare(b.row.name))
     : items;
+
+  if (!linked)
+    return (
+      <>
+        <header className="page-head landing-head lists-head">{head}</header>
+        {lists}
+      </>
+    );
 
   return (
     <>

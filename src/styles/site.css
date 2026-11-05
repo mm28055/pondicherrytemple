@@ -2158,10 +2158,8 @@ button.home-strip-photo:focus-visible { outline: 3px solid var(--ochre); outline
   .rasi .rasi-centre p:not(.rasi-year-name) { font-size: 15.5px; margin-top: 2px; max-width: none; }
 }
 
-/* The "new calendar animation": on a phone, the months as a wheel that turns
-   (components/MonthWheel), in place of the list. Three and a half months
-   show; the middle one plain, the others tipped back and fainter, and
-   fading out at the top and bottom, with an arrow at each, nudging once. */
+/* On a phone, the months in a box that scrolls (components/MonthWheel), in
+   place of the list: three and a half of them show. */
 .wheel { display: none; }
 @media (max-width: 860px) {
   .rasi.has-wheel > .rasi-month { display: none; }
@@ -2170,25 +2168,15 @@ button.home-strip-photo:focus-visible { outline: 3px solid var(--ochre); outline
     --wheel-h: calc(var(--row) * 3.5);
     position: relative;
     height: var(--wheel-h);
-    padding-block: calc((var(--wheel-h) - var(--row)) / 2);
     overflow-y: auto;
-    overscroll-behavior: contain;
-    scroll-snap-type: y mandatory;
-    scrollbar-width: none;
-    -webkit-mask-image: linear-gradient(transparent, #000 22%, #000 78%, transparent);
-    mask-image: linear-gradient(transparent, #000 22%, #000 78%, transparent);
   }
-  .wheel-box::-webkit-scrollbar { display: none; }
-  /* (until it is turned to its month, as the page first loads) */
+  /* (until it is on its month, as the page first loads) */
   .wheel-box:not(.ready) { visibility: hidden; }
   .rasi .wheel-month {
     height: var(--row);
     box-sizing: border-box;
     padding: 8px 16px;
-    scroll-snap-align: center;
     border-bottom: 1px solid var(--rule);
-    transform-origin: 50% 50%;
-    will-change: transform, opacity;
   }
   /* the month's drawing at the left, in a column of its own, the full height
      of the row (room for it to grow and move as it comes alive, uncut); its
@@ -2206,21 +2194,7 @@ button.home-strip-photo:focus-visible { outline: 3px solid var(--ochre); outline
   }
   .rasi .wheel-month .rasi-motif { grid-row: 1 / 4; align-self: center; justify-self: center; width: 56px; height: 40px; margin: 0; }
   .rasi .wheel-month.now { border-bottom-color: var(--ink); }
-  .wheel-cue {
-    position: absolute;
-    left: 50%;
-    z-index: 1;
-    font-size: 26px;
-    line-height: 1;
-    color: var(--muted);
-    pointer-events: none;
-    animation: wheel-nudge 1.6s ease-in-out 0.9s 2;
-  }
-  .wheel-cue.up { top: 4px; transform: translateX(-50%) rotate(90deg); }
-  .wheel-cue.down { bottom: 4px; transform: translateX(-50%) rotate(90deg); --way: 1; }
-  @keyframes wheel-nudge { 50% { translate: 0 calc(var(--way, -1) * 5px); } }
 }
-@media (prefers-reduced-motion: reduce) { .wheel-cue { animation: none; } }
 
 /* One month of the ritual year */
 .month-entries > li {
@@ -3078,6 +3052,37 @@ body { container: page / inline-size; }
    not a link, quieter, "(coming soon)" beside them */
 .arrow-link.reserved { color: var(--muted); border-bottom-color: var(--rule); cursor: default; }
 .arrow-link.reserved::after { content: none; }
+/* The public Festivals & Rituals page, until the festivals' own pages are
+   ready: their names A to Z, the festivals on the left, the rituals on the
+   right (one above the other on a phone), each in two columns: in Tamil,
+   with the English name beneath; rituals in red */
+.page-head.lists-head { border-bottom: 0; padding-bottom: 0; } /* each list has the rule of its own head */
+.name-lists { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(32px, 5vw, 72px); padding-top: clamp(24px, 2.4vw, 32px); }
+.name-list { columns: 2; column-gap: clamp(16px, 2.4vw, 32px); padding-top: 14px; }
+.name-list li { break-inside: avoid; padding-block: 7px; overflow-wrap: anywhere; }
+.name-list-ta { display: block; font-family: var(--tamil); font-weight: 700; font-size: 18px; line-height: 1.25; }
+.name-list .ritual .name-list-ta { color: var(--ochre); }
+.name-list-en { display: block; font-family: var(--title-face); font-size: 14px; line-height: 1.25; color: var(--muted); margin-top: 1px; }
+@media (max-width: 900px) {
+  .name-lists { grid-template-columns: minmax(0, 1fr); gap: 36px; }
+}
+@media (max-width: 640px) {
+  .name-list { column-gap: 16px; }
+  .name-list-ta { font-size: 17px; }
+}
+
+/* under the Festivals & Rituals title, for the public: a head of the site's, in red */
+.coming-soon {
+  margin-top: clamp(10px, 1.4vw, 16px);
+  font-family: var(--display);
+  font-weight: 800;
+  font-variation-settings: "wdth" 75;
+  font-size: clamp(24px, 3vw, 36px);
+  line-height: 1.1;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ochre);
+}
 .reserved-soon { font-weight: 500; letter-spacing: 0.04em; color: var(--ochre); }
 /* "About Brahmotsavam" on a month's page: only where the name is a link */
 span.month-obs .month-obs-more { display: none; }
