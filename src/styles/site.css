@@ -3083,6 +3083,9 @@ body { container: page / inline-size; }
   text-transform: uppercase;
   color: var(--ochre);
 }
+/* the way to the field notes meanwhile, in the public introduction */
+.lede-link { font-weight: 600; color: var(--ochre); transition: color 0.15s; }
+.lede-link:hover { color: var(--ochre-deep); }
 .reserved-soon { font-weight: 500; letter-spacing: 0.04em; color: var(--ochre); }
 /* "About Brahmotsavam" on a month's page: only where the name is a link */
 span.month-obs .month-obs-more { display: none; }

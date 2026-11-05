@@ -7,7 +7,7 @@ import {
   getSectionIntro,
 } from "@/lib/data";
 import { observanceRow } from "@/lib/view";
-import { ReservedSoon } from "@/components/ReservedSoon";
+import { ReservedLede, ReservedSoon } from "@/components/ReservedSoon";
 import { ObservanceGallery } from "@/components/ObservanceGallery";
 
 export const metadata: Metadata = {
@@ -84,7 +84,7 @@ export default async function ObservancesPage() {
             <div className="kicker">The ritual year</div>
             <h1 className="page-title">Festivals &amp; Rituals</h1>
             <ReservedSoon />
-            <p className="page-lede">{intro}</p>
+            <ReservedLede intro={intro} />
           </>
         }
       />
