@@ -1186,6 +1186,11 @@ export async function getFieldNotes(regionId?: string): Promise<FieldNote[]> {
   return (await fieldNotes()).filter((n) => !regionId || n.region === regionId).sort(byDateDesc);
 }
 
+/** Every note's whole words, by its web address: for the Field Notes search. */
+export async function getFieldNoteTexts(): Promise<Record<string, string>> {
+  return Object.fromEntries((await rawNotes()).filter((n) => n.slug).map((n) => [n.slug, plainText(n.body)]));
+}
+
 /** One note, with its full text, recording and photographs. */
 export async function getFieldNote(id: string): Promise<FieldNote | null> {
   const doc = await rawOne("field-notes", id);

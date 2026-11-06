@@ -44,6 +44,15 @@ export function Nav() {
   // the home page has the name large in its masthead: none in the bar, there only
   const home = pathname === "/";
   const [open, setOpen] = useState(false);
+  // there, the bar's line comes only once the page has moved under it
+  const [scrolled, setScrolled] = useState(false);
+  useEffect(() => {
+    if (!home) return;
+    const on = () => setScrolled(window.scrollY > 4);
+    on();
+    window.addEventListener("scroll", on, { passive: true });
+    return () => window.removeEventListener("scroll", on);
+  }, [home]);
   // a dropdown just clicked through stays shut until the pointer leaves it
   const [shut, setShut] = useState<string | null>(null);
 
@@ -68,7 +77,7 @@ export function Nav() {
   }, [open]);
 
   return (
-    <header className={home ? "nav nav-home" : "nav"} ref={bar}>
+    <header className={home ? `nav nav-home${scrolled ? " scrolled" : ""}` : "nav"} ref={bar}>
       <div className="stripes" aria-hidden="true" />
       <div className="wrap nav-inner">
         {!home && (
