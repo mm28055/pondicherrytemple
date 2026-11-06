@@ -39,7 +39,7 @@
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
-html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; scrollbar-gutter: stable; } /* the page keeps its width from one page to the next, short or long */
 
 body {
   background: var(--chalk);
@@ -127,6 +127,14 @@ a:focus-visible, button:focus-visible {
   position: relative;
 }
 
+/* the home page: no name in the bar, the menu at the right; where that is only
+   the menu button, no line under it and a shallower bar, the page a little higher */
+.nav-home .nav-inner { justify-content: flex-end; }
+@media (max-width: 1060px) {
+  .nav-home { border-bottom: 0; }
+  .nav-home .nav-inner { height: 52px; }
+}
+
 .brand { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
 
 .brand-word {
@@ -165,8 +173,8 @@ a:focus-visible, button:focus-visible {
 .nav-links a.active { color: var(--ink); border-bottom-color: var(--ochre); }
 /* pointed at, every one turns red: the page you are on too */
 .nav-links a:hover { color: var(--ochre); }
-/* A dropdown under a label (Festivals & Rituals: the Calendar; Field Notes:
-   Photographs), dark against the page, appearing straight below the label,
+/* A dropdown under a label (Festivals & Rituals: the Calendar), a paper panel
+   with a thin line round it, red when pointed at as the labels are, appearing straight below the label,
    centred on it (at least as wide; wider only when its word is longer), when
    it is pointed at. The
    padding above bridges the gap, so the pointer can travel down to it. */
@@ -184,18 +192,32 @@ a:focus-visible, button:focus-visible {
 }
 /* open while pointed at, or reached with the keyboard; not after a click (shut) */
 .nav-links li.has-sub:not(.shut):is(:hover, :has(:focus-visible)) .nav-sub { opacity: 1; visibility: visible; transform: translate(-50%, 0); }
-.nav-sub li { background: var(--ink); }
+.nav-sub li { background: #fbf9f4; border: 1px solid var(--rule); }
 .nav-sub a {
   display: block;
   padding: 6px 14px 7px; /* a thin band */
   font-size: 13px;
   text-align: center;
-  color: var(--chalk);
+  color: var(--ink-2);
   border-bottom: 0;
   white-space: nowrap;
 }
 .nav-sub a:hover,
-.nav-sub a.active { color: var(--lamp); }
+.nav-sub a.active { color: var(--ochre); }
+/* On a computer: a small arrow beside a label with a dropdown, and the label
+   stays red for as long as its dropdown is open, the pointer on either */
+@media (min-width: 1061px) {
+  .nav-links li.has-sub > a::after {
+    content: "";
+    display: inline-block;
+    margin-left: 6px;
+    vertical-align: 2px;
+    border-left: 3.5px solid transparent;
+    border-right: 3.5px solid transparent;
+    border-top: 4px solid currentColor;
+  }
+  .nav-links li.has-sub:not(.shut):is(:hover, :has(:focus-visible)) > a { color: var(--ochre); }
+}
 
 .nav-toggle {
   display: none;
@@ -233,7 +255,7 @@ a:focus-visible, button:focus-visible {
   /* simply there, as the menu opens: none of the computer's fading in or
      centring (which a tap, held as a "hover", would otherwise set off) */
   .nav-links.open .nav-sub { position: static; padding: 0; opacity: 1; visibility: visible; transform: none !important; transition: none; }
-  .nav-links.open .nav-sub li { background: none; border-bottom: 0; }
+  .nav-links.open .nav-sub li { background: none; border: 0; }
   .nav-links.open .nav-sub a { color: var(--ink-2); font-size: 15px; text-align: right; padding: 10px 0; }
   .nav-links.open .nav-sub a:is(:hover, .active) { color: var(--ochre); }
 }
@@ -274,7 +296,7 @@ a:focus-visible, button:focus-visible {
 .page-title {
   font-family: var(--title-face);
   font-weight: 700;
-  font-size: min(96px, 8.3vw); /* (FESTIVALS & RITUALS, the longest, on one line) */
+  font-size: min(82px, 7.1vw); /* (FESTIVALS & RITUALS, the longest, on one line) */
   line-height: 1.02;
   letter-spacing: -0.01em;
   text-transform: uppercase;
@@ -3069,6 +3091,28 @@ body { container: page / inline-size; }
 @media (max-width: 640px) {
   .name-list { column-gap: 16px; }
   .name-list-ta { font-size: 17px; }
+}
+
+/* Writings: Field Notes and Articles, tabs under the title; title and tabs
+   stay still, and what is below them fades in */
+.writings-tabs { display: flex; gap: 30px; margin: 20px 0 22px; border-bottom: 1px solid var(--rule); }
+.writings-tabs a {
+  font-family: var(--display);
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  padding: 8px 0;
+  margin-bottom: -1px;
+  border-bottom: 2px solid transparent;
+  transition: color 0.15s, border-color 0.15s;
+}
+.writings-tabs a.active { color: var(--ink); border-bottom-color: var(--ochre); }
+.writings-tabs a:hover { color: var(--ochre); }
+@keyframes writings-fade { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: no-preference) {
+  .writings-tabs ~ *, .page-head:has(.writings-tabs) ~ * { animation: writings-fade 0.2s ease-out; }
 }
 
 /* under the Festivals & Rituals title, for the public: a head of the site's, in red */

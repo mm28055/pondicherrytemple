@@ -6,6 +6,7 @@ import type { FieldKind } from "@/content/types";
 import { noteRow } from "@/lib/view";
 import { FieldNotesBrowser } from "@/components/FieldNotesBrowser";
 import { HomeStrip } from "@/components/HomeStrip";
+import { WritingsTabs } from "@/components/WritingsTabs";
 
 export const metadata: Metadata = {
   title: "Field Notes",
@@ -38,7 +39,8 @@ export default async function FieldNotesPage() {
     <div className="wrap">
       <header className="page-head landing-head tight-head">
         <div className="kicker">From the temples</div>
-        <h1 className="page-title">Field Notes</h1>
+        <h1 className="page-title">Writings</h1>
+        <WritingsTabs current="field-notes" />
         <p className="page-lede">{await getSectionIntro("fieldNotes")}</p>
       </header>
       {stripPhotos.length > 0 && <HomeStrip photos={stripPhotos} />}

@@ -12,17 +12,17 @@ export const SECTION_INTROS = [
   {
     name: 'fieldNotes',
     label: 'Field Notes',
-    text: 'Everything recorded at the temples — notes written on the day, interviews, videos and photographs. Working material, lightly edited: the raw stuff of everything else on this site.',
+    text: 'Everything recorded at the temples — notes written on the day, interviews, photographs, sometimes also video. This is all working material, only lightly edited: the impressionistic raw material of our day-to-day interactions, things as we first saw them, our first experiential and thinking material. In this, we share also some preliminary interpretations and methods, how we went about doing what we did on a day-to-day basis.',
   },
   {
     name: 'films',
     label: 'Films',
-    text: 'Short films from the temples, newest first. Press one to play it here; each has its own page with the words that go with it.',
+    text: 'The temples in motion: deities carried through the streets, rites performed at dawn, and the people who keep them going. Sometimes also ideas and stories we found in our journeyings through the temple and its utsavams, and the new insights to which they led us. Unless otherwise stated, these have all been filmed, edited, narrated, and produced by Deepa Reddy and Arunaditya Das.',
   },
   {
     name: 'articles',
     label: 'Articles',
-    text: 'Essays and longer writing with a named author: on the temple, its festivals and rituals, and what they mean.',
+    text: 'Essays and longer writings with named authors: on the temple, its festivals and rituals, and what they mean. Some of these writings are our own, others may be archival material we have found particularly insightful in illuminating Indian temple traditions and culture.',
   },
   {
     name: 'books',

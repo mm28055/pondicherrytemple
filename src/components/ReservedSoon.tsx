@@ -21,12 +21,12 @@ export function ReservedLede({ intro }: { intro: string }) {
   if (FESTIVALS_PUBLISHED || team) return <p className="page-lede">{intro}</p>;
   return (
     <p className="page-lede">
-      The festivals and rituals we were present for — our field notes, articles, illustrations, explanations. All
-      being written and synthesized. For now, follow our field notes{" "}
+      The festivals and rituals we were present for, described and explained with all relevant detail, connected to
+      our field notes, photographs of the session, and eventually to longer articles and other syntheses. To be
+      compiled and published once our full year of field immersion is complete. For now,{" "}
       <Link className="lede-link" href="/field-notes">
-        here
+        follow our field notes →
       </Link>
-      .
     </p>
   );
 }

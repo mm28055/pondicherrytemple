@@ -67,6 +67,7 @@ import * as migration_20261102_130000_photo_tags from './20261102_130000_photo_t
 import * as migration_20261104_180000_photo_description from './20261104_180000_photo_description';
 import * as migration_20261104_190000_note_plain_letters from './20261104_190000_note_plain_letters';
 import * as migration_20261104_191000_site_plain_letters from './20261104_191000_site_plain_letters';
+import * as migration_20261106_170000_page_intros from './20261106_170000_page_intros';
 
 export const migrations = [
   {
@@ -413,5 +414,10 @@ export const migrations = [
     up: migration_20261104_191000_site_plain_letters.up,
     down: migration_20261104_191000_site_plain_letters.down,
     name: '20261104_191000_site_plain_letters',
+  },
+  {
+    up: migration_20261106_170000_page_intros.up,
+    down: migration_20261106_170000_page_intros.down,
+    name: '20261106_170000_page_intros',
   },
 ];

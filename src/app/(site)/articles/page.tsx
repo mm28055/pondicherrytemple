@@ -3,6 +3,7 @@ import Link from "next/link";
 import { getArticles, getRegion, getSectionIntro } from "@/lib/data";
 import { articleRow } from "@/lib/view";
 import { NoteRow } from "@/components/Rows";
+import { WritingsTabs } from "@/components/WritingsTabs";
 
 export const metadata: Metadata = {
   title: "Articles",
@@ -16,22 +17,27 @@ export default async function ArticlesPage() {
   return (
     <div className="wrap">
       <header className="page-head landing-head">
-        <div className="kicker">Writing</div>
-        <h1 className="page-title">Articles</h1>
-        <p className="page-lede">{await getSectionIntro("articles")}</p>
+        <div className="kicker">From the temples</div>
+        <h1 className="page-title">Writings</h1>
+        <WritingsTabs current="articles" />
+        {!articles.length && <p className="coming-soon">Coming soon</p>}
+        <p className="page-lede">
+          {await getSectionIntro("articles")}
+          {!articles.length && (
+            <>
+              {" "}
+              The first articles are being prepared. Until then,{" "}
+              <Link className="lede-link" href="/field-notes">
+                the field notes are the place to start →
+              </Link>
+            </>
+          )}
+        </p>
       </header>
       <section className="section">
-        {articles.length ? (
-          articles.map((r) => <NoteRow key={r.id} row={r} />)
-        ) : (
-          <p className="empty">
-            The first articles are being prepared. Until then, the{" "}
-            <Link href="/field-notes" style={{ color: "var(--ochre)", borderBottom: "1px solid var(--ochre)" }}>
-              field notes
-            </Link>{" "}
-            are the place to start.
-          </p>
-        )}
+        {articles.map((r) => (
+          <NoteRow key={r.id} row={r} />
+        ))}
       </section>
     </div>
   );

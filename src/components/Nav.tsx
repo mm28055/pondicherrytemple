@@ -14,7 +14,6 @@ type Tab = {
 
 // the calendar, and the month pages it opens
 const inCalendar = (p: string) => p.startsWith("/calendar") || p.startsWith("/festivals-and-rituals/month");
-const inPhotographs = (p: string) => p.startsWith("/photographs");
 
 const TABS: Tab[] = [
   {
@@ -30,18 +29,20 @@ const TABS: Tab[] = [
     sub: [{ href: "/calendar", label: "Calendar", match: inCalendar }],
   },
   {
+    // Writings: the field notes and the articles, with tabs between them (WritingsTabs)
     href: "/field-notes",
-    label: "Field Notes",
-    match: (p) => p.startsWith("/field-notes") || inPhotographs(p),
-    sub: [{ href: "/photographs", label: "Photographs", match: inPhotographs }],
+    label: "Writings",
+    match: (p) => p.startsWith("/field-notes") || p.startsWith("/articles"),
   },
-  { href: "/articles", label: "Articles", match: (p) => p.startsWith("/articles") },
+  { href: "/photographs", label: "Photographs", match: (p) => p.startsWith("/photographs") },
   { href: "/films", label: "Films", match: (p) => p.startsWith("/films") },
   { href: "/about", label: "About", match: (p) => p.startsWith("/about") },
 ];
 
 export function Nav() {
   const pathname = usePathname();
+  // the home page has the name large in its masthead: none in the bar, there only
+  const home = pathname === "/";
   const [open, setOpen] = useState(false);
   // a dropdown just clicked through stays shut until the pointer leaves it
   const [shut, setShut] = useState<string | null>(null);
@@ -67,17 +68,19 @@ export function Nav() {
   }, [open]);
 
   return (
-    <header className="nav" ref={bar}>
+    <header className={home ? "nav nav-home" : "nav"} ref={bar}>
       <div className="stripes" aria-hidden="true" />
       <div className="wrap nav-inner">
-        <Link className="brand" href="/" aria-label="Sthalam — home">
-          <span>
-            <span className="brand-word">Sthalam</span>
-            <span className="brand-tamil" lang="ta">
-              ஸ்தலம்
+        {!home && (
+          <Link className="brand" href="/" aria-label="Sthalam — home">
+            <span>
+              <span className="brand-word">Sthalam</span>
+              <span className="brand-tamil" lang="ta">
+                ஸ்தலம்
+              </span>
             </span>
-          </span>
-        </Link>
+          </Link>
+        )}
         <nav aria-label="Main">
           <ul className={`nav-links${open ? " open" : ""}`} id="primary-nav">
             {TABS.map((t) => {
