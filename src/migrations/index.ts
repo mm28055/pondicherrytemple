@@ -68,6 +68,8 @@ import * as migration_20261104_180000_photo_description from './20261104_180000_
 import * as migration_20261104_190000_note_plain_letters from './20261104_190000_note_plain_letters';
 import * as migration_20261104_191000_site_plain_letters from './20261104_191000_site_plain_letters';
 import * as migration_20261106_170000_page_intros from './20261106_170000_page_intros';
+import * as migration_20261106_180000_home_quote from './20261106_180000_home_quote';
+import * as migration_20261107_100000_ritual_day from './20261107_100000_ritual_day';
 
 export const migrations = [
   {
@@ -419,5 +421,15 @@ export const migrations = [
     up: migration_20261106_170000_page_intros.up,
     down: migration_20261106_170000_page_intros.down,
     name: '20261106_170000_page_intros',
+  },
+  {
+    up: migration_20261106_180000_home_quote.up,
+    down: migration_20261106_180000_home_quote.down,
+    name: '20261106_180000_home_quote',
+  },
+  {
+    up: migration_20261107_100000_ritual_day.up,
+    down: migration_20261107_100000_ritual_day.down,
+    name: '20261107_100000_ritual_day',
   },
 ];

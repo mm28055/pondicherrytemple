@@ -39,10 +39,22 @@ export interface Region {
 
 export type DeityGroup = "shiva" | "vishnu" | "amman" | "vinayaka" | "murugan";
 
+/** One kalam of a temple's ritual day (The Day, in Ritual Cycles). */
+export interface Kalam {
+  kalam: string;
+  tamil?: string;
+  time?: string;
+  timingNote?: string;
+  whatHappens?: string;
+  naivedyam?: string;
+}
+
 export interface Temple {
   /** Web address, unique within its region: /pondicherry/chetty-koil */
   id: string;
   region: RegionId;
+  /** Its day, kalam by kalam, in order. */
+  ritualDay?: Kalam[];
   name: string;
   /** What the temple is called in town, if different. */
   knownAs?: string;

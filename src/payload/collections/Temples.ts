@@ -154,6 +154,47 @@ export const Temples: CollectionConfig = {
           ],
         },
         {
+          label: 'The ritual day',
+          description:
+            'The temple’s day, kalam by kalam, in order: shown as The Day in Ritual Cycles on its page, once there is at least one. Drag the rows to reorder.',
+          fields: [
+            {
+              name: 'ritualDay',
+              label: 'Kalams',
+              labels: { singular: 'Kalam', plural: 'Kalams' },
+              type: 'array',
+              fields: [
+                {
+                  type: 'row',
+                  fields: [
+                    { name: 'kalam', type: 'text', label: 'Kalam', required: true, admin: { width: '33%', placeholder: 'Kalasandhi' } },
+                    { name: 'tamil', type: 'text', label: 'In Tamil', admin: { width: '33%', description: 'Shown above its name. Can be left empty.' } },
+                    { name: 'time', type: 'text', label: 'Time', admin: { width: '33%', placeholder: '6am', description: 'Short: shown beside its name.' } },
+                  ],
+                },
+                {
+                  name: 'timingNote',
+                  type: 'textarea',
+                  label: 'More on the timing',
+                  admin: { rows: 2, description: 'Can be left empty. Shown under its name.' },
+                },
+                {
+                  name: 'whatHappens',
+                  type: 'textarea',
+                  label: 'What happens',
+                  admin: { rows: 3, description: 'A few words or a sentence or two. A new line here is a new line on the page.' },
+                },
+                {
+                  name: 'naivedyam',
+                  type: 'textarea',
+                  label: 'Naivedyam',
+                  admin: { rows: 2, description: 'A new line here is a new line on the page.' },
+                },
+              ],
+            },
+          ],
+        },
+        {
           label: 'The year so far',
           description:
             'Every date the team was present, oldest first. "Add new" adds a date at this temple. The festivals and rituals tagged on these dates make the "Festivals & rituals seen here" list.',

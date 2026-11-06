@@ -1,3 +1,4 @@
+import type { Kalam } from "@/content/types";
 import type { TempleRitualYear, TempleYearEntry } from "@/lib/data";
 import { FestivalLink } from "@/components/FestivalLink";
 import { MonthHead } from "@/components/MonthHead";
@@ -57,15 +58,15 @@ function timing(e: TempleYearEntry) {
   return { group, short: short.charAt(0).toUpperCase() + short.slice(1) };
 }
 
-/** A temple's ritual calendar (lib/data getTempleRitualYear), in three
-    parts chosen at the top (components/RitualTabs): the year, the month and
-    the week, each with how many there are.
-    The Ritual Year: the twelve months from Chithirai to Panguni, the one we
+/** A temple's ritual calendar (lib/data getTempleRitualYear), in three or four
+    parts chosen at the top (components/RitualTabs): the year, the month, the
+    week and, where it is written, the day, each with how many there are.
+    The Year: the twelve months from Chithirai to Panguni, the one we
     are in in its own colour; under each its festivals (anything that comes
     once a year, or a few times), each in a pale panel: the Tamil name, the
     English beneath it with the red mark and the number of days when it was
     seen on more than one ("Brahmotsavam • 16 days"), and a few words on it.
-    The Ritual Month: what comes twice a month and every month; the Ritual
+    The Month: what comes twice a month and every month; The
     Week: what comes every week. Each once, in a pale panel too, two to a
     line, under its heading: the Tamil, the English, and the day and time
     below ("On Thiruvonam", in italics), then its few words at the temple;
@@ -74,7 +75,7 @@ function timing(e: TempleYearEntry) {
     name. A day listed
     under its own name ("Bhairava Abhishekam") shows that name, its rite's
     Tamil above it, and leads to the rite's page. */
-export function TempleYear({ year }: { year: TempleRitualYear }) {
+export function TempleYear({ year, day = [] }: { year: TempleRitualYear; day?: Kalam[] }) {
   const regular = year.regular.map((e) => ({ e, ...timing(e) }));
   const weekly = regular.filter((x) => x.group === "weekly").sort((a, b) => weekdayOf(a.short) - weekdayOf(b.short));
   const monthly = regular.filter((x) => x.group !== "weekly");
@@ -125,7 +126,7 @@ export function TempleYear({ year }: { year: TempleRitualYear }) {
         {
           key: "year",
           ta: "வருடம்",
-          en: "The Ritual Year",
+          en: "The Year",
           count: many(festivals, "festival", "festivals"),
           panel: (
             <div>
@@ -153,7 +154,7 @@ export function TempleYear({ year }: { year: TempleRitualYear }) {
         {
           key: "month",
           ta: "மாதம்",
-          en: "The Ritual Month",
+          en: "The Month",
           count: many(monthly.length, "ritual", "rituals"),
           panel: monthly.length
             ? GROUPS.filter((g) => g.key !== "weekly").map(({ key, label }) => {
@@ -170,7 +171,7 @@ export function TempleYear({ year }: { year: TempleRitualYear }) {
         {
           key: "week",
           ta: "வாரம்",
-          en: "The Ritual Week",
+          en: "The Week",
           count: many(weekly.length, "ritual", "rituals"),
           panel: weekly.length ? (
             <section className="year-regular">
@@ -181,8 +182,52 @@ export function TempleYear({ year }: { year: TempleRitualYear }) {
             none
           ),
         },
+        // only for a temple whose day has been written
+        ...(day.length
+          ? [
+              {
+                key: "day",
+                ta: "நாள்",
+                en: "The Day",
+                count: many(day.length, "kalam", "kalams"),
+                panel: <RitualDay day={day} />,
+              },
+            ]
+          : []),
       ]}
     />
+  );
+}
+
+/** The temple's day, kalam by kalam: its Tamil, its name and time, a note on
+    the time, what happens, and its naivedyam, each only when it is written. */
+function RitualDay({ day }: { day: Kalam[] }) {
+  return (
+    <div className="year-list year-day">
+      {day.map((k, i) => (
+        <div key={i} className="fl">
+          {k.tamil && (
+            <span className="t" lang="ta">
+              {k.tamil}
+            </span>
+          )}
+          <span className="caps">{[k.kalam, k.time].filter(Boolean).join(" · ")}</span>
+          {k.timingNote && <p>{k.timingNote}</p>}
+          {k.whatHappens && (
+            <>
+              <h5>What happens</h5>
+              <p>{k.whatHappens}</p>
+            </>
+          )}
+          {k.naivedyam && (
+            <>
+              <h5>Naivedyam</h5>
+              <p>{k.naivedyam}</p>
+            </>
+          )}
+        </div>
+      ))}
+    </div>
   );
 }
 

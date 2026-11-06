@@ -23,7 +23,6 @@ import {
   layoutsOf,
   withPlaceholderLayouts,
 } from "@/lib/data";
-import { Html } from "@/components/Prose";
 import { articleRow, filmTile, noteRow, templesOf } from "@/lib/view";
 import { Drawings } from "@/components/Drawings";
 import { FilmWall } from "@/components/FilmWall";
@@ -34,6 +33,7 @@ import { formatDate } from "@/lib/calendar";
 import { NoteRow } from "@/components/Rows";
 import { TempleYear } from "@/components/TempleYear";
 import { ShowMore } from "@/components/ShowMore";
+import { FoldedIntro } from "@/components/FoldedIntro";
 import { TempleLayout } from "@/components/TempleLayout";
 import { TempleColumns } from "@/components/TempleColumns";
 import { ReservedLink } from "@/components/ReservedLink";
@@ -132,7 +132,7 @@ export default async function TemplePage({ params }: Props) {
 
             {/* its introduction (Admin → Temples); a note in its place until it is written */}
             {t.intro ? (
-              <Html className="prose" html={t.intro} />
+              <FoldedIntro html={t.intro} />
             ) : (
               <p className="note-line">An introduction to the temple is being written.</p>
             )}
@@ -212,7 +212,7 @@ export default async function TemplePage({ params }: Props) {
 
             <section id="ritual-year">
               <h2 id="ritual-cycles" className="sub-head">Ritual Cycles</h2>
-              <TempleYear year={year} />
+              <TempleYear year={year} day={t.ritualDay ?? []} />
             </section>
           </>
         }

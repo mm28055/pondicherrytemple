@@ -319,6 +319,20 @@ const toTemple = (t: P.Temple, L: Lookups): Temple => ({
   faces: t.faces ?? "east",
   intro: toHTML(t.intro, L.paths) || undefined,
   introText: plainText(t.intro) || undefined,
+  ritualDay: (t.ritualDay ?? []).flatMap((k) =>
+    k.kalam?.trim()
+      ? [
+          {
+            kalam: k.kalam.trim(),
+            tamil: k.tamil?.trim() || undefined,
+            time: k.time?.trim() || undefined,
+            timingNote: k.timingNote?.trim() || undefined,
+            whatHappens: k.whatHappens?.trim() || undefined,
+            naivedyam: k.naivedyam?.trim() || undefined,
+          },
+        ]
+      : [],
+  ),
   coordinates:
     t.coordinates?.lat != null && t.coordinates?.lng != null
       ? [t.coordinates.lat, t.coordinates.lng]

@@ -321,6 +321,32 @@ export interface Temple {
     hasNextPage?: boolean;
     totalDocs?: number;
   };
+  ritualDay?:
+    | {
+        kalam: string;
+        /**
+         * Shown above its name. Can be left empty.
+         */
+        tamil?: string | null;
+        /**
+         * Short: shown beside its name.
+         */
+        time?: string | null;
+        /**
+         * Can be left empty. Shown under its name.
+         */
+        timingNote?: string | null;
+        /**
+         * A few words or a sentence or two. A new line here is a new line on the page.
+         */
+        whatHappens?: string | null;
+        /**
+         * A new line here is a new line on the page.
+         */
+        naivedyam?: string | null;
+        id?: string | null;
+      }[]
+    | null;
   yearSoFar?: {
     docs?: (number | Occasion)[];
     hasNextPage?: boolean;
@@ -1579,6 +1605,17 @@ export interface TemplesSelect<T extends boolean = true> {
         lng?: T;
       };
   pieces?: T;
+  ritualDay?:
+    | T
+    | {
+        kalam?: T;
+        tamil?: T;
+        time?: T;
+        timingNote?: T;
+        whatHappens?: T;
+        naivedyam?: T;
+        id?: T;
+      };
   yearSoFar?: T;
   drawings?: T;
   photographs?: T;

@@ -4,9 +4,9 @@ import { useId, useState, type ReactNode } from "react";
 
 export type RitualTab = { key: string; ta: string; en: string; count: string; panel: ReactNode };
 
-/** A temple's ritual calendar in three parts, the year, the month and the
-    week, chosen at the top: a switch of three, each with its Tamil and
-    English name and how many there are, the one shown dark. All three are
+/** A temple's ritual calendar in parts, the year, the month, the week and the
+    day, chosen at the top: a switch, each with its Tamil and
+    English name and how many there are, the one shown dark. All of them are
     in the page (for those without scripts, and for search); one is shown. */
 export function RitualTabs({ tabs }: { tabs: RitualTab[] }) {
   const [on, setOn] = useState(tabs[0]?.key);

@@ -139,7 +139,7 @@ a:focus-visible, button:focus-visible {
   .nav-home:not(.scrolled) { background: transparent; }
   .home-hero { margin-top: max(-14vw, -64px); }
   /* the menu open, from under the stripes: the name large behind it, softened, the words clear in front */
-  .nav-home .nav-links.open { top: 0; padding-top: 60px; background: rgba(245, 244, 240, 0.74); -webkit-backdrop-filter: blur(9px); backdrop-filter: blur(9px); }
+  .nav-home .nav-links.open { top: 0; padding-top: 60px; }
   .nav-home .nav-toggle { position: relative; z-index: 1; }
 }
 
@@ -248,7 +248,10 @@ a:focus-visible, button:focus-visible {
     align-items: flex-end;
     text-align: right;
     gap: 0;
-    background: var(--chalk);
+    /* every hamburger menu, on every page: frosted over what is behind it, the words clear in front */
+    background: rgba(245, 244, 240, 0.74);
+    -webkit-backdrop-filter: blur(9px);
+    backdrop-filter: blur(9px);
     border-bottom: 2px solid var(--ink);
     padding: 8px var(--gutter) 20px;
   }
@@ -1244,15 +1247,15 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
 /* A temple's ritual calendar, in three parts chosen at the top
    (components/RitualTabs): a switch of three, a box each, its Tamil, its
    English and how many there are; the one shown dark. */
-.ritual-switch { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border: 1.5px solid var(--ink); margin: 6px 0 18px; }
+.ritual-switch { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); border: 1.5px solid var(--ink); margin: 6px 0 18px; }
 .ritual-switch button { background: none; border: 0; border-right: 1.5px solid var(--ink); padding: 8px 4px 7px; cursor: pointer; text-align: center; color: var(--ink); font: inherit; }
 .ritual-switch button:last-child { border-right: 0; }
 .ritual-switch button:hover:not(.on) { background: var(--chalk-2); }
 .ritual-switch .ta { display: block; font-family: var(--tamil); font-weight: 700; font-size: 16px; line-height: 1.2; }
 .ritual-switch .en { display: block; font-family: var(--display); font-weight: 600; font-size: 12.5px; letter-spacing: 0.1em; text-transform: uppercase; margin-top: 2px; }
-.ritual-switch .n { display: block; font-size: 11.5px; color: var(--muted); margin-top: 1px; }
+.ritual-switch .n { display: block; font-size: 11.5px; color: var(--turmeric); margin-top: 1px; }
 .ritual-switch .on { background: var(--ink); color: var(--chalk); }
-.ritual-switch .on .n { color: color-mix(in srgb, var(--on-night) 82%, var(--on-night-dim)); }
+.ritual-switch .on .n { color: var(--lamp); }
 /* Its parts, each on one pale ground (a month's festivals; each heading's
    rituals, its set too), every entry marked by a red line at its left. The
    year: under each month its festivals, the bigger utsavams, named as in the
@@ -1282,6 +1285,13 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
 .year-set-head .caps { font-size: 12.5px; color: var(--ink-2); }
 @media (max-width: 640px) {
   .ritual-switch .en, .year-regular-head, .year-regular-list .caps, .year-set-head .caps { font-size: 10.5px; }
+}
+/* The Day: a temple's kalams, each as a festival is in The Year, with its words below */
+.year-day .caps { display: block; }
+.year-day p { font-size: 15.5px; line-height: 1.45; white-space: pre-line; }
+.year-day h5 { margin-top: 7px; font-family: var(--display); font-weight: 600; font-size: 12.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ochre); }
+@media (max-width: 640px) {
+  .year-day h5 { font-size: 10.5px; }
 }
 .year-about { display: block; margin-top: 6px; font-size: 14px; line-height: 1.45; color: var(--muted); }
 /* the month we are in: its heading in a band of its own colour, as on the calendar, marked "Now" */
@@ -3416,6 +3426,19 @@ span.month-obs .month-obs-more { display: none; }
   color: var(--ink);
 }
 .more-button:hover { color: var(--ochre); }
+/* a temple's introduction, past about 250 words (FoldedIntro): words at the end of the
+   text's line, as the header's way to the field notes (.lede-link), no line under them */
+.intro-more {
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 600;
+  color: var(--ochre);
+  white-space: nowrap;
+}
+.intro-more:hover { color: var(--ochre-deep); }
 #ritual-year, #field-notes, #all-field-notes, #photographs, #films, #articles { scroll-margin-top: 84px; }
 @media (max-width: 900px) {
   .page-parts {

@@ -18,7 +18,7 @@ const home = {
   headline: 'The temple is the soul of every town',
   opening: toLexical([OPENING_1, PILOT]),
   quote:
-    'What are their calendars, their rituals, their stories? What sustains them, what world do they still hold together?',
+    'What are the temples’ calendars, their rituals, their stories? What sustains them, what world do they still hold together?',
   quoteBy: '— Deepa Reddy, anthropologist · May 2026',
   bookHeading: 'A book is in preparation',
   bookText: "Written from the year's fieldwork, with illustrated plans of each temple.",
