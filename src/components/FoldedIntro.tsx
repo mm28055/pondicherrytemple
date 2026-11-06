@@ -1,5 +1,6 @@
 "use client";
 
+import { flushSync } from "react-dom";
 import { useState, type MouseEvent } from "react";
 import { Html } from "./Prose";
 
@@ -55,9 +56,17 @@ export function FoldedIntro({ html }: { html: string }) {
   const fold = foldAt(html);
   if (open || !fold) return <Html className="prose" html={html} />;
 
-  // the words are in the text, so the tap is heard here
+  // the words are in the text, so the tap is heard here. The rest opens below
+  // and the page stays exactly where it is: left to itself, the browser would
+  // hold on to what is under the text, and carry the reader down with it
   const read = (e: MouseEvent) => {
-    if ((e.target as HTMLElement).closest(".intro-more")) setOpen(true);
+    if (!(e.target as HTMLElement).closest(".intro-more")) return;
+    const page = document.documentElement;
+    const y = window.scrollY;
+    page.style.overflowAnchor = "none";
+    flushSync(() => setOpen(true));
+    window.scrollTo({ top: y, behavior: "instant" });
+    requestAnimationFrame(() => requestAnimationFrame(() => (page.style.overflowAnchor = "")));
   };
 
   return (
