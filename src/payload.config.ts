@@ -18,6 +18,7 @@ import { Occasions } from './payload/collections/Occasions'
 import { Regions } from './payload/collections/Regions'
 import { SpecialNakshatras } from './payload/collections/SpecialNakshatras'
 import { SpecialTithis } from './payload/collections/SpecialTithis'
+import { Dictionary } from './payload/collections/Dictionary'
 import { WeeklyRituals } from './payload/collections/WeeklyRituals'
 import { TemplePieces } from './payload/collections/TemplePieces'
 import { Temples } from './payload/collections/Temples'
@@ -76,6 +77,7 @@ export default buildConfig({
     Occasions,
     Drawings,
     Observances,
+    Dictionary,
     SpecialNakshatras,
     SpecialTithis,
     WeeklyRituals,

@@ -4,6 +4,7 @@ import { FilmVideo } from "@/components/FilmVideo";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
+  getDictionary,
   getFieldNote,
   getFieldNotes,
   getFieldNotesForTemple,
@@ -19,6 +20,8 @@ import { FIELD_KIND_LABELS } from "@/content/labels";
 import { formatDate, localDate } from "@/lib/calendar";
 import { noteRow } from "@/lib/view";
 import { Html } from "@/components/Prose";
+import { GlossCard } from "@/components/GlossCard";
+import { markDictionary } from "@/lib/dictionary";
 import { FestivalLink } from "@/components/FestivalLink";
 import { NotePhotos } from "@/components/NotePhotos";
 import { NoteRow } from "@/components/Rows";
@@ -57,6 +60,7 @@ export default async function FieldNotePage({ params }: Props) {
 
   // the notes before and after this one, by date (the list is newest first)
   const all = await getFieldNotes();
+  const dictionary = await getDictionary();
   const at = all.findIndex((n) => n.id === note.id);
   const older = at >= 0 ? all[at + 1] : undefined;
   const newer = at > 0 ? all[at - 1] : undefined;
@@ -120,11 +124,12 @@ export default async function FieldNotePage({ params }: Props) {
       {/* the text in a column at the right, ending where the line above
           ends; the photographs down the left beside it (on a phone, in rows
           above the text) */}
+      <GlossCard />
       <div className="wrap note-layout">
         <NotePhotos pack={packPhotos(photos)} seed={note.id} />
         <div className="note-text">
           <article className="note-body">
-            {note.body && <Html className="rich" html={note.body} />}
+            {note.body && <Html className="rich" html={markDictionary(note.body, dictionary)} />}
 
             {note.videos?.map((v) => (
               <figure key={v.src} className="media">
@@ -158,7 +163,7 @@ export default async function FieldNotePage({ params }: Props) {
                   ))}
                 </div>
               )}
-              {n.body && <Html className="rich" html={n.body} />}
+              {n.body && <Html className="rich" html={markDictionary(n.body, dictionary)} />}
             </article>
           ))}
 

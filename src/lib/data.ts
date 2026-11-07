@@ -17,6 +17,7 @@
 import config from "@payload-config";
 import { draftMode } from "next/headers";
 import { unstable_cache } from "next/cache";
+import { buildDictionary, type DictionaryEntry } from "./dictionary";
 import { getPayload, type Payload, type Where } from "payload";
 import { PHOTOS_TAG, SITE_CONTENT_TAG } from "./siteCache";
 import { cache } from "react";
@@ -1192,6 +1193,12 @@ export async function countTemplesForObservance(observanceId: string): Promise<n
   );
   return seen.size;
 }
+
+/** The dictionary, ready for marking the field notes (lib/dictionary). */
+export const getDictionary = cache(async () => {
+  const docs = (await find({ ...base, collection: "dictionary", depth: 0 })).docs;
+  return buildDictionary(docs as unknown as DictionaryEntry[]);
+});
 
 /* ---------- Field notes (notes, interviews, videos, recordings, photos) ---------- */
 

@@ -78,6 +78,7 @@ export interface Config {
     occasions: Occasion;
     drawings: Drawing;
     observances: Observance;
+    dictionary: Dictionary;
     'special-nakshatras': SpecialNakshatra;
     'special-tithis': SpecialTithi;
     'weekly-rituals': WeeklyRitual;
@@ -117,6 +118,7 @@ export interface Config {
     occasions: OccasionsSelect<false> | OccasionsSelect<true>;
     drawings: DrawingsSelect<false> | DrawingsSelect<true>;
     observances: ObservancesSelect<false> | ObservancesSelect<true>;
+    dictionary: DictionarySelect<false> | DictionarySelect<true>;
     'special-nakshatras': SpecialNakshatrasSelect<false> | SpecialNakshatrasSelect<true>;
     'special-tithis': SpecialTithisSelect<false> | SpecialTithisSelect<true>;
     'weekly-rituals': WeeklyRitualsSelect<false> | WeeklyRitualsSelect<true>;
@@ -1019,6 +1021,30 @@ export interface PhotoOrder {
   createdAt: string;
 }
 /**
+ * Words explained in the field notes. The first use of each word in a note is underlined with dots, and its meaning appears on hover, or on a tap on a phone.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "dictionary".
+ */
+export interface Dictionary {
+  id: number;
+  /**
+   * As it should appear at the top of the card.
+   */
+  word: string;
+  /**
+   * Other forms that should show this meaning, separated by commas: alankara for alankaram. Plurals in s are found without being listed.
+   */
+  alsoWritten?: string | null;
+  meaning: string;
+  /**
+   * For a word that is something else without its capital: Thai, the month, and not thai in thai saadam.
+   */
+  exactCase?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * A nakshatram kept specially in a Tamil month, like Purattasi Thiruvonam. Set once, it is marked on the month calendars every year: on the day the nakshatram holds at sunrise.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1319,6 +1345,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'observances';
         value: number | Observance;
+      } | null)
+    | ({
+        relationTo: 'dictionary';
+        value: number | Dictionary;
       } | null)
     | ({
         relationTo: 'special-nakshatras';
@@ -1745,6 +1775,18 @@ export interface ObservancesSelect<T extends boolean = true> {
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "dictionary_select".
+ */
+export interface DictionarySelect<T extends boolean = true> {
+  word?: T;
+  alsoWritten?: T;
+  meaning?: T;
+  exactCase?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
