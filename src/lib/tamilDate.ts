@@ -17,7 +17,7 @@ export const TAMIL_MONTHS = [
   { en: "Aavani", ta: "ஆவணி" },
   { en: "Purattasi", ta: "புரட்டாசி" },
   { en: "Aippasi", ta: "ஐப்பசி" },
-  { en: "Karthigai", ta: "கார்த்திகை" },
+  { en: "Karthikai", ta: "கார்த்திகை" },
   { en: "Margazhi", ta: "மார்கழி" },
   { en: "Thai", ta: "தை" },
   { en: "Masi", ta: "மாசி" },

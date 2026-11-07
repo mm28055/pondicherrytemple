@@ -70,7 +70,7 @@ export const Temples: CollectionConfig = {
                   required: true,
                   admin: {
                     width: '33%',
-                    placeholder: 'e.g. Chetty Koil',
+                    placeholder: 'e.g. Chetty Koyil',
                     description: 'For where there is very little room: the boxes of the month calendars, and the temples above field notes on a phone.',
                   },
                 },
@@ -167,7 +167,7 @@ export const Temples: CollectionConfig = {
                 {
                   type: 'row',
                   fields: [
-                    { name: 'kalam', type: 'text', label: 'Kalam', required: true, admin: { width: '33%', placeholder: 'Kalasandhi' } },
+                    { name: 'kalam', type: 'text', label: 'Kaalam', required: true, admin: { width: '33%', placeholder: 'Kaalasandhi' } },
                     { name: 'tamil', type: 'text', label: 'In Tamil', admin: { width: '33%', description: 'Shown above its name. Can be left empty.' } },
                     { name: 'time', type: 'text', label: 'Time', admin: { width: '33%', placeholder: '6am', description: 'Short: shown beside its name.' } },
                   ],

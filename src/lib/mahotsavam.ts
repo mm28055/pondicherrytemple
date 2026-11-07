@@ -5,19 +5,19 @@ export const MAHOTSAVAM_PARTS: { id: string; title: string; mark: string; rites:
     id: "before",
     mark: "Before the Mahotsavam",
     title: "Before the Mahotsavam Begins",
-    rites: ["Anugnai", "Vigneswara Puja", "Vastu Shanti Puja", "Mritsangrahanam", "Ankurarpanam"],
+    rites: ["Anugnai", "Vigneswara Puja", "Vastu Shanti Puja", "Mrtsangrahanam", "Ankurarpanam"],
   },
   {
     id: "defining",
     mark: "The Defining Elements",
     title: "The Defining Elements",
-    rites: ["Dhvajarohanam", "Processions", "Thirukalyanam", "Rathotsavam", "Teerthavari", "Dhvajavarohanam"],
+    rites: ["Dhvajarohanam", "Processions", "Thirukalyanam", "Rathotsavam", "Theerthavari", "Dhvajavarohanam"],
   },
   {
     id: "concluding",
     mark: "Concluding Events",
     title: "Vidaiyaatri, Concluding Events",
-    rites: ["Theppotsavam", "Unjal Utsavam", "Mutthupalakku Madaveethi Purappadu", "Shankhabhishekam"],
+    rites: ["Theppotsavam", "Unjal Utsavam", "Mutthupallakku Madaveethi Purappadu", "Shankhabhishekam"],
   },
 ];
 

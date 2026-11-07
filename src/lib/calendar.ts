@@ -45,7 +45,7 @@ export const TAMIL_MONTHS: TamilMonth[] = [
   { slug: "aavani", name: "Aavani", tamil: "ஆவணி", span: "mid-August to mid-September", starts: "08-17", rasi: [2, 4], colour: "#9b2d3f" },
   { slug: "purattasi", name: "Purattasi", tamil: "புரட்டாசி", span: "mid-September to mid-October", starts: "09-17", rasi: [3, 4], colour: "#3b4f8c" },
   { slug: "aippasi", name: "Aippasi", tamil: "ஐப்பசி", span: "mid-October to mid-November", starts: "10-17", rasi: [4, 4], colour: "#4d6878" },
-  { slug: "karthigai", name: "Karthigai", tamil: "கார்த்திகை", span: "mid-November to mid-December", starts: "11-16", rasi: [4, 3], colour: "#c0561b" },
+  { slug: "karthigai", name: "Karthikai", tamil: "கார்த்திகை", span: "mid-November to mid-December", starts: "11-16", rasi: [4, 3], colour: "#c0561b" },
   { slug: "margazhi", name: "Margazhi", tamil: "மார்கழி", span: "mid-December to mid-January", starts: "12-16", rasi: [4, 2], colour: "#9a4a68" },
   { slug: "thai", name: "Thai", tamil: "தை", span: "mid-January to mid-February", starts: "01-14", rasi: [4, 1], colour: "#4e7d34" },
   { slug: "masi", name: "Masi", tamil: "மாசி", span: "mid-February to mid-March", starts: "02-13", rasi: [3, 1], colour: "#1f5d7f" },

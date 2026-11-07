@@ -1,7 +1,7 @@
 import type { DeityGroup, EntryTopic, FieldKind } from "./types";
 
 export const DEITY_GROUP_LABELS: Record<DeityGroup, string> = {
-  shiva: "Shiva",
+  shiva: "Siva",
   vishnu: "Vishnu",
   amman: "Amman",
   vinayaka: "Vinayaka",

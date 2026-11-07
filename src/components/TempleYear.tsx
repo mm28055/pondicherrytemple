@@ -17,7 +17,7 @@ const DAYS: Record<string, string> = { sun: "Sunday", mon: "Monday", tue: "Tuesd
 const plain = (s: string) => ` ${s.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim()} `;
 
 /* The Pancha Paruva Utsavam's five, in their order; anything else after them, as it comes. */
-const SET_ORDER = ["Amavasya", "Pournami", "Maasa Pirappu", "Masa Shivaratri", "Theipirai Ashtami"];
+const SET_ORDER = ["Amavasya", "Pournami", "Masa Pirappu", "Masa Sivaratri", "Theipirai Ashtami"];
 const setOrder = (name = "") => {
   const i = SET_ORDER.indexOf(name);
   return i < 0 ? SET_ORDER.length : i;
@@ -26,7 +26,7 @@ const setOrder = (name = "") => {
 /** How often it comes round (its group), and when, below its name: how
     often is said once, in the group's heading, and what its name says
     already is not said again (Theipirai Ashtami: "11 am", not "On
-    Theipirai Ashtami, 11 am"; Maasa Pirappu: nothing, not "On the first day
+    Theipirai Ashtami, 11 am"; Masa Pirappu: nothing, not "On the first day
     of the month"); what is left is the day and the time (Perumal
     Thirumanjanam: "On Thiruvonam"; Bhairava Abhishekam: "Sunday, after
     7:30 pm"). */
@@ -44,7 +44,7 @@ function timing(e: TempleYearEntry) {
         : e.on && !said(e.on)
           ? `on ${e.on}`
           : "";
-    // "After 7:30 pm" and "Morning" in lower case after the day; a name ("Pradosha kalam") as it is
+    // "After 7:30 pm" and "Morning" in lower case after the day; a name ("Pradosha kaalam") as it is
     const time = day && /^(after|before|from|morning|evening|noon|night)\b/i.test(e.time) ? e.time.charAt(0).toLowerCase() + e.time.slice(1) : e.time;
     // then anything particular to this time
     const short = [[day, time].filter(Boolean).join(", "), e.details].filter(Boolean).join(" · ");
@@ -189,7 +189,7 @@ export function TempleYear({ year, day = [] }: { year: TempleRitualYear; day?: K
                 key: "day",
                 ta: "நாள்",
                 en: "The Day",
-                count: many(day.length, "kalam", "kalams"),
+                count: many(day.length, "kaalam", "kaalams"),
                 panel: <RitualDay day={day} />,
               },
             ]
@@ -199,7 +199,7 @@ export function TempleYear({ year, day = [] }: { year: TempleRitualYear; day?: K
   );
 }
 
-/** The temple's day, kalam by kalam: its Tamil, its name and time, a note on
+/** The temple's day, kaalam by kaalam: its Tamil, its name and time, a note on
     the time, what happens, and its naivedyam, each only when it is written. */
 function RitualDay({ day }: { day: Kalam[] }) {
   return (

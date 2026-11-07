@@ -32,7 +32,7 @@ export const TITHI_NAMES: Record<TithiKey, { name: string; tamil: string; icon: 
   "panchami-k": { name: "Theipirai Panchami", tamil: "தேய்பிறை பஞ்சமி", icon: "🐍" },
   "ashtami-k": { name: "Theipirai Ashtami", tamil: "தேய்பிறை அஷ்டமி", icon: "🐕" },
   "pradosham-k": { name: "Pradosham", tamil: "பிரதோஷம்", icon: "🐂" },
-  shivaratri: { name: "Masa Shivaratri", tamil: "மாத சிவராத்திரி", icon: "🔱" },
+  shivaratri: { name: "Masa Sivaratri", tamil: "மாத சிவராத்திரி", icon: "🔱" },
   amavasya: { name: "Amavasya", tamil: "அமாவாசை", icon: "" },
 };
 

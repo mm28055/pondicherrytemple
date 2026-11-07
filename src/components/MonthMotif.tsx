@@ -268,7 +268,7 @@ const rain = (
   </>
 );
 
-// Karthigai: the lamps of Karthigai Deepam
+// Karthikai: the lamps of Karthikai Deepam
 const lamp = (cx: number, cy: number) => (
   <g key={cx}>
     <path
@@ -396,7 +396,7 @@ const pongal = (
   </>
 );
 
-// Masi: the full moon over the sea, for Masi Magam
+// Masi: the full moon over the sea, for Masi Maham
 const sea = (
   <>
     {/* the moon rises out of the sea, and its light shimmers on the water */}
@@ -453,7 +453,7 @@ const MOTIFS: Record<string, { art: ReactNode; label: string; box: string }> = {
   aavani: { art: kozhukattai, label: "A kozhukattai", box: "11 -8 78 103" },
   purattasi: { art: namam, label: "Perumal's namam", box: "29 11 42 86" },
   aippasi: { art: rain, label: "The first rains", box: "10 15 79 76" },
-  karthigai: { art: lamps, label: "Karthigai lamps", box: "5 27 96 66" },
+  karthigai: { art: lamps, label: "Karthikai lamps", box: "5 27 96 66" },
   margazhi: { art: kolam, label: "A kolam", box: "11 11 78 78" },
   thai: { art: pongal, label: "The pongal pot, and sugarcane", box: "16 0 88 97" },
   masi: { art: sea, label: "The full moon over the sea", box: "5 11 88 86" },

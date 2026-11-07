@@ -553,7 +553,7 @@ const illustrations = cache(async () => {
     month's name kept with what follows it ("Adi, Friday1": "Adi Friday1"),
     and a day's number with what comes before ("Andu Vizha, Day 2"); of
     two things done, the first. */
-const MONTH_FIRST = /^(?:adi|aadi|aavani|avani|purattasi|aippasi|karthigai|margazhi|thai|masi|panguni|chithirai|vaikasi|aani)$/i;
+const MONTH_FIRST = /^(?:adi|aadi|aavani|avani|purattasi|aippasi|karthigai|karthikai|margazhi|thai|masi|panguni|chithirai|vaikasi|aani)$/i;
 function shortOccasion(title: string) {
   const parts = title.split(",").map((p) => p.trim()).filter(Boolean);
   let first = parts[0] ?? "";
