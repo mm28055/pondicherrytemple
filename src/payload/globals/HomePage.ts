@@ -26,6 +26,17 @@ export const HomePage: GlobalConfig = {
       admin: { description: 'Shown under the heading, beside "Just added". Keep it to two short paragraphs.' },
     },
     {
+      name: 'film',
+      type: 'upload',
+      relationTo: 'media',
+      label: 'Film',
+      filterOptions: { mimeType: { contains: 'video' } },
+      admin: {
+        description:
+          'Shown under the opening paragraphs, with its sound and any subtitles in the video itself. Its still frame (the "Still frame" on the video in Photos & files) shows before it plays. Leave empty for an empty box its size.',
+      },
+    },
+    {
       type: 'collapsible',
       label: 'The quotation (dark band)',
       fields: [

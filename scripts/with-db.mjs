@@ -59,6 +59,7 @@ const alive = (pid) => {
 
 /** Try to become the one process that opens the database. */
 function takeLock(lockFile) {
+  fs.mkdirSync(path.dirname(lockFile), { recursive: true }) // a fresh clone has no .data yet
   for (let attempt = 0; attempt < 2; attempt++) {
     try {
       fs.writeFileSync(lockFile, String(process.pid), { flag: 'wx' })

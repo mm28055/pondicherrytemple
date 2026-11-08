@@ -1566,13 +1566,19 @@ export async function getVaramDays(): Promise<Record<string, string>> {
 
 /** The home page's words, or null if not yet written. */
 export async function getHomePage(): Promise<HomePageText | null> {
-  const g = await findGlobal({ slug: "home-page", depth: 1, overrideAccess: true });
+  // (depth 2 reaches the film's still frame)
+  const g = await findGlobal({ slug: "home-page", depth: 2, overrideAccess: true });
   if (!g.headline) return null;
   const L = await lookups();
+  const f = g.film;
   return {
     headline: g.headline,
     // (without the blank lines an editor leaves at its end, which stood as a gap before what follows)
     opening: toHTML(g.opening, L.paths).replace(/(\s*<p>(\s|&nbsp;|<br\s*\/?>)*<\/p>)+\s*$/, ""),
+    film:
+      f && typeof f === "object" && f.url && f.consent !== "withhold"
+        ? { src: f.url, poster: toPicture(f.poster)?.src }
+        : undefined,
     quoteLabel: g.quoteLabel || undefined,
     quote: g.quote ?? undefined,
     quoteBy: g.quoteBy || undefined,

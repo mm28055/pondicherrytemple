@@ -319,6 +319,7 @@ export interface Book {
 export interface HomePageText {
   headline: string;
   opening: string; // HTML
+  film?: { src: string; poster?: string };
   quoteLabel?: string;
   quote?: string;
   quoteBy?: string;

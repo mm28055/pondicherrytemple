@@ -1,5 +1,3 @@
-import fs from "fs";
-import path from "path";
 import Link from "next/link";
 import { Fragment } from "react";
 import { DownTo } from "@/components/DownTo";
@@ -25,12 +23,7 @@ import { Html } from "@/components/Prose";
 import { HomeStrip } from "@/components/HomeStrip";
 import { HomeMark } from "@/components/HomeTamil";
 import { plainWithScripts } from "@/lib/richtext";
-
-/* The film: for now a test clip, only where one has been put in public/_test
-   (on this computer, to try it; never committed). With none, the name stays
-   black and the opening has no film, as before. */
-const TEST_FILM = "/_test/home-sthalam.mov";
-const film = fs.existsSync(path.join(process.cwd(), "public", TEST_FILM)) ? TEST_FILM : undefined;
+import { FilmVideo } from "@/components/FilmVideo";
 
 export default async function HomePage() {
   const words = await getHomePage();
@@ -78,7 +71,8 @@ export default async function HomePage() {
     <>
       <div className="wrap">
         <section className="home-hero">
-          <HomeMark video={film} />
+          {/* the name in black letters; the play button at its end opens the film large */}
+          <HomeMark film={words?.film} />
           <TodayTamil events={todayEvents} />
         </section>
 
@@ -90,9 +84,17 @@ export default async function HomePage() {
           <div>
             <h1>{words?.headline}</h1>
             {words?.opening && <Html html={words.opening} />}
-            {/* the film, as it is, after the words (until there is one, an empty box its size) */}
-            {film ? (
-              <video className="home-opening-film" src={film} controls playsInline preload="metadata" />
+            {/* the film, after the words: chosen in the admin, Site pages → Home page
+                (until there is one, an empty box its size) */}
+            {words?.film ? (
+              <FilmVideo
+                className="home-opening-film"
+                src={words.film.src}
+                poster={words.film.poster}
+                controls
+                playsInline
+                preload="metadata"
+              />
             ) : (
               <div className="home-opening-film placeholder" aria-hidden="true" />
             )}

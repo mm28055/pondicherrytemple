@@ -1021,7 +1021,7 @@ export interface PhotoOrder {
   createdAt: string;
 }
 /**
- * Words explained in the field notes. The first use of each word in a note is underlined with dots, and its meaning appears on hover, or on a tap on a phone.
+ * Words explained in the field notes. The first use of each word in a note is underlined, and its meaning appears on hover, or on a tap on a phone.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "dictionary".
@@ -1992,6 +1992,10 @@ export interface HomePage {
     [k: string]: unknown;
   } | null;
   /**
+   * Shown under the opening paragraphs, with its sound and any subtitles in the video itself. Its still frame (the "Still frame" on the video in Photos & files) shows before it plays. Leave empty for an empty box its size.
+   */
+  film?: (number | null) | Media;
+  /**
    * Leave empty for none.
    */
   quoteLabel?: string | null;
@@ -2133,6 +2137,7 @@ export interface Varam {
 export interface HomePageSelect<T extends boolean = true> {
   headline?: T;
   opening?: T;
+  film?: T;
   quoteLabel?: T;
   quote?: T;
   quoteBy?: T;
