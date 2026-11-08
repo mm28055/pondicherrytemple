@@ -3515,7 +3515,11 @@ span.month-obs .month-obs-more { display: none; }
 /* A dictionary word in a field note (lib/dictionary): a thin pale line under
    it, and its card (components/GlossCard) frosted as the menus are */
 .dict-word {
-  cursor: help;
+  /* an information mark (a ringed "i") in place of the arrow and question
+     mark, 16px; inside the ring white at 90%, as near to frosted as
+     a cursor can be (a cursor can't blur what lies under it); the browser's
+     own help cursor if the drawing can't be used */
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='10' fill='%23fff' fill-opacity='0.9' stroke='%23000' stroke-width='2'/%3E%3Cpath d='M12 11v6' stroke='%23000' stroke-width='2.4' stroke-linecap='round'/%3E%3Ccircle cx='12' cy='7.2' r='1.6' fill='%23000'/%3E%3C/svg%3E") 8 8, help;
   outline: none;
   text-decoration: underline;
   text-decoration-color: #c9bfb0;
