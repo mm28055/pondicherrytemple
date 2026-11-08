@@ -314,6 +314,11 @@ a:focus-visible, button:focus-visible {
   margin-block: -0.08em; /* the taller line takes no more room above or below: the header-to-rule spacing stands */
 }
 .page-head .page-title:last-child { margin-bottom: -0.08em; }
+/* a title in Tamil (the About page's ஸ்தலம்): the home page's letters, at the titles' size */
+.page-title-tamil { font-family: var(--tamil); font-weight: 800; font-variation-settings: "wdth" 75; text-transform: none; letter-spacing: 0; }
+/* (and as large as they are: the body of its letters, as in ல and ம, as tall as their capitals (0.62 of its size, to their 0.73), and standing on their line, 0.851 down where its own falls at 0.772; drawn larger without taking more room, so the words above and below stand as on every other page) */
+/* (and a little lower again, for the dots over ஸ் and ம், which rise above the capitals' line) */
+.page-title-tamil { position: relative; top: 0.1385em; transform: scale(1.177); transform-origin: 0 0.772em; }
 
 /* the opening words of each menu page (Temples, Festivals & Rituals, Field
    Notes, Articles, Films, About, the Book): the size of the home page's
@@ -1071,6 +1076,27 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
   .with-today .today-more-short { display: inline; }
 }
 
+/* The Films page's header with a film in it (FilmTop): as the Temples page
+   holds today's date, the film at the header's right, its foot level with
+   the header's last line, and as wide as a column of the films below it,
+   in line with the third (its right edge the page's) */
+.page-head.with-film {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) calc((100% - 48px) / 3);
+  grid-template-areas: "kicker film" "title film" "lede film";
+  column-gap: 24px;
+}
+.with-film > .kicker { grid-area: kicker; }
+.with-film > .page-title { grid-area: title; }
+.with-film > .page-lede { grid-area: lede; }
+.with-film > .film-top { grid-area: film; align-self: end; }
+.film-top.video-tile .still { aspect-ratio: 16 / 9; margin-bottom: 0; }
+/* narrower (two columns of films below): the film under the words, as wide as the page */
+@media (max-width: 900px) {
+  .page-head.with-film { grid-template-columns: minmax(0, 1fr); grid-template-areas: "kicker" "title" "lede" "film"; }
+  .with-film > .film-top { margin-top: 24px; }
+}
+
 .split {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
@@ -1728,6 +1754,26 @@ button.home-strip-photo:focus-visible { outline: 3px solid var(--ochre); outline
 .film-viewer-step.next { right: 12px; }
 .film-viewer-close:hover,
 .film-viewer-step:hover { color: var(--lamp); }
+/* A film across the screen (FilmTop, at the top of the Films page): the
+   same viewer, the film as wide as leaves its words a few lines below it,
+   and the words under it, as wide as the film, scrolling on their own */
+@media (min-width: 861px) {
+  .film-viewer-below .film-viewer-inner {
+    --film-w: min(100%, calc((100dvh - 64px - 24px - 170px) * 16 / 9));
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+  }
+  .film-viewer-below video { width: var(--film-w); height: auto; max-height: none; flex: none; }
+  .film-viewer-below .film-viewer-text { width: var(--film-w); flex: 1 1 auto; min-height: 0; max-height: none; }
+  /* (its lines no longer than beside a film) */
+  .film-viewer-below .film-viewer-text > * { max-width: 46em; }
+}
+@media (max-width: 860px) {
+  .film-viewer-below video { width: 100%; }
+}
+
 @media (max-width: 860px) {
   /* phones: the film on top, its words below, the whole viewer scrolls */
   .film-viewer { overflow-y: auto; }

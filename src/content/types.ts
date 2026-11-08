@@ -179,6 +179,8 @@ export interface Film {
   video: FieldVideo;
   /** The original Instagram post, if it came from there. */
   instagram?: string;
+  /** Shown beside the Films page's opening words instead of in its grid. */
+  top?: boolean;
 }
 
 export interface Article {

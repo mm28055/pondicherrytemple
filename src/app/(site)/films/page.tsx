@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getFilms, getObservances, getRegion, getSectionIntro, getTemples } from "@/lib/data";
 import { filmTile, shortTempleName } from "@/lib/view";
 import { FilmWall } from "@/components/FilmWall";
+import { FilmTop } from "@/components/FilmTop";
 
 export const metadata: Metadata = {
   title: "Films",
@@ -15,9 +16,10 @@ export default async function FilmsPage() {
   const regionIds = [region.id, ...(around ? [around.id] : [])];
   const temples = (await Promise.all(regionIds.map((id) => getTemples(id)))).flat();
   const observances = await getObservances();
-  const tiles = (await getFilms())
-    .filter((f) => regionIds.includes(f.region))
-    .map((f) => filmTile(f, temples));
+  const films = (await getFilms()).filter((f) => regionIds.includes(f.region));
+  // the film marked for the top of the page, beside the opening words, and not in the grid as well
+  const top = films.find((f) => f.top);
+  const tiles = films.filter((f) => f !== top).map((f) => filmTile(f, temples));
 
   // one filter per temple or festival that actually has a film
   const count = (key: "temples" | "observances", id: string) => tiles.filter((t) => t[key].includes(id)).length;
@@ -30,10 +32,11 @@ export default async function FilmsPage() {
 
   return (
     <div className="wrap">
-      <header className="page-head landing-head">
+      <header className={`page-head landing-head${top ? " with-film" : ""}`}>
         <div className="kicker">From the temples</div>
         <h1 className="page-title">Films</h1>
         <p className="page-lede">{await getSectionIntro("films")}</p>
+        {top && <FilmTop film={filmTile(top, temples)} />}
       </header>
       <section className="section">
         {tiles.length ? <FilmWall tiles={tiles} filters={filters} /> : <p className="empty">No films yet.</p>}

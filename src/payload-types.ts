@@ -590,7 +590,7 @@ export interface Film {
    */
   observances?: (number | Observance)[] | null;
   /**
-   * Shown beside the film. For Instagram films, the original caption.
+   * Shown beside the film (below it, for the film at the top of the Films page). For Instagram films, the original caption.
    */
   body?: {
     root: {
@@ -614,6 +614,10 @@ export interface Film {
   /**
    * Films of people need their consent. Passed to the video and its still.
    */
+  /**
+   * Shown beside the Films page's opening words instead of in its grid (the first so marked, if more than one), its text below it when opened.
+   */
+  top?: boolean | null;
   consent: 'not-needed' | 'given' | 'withhold';
   /**
    * Made from the title when left empty. Change it only before publishing.
@@ -1478,6 +1482,7 @@ export interface FilmsSelect<T extends boolean = true> {
         postId?: T;
         link?: T;
       };
+  top?: T;
   consent?: T;
   slug?: T;
   region?: T;

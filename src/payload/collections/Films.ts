@@ -151,7 +151,7 @@ export const Films: CollectionConfig = {
       type: 'richText',
       editor: fullEditor,
       label: 'Text',
-      admin: { description: 'Shown beside the film. For Instagram films, the original caption.' },
+      admin: { description: 'Shown beside the film (below it, for the film at the top of the Films page). For Instagram films, the original caption.' },
     },
     {
       name: 'instagram',
@@ -162,6 +162,16 @@ export const Films: CollectionConfig = {
         { name: 'postId', type: 'text', index: true, admin: { hidden: true } },
         { name: 'link', type: 'text', label: 'Original post', admin: { readOnly: true } },
       ],
+    },
+    {
+      name: 'top',
+      type: 'checkbox',
+      label: 'At the top of the Films page',
+      defaultValue: false,
+      admin: {
+        position: 'sidebar',
+        description: 'Shown beside the Films page\'s opening words instead of in its grid (the first so marked, if more than one), its text below it when opened.',
+      },
     },
     {
       name: 'consent',

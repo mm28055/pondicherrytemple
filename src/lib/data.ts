@@ -432,6 +432,7 @@ function toFilm(f: P.Film, L: Lookups, full: boolean): Film | null {
     body: full ? toHTML(f.body, L.paths) : undefined,
     video: { type: "video", src: m.url, poster: toPicture(m.poster)?.src, caption: m.caption ?? undefined },
     instagram: f.instagram?.link ?? undefined,
+    top: f.top === true || undefined,
   };
 }
 

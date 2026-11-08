@@ -18,7 +18,10 @@ export default async function AboutPage() {
     <div className="wrap">
       <header className="page-head landing-head">
         <div className="kicker">About</div>
-        <h1 className="page-title">Sthalam</h1>
+        {/* the name in Tamil, as on the home page */}
+        <h1 className="page-title page-title-tamil" lang="ta">
+          ஸ்தலம்
+        </h1>
         {about?.lede && <p className="page-lede">{about.lede}</p>}
       </header>
 

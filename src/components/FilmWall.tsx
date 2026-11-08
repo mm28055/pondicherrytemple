@@ -176,34 +176,7 @@ export function FilmWall({
               src={film.src}
               poster={film.poster}
             />
-            <div className="film-viewer-text">
-              <div className="caps">
-                {film.date}
-                {film.where && ` · ${film.where}`}
-              </div>
-              <h2 className="film-viewer-title">{film.title}</h2>
-              {film.madeBy && (
-                <p className="film-viewer-by">By {film.madeBy}</p>
-              )}
-              {film.html && (
-                <Html className="rich film-text" html={film.html} />
-              )}
-              <div className="film-viewer-links">
-                <Link className="arrow-link" href={film.href}>
-                  Link to this film
-                </Link>
-                {film.instagram && (
-                  <a
-                    className="arrow-link"
-                    href={film.instagram}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    On Instagram
-                  </a>
-                )}
-              </div>
-            </div>
+            <FilmViewerText film={film} />
           </div>
         )}
         <button
@@ -233,5 +206,34 @@ export function FilmWall({
         )}
       </dialog>
     </>
+  );
+}
+
+/** A film's words in its viewer: its date and places, title, maker, text and
+    links (beside the film in the wall's viewer; below it at the top of the
+    Films page, FilmTop). */
+export function FilmViewerText({ film, link = true }: { film: FilmTile; link?: boolean }) {
+  return (
+    <div className="film-viewer-text">
+      <div className="caps">
+        {film.date}
+        {film.where && ` · ${film.where}`}
+      </div>
+      <h2 className="film-viewer-title">{film.title}</h2>
+      {film.madeBy && <p className="film-viewer-by">By {film.madeBy}</p>}
+      {film.html && <Html className="rich film-text" html={film.html} />}
+      <div className="film-viewer-links">
+        {link && (
+            <Link className="arrow-link" href={film.href}>
+              Link to this film
+            </Link>
+          )}
+        {film.instagram && (
+          <a className="arrow-link" href={film.instagram} target="_blank" rel="noopener noreferrer">
+            On Instagram
+          </a>
+        )}
+      </div>
+    </div>
   );
 }
