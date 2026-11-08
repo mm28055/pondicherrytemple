@@ -104,6 +104,19 @@ export const PhotoSets: CollectionConfig = {
       ],
     },
     {
+      // Varam: its photos under the day of the week, at each of its temples
+      name: 'weekly',
+      type: 'relationship',
+      relationTo: 'weekly-rituals',
+      hasMany: true,
+      label: 'Weekly ritual (Varam)',
+      filterOptions: { often: { equals: 'weekly' } },
+      admin: {
+        description:
+          'Only for photos of a ritual done every week (“Fridays”, “Panduranga Bhajanai”): they then show in Varam, under every month’s calendar, under that day of the week, at each of the temples above. Not for a festival that falls on that day (an Adi Friday, a Purattasi Saturday).',
+      },
+    },
+    {
       name: 'dayOrder',
       type: 'number',
       label: 'Place in its day',

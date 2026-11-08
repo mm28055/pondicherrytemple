@@ -39,7 +39,8 @@ function minutesOf(time: string): number {
 /** Varam: what the temples do every week. The seven days in a strip, the
     day it is today marked; one day open at a time, today to begin with:
     its rituals in the order of the day, then its photographs, temple by
-    temple, then what the day is like (what the town's people do on it). (The photographs are stand-ins until each day's own are added.) */
+    temple, then what the day is like (what the town's people do on it). (The photographs: the photo sets tagged with the day's weekly ritual;
+    a temple with none, no row.) */
 export function WeeklyRituals({
   rituals,
   photos,

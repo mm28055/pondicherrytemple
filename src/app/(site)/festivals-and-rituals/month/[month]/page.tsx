@@ -4,16 +4,15 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { CSSProperties } from "react";
 import {
-  getDummyPhotos,
   getLineBegins,
   getOccasionsInMonth,
   getSpecialNakshatras,
   getSpecialTithis,
   type SpecialTithi,
   getVaramDays,
+  getWeeklyPhotos,
   getWeeklyRituals,
 } from "@/lib/data";
-import type { Photo } from "@/content/types";
 import { monthDates, monthYearOf, TAMIL_MONTHS, tamilMonthOf, type TamilMonth } from "@/lib/calendar";
 import { calendarEvents } from "@/lib/calendarEvents";
 import { nakshatraInEvening, nakshatrasBetween, specialDays, tithisBetween } from "@/lib/tithi";
@@ -68,13 +67,11 @@ export default async function MonthPage({ params }: Props) {
   const next = onward && onward.year <= last ? onward : null;
   const href = (s: Step) => `/festivals-and-rituals/month/${s.month.slug}/${s.year}`;
 
-  // Varam: what is done every week, and stand-in photographs for each day's temples
+  // Varam: what is done every week, and the photographs of each day's temples
+  // (the photo sets tagged with its weekly ritual)
   const weekly = await getWeeklyRituals();
   const character = await getVaramDays();
-  const weeklyPhotos: Record<string, Photo[]> = {};
-  for (const r of weekly)
-    for (const d of r.days)
-      for (const t of r.temples) weeklyPhotos[`${d}|${t.key}`] ??= await getDummyPhotos(`varam-${d}-${t.key}`, 12);
+  const weeklyPhotos = await getWeeklyPhotos();
 
   // the nakshatrams kept specially, by month (rules set in the admin)
   const special = await getSpecialNakshatras();

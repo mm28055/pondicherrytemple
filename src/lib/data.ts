@@ -946,6 +946,32 @@ export type RegularRitual = {
 export type WeeklyRitual = RegularRitual;
 /** The weekly ones (Varam), under every month's calendar. */
 export const getWeeklyRituals = cache(async (): Promise<WeeklyRitual[]> => (await getRegularRituals()).filter((r) => r.often === "weekly"));
+/** Varam's photographs, by "day|temple": those of the photo sets tagged with
+    a weekly ritual ("Fridays"), under its day of the week at each of the
+    set's temples; the latest set first, each set's photos in their order. */
+export const getWeeklyPhotos = cache(async (): Promise<Record<string, Photo[]>> => {
+  const [sets, docs, L, all] = await Promise.all([
+    rawSets(),
+    (async () => (await find({ ...base, collection: "weekly-rituals", depth: 0 })).docs)(),
+    lookups(),
+    photos(),
+  ]);
+  const ids = (refs: Ref[] | null | undefined) => (refs ?? []).map(idOf).filter((id): id is number => id !== undefined);
+  const weekdayOf = new Map(docs.filter((d) => (d.often ?? "weekly") === "weekly" && d.weekday).map((d) => [d.id, d.weekday!]));
+  // each tagged set: its place (latest first) and where it goes
+  const where = new Map<string, { at: number; keys: string[] }>();
+  sets.forEach((s, at) => {
+    const days = [...new Set(ids(s.weekly).map((w) => weekdayOf.get(w)).filter((d) => d !== undefined))];
+    const temples = ids(s.temples).map((t) => L.templeKey.get(t)).filter((t) => t !== undefined);
+    const keys = days.flatMap((d) => temples.map((t) => `${d}|${t}`));
+    if (keys.length) where.set(String(s.id), { at, keys });
+  });
+  const out: Record<string, Photo[]> = {};
+  const tagged = all.filter((p) => p.set && where.has(p.set));
+  tagged.sort((a, b) => where.get(a.set!)!.at - where.get(b.set!)!.at);
+  for (const p of tagged) for (const k of where.get(p.set!)!.keys) (out[k] ??= []).push(p);
+  return out;
+});
 export const getRegularRituals = cache(async (): Promise<RegularRitual[]> => {
   const [docs, temples, L, obs] = await Promise.all([
     (async () => (await find({ ...base, collection: "weekly-rituals", depth: 0 })).docs)(),

@@ -836,6 +836,10 @@ export interface PhotoSet {
    */
   observances?: (number | Observance)[] | null;
   /**
+   * Only for photos of a ritual done every week (“Fridays”, “Panduranga Bhajanai”): they then show in Varam, under every month’s calendar, under that day of the week, at each of the temples above. Not for a festival that falls on that day (an Adi Friday, a Purattasi Saturday).
+   */
+  weekly?: (number | WeeklyRitual)[] | null;
+  /**
    * Where a day is divided into several sets, their order on the site: 1 first, 2 next, and so on. Empty: by the time their photos were taken.
    */
   dayOrder?: number | null;
@@ -858,6 +862,66 @@ export interface PhotoSet {
   folder?: string | null;
   region: number | Region;
   createdBy?: (number | null) | User;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * What the temples do again and again: every week (shown under every month’s calendar, under its day of the week), twice a month or every month. Each ritual once, with a section for each temple it is done at. Each temple’s Ritual Year lists its own under every month.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "weekly-rituals".
+ */
+export interface WeeklyRitual {
+  id: number;
+  what: string;
+  /**
+   * Shown above it in a temple’s Ritual Year. Left empty: the Tamil of the festival or ritual chosen below.
+   */
+  tamil?: string | null;
+  often?: ('weekly' | 'fortnightly' | 'monthly') | null;
+  /**
+   * What is done every week has an entry for each day (“Fridays”): every temple’s, that day, in its sections.
+   */
+  weekday?: ('sun' | 'mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat') | null;
+  /**
+   * Optional: ten to twenty words for every temple without its own (each temple’s own go in its section, under “Different here”).
+   */
+  about?: string | null;
+  /**
+   * Optional: the festival or ritual it is, linked to its page (and its Tamil, if none is given above).
+   */
+  observances?: (number | Observance)[] | null;
+  /**
+   * A section for each temple it is done at: when, there (one or more times, each with its own details), and anything that is different there.
+   */
+  atTemples: {
+    temple: number | Temple;
+    /**
+     * Listed with the Pancha Paruva Utsavam (பஞ்ச பருவ உற்சவம்) in this temple’s Ritual Year.
+     */
+    panchaParvam?: boolean | null;
+    /**
+     * Once, or a row for each time it is done here with its own timing or details (e.g. in the morning and again in the evening).
+     */
+    times: {
+      on?: string | null;
+      time?: string | null;
+      details?: string | null;
+      id?: string | null;
+    }[];
+    name?: string | null;
+    tamil?: string | null;
+    about?: string | null;
+    /**
+     * Optional: the festival or ritual it is here, linked to its page (for a day of the week’s entry, where each temple’s is its own). Left empty: the one chosen above.
+     */
+    observances?: (number | Observance)[] | null;
+    /**
+     * Marked TBC in this temple’s Ritual Year until it is confirmed.
+     */
+    tbc?: boolean | null;
+    id?: string | null;
+  }[];
   updatedAt: string;
   createdAt: string;
 }
@@ -1197,66 +1261,6 @@ export interface SpecialTithi {
    */
   replaceIcon?: boolean | null;
   icon?: 'nataraja' | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * What the temples do again and again: every week (shown under every month’s calendar, under its day of the week), twice a month or every month. Each ritual once, with a section for each temple it is done at. Each temple’s Ritual Year lists its own under every month.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "weekly-rituals".
- */
-export interface WeeklyRitual {
-  id: number;
-  what: string;
-  /**
-   * Shown above it in a temple’s Ritual Year. Left empty: the Tamil of the festival or ritual chosen below.
-   */
-  tamil?: string | null;
-  often?: ('weekly' | 'fortnightly' | 'monthly') | null;
-  /**
-   * What is done every week has an entry for each day (“Fridays”): every temple’s, that day, in its sections.
-   */
-  weekday?: ('sun' | 'mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat') | null;
-  /**
-   * Optional: ten to twenty words for every temple without its own (each temple’s own go in its section, under “Different here”).
-   */
-  about?: string | null;
-  /**
-   * Optional: the festival or ritual it is, linked to its page (and its Tamil, if none is given above).
-   */
-  observances?: (number | Observance)[] | null;
-  /**
-   * A section for each temple it is done at: when, there (one or more times, each with its own details), and anything that is different there.
-   */
-  atTemples: {
-    temple: number | Temple;
-    /**
-     * Listed with the Pancha Paruva Utsavam (பஞ்ச பருவ உற்சவம்) in this temple’s Ritual Year.
-     */
-    panchaParvam?: boolean | null;
-    /**
-     * Once, or a row for each time it is done here with its own timing or details (e.g. in the morning and again in the evening).
-     */
-    times: {
-      on?: string | null;
-      time?: string | null;
-      details?: string | null;
-      id?: string | null;
-    }[];
-    name?: string | null;
-    tamil?: string | null;
-    about?: string | null;
-    /**
-     * Optional: the festival or ritual it is here, linked to its page (for a day of the week’s entry, where each temple’s is its own). Left empty: the one chosen above.
-     */
-    observances?: (number | Observance)[] | null;
-    /**
-     * Marked TBC in this temple’s Ritual Year until it is confirmed.
-     */
-    tbc?: boolean | null;
-    id?: string | null;
-  }[];
   updatedAt: string;
   createdAt: string;
 }
@@ -1615,6 +1619,7 @@ export interface PhotoSetsSelect<T extends boolean = true> {
   date?: T;
   temples?: T;
   observances?: T;
+  weekly?: T;
   dayOrder?: T;
   ethos?: T;
   fieldNote?: T;
