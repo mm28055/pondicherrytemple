@@ -16,6 +16,7 @@ const INK = { left: 6 / 205.9, width: 649 / 205.9, top: 41 / 205.9, height: 202 
 const FILM_INK = { left: 0.15, width: 0.7, top: 0.306, height: 0.383 };
 const GROW_FOR = 2600; // ms for the name to grow into the film
 const COME_FOR = 900; // ms for the rest of the film, and the black round it, to come in
+const CLOSE_FOR = 3500; // ms for the film, once over, to go back into the name, in one movement
 const FROST = "rgba(245, 244, 240, 0.74)"; // the page behind the moving name, as the menus frost it (site.css)
 
 function Name() {
@@ -41,13 +42,41 @@ export function HomeMark({ film }: { film?: { src: string; poster?: string } }) 
     const m = mark.current;
     const gloss = m?.querySelector<HTMLElement>(".home-name .home-gloss");
     if (!m || !gloss || !film) return;
+    const latin = m.querySelector<HTMLElement>(".home-name .home-latin");
     const place = () => {
+      // the circle as tall as the red STHALAM's capitals (a touch over, as a
+      // round letter is), and centred on the capitals of "Watch the film"
+      // beside it: so its foot a little below the line their letters stand on
+      let below = 0;
+      const label = m.querySelector<HTMLElement>(".home-play-label");
+      const g = document.createElement("canvas").getContext("2d");
+      const capOf = (el: HTMLElement) => {
+        if (!g) return 0;
+        const cs = getComputedStyle(el);
+        g.font = `${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
+        return g.measureText("H").actualBoundingBoxAscent;
+      };
+      const cap = latin ? capOf(latin) : 0;
+      if (cap > 0) {
+        const size = Math.round(cap * 1.04 * 2) / 2;
+        m.style.setProperty("--cap", `${size}px`);
+        below = Math.max(0, size / 2 - (label ? capOf(label) : 0) / 2);
+        m.style.setProperty("--below", `${below}px`);
+      }
       const probe = document.createElement("span");
       probe.style.cssText = "display:inline-block;width:0;height:0;vertical-align:baseline";
       gloss.appendChild(probe);
-      const lift = m.getBoundingClientRect().bottom - probe.getBoundingClientRect().bottom;
+      const line = probe.getBoundingClientRect().bottom;
       probe.remove();
+      let lift = m.getBoundingClientRect().bottom - line;
       m.style.setProperty("--lift", `${Math.max(0, lift)}px`);
+      // and its foot on that line exactly (the label's letters below their line
+      // would otherwise hold the button, and so the circle, up off it)
+      const circle = m.querySelector(".home-play svg");
+      if (circle) {
+        lift += circle.getBoundingClientRect().bottom - (line + below);
+        m.style.setProperty("--lift", `${Math.max(0, lift)}px`);
+      }
     };
     place();
     document.fonts?.ready.then(place);
@@ -56,12 +85,26 @@ export function HomeMark({ film }: { film?: { src: string; poster?: string } }) 
     return () => ro.disconnect();
   }, [film]);
 
+  const hold = (on: boolean) => {
+    const m = mark.current;
+    const hero = m?.closest<HTMLElement>(".home-hero");
+    if (!m) return;
+    m.style.width = on ? `${m.getBoundingClientRect().width}px` : "";
+    if (hero) hero.style.paddingTop = on ? getComputedStyle(hero).paddingTop : "";
+  };
+
   const play = () => {
     // the film under the opening words stops, so the two never play at once
     document.querySelectorAll<HTMLVideoElement>("video.home-opening-film").forEach((v) => v.pause());
     const d = viewer.current;
     if (!d) return;
     const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    // the page behind keeps its width while its scrollbar is hidden (site.css),
+    // and the name's box and the header's top (set by the window's width) are
+    // held as they are: so the name neither moves nor grows as the film comes and goes
+    const root = document.documentElement;
+    root.style.setProperty("--film-gutter", `${Math.max(0, window.innerWidth - root.clientWidth)}px`);
+    hold(true);
     d.classList.add("intro");
     setOpen(true);
     d.showModal();
@@ -90,11 +133,16 @@ export function HomeMark({ film }: { film?: { src: string; poster?: string } }) 
      them, and a copy of the header's black letters over them dissolves into
      the film's. Once there, the rest of the film and the black round it
      come in, the page going to black behind. */
-  const grow = (d: HTMLDialogElement) => {
+  /* Where things stand for the name to grow into the film, or the film to
+     shrink back into the name: the film's letters, as a mask, and a copy of
+     the header's black letters on them, in the pop-up as it is at full size;
+     and the move (small) that puts the pop-up's letters on the header's.
+     rest: how much of the film beyond its letters shows at the start. */
+  const stage = (d: HTMLDialogElement, rest: 0 | 1) => {
     const from = mark.current?.querySelector<HTMLElement>(".home-tamil");
     const video = d.querySelector("video");
     const close = d.querySelector<HTMLElement>(".day-close");
-    if (!from || !video) return finish(d);
+    if (!from || !video) return null;
     const fs = parseFloat(getComputedStyle(from).fontSize);
     const ink = (box: DOMRect) => ({
       x: box.left + INK.left * fs,
@@ -125,6 +173,7 @@ export function HomeMark({ film }: { film?: { src: string; poster?: string } }) 
     copy.lang = "ta";
     copy.textContent = word;
     copy.style.fontSize = `${fs}px`;
+    copy.style.opacity = String(1 - rest);
     d.appendChild(copy);
     const own = copy.getBoundingClientRect();
     const at = ink(own);
@@ -161,9 +210,9 @@ export function HomeMark({ film }: { film?: { src: string; poster?: string } }) 
     }
     // (the letters, and over the whole film a layer as clear as --film-rest)
     const shape = `url(${canvas.toDataURL("image/png")})`;
-    const rest = "linear-gradient(rgba(0, 0, 0, var(--film-rest)), rgba(0, 0, 0, var(--film-rest)))";
+    const layer = "linear-gradient(rgba(0, 0, 0, var(--film-rest)), rgba(0, 0, 0, var(--film-rest)))";
     const masked: [string, string][] = [
-      ["mask-image", `${shape}, ${rest}`],
+      ["mask-image", `${shape}, ${layer}`],
       ["mask-size", `${W}px ${H}px, 100% 100%`],
       ["mask-position", `${cx}px ${cy}px, 0 0`],
       ["mask-repeat", "no-repeat"],
@@ -172,24 +221,42 @@ export function HomeMark({ film }: { film?: { src: string; poster?: string } }) 
       video.style.setProperty(p, v);
       video.style.setProperty(`-webkit-${p}`, v);
     }
-    video.style.setProperty("--film-rest", "0");
+    video.style.setProperty("--film-rest", String(rest));
 
     // the pop-up, from its top left corner: the film's letters on the header's
     const dr = d.getBoundingClientRect();
     const s = start.w / end.w;
     const tx = start.x - dr.left - (end.x - dr.left) * s;
     const ty = start.y + start.h / 2 - dr.top - (end.y + end.h / 2 - dr.top) * s;
+    const small = `translate(${tx}px, ${ty}px) scale(${s})`;
 
+    const tidy = () => {
+      copy.remove();
+      for (const [p] of masked) {
+        video.style.removeProperty(p);
+        video.style.removeProperty(`-webkit-${p}`);
+      }
+      video.style.removeProperty("--film-rest");
+    };
+    return { from, video, close, copy, small, tidy };
+  };
+
+  const clear = "rgba(0, 0, 0, 0)";
+  const black = "rgb(0, 0, 0)";
+  const move = { duration: GROW_FOR, easing: "cubic-bezier(0.45, 0, 0.2, 1)", fill: "both" as const };
+  const come = { duration: COME_FOR, easing: "ease-in-out", fill: "both" as const };
+
+  const grow = (d: HTMLDialogElement) => {
+    const st = stage(d, 0);
+    if (!st) return finish(d);
+    const { from, video, close, copy, small, tidy } = st;
     from.style.visibility = "hidden";
     video.currentTime = 0;
     video.play().catch(() => undefined);
-    const clear = "rgba(0, 0, 0, 0)";
-    const black = "rgb(0, 0, 0)";
-    const move = { duration: GROW_FOR, easing: "cubic-bezier(0.45, 0, 0.2, 1)", fill: "both" as const };
     const moving = [
       d.animate(
         [
-          { transform: `translate(${tx}px, ${ty}px) scale(${s})`, backgroundColor: clear },
+          { transform: small, backgroundColor: clear },
           { transform: "none", backgroundColor: clear },
         ],
         move,
@@ -212,7 +279,6 @@ export function HomeMark({ film }: { film?: { src: string; poster?: string } }) 
     Promise.all(moving.map((a) => a.finished))
       .then(() => {
         // the rest of the film and the black round it
-        const come = { duration: COME_FOR, easing: "ease-in-out", fill: "both" as const };
         coming = [
           d.animate([{ backgroundColor: clear }, { backgroundColor: black }], come),
           d.animate(
@@ -233,15 +299,120 @@ export function HomeMark({ film }: { film?: { src: string; poster?: string } }) 
       .finally(() => {
         moving.forEach((a) => a.cancel());
         coming.forEach((a) => a.cancel());
-        copy.remove();
-        for (const [p] of masked) {
-          video.style.removeProperty(p);
-          video.style.removeProperty(`-webkit-${p}`);
-        }
-        video.style.removeProperty("--film-rest");
+        tidy();
         from.style.visibility = "";
         if (d.open) finish(d);
       });
+  };
+
+  /* The film over: the opening backwards, in one movement. Out of the whole
+     screen first (the page at its top behind, so the name is where it
+     starts), its controls gone. Then, on one timeline: the film beyond its
+     letters goes into the black; the black eases to the page frosted behind,
+     as the letters set out; they shrink back into the header's, the header's
+     black letters coming up over them, the frost clearing as they arrive; and
+     the pop-up closes on the home page as it was. The black and the frost are
+     only on the layer behind (::backdrop), which fills the window and never
+     moves: the pop-up and its film carry no colour of their own, so no edge of
+     theirs can show. The film's last frame is held as it shrinks. */
+  const ending = useRef(false);
+  const shrink = async () => {
+    const d = viewer.current;
+    if (!d?.open || ending.current) return;
+    ending.current = true;
+    setReady(false);
+    if (document.fullscreenElement) {
+      await document.exitFullscreen().catch(() => undefined);
+      // (the window back at its own size before anything is measured)
+      await new Promise((r) => setTimeout(r, 150));
+    }
+    window.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior });
+    const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const st = still ? null : stage(d, 1);
+    if (!st) {
+      ending.current = false;
+      return d.close();
+    }
+    const { from, video, close, copy, small, tidy } = st;
+    from.style.visibility = "hidden";
+    // (the black now the layer behind's alone: the same to see)
+    d.style.backgroundColor = "transparent";
+    video.style.backgroundColor = "transparent";
+    const all = { duration: CLOSE_FOR, easing: "linear", fill: "both" as const };
+    const soft = "ease-in-out";
+    const glide = "cubic-bezier(0.4, 0, 0.2, 1)";
+    let going: Animation[] = [];
+    try {
+      going = [
+        // the film beyond its letters, into the black
+        video.animate(
+          [
+            { "--film-rest": 1, offset: 0, easing: soft } as Keyframe,
+            { "--film-rest": 0, offset: 0.26 } as Keyframe,
+            { "--film-rest": 0, offset: 1 } as Keyframe,
+          ],
+          all,
+        ),
+        // the black to the frost, then the frost clearing as the name arrives
+        d.animate(
+          [
+            { backgroundColor: black, backdropFilter: "blur(9px)", offset: 0 },
+            { backgroundColor: black, backdropFilter: "blur(9px)", offset: 0.1, easing: soft },
+            { backgroundColor: FROST, backdropFilter: "blur(9px)", offset: 0.52 },
+            { backgroundColor: FROST, backdropFilter: "blur(9px)", offset: 0.74, easing: "ease-in" },
+            { backgroundColor: clear, backdropFilter: "blur(0px)", offset: 1 },
+          ],
+          { ...all, pseudoElement: "::backdrop" },
+        ),
+        // the letters home
+        d.animate(
+          [
+            { transform: "none", offset: 0 },
+            { transform: "none", offset: 0.24, easing: glide },
+            { transform: small, offset: 1 },
+          ],
+          all,
+        ),
+        video.animate(
+          [
+            { opacity: 1, offset: 0 },
+            { opacity: 1, offset: 0.45, easing: soft },
+            { opacity: 0, offset: 1 },
+          ],
+          all,
+        ),
+        copy.animate(
+          [
+            { opacity: 0, offset: 0 },
+            { opacity: 0, offset: 0.45, easing: soft },
+            { opacity: 1, offset: 1 },
+          ],
+          all,
+        ),
+        ...(close
+          ? [
+              close.animate(
+                [
+                  { opacity: 1, offset: 0, easing: "ease-out" },
+                  { opacity: 0, offset: 0.15 },
+                  { opacity: 0, offset: 1 },
+                ],
+                all,
+              ),
+            ]
+          : []),
+      ];
+      await Promise.all(going.map((a) => a.finished));
+    } catch {
+      // (closed on the way: nothing more to do)
+    }
+    from.style.visibility = "";
+    if (d.open) d.close();
+    going.forEach((a) => a.cancel());
+    d.style.backgroundColor = "";
+    video.style.backgroundColor = "";
+    tidy();
+    ending.current = false;
   };
 
   // the film come in: its controls and corner button
@@ -267,9 +438,10 @@ export function HomeMark({ film }: { film?: { src: string; poster?: string } }) 
       <Name />
       {film && (
         <>
-          <button type="button" className="home-play" onClick={play} aria-label="Play the film">
+          <button type="button" className="home-play" onClick={play}>
+            <span className="home-play-label">Watch the film</span>
             <svg viewBox="0 0 48 48" aria-hidden="true">
-              <circle cx="24" cy="24" r="22" />
+              <circle cx="24" cy="24" r="21.5" />
               <path d="M19 15.5 L34 24 L19 32.5 Z" />
             </svg>
           </button>
@@ -279,6 +451,7 @@ export function HomeMark({ film }: { film?: { src: string; poster?: string } }) 
             onClose={() => {
               setOpen(false);
               setReady(false);
+              hold(false);
               viewer.current?.getAnimations({ subtree: true }).forEach((a) => a.cancel());
               viewer.current?.classList.remove("intro");
               if (document.fullscreenElement) document.exitFullscreen().catch(() => undefined);
@@ -292,7 +465,7 @@ export function HomeMark({ film }: { film?: { src: string; poster?: string } }) 
                 film under the opening words, without the download) */}
             {open && (
               // eslint-disable-next-line jsx-a11y/media-has-caption
-              <video src={film.src} poster={film.poster} controls={ready} controlsList="nodownload" playsInline preload="auto" />
+              <video src={film.src} poster={film.poster} controls={ready} controlsList="nodownload" playsInline preload="auto" onEnded={shrink} />
             )}
           </dialog>
         </>

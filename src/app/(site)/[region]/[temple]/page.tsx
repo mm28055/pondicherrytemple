@@ -1,3 +1,4 @@
+import { shareMeta, sharePicture } from "@/lib/share";
 import type { Metadata } from "next";
 import { BackLink } from "@/components/BackLink";
 import Link from "next/link";
@@ -55,7 +56,10 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { region, temple } = await params;
   const t = await getTemple(region, temple);
-  return t ? { title: t.knownAs ?? t.name, description: t.introText } : {};
+  // shared with the first of its photographs (in their order put in by hand, if any)
+  return t
+    ? shareMeta({ title: t.knownAs ?? t.name, description: t.introText, image: sharePicture((await getOrderedPhotosForTemple(region, temple)).photos[0]) })
+    : {};
 }
 
 /* A temple's page. The header: the name, and the temple's plan as a card at
@@ -132,7 +136,9 @@ export default async function TemplePage({ params }: Props) {
 
             {/* its introduction (Admin → Temples); a note in its place until it is written */}
             {t.intro ? (
-              <FoldedIntro html={t.intro} />
+              <div className="temple-intro">
+                <FoldedIntro html={t.intro} />
+              </div>
             ) : (
               <p className="note-line">An introduction to the temple is being written.</p>
             )}

@@ -1,3 +1,4 @@
+import { shareMeta, sharePicture } from "@/lib/share";
 import type { Metadata } from "next";
 import { BackLink } from "@/components/BackLink";
 import { FilmVideo } from "@/components/FilmVideo";
@@ -18,7 +19,8 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const f = await getFilm((await params).id);
-  return f ? { title: f.title, description: f.excerpt || formatDate(f.date) } : {};
+  // shared with its still
+  return f ? shareMeta({ title: f.title, description: f.excerpt || formatDate(f.date), image: sharePicture({ src: f.video.poster }) }) : {};
 }
 
 export default async function FilmPage({ params }: Props) {

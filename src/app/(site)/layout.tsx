@@ -9,6 +9,7 @@ import { DialogBack } from "@/components/DialogBack";
 import { LandAtTop } from "@/components/LandAtTop";
 import { PageNames } from "@/components/PageNames";
 import { NoImageSave } from "@/components/NoImageSave";
+import { SITE_URL, shareMeta } from "@/lib/share";
 
 /* The public site. (The admin, under /admin, has its own layout in (payload).) */
 
@@ -53,13 +54,18 @@ const specialGothic = Special_Gothic({
   display: "swap",
 });
 
+const SITE_TITLE = "Sthalam — The Temple Documentation Project";
+const SITE_LINE =
+  "The temple is the soul of every town. Sthalam unearths the temple life hidden in plain sight, beginning with Pondicherry. A Centre for Shaiva Studies project.";
+
 export const metadata: Metadata = {
+  // (links in what is shared, the picture's among them, made whole from this)
+  metadataBase: new URL(SITE_URL),
+  ...shareMeta({ title: SITE_TITLE, description: SITE_LINE }),
   title: {
-    default: "Sthalam — The Temple Documentation Project",
+    default: SITE_TITLE,
     template: "%s — Sthalam",
   },
-  description:
-    "The temple is the soul of every town. Sthalam unearths the temple life hidden in plain sight, beginning with Pondicherry. A Centre for Shaiva Studies project.",
   // The tab icon (red and white stripes) comes from app/icon.svg and app/favicon.ico.
 };
 

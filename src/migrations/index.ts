@@ -80,6 +80,8 @@ import * as migration_20261108_170000_about_text from './20261108_170000_about_t
 import * as migration_20261108_200000_varam_photos from './20261108_200000_varam_photos';
 import * as migration_20261108_210000_bhajan_saturday from './20261108_210000_bhajan_saturday';
 import * as migration_20261108_220000_temple_intros from './20261108_220000_temple_intros';
+import * as migration_20261108_230000_home_quote from './20261108_230000_home_quote';
+import * as migration_20261109_010000_two_photo_sets from './20261109_010000_two_photo_sets';
 
 export const migrations = [
   {
@@ -491,5 +493,15 @@ export const migrations = [
     up: migration_20261108_220000_temple_intros.up,
     down: migration_20261108_220000_temple_intros.down,
     name: '20261108_220000_temple_intros',
+  },
+  {
+    up: migration_20261108_230000_home_quote.up,
+    down: migration_20261108_230000_home_quote.down,
+    name: '20261108_230000_home_quote',
+  },
+  {
+    up: migration_20261109_010000_two_photo_sets.up,
+    down: migration_20261109_010000_two_photo_sets.down,
+    name: '20261109_010000_two_photo_sets',
   },
 ];

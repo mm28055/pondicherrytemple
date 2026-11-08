@@ -324,7 +324,7 @@ a:focus-visible, button:focus-visible {
    Notes, Articles, Films, About, the Book): the size of the home page's
    ("A lamp at the centre"), so every opening reads alike */
 .page-lede {
-  font-size: clamp(18px, 1.5vw, 20px);
+  font-size: 17px;
   line-height: 1.6;
   color: var(--ink-2);
   max-width: 38em;
@@ -815,20 +815,28 @@ a.temple-row:hover .temple-name { color: var(--ochre); }
    ஸ்தலம் is sized, kept). It opens the film large in a pop-up. */
 .home-mark.with-film { position: relative; }
 @media (min-width: 901px) { .home-mark.with-film { --reach: calc(var(--hero-gap) - var(--hero-foot) - var(--lift, 0px)); } }
-.home-play { position: absolute; right: calc(-1 * var(--reach, 0px)); bottom: var(--lift, 0px); width: 20px; height: 20px; padding: 0; border: 0; background: none; cursor: pointer; color: var(--ink); }
-.home-play svg { display: block; width: 100%; height: 100%; }
+.home-play { position: absolute; right: calc(-1 * var(--reach, 0px)); bottom: var(--lift, 0px); display: inline-flex; align-items: baseline; gap: 9px; padding: 0; border: 0; background: none; cursor: pointer; color: var(--ink); }
+.home-play svg { display: block; flex: none; width: var(--cap, 18px); height: var(--cap, 18px); }
+/* "Watch the film" before it, in grey small capitals, its letters on the line
+   "a sacred site" stands on (the circle's foot is that line); darker on hover */
+.home-play-label { font-family: var(--display); font-weight: 600; font-size: 12.5px; line-height: 1; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); white-space: nowrap; transition: color 0.2s; position: relative; top: calc(-1 * var(--below, 0px)); }
+.home-play:hover .home-play-label, .home-play:focus-visible .home-play-label { color: var(--ink); }
 /* small to see, a finger's width to tap */
 .home-play::after { content: ""; position: absolute; inset: -12px; }
 .home-play circle { fill: none; stroke: currentColor; stroke-width: 5; }
 .home-play path { fill: currentColor; stroke: currentColor; stroke-width: 2; stroke-linejoin: round; }
-.home-play:focus-visible { outline-offset: 4px; border-radius: 50%; }
-@media (max-width: 640px) { .home-play { width: 15px; height: 15px; } }
+.home-play:focus-visible { outline-offset: 4px; border-radius: 2px; }
+@media (max-width: 640px) { .home-play { gap: 7px; } .home-play-label { font-size: 10.5px; } }
 /* the film, with its sound, filling the screen (the browser's whole screen
    where it allows, HomeTamil), kept whole, black round it */
 .home-film { position: fixed; inset: 0; margin: 0; padding: 0; border: 0; width: auto; height: auto; max-width: none; max-height: none; background: #000; overflow: visible; transform-origin: 0 0; }
 .home-film::backdrop { background: #000; }
 /* the page behind not scrolling, nor its scrollbar showing */
 html:has(dialog.home-film[open]) { overflow: hidden; scrollbar-gutter: auto; }
+/* (the page's width held as it was, the scrollbar's room, measured on opening,
+   kept as padding; the name's box and the header's top held too, HomeTamil:
+   so the name stands exactly where the film leaves it) */
+html:has(dialog.home-film[open]) body { padding-right: var(--film-gutter, 0px); }
 /* (black round the film's frame, so that it and the frame come in as one, no lighter bands at its sides) */
 .home-film video { display: block; width: 100%; height: 100%; object-fit: contain; background: #000; }
 .home-film .day-close { position: absolute; top: 14px; right: 20px; z-index: 3; color: #fff; font-size: 30px; }
@@ -975,7 +983,7 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
 }
 
 .home-opening p {
-  font-size: clamp(18px, 1.5vw, 20px);
+  font-size: 17px;
   line-height: 1.6;
   color: var(--ink-2);
   max-width: 36em;
@@ -984,7 +992,7 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
 
 .home-opening p + p { margin-top: 1em; }
 /* the film after the words, as wide as they are */
-.home-opening-film { display: block; width: 100%; max-width: 36em; font-size: clamp(18px, 1.5vw, 20px); aspect-ratio: 16 / 9; margin-top: 1.4em; background: var(--night); }
+.home-opening-film { display: block; width: 100%; max-width: 36em; font-size: 17px; aspect-ratio: 16 / 9; margin-top: 1.4em; background: var(--night); }
 .home-opening-film.placeholder { background: var(--rule); }
 
 .more-link {
@@ -1211,6 +1219,9 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
   max-width: 36em;
   margin-bottom: 1em;
 }
+/* a temple's introduction: the size of every page's opening words (.page-lede),
+   nearer the field notes' previews than the notes' own reading size */
+.temple-intro .prose p { font-size: 17px; line-height: 1.65; }
 
 /* a signature under a passage */
 .prose p.caps { font-size: 12.5px; line-height: 1.6; margin-top: 1.6em; }

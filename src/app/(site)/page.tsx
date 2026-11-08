@@ -99,9 +99,6 @@ export default async function HomePage() {
             ) : (
               <div className="home-opening-film placeholder" aria-hidden="true" />
             )}
-            <Link className="more-link" href="/about#idea">
-              About Sthalam
-            </Link>
           </div>
 
           {/* Beside the opening, so a returning visitor sees what's new without scrolling */}
