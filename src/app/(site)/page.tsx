@@ -92,6 +92,7 @@ export default async function HomePage() {
                 src={words.film.src}
                 poster={words.film.poster}
                 controls
+                controlsList="nodownload"
                 playsInline
                 preload="metadata"
               />

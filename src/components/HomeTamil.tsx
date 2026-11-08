@@ -16,6 +16,7 @@ const INK = { left: 6 / 205.9, width: 649 / 205.9, top: 41 / 205.9, height: 202 
 const FILM_INK = { left: 0.15, width: 0.7, top: 0.306, height: 0.383 };
 const GROW_FOR = 2600; // ms for the name to grow into the film
 const COME_FOR = 900; // ms for the rest of the film, and the black round it, to come in
+const FROST = "rgba(245, 244, 240, 0.74)"; // the page behind the moving name, as the menus frost it (site.css)
 
 function Name() {
   return (
@@ -220,7 +221,15 @@ export function HomeMark({ film }: { film?: { src: string; poster?: string } }) 
         ],
         move,
       ),
-      d.animate([{ backgroundColor: clear }, { backgroundColor: clear }], { ...move, pseudoElement: "::backdrop" }),
+      // the page behind frosting over as the name sets out, like the menus' frost
+      d.animate(
+        [
+          { backgroundColor: clear, backdropFilter: "blur(0px)", offset: 0 },
+          { backgroundColor: FROST, backdropFilter: "blur(9px)", offset: 0.4 },
+          { backgroundColor: FROST, backdropFilter: "blur(9px)", offset: 1 },
+        ],
+        { ...move, easing: "ease-out", pseudoElement: "::backdrop" },
+      ),
       video.animate([{ opacity: 0 }, { opacity: 1 }], { ...move, easing: "ease-in-out" }),
       copy.animate([{ opacity: 1 }, { opacity: 0 }], { ...move, easing: "ease-in-out" }),
       ...(close ? [close.animate([{ opacity: 0 }, { opacity: 0 }], move)] : []),
@@ -233,7 +242,13 @@ export function HomeMark({ film }: { film?: { src: string; poster?: string } }) 
         const come = { duration: COME_FOR, easing: "ease-in-out", fill: "both" as const };
         coming = [
           d.animate([{ backgroundColor: clear }, { backgroundColor: black }], come),
-          d.animate([{ backgroundColor: clear }, { backgroundColor: black }], { ...come, pseudoElement: "::backdrop" }),
+          d.animate(
+            [
+              { backgroundColor: FROST, backdropFilter: "blur(9px)" },
+              { backgroundColor: black, backdropFilter: "blur(9px)" },
+            ],
+            { ...come, pseudoElement: "::backdrop" },
+          ),
           video.animate([{ "--film-rest": 0 } as Keyframe, { "--film-rest": 1 } as Keyframe], come),
           ...(close ? [close.animate([{ opacity: 0 }, { opacity: 1 }], come)] : []),
         ];
