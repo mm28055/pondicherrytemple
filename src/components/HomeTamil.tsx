@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 
 /* The home page's name: the large ஸ்தலம், and under it "Sthalam · a sacred
    site", in black letters. Where the home page has a film, a black play
@@ -64,57 +64,20 @@ export function HomeMark({ film }: { film?: { src: string; poster?: string } }) 
     const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     d.classList.add("intro");
     setOpen(true);
-    // the whole screen (where the browser allows it: not an iPhone, which
-    // has the film fill the window instead), asked for at the press itself
-    // (not waiting for ever: some browsers never answer, the film then filling the window)
-    const screen = document.fullscreenElement
-      ? Promise.resolve()
-      : Promise.race([
-          document.documentElement.requestFullscreen?.({ navigationUI: "hide" }).catch(() => undefined),
-          new Promise((done) => window.setTimeout(done, 700)),
-        ]);
     d.showModal();
-    // once the screen has settled into its new size
-    screen.then(() =>
-      requestAnimationFrame(() =>
-        requestAnimationFrame(() => {
-          if (!d.open) return;
-          if (still) {
-            finish(d);
-            d.querySelector("video")?.play().catch(() => undefined);
-          } else grow(d);
-        }),
-      ),
+    requestAnimationFrame(() =>
+      requestAnimationFrame(() => {
+        if (!d.open) return;
+        if (still) {
+          d.querySelector("video")?.play().catch(() => undefined);
+          finish(d);
+        } else grow(d);
+      }),
     );
   };
 
-  // whether the film has the whole screen (its corner button, maximise or minimise)
-  const [full, setFull] = useState(false);
-  // the film's controls and that button: shown once it has grown in, and
-  // like the browser's own controls, hidden while it plays and the pointer is still
+  // the film's controls: shown once it has grown in
   const [ready, setReady] = useState(false);
-  const [awake, setAwake] = useState(true);
-  const idle = useRef<number | undefined>(undefined);
-  const stir = () => {
-    setAwake(true);
-    window.clearTimeout(idle.current);
-    idle.current = window.setTimeout(() => {
-      if (!viewer.current?.querySelector("video")?.paused) setAwake(false);
-    }, 2500);
-  };
-
-  // leaving the whole screen (Esc, or the minimise button) keeps the film,
-  // filling the window; closing the film leaves the whole screen
-  useEffect(() => {
-    const changed = () => setFull(Boolean(document.fullscreenElement));
-    document.addEventListener("fullscreenchange", changed);
-    return () => document.removeEventListener("fullscreenchange", changed);
-  }, []);
-
-  const toggleFull = () => {
-    if (document.fullscreenElement) document.exitFullscreen().catch(() => undefined);
-    else document.documentElement.requestFullscreen?.({ navigationUI: "hide" }).catch(() => undefined);
-  };
 
   /* The name grows into the film: its film opens on the same ஸ்தலம். The
      pop-up (the film filling the screen) starts small, placed so that the
@@ -272,10 +235,18 @@ export function HomeMark({ film }: { film?: { src: string; poster?: string } }) 
   };
 
   // the film come in: its controls and corner button
+  /* The film come in: its controls, and the film itself given the whole
+     screen, as its own full-screen button would (the browser's own view and
+     controls, as for the film under the opening words). Still within the
+     few seconds a browser allows after the press; where it refuses (an
+     iPhone, or a slow start) the film stays filling the window, its own
+     button there to take it to the whole screen. Leaving the whole screen
+     (minimise, or Esc) keeps the film in the window. */
   const finish = (d: HTMLDialogElement) => {
     d.classList.remove("intro");
     setReady(true);
-    stir();
+    const video = d.querySelector("video");
+    if (video && !document.fullscreenElement) video.requestFullscreen?.({ navigationUI: "hide" }).catch(() => undefined);
   };
 
   return (
@@ -298,51 +269,20 @@ export function HomeMark({ film }: { film?: { src: string; poster?: string } }) 
             onClose={() => {
               setOpen(false);
               setReady(false);
-              window.clearTimeout(idle.current);
               viewer.current?.getAnimations({ subtree: true }).forEach((a) => a.cancel());
               viewer.current?.classList.remove("intro");
               if (document.fullscreenElement) document.exitFullscreen().catch(() => undefined);
             }}
             onClick={(e) => e.target === viewer.current && viewer.current?.close()}
-            onPointerMove={() => ready && stir()}
-            data-awake={ready && awake ? "" : undefined}
           >
             <button type="button" className="day-close" onClick={() => viewer.current?.close()} aria-label="Close">
               ×
             </button>
-            {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
-            {/* (started by play, once the screen is ready; the browser's own
-                whole-screen button and menu left out, for the button below) */}
+            {/* (started by play; its controls the browser's own, as for the
+                film under the opening words, without the download) */}
             {open && (
-              <video
-                src={film.src}
-                poster={film.poster}
-                controls={ready}
-                controlsList="nofullscreen nodownload noplaybackrate noremoteplayback"
-                disablePictureInPicture
-                playsInline
-                preload="auto"
-                onPause={stir}
-                onPlay={stir}
-              />
-            )}
-            {ready && (
-              <button
-                type="button"
-                className="home-film-full"
-                onClick={toggleFull}
-                aria-label={full ? "Leave full screen" : "Full screen"}
-              >
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  {full ? (
-                    // four corners turned in
-                    <path d="M9 4v5H4M15 4v5h5M20 15h-5v5M4 15h5v5" />
-                  ) : (
-                    // four corners turned out
-                    <path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5" />
-                  )}
-                </svg>
-              </button>
+              // eslint-disable-next-line jsx-a11y/media-has-caption
+              <video src={film.src} poster={film.poster} controls={ready} controlsList="nodownload" playsInline preload="auto" />
             )}
           </dialog>
         </>

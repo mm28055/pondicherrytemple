@@ -831,17 +831,6 @@ html:has(dialog.home-film[open]) { overflow: hidden; scrollbar-gutter: auto; }
 .home-film.intro::backdrop { background: transparent; }
 /* while the name grows in, how much of the film beyond its letters shows (HomeTamil) */
 @property --film-rest { syntax: "<number>"; inherits: false; initial-value: 1; }
-/* its whole-screen button, in the corner of the film's controls where the
-   browser's own was: four corners turned out, or in while it has the whole
-   screen; like the controls, hidden while the film plays and the pointer is still */
-.home-film-full { position: absolute; right: 12px; bottom: 25px; z-index: 3; width: 40px; height: 40px; padding: 8px; border: 0; border-radius: 50%; background: none; color: #fff; cursor: pointer; opacity: 0; pointer-events: none; transition: opacity 0.3s ease, background-color 0.15s; }
-.home-film[data-awake] .home-film-full { opacity: 1; pointer-events: auto; }
-.home-film-full:hover { background: rgba(255, 255, 255, 0.15); }
-/* the browser's own whole-screen button and menu, which some (Brave) show still, under ours */
-.home-film video::-webkit-media-controls-fullscreen-button, .home-film video::-webkit-media-controls-overflow-button { display: none !important; }
-/* (and room kept for ours at the end of their bar) */
-.home-film video::-webkit-media-controls-panel { padding-right: 52px !important; }
-.home-film-full svg { display: block; width: 100%; height: 100%; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: square; }
 /* the header's black ஸ்தலம், on the film's own letters, dissolving into them */
 .home-film-name { position: absolute; left: 0; top: 0; margin: 0; display: inline-block; white-space: nowrap; font-family: var(--tamil); font-weight: 800; font-variation-settings: "wdth" 75; line-height: normal; color: var(--ink); transform-origin: 0 0; pointer-events: none; z-index: 2; }
 
