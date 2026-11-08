@@ -79,6 +79,7 @@ import * as migration_20261108_150000_ritual_days from './20261108_150000_ritual
 import * as migration_20261108_170000_about_text from './20261108_170000_about_text';
 import * as migration_20261108_200000_varam_photos from './20261108_200000_varam_photos';
 import * as migration_20261108_210000_bhajan_saturday from './20261108_210000_bhajan_saturday';
+import * as migration_20261108_220000_temple_intros from './20261108_220000_temple_intros';
 
 export const migrations = [
   {
@@ -485,5 +486,10 @@ export const migrations = [
     up: migration_20261108_210000_bhajan_saturday.up,
     down: migration_20261108_210000_bhajan_saturday.down,
     name: '20261108_210000_bhajan_saturday',
+  },
+  {
+    up: migration_20261108_220000_temple_intros.up,
+    down: migration_20261108_220000_temple_intros.down,
+    name: '20261108_220000_temple_intros',
   },
 ];
