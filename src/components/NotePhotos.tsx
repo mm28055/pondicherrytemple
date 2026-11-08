@@ -1,8 +1,10 @@
 "use client";
 
 import { useLayoutEffect, useRef, useState, type CSSProperties } from "react";
-import type { Photo } from "@/content/types";
-import { STRIPE, stripeWidth, useStripeFit } from "@/lib/stripes";
+import { createPortal } from "react-dom";
+import type { FieldVideo, Photo } from "@/content/types";
+import { FilmVideo } from "./FilmVideo";
+import { STRIPE, stripeRows, stripeWidth, useStripeFit } from "@/lib/stripes";
 import { seeded } from "@/lib/mahotsavam";
 import type { PhotoPack } from "@/lib/photoPack";
 import { pack } from "./HomeStrip";
@@ -53,13 +55,47 @@ function rows(photos: Photo[], units: number, height: number, seed: string): Row
   return out;
 }
 
-/** Beside a field note's text: photographs down the left of the page, from
-    its margin, each as wide as whole stripes at the top of the page (the gaps
-    a white one's width), as long as the text; as many as fit. */
-function NoteColumn({ photos, seed, open }: { photos: Photo[]; seed: string; open: Open }) {
+const VIDEO_MOST = 560; // a video in the column at most this tall (a phone's upright one)
+const CAPTION = 30; // room for a video's caption under it
+
+/** A field note's videos, first among its media: at the top of the column
+    beside the text, or above the photographs on a phone, each at its own
+    shape (16:9 until it says otherwise), with its caption. */
+function NoteVideos({ videos, width, onShape }: { videos: FieldVideo[]; width?: number; onShape?: (i: number, shape: number) => void }) {
+  return (
+    <>
+      {videos.map((v, i) => (
+        <figure key={v.src} className="note-photos-video" style={width ? { width } : undefined}>
+          <FilmVideo
+            controls
+            playsInline
+            preload="metadata"
+            src={v.src}
+            poster={v.poster}
+            onLoadedMetadata={(e) => {
+              const el = e.currentTarget;
+              if (el.videoWidth && el.videoHeight) onShape?.(i, el.videoWidth / el.videoHeight);
+            }}
+          />
+          {v.caption && <figcaption>{v.caption}</figcaption>}
+        </figure>
+      ))}
+    </>
+  );
+}
+
+/** Beside a field note's text: its videos first, then photographs down the
+    left of the page, from its margin, each as wide as whole stripes at the top
+    of the page (the gaps a white one's width), as long as the text; as many as
+    fit. When more are left, the last says how many, and opens them all in the
+    column, carrying on down the page under the text ("See fewer" at the end). */
+function NoteColumn({ photos, videos, seed, open }: { photos: Photo[]; videos: FieldVideo[]; seed: string; open: Open }) {
   // the space the photos may fill, beside the text (see site.css)
   const frame = useRef<HTMLDivElement>(null);
+  const col = useRef<HTMLDivElement>(null);
   const [fit, setFit] = useState<{ units: number; height: number }>();
+  const [shapes, setShapes] = useState<Record<number, number>>({});
+  const [all, setAll] = useState(false);
 
   useLayoutEffect(() => {
     const el = frame.current;
@@ -77,30 +113,130 @@ function NoteColumn({ photos, seed, open }: { photos: Photo[]; seed: string; ope
     return () => ro.disconnect();
   }, []);
 
+  const width = fit ? stripeWidth(fit.units) : 0;
+  // the height the videos take at the top, with their gaps and captions
+  const above = videos.reduce(
+    (h, v, i) => h + Math.min(VIDEO_MOST, Math.round(width / (shapes[i] ?? 16 / 9))) + (v.caption ? CAPTION : 0) + GAP,
+    0,
+  );
+  // (while the rest is open under the text, the column keeps the height it had,
+  // so the photos beside the text stay as they were)
+  const [held, setHeld] = useState<number>();
+  const height = all && held !== undefined ? held : (fit?.height ?? 0);
+  const laid = fit ? rows(photos, fit.units, height - above, seed) : [];
+  const rest = photos.slice(laid.reduce((n, r) => n + r.cells.length, 0));
+
+  // the rest, opened under the note's text (page: #note-more-photos)
+  const [spot, setSpot] = useState<HTMLElement | null>(null);
+  useLayoutEffect(() => setSpot(document.getElementById("note-more-photos")), []);
+  const wall = useRef<HTMLElement>(null);
+  const openRest = () => {
+    // the column ends level with the note's own text, and the rest open
+    // under both, from margin to margin (site.css, .note-more)
+    const top = frame.current?.getBoundingClientRect().top;
+    const end = document.querySelector(".note-text > .note-body")?.getBoundingClientRect().bottom;
+    setHeld(top !== undefined && end !== undefined && end > top ? Math.round(end - top) : fit?.height);
+    setAll(true);
+    requestAnimationFrame(() => wall.current?.scrollIntoView({ behavior: "smooth", block: "start" }));
+  };
+  const fewer = () => {
+    setAll(false);
+    if (col.current && col.current.getBoundingClientRect().bottom < 0) col.current.scrollIntoView();
+  };
+
   return (
     <>
       <div ref={frame} className="note-photos-frame" />
       {fit && (
-        <div className="note-photos-col" style={{ width: stripeWidth(fit.units) }}>
-          {rows(photos, fit.units, fit.height, seed).map((row, k) => (
+        <div ref={col} className="note-photos-col" style={{ width }}>
+          <NoteVideos videos={videos} width={width} onShape={(i, s) => setShapes((m) => (m[i] === s ? m : { ...m, [i]: s }))} />
+          {laid.map((row, k) => (
             <div key={k} className="note-photos-row" style={{ height: row.h }}>
-              {row.cells.map(({ p, units }, j) => (
-                <button
-                  key={j}
-                  className="note-photos-photo"
-                  onClick={() => open(p)}
-                  aria-label={p.alt || p.caption || "Photograph"}
-                  style={{ width: stripeWidth(units) }}
-                >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={p.medium} alt="" loading="lazy" style={{ objectPosition: `${p.focus[0]}% ${p.focus[1]}%` }} />
-                </button>
-              ))}
+              {row.cells.map(({ p, units }, j) => {
+                // the last photo, when more are left (and not yet opened): how many, and the way to them
+                const more = !all && rest.length > 0 && k === laid.length - 1 && j === row.cells.length - 1;
+                return (
+                  <button
+                    key={j}
+                    className={more ? "note-photos-photo note-photos-more" : "note-photos-photo"}
+                    onClick={more ? openRest : () => open(p)}
+                    aria-label={more ? undefined : p.alt || p.caption || "Photograph"}
+                    style={{ width: stripeWidth(units) }}
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={p.medium} alt="" loading="lazy" style={{ objectPosition: `${p.focus[0]}% ${p.focus[1]}%` }} />
+                    {more && (
+                      <span>
+                        <span>+ {rest.length + 1} photos</span>
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          ))}
+          {/* no room for even one: the way to them, under the videos */}
+          {!all && laid.length === 0 && rest.length > 0 && (
+            <button className="arrow-link note-photos-fewer" onClick={openRest}>
+              {rest.length} photo{rest.length === 1 ? "" : "s"}
+            </button>
+          )}
+        </div>
+      )}
+      {all &&
+        spot &&
+        rest.length > 0 &&
+        createPortal(
+          <section ref={wall} className="note-more">
+            <MoreRows photos={rest} open={open} fewer={fewer} />
+          </section>,
+          spot,
+        )}
+    </>
+  );
+}
+
+/** The rest of a note's photos, opened under its text: in rows as the
+    Photographs page lays them (lib/stripes), each photo whole stripes wide,
+    a white stripe's width between, the row drawn from margin to margin; at
+    the end, as there, the way back: the first of them again, darkened, its
+    shape, "See fewer" over it. */
+function MoreRows({ photos, open, fewer }: { photos: Photo[]; open: Open; fewer: () => void }) {
+  const box = useRef<HTMLDivElement>(null);
+  const fit = useStripeFit(box);
+  const first = photos[0];
+  const back = { id: "fewer", width: first.width, height: first.height, fewer: true as const };
+  return (
+    <div ref={box} className="photo-rows note-more-rows">
+      {fit && (
+        <div style={{ "--gap": `${fit.gap}px` } as CSSProperties}>
+          {stripeRows<Photo | typeof back>([...photos, back], fit.units, fit.h).map((row) => (
+            <div key={row[0].p.id} className="photo-row">
+              {row.map(({ p, units }) =>
+                "fewer" in p ? (
+                  <button key={p.id} className="photo-tile photo-line-more photo-fewer" style={{ width: fit.width(units) }} onClick={fewer}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={fit.width(units) > 240 ? first.medium : first.small} alt="" loading="lazy" style={{ objectPosition: `${first.focus[0]}% ${first.focus[1]}%` }} />
+                    <span>See fewer</span>
+                  </button>
+                ) : (
+                  <button
+                    key={p.id}
+                    className="photo-tile"
+                    style={{ width: fit.width(units) }}
+                    onClick={() => open(p)}
+                    aria-label={p.alt || p.caption || "Photograph"}
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={fit.width(units) > 240 ? p.medium : p.small} alt="" loading="lazy" style={{ objectPosition: `${p.focus[0]}% ${p.focus[1]}%` }} />
+                  </button>
+                ),
+              )}
             </div>
           ))}
         </div>
       )}
-    </>
+    </div>
   );
 }
 
@@ -184,9 +320,10 @@ function NoteStrip({ photos, open }: { photos: Photo[]; open: Open }) {
   );
 }
 
-/** A field note's own photographs (those of its photo sets), in the order
-    taken: beside its text, or above it on a phone. Each opens in the viewer. */
-export function NotePhotos({ pack: photos, seed }: { pack: PhotoPack; seed: string }) {
+/** A field note's videos and its own photographs (those of its photo sets),
+    in the order taken: beside its text, or above it on a phone, the videos
+    first. Each photo opens in the viewer. */
+export function NotePhotos({ pack: photos, videos = [], seed }: { pack: PhotoPack; videos?: FieldVideo[]; seed: string }) {
   const [narrow, setNarrow] = useState<boolean>();
 
   useLayoutEffect(() => {
@@ -206,9 +343,12 @@ export function NotePhotos({ pack: photos, seed }: { pack: PhotoPack; seed: stri
         return (
           <div className="note-photos" style={{ "--rows": Math.min(ROWS, Math.ceil(list.length / 3)) } as CSSProperties}>
             {narrow === undefined ? null : narrow ? (
-              <NoteStrip photos={list} open={show} />
+              <>
+                <NoteVideos videos={videos} />
+                <NoteStrip photos={list} open={show} />
+              </>
             ) : (
-              <NoteColumn photos={list} seed={seed} open={show} />
+              <NoteColumn photos={list} videos={videos} seed={seed} open={show} />
             )}
           </div>
         );

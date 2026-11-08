@@ -75,6 +75,7 @@ import * as migration_20261107_140000_dictionary from './20261107_140000_diction
 import * as migration_20261107_150000_photo_set_days from './20261107_150000_photo_set_days';
 import * as migration_20261107_190000_home_film from './20261107_190000_home_film';
 import * as migration_20261108_120000_film_top from './20261108_120000_film_top';
+import * as migration_20261108_150000_ritual_days from './20261108_150000_ritual_days';
 
 export const migrations = [
   {
@@ -461,5 +462,10 @@ export const migrations = [
     up: migration_20261108_120000_film_top.up,
     down: migration_20261108_120000_film_top.down,
     name: '20261108_120000_film_top',
+  },
+  {
+    up: migration_20261108_150000_ritual_days.up,
+    down: migration_20261108_150000_ritual_days.down,
+    name: '20261108_150000_ritual_days',
   },
 ];

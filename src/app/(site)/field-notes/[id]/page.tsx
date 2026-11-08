@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { BackLink } from "@/components/BackLink";
-import { FilmVideo } from "@/components/FilmVideo";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
@@ -126,22 +125,24 @@ export default async function FieldNotePage({ params }: Props) {
           above the text) */}
       <GlossCard />
       <div className="wrap note-layout">
-        <NotePhotos pack={packPhotos(photos)} seed={note.id} />
+        {/* its videos first among its media, at the top of the column; recordings stay with the text */}
+        <NotePhotos pack={packPhotos(photos)} videos={note.videos?.filter((v) => v.type === "video")} seed={note.id} />
         <div className="note-text">
           <article className="note-body">
             {note.body && <Html className="rich" html={markDictionary(note.body, dictionary)} />}
 
-            {note.videos?.map((v) => (
-              <figure key={v.src} className="media">
-                {v.type === "video" ? (
-                  <FilmVideo controls preload="metadata" src={v.src} poster={v.poster} />
-                ) : (
+            {note.videos
+              ?.filter((v) => v.type === "audio")
+              .map((v) => (
+                <figure key={v.src} className="media">
                   <audio controls preload="metadata" src={v.src} />
-                )}
-                {v.caption && <figcaption>{v.caption}</figcaption>}
-              </figure>
-            ))}
+                  {v.caption && <figcaption>{v.caption}</figcaption>}
+                </figure>
+              ))}
           </article>
+
+          {/* the photographs the column beside has no room for, opened from its last one (NotePhotos) */}
+          <div id="note-more-photos" />
 
           {following.map(({ note: n, local, observances }) => (
             <article key={n.id} className="note-body note-next">

@@ -323,6 +323,14 @@ export interface Temple {
     hasNextPage?: boolean;
     totalDocs?: number;
   };
+  /**
+   * How many kaalams of puja a day, shown as the heading of The Day.
+   */
+  dayStandard?: string | null;
+  /**
+   * Shown under the heading, before the kalams: what holds for every kaalam, or, for a temple with no kalams below, the whole of its day. A new line here is a new paragraph. Can be left empty.
+   */
+  dayIntro?: string | null;
   ritualDay?:
     | {
         kalam: string;
@@ -349,6 +357,14 @@ export interface Temple {
         id?: string | null;
       }[]
     | null;
+  /**
+   * For the text below. Can be left empty.
+   */
+  dayNotesHeading?: string | null;
+  /**
+   * More about the day, shown after the kalams in a box of its own. A new line here is a new paragraph. Can be left empty.
+   */
+  dayNotes?: string | null;
   yearSoFar?: {
     docs?: (number | Occasion)[];
     hasNextPage?: boolean;
@@ -612,12 +628,12 @@ export interface Film {
     link?: string | null;
   };
   /**
-   * Films of people need their consent. Passed to the video and its still.
-   */
-  /**
    * Shown beside the Films page's opening words instead of in its grid (the first so marked, if more than one), its text below it when opened.
    */
   top?: boolean | null;
+  /**
+   * Films of people need their consent. Passed to the video and its still.
+   */
   consent: 'not-needed' | 'given' | 'withhold';
   /**
    * Made from the title when left empty. Change it only before publishing.
@@ -1640,6 +1656,8 @@ export interface TemplesSelect<T extends boolean = true> {
         lng?: T;
       };
   pieces?: T;
+  dayStandard?: T;
+  dayIntro?: T;
   ritualDay?:
     | T
     | {
@@ -1651,6 +1669,8 @@ export interface TemplesSelect<T extends boolean = true> {
         naivedyam?: T;
         id?: T;
       };
+  dayNotesHeading?: T;
+  dayNotes?: T;
   yearSoFar?: T;
   drawings?: T;
   photographs?: T;

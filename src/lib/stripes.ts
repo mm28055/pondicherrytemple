@@ -36,7 +36,9 @@ export function useStripeFit(box: RefObject<HTMLElement | null>) {
     const measure = () => {
       const w = el.getBoundingClientRect().width;
       const h = parseFloat(getComputedStyle(el).getPropertyValue("--h")) || 120;
-      const units = Math.max(1, Math.round((w - STRIPE / 2) / STRIPE));
+      // (by the whole pixel, so boxes as wide as each other to a hair, on
+      // different pages, are always the same number of stripes long)
+      const units = Math.max(1, Math.round((Math.round(w) - STRIPE / 2) / STRIPE));
       const k = w / stripeWidth(units);
       setFit((f) =>
         f && f.units === units && f.h === h && f.k === k

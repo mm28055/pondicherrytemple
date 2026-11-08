@@ -1,4 +1,4 @@
-import type { Kalam } from "@/content/types";
+import type { Kalam, TempleDay } from "@/content/types";
 import type { TempleRitualYear, TempleYearEntry } from "@/lib/data";
 import { FestivalLink } from "@/components/FestivalLink";
 import { MonthHead } from "@/components/MonthHead";
@@ -75,7 +75,9 @@ function timing(e: TempleYearEntry) {
     name. A day listed
     under its own name ("Bhairava Abhishekam") shows that name, its rite's
     Tamil above it, and leads to the rite's page. */
-export function TempleYear({ year, day = [] }: { year: TempleRitualYear; day?: Kalam[] }) {
+export function TempleYear({ year, day }: { year: TempleRitualYear; day?: TempleDay }) {
+  // the tab's count: the kaalams its puja names ("4 kaalam puja"), else the kalams written
+  const kaalams = Number(day?.standard?.match(/^\s*(\d+)/)?.[1] ?? day?.kalams.length ?? 0);
   const regular = year.regular.map((e) => ({ e, ...timing(e) }));
   const weekly = regular.filter((x) => x.group === "weekly").sort((a, b) => weekdayOf(a.short) - weekdayOf(b.short));
   const monthly = regular.filter((x) => x.group !== "weekly");
@@ -183,13 +185,13 @@ export function TempleYear({ year, day = [] }: { year: TempleRitualYear; day?: K
           ),
         },
         // only for a temple whose day has been written
-        ...(day.length
+        ...(day
           ? [
               {
                 key: "day",
                 ta: "நாள்",
                 en: "The Day",
-                count: many(day.length, "kaalam", "kaalams"),
+                count: kaalams ? many(kaalams, "kaalam", "kaalams") : "",
                 panel: <RitualDay day={day} />,
               },
             ]
@@ -199,12 +201,51 @@ export function TempleYear({ year, day = [] }: { year: TempleRitualYear; day?: K
   );
 }
 
-/** The temple's day, kaalam by kaalam: its Tamil, its name and time, a note on
-    the time, what happens, and its naivedyam, each only when it is written. */
-function RitualDay({ day }: { day: Kalam[] }) {
+/** Text written in a box of the admin: a paragraph for each line. */
+function Paras({ text }: { text?: string }) {
+  if (!text) return null;
+  return (
+    <>
+      {text
+        .split(/\n+/)
+        .map((p) => p.trim())
+        .filter(Boolean)
+        .map((p, i) => (
+          <p key={i} className="day-para">
+            {p}
+          </p>
+        ))}
+    </>
+  );
+}
+
+/** The temple's day: its puja ("4 kaalam puja") as the heading, what holds
+    for every kaalam (or, with no kalams, the whole day), then kaalam by
+    kaalam (its Tamil, its name and time, a note on the time, what happens,
+    and its naivedyam, each only when it is written), then any text after
+    them in a box of its own. */
+function RitualDay({ day }: { day: TempleDay }) {
+  return (
+    <>
+      <section className="year-regular">
+        {day.standard && <h4 className="year-regular-head">{day.standard}</h4>}
+        <Paras text={day.intro} />
+        {day.kalams.length > 0 && <Kalams kalams={day.kalams} />}
+      </section>
+      {day.notes && (
+        <section className="year-regular">
+          {day.notesHeading && <h4 className="year-regular-head">{day.notesHeading}</h4>}
+          <Paras text={day.notes} />
+        </section>
+      )}
+    </>
+  );
+}
+
+function Kalams({ kalams }: { kalams: Kalam[] }) {
   return (
     <div className="year-list year-day">
-      {day.map((k, i) => (
+      {kalams.map((k, i) => (
         <div key={i} className="fl">
           {k.tamil && (
             <span className="t" lang="ta">
@@ -212,7 +253,7 @@ function RitualDay({ day }: { day: Kalam[] }) {
             </span>
           )}
           <span className="caps">{[k.kalam, k.time].filter(Boolean).join(" · ")}</span>
-          {k.timingNote && <p>{k.timingNote}</p>}
+          {k.timingNote && <p className="day-when">{k.timingNote}</p>}
           {k.whatHappens && (
             <>
               <h5>What happens</h5>

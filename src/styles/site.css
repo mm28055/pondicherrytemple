@@ -1317,6 +1317,11 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
 @media (max-width: 640px) {
   .year-day h5 { font-size: 10.5px; }
 }
+/* its puja's box: what holds for every kaalam, or the whole day; and any text after the kalams */
+.day-para { font-size: 15.5px; line-height: 1.45; color: var(--ink-2); }
+.day-para + .day-para { margin-top: 0.7em; }
+.year-regular-head + .year-list { margin-top: 0; }
+.year-day .day-when { font-size: 14.5px; color: var(--muted); }
 .year-about { display: block; margin-top: 6px; font-size: 14px; line-height: 1.45; color: var(--muted); }
 /* the month we are in: its heading in a band of its own colour, as on the calendar, marked "Now" */
 .year-month h3.now { background: var(--m); border-bottom-color: var(--m); color: var(--chalk); padding: 6px 10px 5px; }
@@ -1493,6 +1498,39 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
 .note-photos-photo img { width: 100%; height: 100%; object-fit: cover; display: block; transition: opacity 0.2s; }
 .note-photos-photo:hover img { opacity: 0.85; }
 .note-photos-photo:focus-visible { outline: 3px solid var(--ochre); outline-offset: 2px; }
+/* its videos, first in the column (on a phone, above the photographs) */
+.note-photos-video { flex: none; margin: 0; }
+.note-photos-video video { display: block; width: 100%; max-height: 560px; background: var(--night); }
+.note-photos-video figcaption { margin-top: 6px; font-size: 14px; line-height: 1.4; color: var(--muted); }
+/* the last photo when more are left: how many, over it, as the strips' way to the rest */
+.note-photos-more { position: relative; overflow: hidden; container-type: inline-size; cursor: pointer; }
+.note-photos-more img { filter: blur(2px) grayscale(0.5) brightness(0.65); transform: scale(1.06); transition: filter 0.3s, transform 0.3s; }
+.note-photos-more:hover img { opacity: 1; filter: blur(5px) grayscale(0.8) brightness(0.45); }
+.note-photos-more > span {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  padding: 0 8%;
+  text-align: center;
+  color: var(--chalk);
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: clamp(14px, 9cqi, 26px);
+  line-height: 1.1;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  transition: transform 0.3s;
+}
+.note-photos-more span span::after { content: "\00a0\2192"; }
+.note-photos-more:hover > span { transform: scale(1.08); }
+/* opened: the rest of the photos under the note's text, in rows as on the Photographs page (.photo-rows) */
+/* (under the column's last photo by the gap between photos, as one row is under another) */
+.note-more { scroll-margin-top: 110px; }
+.note-more-rows > div { padding-top: var(--gap); }
+/* beside the text it reaches back over the photos' column too, from the page's margin (.note-layout: 33% and 67%) */
+@media (min-width: 901px) { .note-more { margin-left: calc(-33% / 0.67); } }
+.photo-rows.note-more-rows { padding-top: 0; }
+.note-more-rows .photo-fewer { cursor: pointer; }
+.note-photos-fewer { align-self: flex-start; margin-top: 14px; background: none; border: 0; padding: 0; cursor: pointer; font: inherit; }
 /* the Field Notes page's strip, three rows of it, its place kept while it is measured */
 .note-strip { --h: 96px; padding-top: 16px; scroll-margin-top: 84px; }
 button.home-strip-photo { padding: 0; border: 0; cursor: zoom-in; }
@@ -1501,6 +1539,7 @@ button.home-strip-photo:focus-visible { outline: 3px solid var(--ochre); outline
 @media (max-width: 900px) {
   .note-layout { grid-template-columns: minmax(0, 1fr); }
   .note-photos { min-height: calc(var(--rows, 0) * 96px + (var(--rows, 0) - 1) * 20px + 16px); }
+  .note-photos-video { padding-top: 16px; }
 }
 .note-head { padding-block: clamp(18px, 3vw, 36px) clamp(16px, 2.5vw, 28px); border-bottom: 2px solid var(--ink); }
 

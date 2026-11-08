@@ -49,12 +49,23 @@ export interface Kalam {
   naivedyam?: string;
 }
 
+/** A temple's ritual day (The Day, in Ritual Cycles): its puja ("4 kaalam
+    puja"), what holds for every kaalam (or, with no kalams, the whole day),
+    its kalams in order, and any text after them. */
+export interface TempleDay {
+  standard?: string;
+  intro?: string;
+  kalams: Kalam[];
+  notesHeading?: string;
+  notes?: string;
+}
+
 export interface Temple {
   /** Web address, unique within its region: /pondicherry/chetty-koil */
   id: string;
   region: RegionId;
-  /** Its day, kalam by kalam, in order. */
-  ritualDay?: Kalam[];
+  /** Its ritual day, when anything of it is written. */
+  day?: TempleDay;
   name: string;
   /** What the temple is called in town, if different. */
   knownAs?: string;

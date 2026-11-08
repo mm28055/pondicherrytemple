@@ -156,8 +156,24 @@ export const Temples: CollectionConfig = {
         {
           label: 'The ritual day',
           description:
-            'The temple’s day, kalam by kalam, in order: shown as The Day in Ritual Cycles on its page, once there is at least one. Drag the rows to reorder.',
+            'The temple’s day: shown as The Day in Ritual Cycles on its page, once anything here is written. Its puja ("4 kaalam puja"), then the kalams in order (drag the rows to reorder), then any text about the day as a whole. A temple with text only leaves the kalams empty.',
           fields: [
+            {
+              name: 'dayStandard',
+              type: 'text',
+              label: 'Its puja',
+              admin: { placeholder: '4 kaalam puja', description: 'How many kaalams of puja a day, shown as the heading of The Day.' },
+            },
+            {
+              name: 'dayIntro',
+              type: 'textarea',
+              label: 'Under it',
+              admin: {
+                rows: 3,
+                description:
+                  'Shown under the heading, before the kalams: what holds for every kaalam, or, for a temple with no kalams below, the whole of its day. A new line here is a new paragraph. Can be left empty.',
+              },
+            },
             {
               name: 'ritualDay',
               label: 'Kalams',
@@ -191,6 +207,18 @@ export const Temples: CollectionConfig = {
                   admin: { rows: 2, description: 'A new line here is a new line on the page.' },
                 },
               ],
+            },
+            {
+              name: 'dayNotesHeading',
+              type: 'text',
+              label: 'After the kalams: heading',
+              admin: { placeholder: 'The nityapadi pujai', description: 'For the text below. Can be left empty.' },
+            },
+            {
+              name: 'dayNotes',
+              type: 'textarea',
+              label: 'After the kalams: text',
+              admin: { rows: 4, description: 'More about the day, shown after the kalams in a box of its own. A new line here is a new paragraph. Can be left empty.' },
             },
           ],
         },

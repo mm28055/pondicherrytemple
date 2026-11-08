@@ -39,6 +39,7 @@ import type {
   RegionId,
   Facing,
   Temple,
+  TempleDay,
   TempleEntry,
   HomePageText,
   AboutPageText,
@@ -307,6 +308,31 @@ const toRegion = (r: P.Region, L: Lookups): Region => ({
   introText: plainText(r.intro),
 });
 
+/** A temple's ritual day, or undefined while nothing of it is written. */
+function toTempleDay(t: P.Temple): TempleDay | undefined {
+  const day: TempleDay = {
+    standard: t.dayStandard?.trim() || undefined,
+    intro: t.dayIntro?.trim() || undefined,
+    kalams: (t.ritualDay ?? []).flatMap((k) =>
+      k.kalam?.trim()
+        ? [
+            {
+              kalam: k.kalam.trim(),
+              tamil: k.tamil?.trim() || undefined,
+              time: k.time?.trim() || undefined,
+              timingNote: k.timingNote?.trim() || undefined,
+              whatHappens: k.whatHappens?.trim() || undefined,
+              naivedyam: k.naivedyam?.trim() || undefined,
+            },
+          ]
+        : [],
+    ),
+    notesHeading: t.dayNotesHeading?.trim() || undefined,
+    notes: t.dayNotes?.trim() || undefined,
+  };
+  return day.standard || day.intro || day.kalams.length || day.notes ? day : undefined;
+}
+
 const toTemple = (t: P.Temple, L: Lookups): Temple => ({
   id: t.slug ?? "",
   region: L.regionOf(t.region),
@@ -320,20 +346,7 @@ const toTemple = (t: P.Temple, L: Lookups): Temple => ({
   faces: t.faces ?? "east",
   intro: toHTML(t.intro, L.paths) || undefined,
   introText: plainText(t.intro) || undefined,
-  ritualDay: (t.ritualDay ?? []).flatMap((k) =>
-    k.kalam?.trim()
-      ? [
-          {
-            kalam: k.kalam.trim(),
-            tamil: k.tamil?.trim() || undefined,
-            time: k.time?.trim() || undefined,
-            timingNote: k.timingNote?.trim() || undefined,
-            whatHappens: k.whatHappens?.trim() || undefined,
-            naivedyam: k.naivedyam?.trim() || undefined,
-          },
-        ]
-      : [],
-  ),
+  day: toTempleDay(t),
   coordinates:
     t.coordinates?.lat != null && t.coordinates?.lng != null
       ? [t.coordinates.lat, t.coordinates.lng]

@@ -212,7 +212,7 @@ export default async function TemplePage({ params }: Props) {
 
             <section id="ritual-year">
               <h2 id="ritual-cycles" className="sub-head">Ritual Cycles</h2>
-              <TempleYear year={year} day={t.ritualDay ?? []} />
+              <TempleYear year={year} day={t.day} />
             </section>
           </>
         }
