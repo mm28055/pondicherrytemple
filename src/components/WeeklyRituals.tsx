@@ -17,18 +17,6 @@ const DAYS = [
   { key: "sat", en: "Saturday", short: "Sat", ta: "சனி" },
 ];
 
-/* Until a day's character is written in the admin (Site pages → Varam):
-   placeholder text, about five hundred words, plainly not the real thing. */
-const PLACEHOLDER = [
-  "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium.",
-  "Totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem.",
-  "Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur. Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur. At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident.",
-  "Similique sunt in culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga. Et harum quidem rerum facilis est et expedita distinctio. Nam libero tempore, cum soluta nobis est eligendi optio cumque nihil impedit quo minus id quod maxime placeat facere possimus, omnis voluptas assumenda est, omnis dolor repellendus. Temporibus autem quibusdam et aut officiis debitis aut rerum necessitatibus saepe eveniet ut et voluptates repudiandae sint et molestiae non recusandae.",
-  "Itaque earum rerum hic tenetur a sapiente delectus, ut aut reiciendis voluptatibus maiores alias consequatur aut perferendis doloribus asperiores repellat. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat a ante venenatis dapibus posuere velit aliquet. Maecenas faucibus mollis interdum, cras mattis consectetur purus sit amet fermentum, donec ullamcorper nulla non metus auctor fringilla. Vestibulum id ligula porta felis euismod semper, aenean lacinia bibendum nulla sed consectetur.",
-  "Curabitur blandit tempus porttitor. Nullam quis risus eget urna mollis ornare vel eu leo. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec sed odio dui, etiam porta sem malesuada magna mollis euismod. Praesent commodo cursus magna, vel scelerisque nisl consectetur et. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Nulla vitae elit libero, a pharetra augue.",
-  "Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Etiam porta sem malesuada magna mollis euismod. Aenean eu leo quam, pellentesque ornare sem lacinia quam venenatis vestibulum. Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor. Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit. Sed posuere consectetur est at lobortis. Cras justo odio, dapibus ac facilisis in, egestas eget quam.",
-].join("\n\n");
-
 /** When in the day, as minutes, to put a day's rituals in order: "3:30 pm
     onwards", "after 7:30 pm", "5 pm"; "morning", "evening", "night" by
     their usual hours; anything else last. */
@@ -141,13 +129,16 @@ export function WeeklyRituals({
           ) : null
         )}
 
-        {/* what the day is like: what the town's people do on it */}
-        <div className="varam-character">
-          <h3 className="caps">{day.en}s</h3>
-          {(character[shown] ?? PLACEHOLDER).split(/\n\s*\n/).map((p, i) => (
-            <p key={i}>{p.trim()}</p>
-          ))}
-        </div>
+        {/* what the day is like: what the town's people do on it, once written
+            in the admin (Site pages → Varam); until then nothing */}
+        {character[shown]?.trim() && (
+          <div className="varam-character">
+            <h3 className="caps">{day.en}s</h3>
+            {character[shown].split(/\n\s*\n/).map((p, i) => (
+              <p key={i}>{p.trim()}</p>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
