@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useDeferredValue, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { flushSync } from "react-dom";
 import type { NoteRowData } from "@/lib/view";
-import { hasTerm, searchForm, searchTerms, startsWord } from "@/lib/searchWords";
+import { hasTerm, nearestWords, searchForm, searchTerms, slips, slipsFor, startsWord } from "@/lib/searchWords";
 import { NoteRow } from "./Rows";
 import { WritingsTabs } from "./WritingsTabs";
 
@@ -37,15 +37,40 @@ const isUnder = (r: BrowsedNote, key: Key, id: string) => {
 };
 
 type Suggestion =
-  | { type: "words"; label: string }
-  | { type: "choice"; key: Key; id: string; label: string; count: number }
-  | { type: "note"; href: string; label: string; date: string };
+  | { type: "words"; label: string; query?: string }
+  | { type: "choice"; key: Key; id: string; label: string; count: number; close?: boolean }
+  | { type: "note"; href: string; label: string; date: string; quote?: Quote };
+
+/** A few words from a note's text round a word searched for. */
+type Quote = { before: string; word: string; after: string };
+
+/** The first place in a text where a word starts or ends with one of the
+    spellings searched for (as hasTerm finds them), with some words either side. */
+function quoteFrom(text: string, spellings: string[]): Quote | null {
+  for (const m of text.matchAll(/[\p{L}\p{M}\p{N}]+/gu)) {
+    const w = searchForm(m[0]).trim();
+    if (!spellings.some((s) => w.startsWith(s) || (s.length > 3 && w.endsWith(s)))) continue;
+    const at = m.index ?? 0;
+    let from = Math.max(0, at - 40);
+    let to = Math.min(text.length, at + m[0].length + 60);
+    if (from > 0) from = text.indexOf(" ", from) + 1 || from;
+    if (to < text.length) to = text.lastIndexOf(" ", to) > at + m[0].length ? text.lastIndexOf(" ", to) : to;
+    return {
+      before: (from > 0 ? "…" : "") + text.slice(from, at),
+      word: m[0],
+      after: text.slice(at + m[0].length, to) + (to < text.length ? "…" : ""),
+    };
+  }
+  return null;
+}
 
 /** The Field Notes page's header, list and search. The search sits on the tabs'
     line. Pressed, it offers the temples, festivals and months to choose from;
     typing narrows these to what fits and adds the notes with those words in
     their titles; Enter searches every note's whole words for what is typed,
-    in their spellings (lib/searchWords). While searching, the introduction and
+    in their spellings (lib/searchWords). A word no note has is taken for the
+    nearest that some do (a slip or two, by its length), the list says so, and
+    the suggestions offer that spelling and match names and titles near it. While searching, the introduction and
     the photographs make way, so the results are just under the tabs. The
     notes' words are fetched only once someone goes to search, and the address
     keeps the search (?q=…&temple=…), so it can be sent to someone. */
@@ -126,25 +151,89 @@ export function FieldNotesBrowser({
     return out;
   }, [rows, texts]);
 
+  // every word the notes and the choices have (in search form), with how many
+  // notes have it, and a spelling of it as written, to show
+  const { vocab, written } = useMemo(() => {
+    const vocab = new Map<string, number>();
+    const written = new Map<string, string>();
+    for (const text of hay.values()) for (const w of new Set(text.split(" "))) if (w) vocab.set(w, (vocab.get(w) ?? 0) + 1);
+    const raw = [
+      ...rows.map((r) => [r.title, r.where, r.also, texts?.[r.id] ?? r.longExcerpt].join(" ")),
+      ...filters.flatMap((f) => f.options.map((o) => `${o.label} ${o.also ?? ""}`)),
+    ];
+    for (const text of raw)
+      for (const token of text.split(/[^\p{L}\p{M}\p{N}]+/u)) {
+        const w = searchForm(token).trim();
+        if (!w || w.includes(" ")) continue;
+        if (!vocab.has(w)) vocab.set(w, 0);
+        if (!written.has(w)) written.set(w, token);
+      }
+    return { vocab, written };
+  }, [hay, rows, texts, filters]);
+
+  /** What is typed, each word with the words it is searched as: itself, or,
+      when no note has it, the nearest words that some do. */
+  const readTerms = useCallback(
+    (typed: string) =>
+      searchTerms(typed).map((t) => {
+        const has = [...hay.values()].filter((text) => hasTerm(text, t)).length;
+        // a spelling takes in a near one three times as many notes use, as Vinayagar does Vinayaka
+        const near = nearestWords(t, vocab);
+        if (has) {
+          const max = slipsFor(t.length);
+          const also = [...vocab]
+            .filter(([w, n]) => n >= Math.max(5, has * 3) && w !== t && slips(t, w, max) <= max)
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 2)
+            .map(([w]) => w);
+          return { t, as: [t, ...also], fixed: false, also };
+        }
+        const as = near.length ? near : nearestWords(t, vocab, true);
+        return { t, as: as.length ? as : [t], fixed: as.length > 0, also: [] as string[] };
+      }),
+    [hay, vocab],
+  );
+  /** The typed words with each one put right, as written; null if none needed it. */
+  const putRight = useCallback(
+    (read: ReturnType<typeof readTerms>) =>
+      read.some((r) => r.fixed) ? read.map((r) => (r.fixed ? (written.get(r.as[0]) ?? r.as[0]) : r.t)).join(" ") : null,
+    [written],
+  );
+  const asRead = useMemo(() => readTerms(words), [readTerms, words]);
+  const meant = putRight(asRead);
+  const alsoWith = asRead.flatMap((r) => r.also.map((w) => written.get(w) ?? w));
+
   const shown = useMemo(() => {
-    const terms = searchTerms(words);
     const out = rows.filter((r) => {
       for (const k of KEYS) if (chosen[k] && !isUnder(r, k, chosen[k]!)) return false;
       const text = hay.get(r.id) ?? "";
-      return terms.every((t) => hasTerm(text, t));
+      return asRead.every((t) => t.as.some((a) => hasTerm(text, a)));
     });
     return oldestFirst ? out.reverse() : out;
-  }, [rows, hay, words, chosen, oldestFirst]);
+  }, [rows, hay, asRead, chosen, oldestFirst]);
 
   // the suggestions, in groups: the words themselves first, then the choices that fit, then notes by their titles
   const groups = useMemo(() => {
     const terms = searchTerms(query);
-    const fits = (text: string) => {
+    const exact = (text: string) => {
       const t = ` ${searchForm(text)} `;
       return terms.every((w) => startsWord(t, w));
     };
+    // near: each word typed, or a spelling it is read as (put right, or a far
+    // commoner one), starts a word of the text
+    const read = readTerms(query);
+    const near = (text: string) => {
+      const t = ` ${searchForm(text)} `;
+      return read.every((r) => r.as.some((w) => startsWord(t, w)));
+    };
+    const fits = (text: string) => exact(text) || near(text);
     const out: { head?: string; items: Suggestion[] }[] = [];
-    if (terms.length) out.push({ items: [{ type: "words", label: `Search all notes for “${query.trim()}”` }] });
+    const fixed = putRight(read);
+    if (terms.length) {
+      const items: Suggestion[] = [{ type: "words", label: `Search all notes for “${query.trim()}”` }];
+      if (fixed) items.unshift({ type: "words", label: `Did you mean “${fixed}”?`, query: fixed });
+      out.push({ items });
+    }
     for (const f of filters) {
       const key = f.key as Key;
       if (key === "type") continue;
@@ -155,26 +244,37 @@ export function FieldNotesBrowser({
           const other = fits(o.label) ? null : o.also?.split(", ").find(fits);
           if (!fits(o.label) && !other) return [];
           const label = other ? `${o.label} · ${other}` : o.label;
-          return [{ type: "choice" as const, key, id: o.id, label, count: rows.filter((r) => isUnder(r, key, o.id)).length }];
+          const close = exact(o.label) || Boolean(o.also?.split(", ").some(exact));
+          return [{ type: "choice" as const, key, id: o.id, label, count: rows.filter((r) => isUnder(r, key, o.id)).length, close }];
         });
       if (key !== "month") items.sort((a, b) => a.label.localeCompare(b.label));
+      if (terms.length) items.sort((a, b) => Number(b.close) - Number(a.close)); // the exact before the near
       if (items.length) out.push({ head: f.label, items: terms.length ? items.slice(0, 5) : items });
     }
     if (terms.length) {
-      const notes = rows
-        .filter((r) => fits(r.title))
+      const notes = [...rows.filter((r) => exact(r.title)), ...rows.filter((r) => !exact(r.title) && near(r.title))]
         .slice(0, 5)
         .map((r) => ({ type: "note" as const, href: r.href, label: r.title, date: `${r.day} ${r.shortMonth}` }));
       if (notes.length) out.push({ head: "Field notes", items: notes });
+      // then notes with the words in their text, a few words shown where they are
+      const titled = new Set(notes.map((n) => n.href));
+      const spellings = read.flatMap((r) => r.as);
+      const inText = rows.filter((r) => !titled.has(r.href) && read.every((x) => x.as.some((a) => hasTerm(hay.get(r.id) ?? "", a))));
+      const quoted = inText.flatMap((r) => {
+        const quote = quoteFrom(texts?.[r.id] ?? r.longExcerpt ?? "", spellings);
+        return quote ? [{ type: "note" as const, href: r.href, label: r.title, date: `${r.day} ${r.shortMonth}`, quote }] : [];
+      });
+      if (quoted.length) out.push({ head: `In the text · ${inText.length} ${inText.length === 1 ? "note" : "notes"}`, items: quoted.slice(0, 5) });
     }
     return out;
-  }, [query, filters, chosen, rows]);
+  }, [query, filters, chosen, rows, readTerms, putRight, hay, texts]);
   const flat = useMemo(() => groups.flatMap((g) => g.items), [groups]);
   useEffect(() => setActive(-1), [query]);
 
   const pick = (s: Suggestion) => {
     setPanel(false);
     if (s.type === "note") return router.push(s.href);
+    if (s.type === "words" && s.query) setQuery(s.query);
     if (s.type === "choice") {
       setChosen((c) => ({ ...c, [s.key]: s.id }));
       setQuery("");
@@ -310,7 +410,16 @@ export function FieldNotesBrowser({
                             onMouseDown={(e) => e.preventDefault()}
                             onClick={() => pick(s)}
                           >
-                            <span>{s.label}</span>
+                            <span>
+                              {s.label}
+                              {s.type === "note" && s.quote && (
+                                <small className="notes-suggest-quote">
+                                  {s.quote.before}
+                                  <b>{s.quote.word}</b>
+                                  {s.quote.after}
+                                </small>
+                              )}
+                            </span>
                             {s.type === "choice" && <span>{s.count}</span>}
                             {s.type === "note" && <span>{s.date}</span>}
                           </li>
@@ -330,6 +439,8 @@ export function FieldNotesBrowser({
         {searching && (
           <p className="notes-count" aria-live="polite">
             {shown.length} of {rows.length} field notes
+            {meant && <span className="notes-meant"> with “{meant}”, as none has “{words.trim()}”</span>}
+            {!meant && alsoWith.length > 0 && <span className="notes-meant"> with “{words.trim()}” or “{alsoWith.join("”, “")}”</span>}
             {KEYS.filter((k) => chosen[k]).map((k) => (
               <button key={k} type="button" aria-label={`Show all, not only ${nameOf(k)}`} onClick={() => setChosen((c) => ({ ...c, [k]: undefined }))}>
                 {nameOf(k)} ×
