@@ -824,7 +824,8 @@ a.temple-row:hover .temple-name { color: var(--ochre); }
 .home-film::backdrop { background: #000; }
 /* the page behind not scrolling, nor its scrollbar showing */
 html:has(dialog.home-film[open]) { overflow: hidden; scrollbar-gutter: auto; }
-.home-film video { display: block; width: 100%; height: 100%; object-fit: contain; background: transparent; }
+/* (black round the film's frame, so that it and the frame come in as one, no lighter bands at its sides) */
+.home-film video { display: block; width: 100%; height: 100%; object-fit: contain; background: #000; }
 .home-film .day-close { position: absolute; top: 14px; right: 20px; z-index: 3; color: #fff; font-size: 30px; }
 /* until the name starts growing into it (HomeTamil): nothing of it yet, the page as it is */
 .home-film.intro { opacity: 0; }

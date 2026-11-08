@@ -65,15 +65,17 @@ export function HomeMark({ film }: { film?: { src: string; poster?: string } }) 
     d.classList.add("intro");
     setOpen(true);
     d.showModal();
-    requestAnimationFrame(() =>
-      requestAnimationFrame(() => {
-        if (!d.open) return;
-        if (still) {
-          d.querySelector("video")?.play().catch(() => undefined);
-          finish(d);
-        } else grow(d);
-      }),
-    );
+    // once the film is in the pop-up (a frame or two; longer on a slow phone)
+    let frames = 0;
+    const begin = () => {
+      if (!d.open) return;
+      if (!d.querySelector("video") && frames++ < 30) return void requestAnimationFrame(begin);
+      if (still) {
+        d.querySelector("video")?.play().catch(() => undefined);
+        finish(d);
+      } else grow(d);
+    };
+    requestAnimationFrame(() => requestAnimationFrame(begin));
   };
 
   // the film's controls: shown once it has grown in
@@ -142,9 +144,17 @@ export function HomeMark({ film }: { film?: { src: string; poster?: string } }) 
     const g = canvas.getContext("2d");
     if (g) {
       g.scale(dpr, dpr);
-      g.font = `${cs.fontWeight} ${fs * k}px ${cs.fontFamily}`;
-      g.fontStretch = "condensed";
-      const m = g.measureText(word);
+      // narrow, as the header sets it: named in the font itself (Safari, on an
+      // iPhone, has no fontStretch for a canvas), and fontStretch where there is one
+      g.font = `${cs.fontWeight} condensed ${fs * k}px ${cs.fontFamily}`;
+      if ("fontStretch" in g) g.fontStretch = "condensed";
+      let m = g.measureText(word);
+      // and if it still comes out wider or narrower than the copy, drawn to the copy's width
+      const wide = m.width / W;
+      if (Math.abs(wide - 1) > 0.01) {
+        g.scale(1 / wide, 1);
+        m = g.measureText(word);
+      }
       const lineH = m.fontBoundingBoxAscent + m.fontBoundingBoxDescent;
       g.fillStyle = "#000";
       g.fillText(word, 0, (H - lineH) / 2 + m.fontBoundingBoxAscent);
