@@ -40,6 +40,18 @@
     margin: 0 0 var(--base);
     max-width: 60em;
   }
+
+  // dictionary words drafted for words new to the site (Welcome)
+  .sthalam-waiting {
+    padding: 10px 14px;
+    border: 1px solid var(--sthalam-ochre);
+    border-radius: 4px;
+
+    a {
+      color: var(--sthalam-ochre);
+      font-weight: 600;
+    }
+  }
 }
 
 .sthalam-actions {

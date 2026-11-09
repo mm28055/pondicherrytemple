@@ -343,7 +343,7 @@ export interface HomePageText {
 }
 
 export interface AboutPageText {
-  lede: string;
+  lede?: string;
   sections: { heading: string; anchor?: string; body: string /* HTML */ }[];
   team: { name: string; role?: string; bio?: string }[];
   contactText?: string;

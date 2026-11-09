@@ -16,7 +16,12 @@ export const AboutPage: GlobalConfig = {
   access: { read: () => true, update: isEditor },
   hooks: { afterChange: [refreshAfterGlobalChange] },
   fields: [
-    { name: 'lede', type: 'textarea', label: 'Opening line', required: true },
+    {
+      name: 'lede',
+      type: 'textarea',
+      label: 'Opening line',
+      admin: { description: 'Under the title. Optional: since 9 November 2026 the page opens straight into its first section.' },
+    },
     {
       name: 'sections',
       type: 'array',

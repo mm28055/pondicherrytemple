@@ -287,14 +287,20 @@ a:focus-visible, button:focus-visible {
    letters than a paragraph's does. */
 .page-head.landing-head { padding-bottom: calc(clamp(18px, 1.6vw, 22px) + 3px); }
 .page-head.landing-head:has(> .page-title:last-child) { padding-bottom: calc(clamp(18px, 1.6vw, 22px) + 7px); }
+/* ending in the Tamil name (About), whose letters stand a little lower in
+   their line: about 5px more on a computer and a tablet, 2px on a phone, to
+   land where an English title does */
+.page-head.landing-head:has(> .page-title-tamil:last-child) { padding-bottom: calc(clamp(18px, 1.6vw, 22px) + 12px); }
 /* (a tablet: the home page's date under its name, its last line "Full calendar") */
 @media (min-width: 641px) and (max-width: 900px) {
   .page-head.landing-head { padding-bottom: clamp(18px, 1.6vw, 22px); }
   .page-head.landing-head:has(> .page-title:last-child) { padding-bottom: calc(clamp(18px, 1.6vw, 22px) + 3px); }
+  .page-head.landing-head:has(> .page-title-tamil:last-child) { padding-bottom: calc(clamp(18px, 1.6vw, 22px) + 7px); }
 }
 @media (max-width: 640px) {
   .page-head.landing-head { padding-bottom: 14px; }
   .page-head.landing-head:has(> .page-title:last-child) { padding-bottom: 22px; }
+  .page-head.landing-head:has(> .page-title-tamil:last-child) { padding-bottom: 24px; }
   /* the Festivals & Rituals search, its own line at the foot on a phone */
   .page-head.landing-head.gallery-head { padding-bottom: 13px; }
 }
@@ -720,8 +726,10 @@ a:focus-visible, button:focus-visible {
 .obs-row .obs-gloss { color: var(--ink-2); font-size: 17px; }
 .obs-row:hover .obs-tamil { color: var(--ochre); }
 
-.obs-row.compact { grid-template-columns: minmax(0, 1fr) auto; }
-.obs-row.compact .obs-tamil { font-size: 24px; }
+/* the home page's list, beside its Temples: names the size of the temples'
+   names, rows as far apart */
+.obs-row.compact { grid-template-columns: minmax(0, 1fr) auto; padding-block: 22px; }
+.obs-row.compact .obs-tamil { font-size: clamp(24px, 2.8vw, 34px); line-height: 1.15; }
 
 /* ---------- Rows: temples ---------- */
 .temple-row {
@@ -1008,6 +1016,16 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
 .more-link::after { content: " →"; }
 .more-link:hover { color: var(--ochre-deep); }
 
+/* the link to the whole list, after its last row (home: Temples, Festivals & Rituals) */
+.list-foot { margin-top: 22px; }
+/* the home page's two lists side by side end level: the festivals' rows share
+   whatever height the temples' four take beyond theirs, words centred in each */
+@media (min-width: 901px) {
+  .home-lists > div { display: flex; flex-direction: column; }
+  .home-lists .obs-row.compact { flex: 1 1 auto; align-content: center; }
+}
+.list-foot .arrow-link { border-bottom: none; padding-bottom: 0; color: var(--ochre); font-size: 12.5px; }
+
 .home-links { display: flex; flex-wrap: wrap; gap: 26px; margin-top: 26px; }
 
 .home-latest li { border-bottom: 1px solid var(--rule); }
@@ -1031,7 +1049,8 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
 
 @media (max-width: 900px) {
   .home-hero { grid-template-columns: minmax(0, 1fr); grid-template-areas: "mark" "today"; }
-  .today { margin: 18px 0 0; }
+  /* under the name, at the right, as it is beside the name on a computer */
+  .today { margin: 18px 0 0; justify-self: end; }
 }
 /* on a phone, today's date smaller, so the photographs and the opening come
    up into view */
@@ -3279,6 +3298,8 @@ body { container: page / inline-size; }
 /* the way to the field notes meanwhile, in the public introduction */
 .lede-link { font-weight: 600; color: var(--ochre); transition: color 0.15s; }
 .lede-link:hover { color: var(--ochre-deep); }
+/* beside the home page's Festivals & Rituals heading: "All field notes"'s letters, unlinked */
+.soon-tag { font-family: var(--display); font-weight: 700; font-size: 12.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ochre); }
 .reserved-soon { font-weight: 500; letter-spacing: 0.04em; color: var(--ochre); }
 /* "About Brahmotsavam" on a month's page: only where the name is a link */
 span.month-obs .month-obs-more { display: none; }

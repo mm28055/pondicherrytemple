@@ -19,6 +19,7 @@ import {
   getTemples,
   getTemplesWithPages,
   getDummyPhotos,
+  getDictionary,
   hasPage,
   isAround,
   layoutsOf,
@@ -35,6 +36,8 @@ import { NoteRow } from "@/components/Rows";
 import { TempleYear } from "@/components/TempleYear";
 import { ShowMore } from "@/components/ShowMore";
 import { FoldedIntro } from "@/components/FoldedIntro";
+import { GlossCard } from "@/components/GlossCard";
+import { markDictionary } from "@/lib/dictionary";
 import { TempleLayout } from "@/components/TempleLayout";
 import { TempleColumns } from "@/components/TempleColumns";
 import { ReservedLink } from "@/components/ReservedLink";
@@ -134,10 +137,12 @@ export default async function TemplePage({ params }: Props) {
               {articles.length > 0 && <a href="#articles">Articles ↓</a>}
             </nav>
 
-            {/* its introduction (Admin → Temples); a note in its place until it is written */}
+            {/* its introduction (Admin → Temples), its dictionary words marked
+                (lib/dictionary); a note in its place until it is written */}
             {t.intro ? (
               <div className="temple-intro">
-                <FoldedIntro html={t.intro} />
+                <GlossCard />
+                <FoldedIntro html={markDictionary(t.intro, await getDictionary())} />
               </div>
             ) : (
               <p className="note-line">An introduction to the temple is being written.</p>

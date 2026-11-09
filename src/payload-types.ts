@@ -1105,7 +1105,7 @@ export interface PhotoOrder {
   createdAt: string;
 }
 /**
- * Words explained in the field notes. The first use of each word in a note is underlined, and its meaning appears on hover, or on a tap on a phone.
+ * Words explained in the field notes and the temples’ introductions. The first use of each word is underlined, and its meaning appears on hover, or on a tap on a phone. A word marked “Waiting for approval” is a draft for a word new to the site: edit it if needed, then set it to Approved.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "dictionary".
@@ -1125,6 +1125,14 @@ export interface Dictionary {
    * For a word that is something else without its capital: Thai, the month, and not thai in thai saadam.
    */
   exactCase?: boolean | null;
+  /**
+   * Shown on the site only once Approved.
+   */
+  status?: ('approved' | 'waiting') | null;
+  /**
+   * Where the word was first found, when it was drafted.
+   */
+  foundIn?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1815,6 +1823,8 @@ export interface DictionarySelect<T extends boolean = true> {
   alsoWritten?: T;
   meaning?: T;
   exactCase?: T;
+  status?: T;
+  foundIn?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2056,7 +2066,10 @@ export interface HomePage {
  */
 export interface AboutPage {
   id: number;
-  lede: string;
+  /**
+   * Under the title. Optional: since 9 November 2026 the page opens straight into its first section.
+   */
+  lede?: string | null;
   /**
    * Each has a heading and its text, shown in this order.
    */

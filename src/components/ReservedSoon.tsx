@@ -13,6 +13,14 @@ export function ReservedSoon() {
   return FESTIVALS_PUBLISHED || team ? null : <p className="coming-soon">Coming soon</p>;
 }
 
+/** "Coming soon" at the right of the home page's Festivals & Rituals heading,
+    in red, as "All field notes" is beside Just added; for the public only,
+    while the festivals' pages are held in reserve. */
+export function ReservedSoonTag() {
+  const team = useTeam(!FESTIVALS_PUBLISHED);
+  return FESTIVALS_PUBLISHED || team ? null : <span className="soon-tag">Coming soon</span>;
+}
+
 /** The page's introduction: `intro`, from the admin (Section descriptions), once
     the festivals' pages can be opened; until then, for the public, these words,
     the way to the field notes meanwhile. */

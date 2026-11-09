@@ -1234,9 +1234,10 @@ export async function countTemplesForObservance(observanceId: string): Promise<n
   return seen.size;
 }
 
-/** The dictionary, ready for marking the field notes (lib/dictionary). */
+/** The dictionary, ready for marking the field notes and the temples'
+    introductions (lib/dictionary): its approved words only. */
 export const getDictionary = cache(async () => {
-  const docs = (await find({ ...base, collection: "dictionary", depth: 0 })).docs;
+  const docs = (await find({ ...base, collection: "dictionary", depth: 0, where: { status: { not_equals: "waiting" } } })).docs;
   return buildDictionary(docs as unknown as DictionaryEntry[]);
 });
 
@@ -1632,10 +1633,11 @@ export async function getHomePage(): Promise<HomePageText | null> {
 /** The About page's words, or null if not yet written. */
 export async function getAboutPage(): Promise<AboutPageText | null> {
   const g = await findGlobal({ slug: "about-page", depth: 1, overrideAccess: true });
-  if (!g.lede) return null;
+  // nothing written yet (the opening line alone may be left empty)
+  if (!g.lede && !g.sections?.length) return null;
   const L = await lookups();
   return {
-    lede: g.lede,
+    lede: g.lede ?? undefined,
     sections: (g.sections ?? []).map((s) => ({
       heading: s.heading,
       anchor: s.anchor || undefined,

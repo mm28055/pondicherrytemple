@@ -82,6 +82,8 @@ import * as migration_20261108_210000_bhajan_saturday from './20261108_210000_bh
 import * as migration_20261108_220000_temple_intros from './20261108_220000_temple_intros';
 import * as migration_20261108_230000_home_quote from './20261108_230000_home_quote';
 import * as migration_20261109_010000_two_photo_sets from './20261109_010000_two_photo_sets';
+import * as migration_20261109_120000_dictionary_status from './20261109_120000_dictionary_status';
+import * as migration_20261109_130000_about_opening from './20261109_130000_about_opening';
 
 export const migrations = [
   {
@@ -503,5 +505,15 @@ export const migrations = [
     up: migration_20261109_010000_two_photo_sets.up,
     down: migration_20261109_010000_two_photo_sets.down,
     name: '20261109_010000_two_photo_sets',
+  },
+  {
+    up: migration_20261109_120000_dictionary_status.up,
+    down: migration_20261109_120000_dictionary_status.down,
+    name: '20261109_120000_dictionary_status',
+  },
+  {
+    up: migration_20261109_130000_about_opening.up,
+    down: migration_20261109_130000_about_opening.down,
+    name: '20261109_130000_about_opening',
   },
 ];

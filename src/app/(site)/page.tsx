@@ -24,6 +24,7 @@ import { HomeStrip } from "@/components/HomeStrip";
 import { HomeMark } from "@/components/HomeTamil";
 import { plainWithScripts } from "@/lib/richtext";
 import { FilmVideo } from "@/components/FilmVideo";
+import { ReservedSoonTag } from "@/components/ReservedSoon";
 
 export default async function HomePage() {
   const words = await getHomePage();
@@ -49,14 +50,14 @@ export default async function HomePage() {
     })
   );
 
-  // The festivals and rituals seen most often
+  // The five festivals and rituals seen most often
   const observances = await Promise.all(
     (await getObservances()).map(async (o) => ({
       row: observanceRow(o, await countTemplesForObservance(o.id)),
       seen: (await getOccasionsForObservance(o.id)).length,
     }))
   );
-  const topObservances = observances.sort((a, b) => b.seen - a.seen).slice(0, 6);
+  const topObservances = observances.sort((a, b) => b.seen - a.seen).slice(0, 5);
 
   // for the pop-up behind "Today": every day recorded, as the calendar shows it
   const todayEvents = await calendarEvents(await getOccasions());
@@ -182,28 +183,34 @@ export default async function HomePage() {
 
       <div className="wrap">
         <section className="section">
-          <div className="split">
+          <div className="split home-lists">
             <div>
+              {/* four temples; the rest a click away, at the end of the list */}
               <div className="section-head">
                 <h2>Temples</h2>
+              </div>
+              {templeRows.slice(0, 4).map(({ t, meta }) => (
+                <TempleRow key={t.id} temple={t} meta={meta} />
+              ))}
+              <div className="list-foot">
                 <Link className="arrow-link" href={`/${region.id}`}>
                   All temples
                 </Link>
               </div>
-              {templeRows.map(({ t, meta }) => (
-                <TempleRow key={t.id} temple={t} meta={meta} />
-              ))}
             </div>
             <div>
               <div className="section-head">
                 <h2>Festivals &amp; Rituals</h2>
-                <Link className="arrow-link" href="/festivals-and-rituals">
-                  All
-                </Link>
+                <ReservedSoonTag />
               </div>
               {topObservances.map(({ row }) => (
                 <ObservanceRow key={row.id} row={row} compact />
               ))}
+              <div className="list-foot">
+                <Link className="arrow-link" href="/festivals-and-rituals">
+                  All festivals and rituals
+                </Link>
+              </div>
             </div>
           </div>
         </section>
