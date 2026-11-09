@@ -38,7 +38,7 @@ export const AboutPage: GlobalConfig = {
               label: 'Link name (optional)',
               admin: {
                 width: '35%',
-                description: 'Lets other pages link straight here. The home page uses "idea" and "why".',
+                description: 'Lets other pages link straight here. The home page uses "idea" and "why". The section named "centre" is shown just before the team.',
               },
             },
           ],

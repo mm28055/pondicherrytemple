@@ -325,6 +325,8 @@ a:focus-visible, button:focus-visible {
 /* (and as large as they are: the body of its letters, as in ல and ம, as tall as their capitals (0.62 of its size, to their 0.73), and standing on their line, 0.851 down where its own falls at 0.772; drawn larger without taking more room, so the words above and below stand as on every other page) */
 /* (and a little lower again, for the dots over ஸ் and ம், which rise above the capitals' line) */
 .page-title-tamil { position: relative; top: 0.1385em; transform: scale(1.177); transform-origin: 0 0.772em; }
+/* its box only as wide as its letters, so the enlarged box stays inside the page (as wide as the page, it went 1.177 times past its right edge) */
+.page-title-tamil { width: fit-content; max-width: calc(100% / 1.177); }
 
 /* the opening words of each menu page (Temples, Festivals & Rituals, Field
    Notes, Articles, Films, About, the Book): the size of the home page's
@@ -2143,6 +2145,13 @@ button.home-strip-photo:focus-visible { outline: 3px solid var(--ochre); outline
 }
 
 .team li { padding-block: 18px; border-bottom: 1px solid var(--rule); }
+/* no rule under the last row: the last person, and the one beside them when the row is full */
+.team li:last-child,
+.team li:nth-last-child(2):nth-child(odd) { border-bottom: none; }
+/* Contact: the email address with a mail icon */
+.contact-email { display: inline-flex; align-items: center; gap: 10px; margin-top: 22px; font-size: 19px; color: var(--ink); border-bottom: 1px solid var(--ochre); padding-bottom: 2px; }
+.contact-email svg { color: var(--ochre); flex: none; }
+.contact-email:hover { color: var(--ochre); }
 .team .who { font-family: var(--display); font-weight: 600; font-size: 22px; }
 .team .role { margin-top: 2px; }
 .team p { color: var(--ink-2); font-size: 17px; margin-top: 8px; }
@@ -2232,6 +2241,7 @@ button.home-strip-photo:focus-visible { outline: 3px solid var(--ochre); outline
   .book-parts li { grid-template-columns: 56px minmax(0, 1fr); gap: 16px; }
   .book-parts li::before { font-size: 32px; }
   .team { grid-template-columns: minmax(0, 1fr); }
+  .team li:nth-last-child(2):nth-child(odd) { border-bottom: 1px solid var(--rule); } /* one column: only the last has none */
   .footer-inner { grid-template-columns: minmax(0, 1fr); }
   .note-body p, .prose p, .qa dd { font-size: 18.5px; }
 }

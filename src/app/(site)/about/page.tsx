@@ -13,6 +13,13 @@ export const metadata: Metadata = {
 export default async function AboutPage() {
   const about = await getAboutPage();
   const email = about?.contactEmail;
+  const sections = about?.sections ?? [];
+  const block = (s: (typeof sections)[number]) => (
+    <section key={s.heading} className="about-block" id={s.anchor ?? undefined}>
+      <h2>{s.heading}</h2>
+      <Html className="prose rich" html={s.body} />
+    </section>
+  );
 
   return (
     <div className="wrap">
@@ -25,12 +32,7 @@ export default async function AboutPage() {
         {about?.lede && <p className="page-lede">{about.lede}</p>}
       </header>
 
-      {about?.sections.map((s) => (
-        <section key={s.heading} className="about-block" id={s.anchor}>
-          <h2>{s.heading}</h2>
-          <Html className="prose rich" html={s.body} />
-        </section>
-      ))}
+      {sections.filter((s) => s.anchor !== "centre").map(block)}
 
       <section className="about-block" id="book">
         <h2>The book</h2>
@@ -41,6 +43,9 @@ export default async function AboutPage() {
           </Link>
         </div>
       </section>
+
+      {/* the section with link name "centre" (The Centre) comes just before the team */}
+      {sections.filter((s) => s.anchor === "centre").map(block)}
 
       {about && about.team.length > 0 && (
         <section className="about-block" id="team">
@@ -61,19 +66,18 @@ export default async function AboutPage() {
         <h2>Contact</h2>
         <div className="prose">
           {about?.contactText && <p>{about.contactText}</p>}
-          <div className="home-links">
-            {email && (
-              <a
-                className="arrow-link"
-                href={`mailto:${email}?subject=Sthalam%20%E2%80%94%20Temple%20Documentation%20Project`}
-              >
-                Write to the project
-              </a>
-            )}
-            <Link className="arrow-link" href="/field-notes">
-              Start with the field notes
-            </Link>
-          </div>
+          {email && (
+            <a
+              className="contact-email"
+              href={`mailto:${email}?subject=Sthalam%20%E2%80%94%20Temple%20Documentation%20Project`}
+            >
+              <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round">
+                <rect x="3" y="5.5" width="18" height="13" rx="1.5" />
+                <path d="M3.5 6.5 12 13l8.5-6.5" />
+              </svg>
+              {email}
+            </a>
+          )}
         </div>
       </section>
     </div>

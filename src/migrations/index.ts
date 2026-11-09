@@ -84,6 +84,7 @@ import * as migration_20261108_230000_home_quote from './20261108_230000_home_qu
 import * as migration_20261109_010000_two_photo_sets from './20261109_010000_two_photo_sets';
 import * as migration_20261109_120000_dictionary_status from './20261109_120000_dictionary_status';
 import * as migration_20261109_130000_about_opening from './20261109_130000_about_opening';
+import * as migration_20261109_200000_about_centre_team from './20261109_200000_about_centre_team';
 
 export const migrations = [
   {
@@ -515,5 +516,10 @@ export const migrations = [
     up: migration_20261109_130000_about_opening.up,
     down: migration_20261109_130000_about_opening.down,
     name: '20261109_130000_about_opening',
+  },
+  {
+    up: migration_20261109_200000_about_centre_team.up,
+    down: migration_20261109_200000_about_centre_team.down,
+    name: '20261109_200000_about_centre_team',
   },
 ];
