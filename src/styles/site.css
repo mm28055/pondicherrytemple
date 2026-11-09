@@ -1056,7 +1056,8 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
    up into view */
 @media (max-width: 640px) {
   .home-hero { padding-bottom: 14px; row-gap: 0; }
-  .today { min-height: 96px; min-width: 0; margin-top: 4px; padding-left: 12px; }
+  /* on a phone at the left under the name, as it was before */
+  .today { min-height: 96px; min-width: 0; margin-top: 4px; padding-left: 12px; justify-self: start; }
   .today .kicker { margin-bottom: 0; font-size: 10.5px; }
   .today-tamil { font-size: 19px; }
   .today-en { font-size: 14px; margin-top: 0; }
