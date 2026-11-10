@@ -453,14 +453,17 @@ function toIllustration(d: P.Drawing, L: Lookups): Illustration | null {
   // the copy made for the site (cut to the drawing, its paper clear), or the image as uploaded
   const picture = toPicture(d.shown) ?? toPicture(d.image);
   if (!picture) return null;
+  // a drawing made only to stand in (its image the old placeholder plan): the stand-in
+  const dummy = /^placeholder-plan/.test(String(typeof d.image === "object" ? d.image?.filename ?? "" : ""));
   return {
     ...picture,
+    ...(dummy ? { ...PLACEHOLDER.east, faces: undefined } : {}),
     id: String(d.id),
     region: L.regionOf(d.region),
     kind: d.kind,
     stackOrder: d._drawings_drawings_order ?? undefined,
     coverOnly: d.coverOnly === true || undefined,
-    faces: (d.faces as Facing | null | undefined) ?? undefined,
+    faces: dummy ? undefined : ((d.faces as Facing | null | undefined) ?? undefined),
     title: d.title,
     caption: d.caption ?? undefined,
     credit: d.credit ?? undefined,
@@ -1280,23 +1283,21 @@ export async function getIllustrationsForTemple(regionId: string, templeId: stri
 /** Stand-ins until a temple's layouts are drawn: its own layouts, then the
     placeholder plan, to make a stack of one to three (how many, chosen by the
     temple, so it stays the same from one visit to the next). A temple with
-    three or more of its own shows only its own. The placeholder is drawn
-    north at the top for a temple facing east, its entrance at the foot
-    (upright); for one facing north or south, turned, its entrance at the
-    right or the left (lying down); for one facing west, turned round, its
-    entrance at the top. */
-const PLACEHOLDER = {
-  east: { src: "/placeholders/temple-layout.svg", width: 1200, height: 1500 },
-  north: { src: "/placeholders/temple-layout-north.svg", width: 1500, height: 1200 },
-  south: { src: "/placeholders/temple-layout-south.svg", width: 1500, height: 1200 },
-  west: { src: "/placeholders/temple-layout-west.svg", width: 1200, height: 1500 },
-} as const;
+    three or more of its own shows only its own. The placeholder is one
+    drawing, the same and upright for every temple, "Illustration coming soon"
+    written in its cartouche. A drawing made only to stand in (its image the
+    old placeholder plan) shows it too (toIllustration). */
+// (10 Nov 2026: one drawing of a generic Siva temple in the look of the
+// Nandhikeswara drawings, upright for every temple whichever way it faces; its
+// cartouche on the mandapam left for the words, which the page writes: TempleLayout)
+const STAND_IN = { src: "/placeholders/temple-layout.png", width: 1200, height: 1500, comingSoon: { x: 600, y: 750 } } as const;
+const PLACEHOLDER = { east: STAND_IN, north: STAND_IN, south: STAND_IN, west: STAND_IN } as const;
 export function withPlaceholderLayouts(templeId: string, regionId: RegionId, own: Illustration[], faces: Temple["faces"] = "east"): Illustration[] {
   const n = Math.max(own.length, 1 + Math.floor(seeded(`layouts-${templeId}`)() * 3));
   const stand = Array.from({ length: n - own.length }, (_, k): Illustration => ({
     id: `placeholder-${templeId}-${k + 1}`,
     ...PLACEHOLDER[faces],
-    alt: "A placeholder: a generic temple plan, until this temple's layout is drawn",
+    alt: "Illustration coming soon: a generic temple plan, until this temple's layout is drawn",
     region: regionId,
     kind: "plan",
     title: "Temple layout (a placeholder until it is drawn)",

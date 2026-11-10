@@ -287,6 +287,10 @@ export interface Illustration extends Picture {
   /** the way its deity faces: a layout is drawn with the deity facing down
       (south), and turned on the site, north at the top, to face this way */
   faces?: Facing;
+  /** a stand-in plan (the site's placeholder): where, in its image's own
+      pixels, the words "Illustration coming soon" go, written by the page in
+      the site's font, always upright */
+  comingSoon?: { x: number; y: number };
   title: string;
   temples: string[];
   observances: string[];

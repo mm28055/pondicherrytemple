@@ -38,7 +38,18 @@ function shapeOf(d: Illustration) {
 function LayoutImage({ d, alt, style, fill }: { d: Illustration; alt: string; style?: CSSProperties; fill?: boolean }) {
   const { turn, w, h } = shapeOf(d);
   // eslint-disable-next-line @next/next/no-img-element
-  if (!turn) return <img src={d.src} alt={alt} style={style} width={fill ? undefined : d.width} height={fill ? undefined : d.height} />;
+  if (!turn && !d.comingSoon) return <img src={d.src} alt={alt} style={style} width={fill ? undefined : d.width} height={fill ? undefined : d.height} />;
+  // a stand-in plan: the words written in its cartouche by the page, in the site's font, upright
+  const words = d.comingSoon && (
+    <g className="layout-soon" transform={`translate(${d.comingSoon.x - d.width / 2} ${d.comingSoon.y - d.height / 2})`}>
+      <text y={-22} textAnchor="middle">
+        ILLUSTRATION
+      </text>
+      <text y={68} textAnchor="middle">
+        COMING SOON
+      </text>
+    </g>
+  );
   return (
     <svg
       className="layout-svg"
@@ -50,6 +61,7 @@ function LayoutImage({ d, alt, style, fill }: { d: Illustration; alt: string; st
       style={style}
     >
       <image href={d.src} x={-d.width / 2} y={-d.height / 2} width={d.width} height={d.height} transform={`rotate(${turn})`} />
+      {words}
     </svg>
   );
 }

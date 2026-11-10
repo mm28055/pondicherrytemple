@@ -454,6 +454,8 @@ a:focus-visible, button:focus-visible {
 .layout-turned.upright img { position: static; width: 100%; transform: none; }
 /* a layout turned as its deity faces (TempleLayout): a box of the turned shape, as tall as the card */
 .layout-turned .layout-svg { display: block; height: 100%; width: auto; }
+/* a stand-in plan's words, in its cartouche (sizes in the image's own pixels) */
+.layout-soon text { font-family: var(--display); font-size: 52px; font-weight: 600; letter-spacing: 0.18em; fill: var(--ochre); text-transform: none; }
 .layout-under .layout-svg { display: block; width: 100%; height: 100%; opacity: 0.45; }
 /* A temple with several layouts: a stack of cards. The top one is the card
    above, exactly where it would be alone; each under it is the same card
