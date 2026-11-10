@@ -2077,7 +2077,7 @@ export interface AboutPage {
     | {
         heading: string;
         /**
-         * Lets other pages link straight here. The home page uses "idea" and "why".
+         * Lets other pages link straight here. The home page uses "idea" and "why". The section named "centre" is shown just before the team.
          */
         anchor?: string | null;
         body: {

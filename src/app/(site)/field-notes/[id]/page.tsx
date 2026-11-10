@@ -12,6 +12,7 @@ import {
   getPhotosForNote,
   getObservancesById,
   getRegion,
+  getRegions,
   getTemple,
   getTemples,
   hasPage,
@@ -49,9 +50,19 @@ export default async function FieldNotePage({ params }: Props) {
 
   const region = (await getRegion(note.region))!;
   const allTemples = await getTemples(region.id);
-  const temples = (await Promise.all(note.temples.map((id) => getTemple(note.region, id)))).filter(
-    (t) => t !== null
-  );
+  // its temples, in the note's region first, else in the other (a town note may
+  // name a temple in and around Pondicherry, as on 1 November 2026)
+  const allRegions = await getRegions();
+  const temples = (
+    await Promise.all(
+      note.temples.map(
+        async (id) =>
+          (await getTemple(note.region, id)) ??
+          (await Promise.all(allRegions.map((r) => getTemple(r.id, id)))).find((t) => t !== null) ??
+          null
+      )
+    )
+  ).filter((t) => t !== null);
   const observances = await getObservancesById(note.observances);
   const local = localDate(region.calendar, note.date);
 

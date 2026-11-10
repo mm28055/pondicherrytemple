@@ -85,6 +85,7 @@ import * as migration_20261109_010000_two_photo_sets from './20261109_010000_two
 import * as migration_20261109_120000_dictionary_status from './20261109_120000_dictionary_status';
 import * as migration_20261109_130000_about_opening from './20261109_130000_about_opening';
 import * as migration_20261109_200000_about_centre_team from './20261109_200000_about_centre_team';
+import * as migration_20261109_210000_database_log_3 from './20261109_210000_database_log_3';
 
 export const migrations = [
   {
@@ -521,5 +522,10 @@ export const migrations = [
     up: migration_20261109_200000_about_centre_team.up,
     down: migration_20261109_200000_about_centre_team.down,
     name: '20261109_200000_about_centre_team',
+  },
+  {
+    up: migration_20261109_210000_database_log_3.up,
+    down: migration_20261109_210000_database_log_3.down,
+    name: '20261109_210000_database_log_3',
   },
 ];

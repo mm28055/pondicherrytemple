@@ -1,0 +1,517 @@
+{
+  "observances": [
+    {
+      "name": "Manavala Mamunigal Utsavam",
+      "kind": "festival",
+      "slug": "manavala-mamunigal-utsavam"
+    },
+    {
+      "name": "Kedara Gowri Nonbu",
+      "kind": "ritual",
+      "slug": "kedara-gowri-nonbu"
+    },
+    {
+      "name": "Dhana Akarshana Puja",
+      "kind": "ritual",
+      "slug": "dhana-akarshana-puja"
+    }
+  ],
+  "newTemples": [
+    {
+      "slug": "thandu-mutthumariamman",
+      "name": "Thandu Mutthumariamman Koyil",
+      "knownAs": "Thandu Mutthumariamman Koyil",
+      "shortName": "Thandu Mutthumariamman",
+      "street": "Chinna Subburaya Chetty Street",
+      "deityGroup": "amman"
+    },
+    {
+      "slug": "palani-andavar-muthialpet",
+      "name": "Palani Andavar Koyil",
+      "knownAs": "Palani Andavar Koyil",
+      "shortName": "Palani Andavar",
+      "street": "26, Bharathidasan Street, Muthialpet",
+      "deityGroup": "murugan",
+      "coordinates": {
+        "lat": 11.956012398684834,
+        "lng": 79.8335432171609
+      }
+    },
+    {
+      "slug": "mutthalamman-muthialpet",
+      "name": "Mutthalamman Koyil",
+      "knownAs": "Mutthalamman Koyil",
+      "shortName": "Mutthalamman",
+      "street": "Muthialpet",
+      "deityGroup": "amman"
+    }
+  ],
+  "notes": [
+    {
+      "slug": "2026-11-01-for-one-for-all",
+      "title": "For One, for All",
+      "date": "2026-11-01",
+      "occasion": "Poosa Nakshatram",
+      "temples": [
+        "kanniga-parameswari",
+        "thandu-mutthumariamman",
+        "vedapuriswara"
+      ],
+      "observances": [
+        "unjal-utsavam",
+        "abhishekam",
+        "guru-puja"
+      ],
+      "body": [
+        "On the day of Poosa Nakshatram, the Kannika temple has a 530pm Kuberan Yantra Abhishekam we’ve long wanted to see. Finally, we made it to this one. Just a single, young ubhayakara there–he or his family owns a jewellery shop, he is both event sponsor and priest’s aid, and he disappears as soon as the puja is done as his shop calls.",
+        "Poosam nakshatram represents nourishment and flourishing; Kubera represents the guardianship and administration of wealth–I suppose this is why this particular puja is done on this particular day. Thursdays is an evening archanai for this same Kuberan Yantra and its smaller counterpart, sitting on the shelf in the small shrine to the right of Ambal, in which the Yantras are installed. The abhishekam is for Mahalakshmi also, because She grants wealth on Kubera’s command, explains the Iyer. He protects it, but She is the one by whose hand and will it reaches us.",
+        "The Kubera Yantras both were apparently found on the building site of the temple, sometime before 1921. Kanchi Periyavar is said to have identified them. For a merchant community, this is a significant and meaningful find, so the temple honours the yantra in this way. But for all the other pujas attended by many groups of women and their families, nobody else is around for this one. Puts us in mind of what Thirukumaran once said: no audience is really required, but if the priest does what he is meant to, the whole world will be well.",
+        "Alankaram is a simple affair, as is the puja. After it is done, the priest asks us if we’re free this evening at 730. Yes of course (we never answer otherwise when called upon in this way), and he instructs us to go to the Thandu Mutthumariamman Koyil that is on Chinna Subburaya Chetty Street. “We’re not the only ones who do a long Navaratri celebration,” he says, “they have an even longer one.” The same deity had come to the Adi Amavasya Theerthavari, and we have photographs from that event with the old priest taking the astra devi to the ocean with an aide to protect him from the rough waters, but we’ve had no other interaction with that temple. There’s an unjal utsavam happening there, says the Iyer, and the same priest (Ashok, also from the Sivan Koyil) who did all the Navaratri alankara for the Kannika temple, will be there, too. Go see, he says, it’ll be super. We do.",
+        "Indeed, it’s a grand event for “just” a theruvu koyil, but this is no ordinary shrine. We’ve heard of its powers from others we’ve met; a lot of people locally know of this Amman and the force She keeps. For all that, though, it’s light music being sung outside, karaoke set up and all. Amman is on the unjal. An older woman, another slightly younger one, and the priest himself appear to go into a faint and need the support of others around who treat this as a but-natural consequence–for the first time, I wonder if this is also their method of surrender. There is a garlanded photograph of a man that looks old, and he’s holding the dandam–which is displayed right next to it. The space is tight there, so we have only phone photos.",
+        "There are two beautiful Murugan sannadhis just beyond the Amman garbhagriha, where very large pots with food are resting. Clearly there is to be an annadanam after.",
+        "We meet the Iyer early the next morning when we’re out at the Sivan Koyil taking video of the Thirupalliyezhucchi and the temple openings. He asks us for an update! And of course we’re happy to provide one.",
+        "And oh, the Vedapuriswara temple had a Guru puja today, for Satthiya Nayanar."
+      ]
+    },
+    {
+      "slug": "2026-11-04-a-thenkalai-acharyas-utsavam-at-a-vadakalai-temple",
+      "title": "A Thenkalai Acharya’s Utsavam at a Vadakalai Temple",
+      "date": "2026-11-04",
+      "occasion": "Manavala Mamunigal Utsavam Day 1",
+      "temples": [
+        "varadaraja-perumal"
+      ],
+      "observances": [
+        "manavala-mamunigal-utsavam"
+      ],
+      "body": [
+        "The 10-day Manavala Mamunigal Utsavam began today morning (days computed such that the 10th concluding day coincides with Moola nakshatram) with a thirumanjanam for Mamunigal.",
+        "Tensions and differences between the Thenkalai and Vadakalai sects have defined Sri Vaishnavism for long; the two major remaining Vadakalai temples are Thiruvahindrapuram (and all its abhimana sthalams) and Kanchipuram. The Perumal Koyil in Pondicherry prides itself on having fostered a kind of rapprochement, even though the symbols of each sect are clearly broken and effaced from above the alvar sannadhis on the temple’s south east corner. But while the shrine to Mamunigal sits outside the temple walls at Thiruvahindrapuram, in this temple it’s inside, directly opposite to the one to Vedanta Desikar. This event is sponsored by the Naidu community, while Desikar’s utsavam is the domain of the Iyengars.",
+        "We are there (with Manish) in the morning and the evening, for the purappadu. Manish’s presence, or the need to explain to someone what it is that is happening, honestly compels us to slow a little and also observe more. But in general, there are all the familiar movements. The initial Prabandham recitation, followed by the commencement of the purappadu–which goes to face Perumal first, where the partivattan is brought to the swami and tied around his head plus Ramanan Bhattacharya has one slung on his shoulder, too. Then he moves thrice around the temple (first round Gambheeranattai mallari, the next two keerthanais as usual), the final Thiruanthikappu or Sama pariharam (pause before the Mamunigal shrine, naivedyam comes and is offered behind a screen, theertham shown to the swami, then to the kumbha vilakku, who receives an offering of a few specifically tossed tulasi leaves and just one criss-cross-fingered mudra before it is circled, then the arati whose red liquid is poured over the kolam and discarded, nadaswaram players circle the deity, and he’s carried back in). Here, however, we also pause for firecrackers, flower pots specifically, perhaps in acknowledgement of Deepavali? since this utsavam always coincides.",
+        "Screen closes again for a second alankaram, following which the elder priest does a deeparadhanai, and we sit for a 4 course prasadam! Sundal, mysorepak, kesari and puli-saadam. Wow. Then: Hecharige! And we have leave to rise and return home."
+      ]
+    },
+    {
+      "slug": "2026-11-05-he-called-us-early-morning",
+      "title": "He Called Us, Early Morning",
+      "date": "2026-11-05",
+      "occasion": "Thursday",
+      "temples": [
+        "vedapuriswara"
+      ],
+      "observances": [
+        "weekly-observances"
+      ],
+      "body": [
+        "7am we were there as Ayyappan Swami called us to be, but the palliezhucchi was barely over and the abhishekam was already done! I was instructed to get 2 large lamps, which I dutifully did. Light them! He said, so I did. Quick puja, I’m asked for family names and nakshatrams, and then handed a big bag with yesterday’s malas, still very fresh. (“How did you know it’s my nakshatra naal (Hindu calendar birthday)?” I asked Ayyappan Swami later. He didn’t skip a beat. “I didn’t,” came the instant reply. Gesturing to the garbhagriha: “He told me,” he said).",
+        "Dakshinamurti is always in velli (silver) kavacham on Thursdays, with black channa malas and a yellow attire. Yellow is associated with Brhaspati, the Guru to the Devas, and with the planet Jupiter (Guru). Dakshinamurti being the supreme Guru, the yellow garment reinforces the association with divine instruction, wisdom and illumined learning.",
+        "Mutthu called us to see the kulam being cleaned, in anticipation of rains. So we went out back and hung out there for a while with all the ladies in blue looking very picturesque against the neat grey stair rows."
+      ]
+    },
+    {
+      "slug": "2026-11-04-finally-a-temple-to-kamadeva",
+      "title": "Finally, a Temple to Kamadeva?",
+      "date": "2026-11-04",
+      "occasion": "Visit",
+      "temples": [
+        "palani-andavar-muthialpet",
+        "mutthalamman-muthialpet"
+      ],
+      "observances": [],
+      "body": [
+        "Not really, because this is one to a deity who might well be considered his polar opposite, the austere figure of Pazhani Andavar. But I (Deepa) was reading in C.S. Murugesan’s book on Pondicherry temples about a temple to Kamadeva being built – not on Kaman Koyil street as we saw in Lawspet (yes, Murugesan mentions this detail) during the Veerabhadraswamy Koyil Alagu Sevai, but in Muthialpet. There is a 60 page section in the book, complete with stories and songs – to a deity who has effectively no temple. Where, then, do we find or sing stories to Kama?",
+        "We went in search of this temple with Manish, dragging him along on our forays. The shilpi for this temple apparently had a dream indicating to him that this should not be a temple to Kama, but to Pazhani Andavar, so Kama (as Manmatha) and Rati are stucco figures in front and at the back of the shrine. We happen to go on the eve of Uttira Nakshatram naal (Arun’s birth star!), when people who wish to get married or find a match or anything related to romantic woes I suppose come, offer three garlands (one to Kamadeva, one to Rati, and one for themselves which they must bring back a month later). We consider coming back for this the next day but don’t make it back.",
+        "The temple’s major festival is Panguni Utthiram time, when the Pazhani Andavar utsavar comes out as Manmatha and marries Rati (I think, or is it a Murugar Kalyanam since it’s Panguni Utthiram?).",
+        "We also wandered into a Mutthalamman Koyil with a lovely patch of garden, where Her trident was shaking apparently without anyone being nearby or having touched it (&amp; Manish is talking about the isolation of ourselves from the vagaries of the world as a different definition of selfhood, while ours is deeply enmeshed with apparently extraneous causes – what the shaking trident portends about me)"
+      ]
+    },
+    {
+      "slug": "2026-11-08-bhajanai-sounds-from-a-shaiva-temple",
+      "title": "Bhajanai Sounds from a Shaiva Temple",
+      "date": "2026-11-08",
+      "occasion": "Sunday Thiruvasagam Muttrothal",
+      "temples": [
+        "vedapuriswara"
+      ],
+      "observances": [
+        "weekly-observances"
+      ],
+      "body": [
+        "Had we noticed before just now much the Sunday morning recitations of the Thiruvasagam by the Siruthonda Nayanar Thiruthondu Sabhai can be like the bhajan sessions that we’re more accustomed to hearing from the bhakta groups associated with the Perumal Koyil? Or is it that today there’s a different group, the Vedapuriswara Sivanadiyar Thirukootam that’s running the show? Either way, it’s clear I hadn’t paid attention to just how much like a bhajan group this was. Or how it combined young and old, everyone rapping the rhythms with their karathalam. These groups seem to do what they do regardless of what else might be happening at the temple, or what else the town may be celebrating! A single-minded focus."
+      ]
+    },
+    {
+      "slug": "2026-11-08-the-temple-as-interface",
+      "title": "The Temple as Interface",
+      "date": "2026-11-08",
+      "occasion": "Chaturdashi, Amavasya",
+      "temples": [
+        "angala-parameswari",
+        "draupadi-amman"
+      ],
+      "observances": [
+        "alankaram",
+        "kedara-gowri-nonbu",
+        "unjal-utsavam"
+      ],
+      "body": [
+        "After going to Mutthumariamman, we stopped in at the Angalamman Koyil which had a notice indicating that nonbu pujas could happen there, too (but it was quiet when we went – well, quiet if you don’t take into account the eardrum bursting cracker bombs being burst just outside by all the boys who are otherwise so sweet inside the temple, being egged on by the priest). In the evening, the temple did its usual amavasya unjal utsavam with a group of 2+2 nadaswaram and tavil players absolutely rocking it on the percussion. There was hardly anyone watching but us, and they were having their fun. Nadaswaram players beating talam, tavil players going with uncommon intensity. Padayal to Pechaiamman was to be offered, but hadn’t by nearly 9 when we had to leave (to get back to website work).",
+        "But the real surprise and prize was seeing the Draupadi Amman Koyil which had, interestingly enough, also transformed its alankara mandapam. At first we thought this was another facet of this “cult” of worship, but the figure in the mandapam was Mariamman, we were told – so this was in honour of the Mariamman figure left at the back at the temple, not really part of Draupadi Amman’s worship traditions. In the main sannadhi, Amman, Arjuna and Perumal were out, “alankaram done by me” said the priest proudly, because the usual alankara men had not shown up. A different priest was officiating at the makeshift Mariamman shrine though. He told us the story.",
+        "Bhringi Maharishi was an ardent devotee of Siva, but he refused to worship Parvati, believing that Siva alone was worthy of his devotion. Whenever he visited Kailasa, he would circumambulate Siva, deliberately excluding Parvati. To demonstrate that Siva and Shakti are inseparable, Siva and Parvati assumed the form of Ardhanarishvara, with Parvati occupying the left half of Siva's body. However, Bhringi refused to accept this and transformed himself into a bee, boring his way between the two halves so that he could circumambulate Siva alone. Angered by his refusal to acknowledge her, Parvati withdrew the feminine principle (or the blood, as the priest told us) from his body, leaving him as a mere skeleton. Unable to stand on his two legs, Bhringi appealed to Siva, who took pity on him and granted him a third leg for support. Thus Bhringi came to be depicted as a three-legged sage. In response to this episode, Parvati left Kailasa and approached Sage Gautama, who instructed her to observe the Kedara Gowri Vratham for 21 days. Pleased with her devotion and austerities, Siva granted Parvati the left half of his body, manifesting as Ardhanarishvara and affirming the inseparability of Siva and Shakti.",
+        "So then why Mariamman? Again, the story first:",
+        "Mariamman is Renuka Devi, the wife of Sage Jamadagni and mother of Parashurama. Renuka was known for her extraordinary chastity and devotion to her husband. Every day she would go to the river and fetch water in an unbaked clay pot, which she could fashion through the power of her chastity. One day, while at the river, she saw a celestial being (in some versions, a Gandharva) and momentarily admired his beauty. Her concentration was disturbed, and she lost the power that enabled her to make the unbaked pot.",
+        "When Jamadagni saw Renuka returning without a pot, he became furious and ordered his sons to behead their mother. The elder sons refused, but Parashurama obeyed his father's command and severed Renuka's head. Pleased with his obedience, Jamadagni offered Parashurama a boon. Parashurama asked that his mother and brothers be restored to life.",
+        "However, in the process of bringing them back to life, Renuka's head became attached to the body of a woman from a lower social community (in some versions, a woman who had tried to protect her). The other woman's head was attached to Renuka's body. The woman with Renuka's head came to be worshipped as Mariamman or Yellamma in different regional traditions. This story is often used to explain Mariamman's association with both the powerful divine mother and ordinary village communities.",
+        "And the connection to the Kedara Gowri Vratam? Well, she is Mariya-amman, of course, the one who was changed or transformed, like Siva and Parvati were together transformed into Ardhanariswara, like we will each be transformed in the undertaking of this vratam.",
+        "All those taking nonbu at this temple had brought flowers and leaves (bilvam, in one case) to place on the deity as they circled clockwise while the priest mediated with the words of the vratam and why it was being undertaken. There is a story for every aspect of this, he said, and all history is an aideegam or belief."
+      ]
+    },
+    {
+      "slug": "2026-11-08-deepavali-begins-with-the-end-of-21-days",
+      "title": "Deepavali Begins with the End of 21 Days",
+      "date": "2026-11-08",
+      "occasion": "Chaturdashi, Amavasya",
+      "temples": [
+        "mutthumariamman"
+      ],
+      "observances": [
+        "alankaram",
+        "kedara-gowri-nonbu"
+      ],
+      "body": [
+        "For us growing up Deepavali was always such a private and personal family celebration, it’s been really interesting to see and understand what happens when personal, household rituals use the temple as an interface. We saw this once before at the <a href=\"/field-notes/2026-09-07-brahmanda-set-up-for-periyandavar\">Mutthumariamman temple during the Periyandavar Puja</a> which was really for a young child’s tonsure and ear-piercing–a family ceremony–but now on a much larger scale with Deepavali nonbu.",
+        "Nonbu is an observance, a vrata, a fast, a promise, a penance, or all of these things combined. Deepavali/Amavasya nonbu is perhaps next in importance only to the Varalakshmi nonbu that happened in Aadi masam, <a href=\"/field-notes/2026-08-21-thiruvilakku-puja-a-week-late\">marked by vilakku pujas</a> and the like. But this nonbu is one that traditionally begins on Shukla Paksha Ashtami (the eighth day of the waxing moon) in the Tamil month of Purattasi (or, occasionally, on dashami, depending on the lunar tithi calculations). Deepavali amavasya is the 21st day, so when families gather they come to the temple carrying 21 of everything: fruits, betel leaves, athirasam, though perhaps not coconuts! Plus as many nonbu kayar yellow strings as there are members of the family who have undertaken the observance. All this in a large vessel, usually clay or metal, and covered here in Pondicherry with what appeared to me to be crocheted tea-cosies, which must be a colonial-era or later artifact. All this is placed in front of Mutthumariamman, but not in her sannadhi. Rather, there’s a makeshift shrine where they keep the utsava murti against a backdrop of punnai maram branches (why punnai? See below). The priest officiates as people arrive, break a coconut, place their offerings beneath the Mariamman figure, words are said, the lamp is raised, blessings are given, thattu-kaasu or plate offerings are made, and then the family retreats with their offerings to circumambulate the temple. Then some continue home to finish the puja there and tie the nonbu kayar or yellow thread on themselves (or someone ties it for them, on their behalf).",
+        "[The priest alerted us to the fact that Deepavali (Naraka chaturdashi) nonbu is different from amavasya nonbu for which there would be a massive rush, he said. 5000 people! There were indeed there were queue-control barriers set up to guide all who came, and a ticket system for those who wished a faster route to the final destination.]",
+        "All this is in addition to the usual very early morning Deepavali oil bath, wearing new clothes and so on. In our homes these were the verses which corresponded:",
+        "तैले लक्ष्मीर्जले गङ्गा दीपावल्यां चतुर्दशीम् ।",
+        "प्रातःस्नानं हि यः कुर्याद्यमलोकं न पश्यति ॥",
+        "अपामार्गमथो तुम्बीं प्रपुन्नाटमथापरम् ।",
+        "भ्रामयेत्स्नानमध्ये तु नरकस्य क्षयाय वै ॥",
+        "सीतालोष्टसमायुक्त सकण्टकदलान्वित ।",
+        "हर पापमपामार्ग भ्राम्यमाणः पुनः पुनः ॥",
+        "Lakshmi resides in the oil and Ganga in the water on the Chaturdasi of Deepavali. Whoever performs the morning bath on this day does not behold the world of Yama. During the bath, one should rotate Apamarga, Tumbi and Prapunnata around oneself, for the destruction of the evils leading to naraka. O Apamarga, accompanied by a clod of earth and furnished with thorny leaves, as you are repeatedly rotated, remove my sins!",
+        "And by the way, Mutthumariamman and just about all the parivara devatas in the temple had this elaborate fruit alankaram–which one of the nirvagam members told me was a tradition grown in this temple by the priests. Why only flowers for alankara? So there were pineapples above her, and dragonfruits below, layers and layers of green apple and orange malas around, a strawberry mala around her neck. Grapes clustered all along the ardhamandapa’s low beams. Pechaiamman had an apple mala. Pacchai amman had the most elaborate fruit alankara ever, with two watermelons cut on either side of her.",
+        "Why the punnai maram as backdrop?",
+        "I’m not fully sure, but I think it may have something to do with Parvati’s penances under the punnai tree when she’s born as a peahen (part of the Mylapore sthalapurana), or it’s an older Sangam era metaphor handed down. Punnai trees which grow abundantly and large all over Pondicherry are signs and symbols of the abundance of coastal (Neithal) landscapes, and indeed of the intimacy of the relationships between trees and the many lives sustained in their shade. In Sangam literature, there is a story of the chieftain Anni cutting down the ancient Punnai tree cherished by his rival Tithiyan. Anni himself subsequently fell in battle. The episode is remembered and evoked in several Akananuru poems. Appar, too, invokes this idea to express the depth of his own spiritual inabilities and suffering: “மன்றத்துப் புன்னை போல மரம்படு துயரமெய்தி ஒன்றினால் உணரமாட்டேன் உன்னையுள் வைக்கமாட்டேன்” – Like the punnai tree standing in the public square that suffers the grief of wood, I can realise nothing through understanding, nor can I hold you within my heart [Sixth Tirumurai, 4.26.8, from the Tiruvathigai Veerattaneswarar/ திருவதிகை வீரட்டானம் padhigam]. Punnai is not merely a tree that is felled, it is the anguish of a vital relationship lost–and perhaps the vratam therefore is a commitment to protecting these trees and all the vital interdependencies that they represent? Jnanavel swami did speak considerably of how families with all their differences put them aside and come to the temple do undertake these nonbu offerings together…",
+        "[Source: <a href=\"http://www.varalaaru.com/design/article.aspx?ArticleID=89\">article by R. Kalaikkovan</a>]",
+        "A poster outside Mutthumariamman had announced the nonbu timings several weeks prior. On all three days (November 7,8,9), Deepavali followed by Amavasya nonbu in several stages:",
+        {
+          "list": [
+            "Deepavali Nonbu will be observed on that day from <strong>4:30 PM in the evening until 9:00 PM at night </strong>(the temple doors will be closed at 9:00 PM at night). 08.11.2026 (Sunday): Observance will continue from early morning 3:00 AM until 12:00 PM noon",
+            "Amavasai Nonbu will be observed from 12:00 PM noon until 9:00 PM at night (the temple doors will be closed at 9:00 PM at night). Next Day Morning (09.11.2026, Monday): Amavasai Nonbu will be observed from 6:00 AM in the morning until 1:00 PM afternoon."
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "2026-11-08-laddoo-alankara-and-dhana-akarshana-puja",
+      "title": "Laddoo Alankara and Dhana Akarshana Puja",
+      "date": "2026-11-08",
+      "occasion": "Deepavali",
+      "temples": [
+        "kanniga-parameswari"
+      ],
+      "observances": [
+        "dhana-akarshana-puja"
+      ],
+      "body": [
+        "On Deepavali morning, Mahalakshmi gets a laddoo alankaram – just as in some temples, a laddoo ther is made and pulled on this day. When we reach, the puja is just going on, ambal in a white sari, spoon and pot in her hands (She is Annapurni), flowers over her, laddoos around her (in a “mandapa” that looks like it must just have been made for this purpose alone).",
+        "Evening is the Dhana Akarshana puja, which is the only time in the year when the Kuberan yantra is pulled out of its separate shrine and brought out to propitiate. It sits now in the middle of the Western nave, facing East. The little Mahalakshmi utsavar is out again, with a manja-vinayaka (made out of turmeric) out directly in front of her and a kalasam. 9 thonnais for the navagrahas on a stool in front. The Yantra is placed on a green cloth I’m not sure of the significance of, and a thinner thundu-like bordered piece lining its very top. Malas.",
+        "Kubera is traditionally associated with Pushya nakshatra (<a href=\"/field-notes/2026-11-01-for-one-for-all\">when the yantra abhishekam happens</a>), and his role is not merely to bestow wealth but also to guard and distribute the treasures entrusted to him. There are mostly women present as usual, and they are seated in rows, but the ubhayakaras do the puja closest up and the rest of us participate from afar as it were.",
+        "The Iyer (Subramanian) holds a book with the title Sampradaya Vrata Puja Vidhanam, chapter on Sri Dhanakarshana, Sri Lakshmi Kubera Pujai. Subheads: Sodadha Matrugana Pujai, Ganapatyadi Pancha Loka Pala pujai (koorchatthil pujai seiyyavum). He chants, while those present “do”--which means offer flowers at intervals. I suppose there would have been a sankalpam, a vinayaka puja, a navagraha puja, and then only a Kuberan puja, archanai offered all along and at the end, finished with deeparadhanai and prasadam."
+      ]
+    }
+  ],
+  "occasions": [
+    {
+      "date": "2026-11-01",
+      "temple": "kanniga-parameswari",
+      "label": "Poosa Nakshatram",
+      "observances": [
+        "unjal-utsavam",
+        "abhishekam",
+        "guru-puja"
+      ],
+      "note": "2026-11-01-for-one-for-all"
+    },
+    {
+      "date": "2026-11-01",
+      "temple": "thandu-mutthumariamman",
+      "label": "Poosa Nakshatram",
+      "observances": [
+        "unjal-utsavam",
+        "abhishekam",
+        "guru-puja"
+      ],
+      "note": "2026-11-01-for-one-for-all"
+    },
+    {
+      "date": "2026-11-01",
+      "temple": "vedapuriswara",
+      "label": "Poosa Nakshatram",
+      "observances": [
+        "unjal-utsavam",
+        "abhishekam",
+        "guru-puja"
+      ],
+      "note": "2026-11-01-for-one-for-all"
+    },
+    {
+      "date": "2026-11-04",
+      "temple": "varadaraja-perumal",
+      "label": "Manavala Mamunigal Utsavam Day 1",
+      "observances": [
+        "manavala-mamunigal-utsavam"
+      ],
+      "note": "2026-11-04-a-thenkalai-acharyas-utsavam-at-a-vadakalai-temple"
+    },
+    {
+      "date": "2026-11-05",
+      "temple": "vedapuriswara",
+      "label": "Thursday",
+      "observances": [
+        "weekly-observances"
+      ],
+      "note": "2026-11-05-he-called-us-early-morning"
+    },
+    {
+      "date": "2026-11-04",
+      "temple": "palani-andavar-muthialpet",
+      "label": "Visit",
+      "observances": [],
+      "note": "2026-11-04-finally-a-temple-to-kamadeva"
+    },
+    {
+      "date": "2026-11-04",
+      "temple": "mutthalamman-muthialpet",
+      "label": "Visit",
+      "observances": [],
+      "note": "2026-11-04-finally-a-temple-to-kamadeva"
+    },
+    {
+      "date": "2026-11-08",
+      "temple": "vedapuriswara",
+      "label": "Sunday Thiruvasagam Muttrothal",
+      "observances": [
+        "weekly-observances"
+      ],
+      "note": "2026-11-08-bhajanai-sounds-from-a-shaiva-temple"
+    },
+    {
+      "date": "2026-11-08",
+      "temple": "angala-parameswari",
+      "label": "Chaturdashi, Amavasya",
+      "observances": [
+        "alankaram",
+        "kedara-gowri-nonbu",
+        "unjal-utsavam"
+      ],
+      "note": "2026-11-08-the-temple-as-interface"
+    },
+    {
+      "date": "2026-11-08",
+      "temple": "draupadi-amman",
+      "label": "Chaturdashi, Amavasya",
+      "observances": [
+        "alankaram",
+        "kedara-gowri-nonbu",
+        "unjal-utsavam"
+      ],
+      "note": "2026-11-08-the-temple-as-interface"
+    },
+    {
+      "date": "2026-11-08",
+      "temple": "mutthumariamman",
+      "label": "Chaturdashi, Amavasya",
+      "observances": [
+        "alankaram",
+        "kedara-gowri-nonbu"
+      ],
+      "note": "2026-11-08-deepavali-begins-with-the-end-of-21-days"
+    },
+    {
+      "date": "2026-11-08",
+      "temple": "kanniga-parameswari",
+      "label": "Deepavali",
+      "observances": [
+        "dhana-akarshana-puja"
+      ],
+      "note": "2026-11-08-laddoo-alankara-and-dhana-akarshana-puja"
+    },
+    {
+      "date": "2026-11-05",
+      "temple": "varadaraja-perumal",
+      "label": "Manavala Mamunigal Utsavam Day 2",
+      "observances": [
+        "manavala-mamunigal-utsavam"
+      ]
+    },
+    {
+      "date": "2026-11-06",
+      "temple": "varadaraja-perumal",
+      "label": "Manavala Mamunigal Utsavam Day 3",
+      "observances": [
+        "manavala-mamunigal-utsavam"
+      ]
+    },
+    {
+      "date": "2026-11-07",
+      "temple": "varadaraja-perumal",
+      "label": "Manavala Mamunigal Utsavam Day 4",
+      "observances": [
+        "manavala-mamunigal-utsavam"
+      ]
+    },
+    {
+      "date": "2026-11-07",
+      "temple": "mutthumariamman",
+      "label": "Deepavali Nonbu",
+      "observances": [
+        "kedara-gowri-nonbu"
+      ],
+      "note": "2026-11-08-deepavali-begins-with-the-end-of-21-days"
+    }
+  ],
+  "sets": [
+    {
+      "folder": "Vācavi Kannika Paramecuvarī_Pondicherry/2026-11-01_Poosam_Kubera Yantra Abhishekam",
+      "title": "Kubera Yantra Abhishekam",
+      "date": "2026-11-01",
+      "temples": [
+        "kanniga-parameswari"
+      ],
+      "note": "2026-11-01-for-one-for-all"
+    },
+    {
+      "folder": "other/2026-11-01_Danda Mutthumariamman_Navaratri Vidaiyatri",
+      "title": "Navaratri Vidaiyatri, Unjal Utsavam",
+      "date": "2026-11-01",
+      "temples": [
+        "thandu-mutthumariamman"
+      ],
+      "note": "2026-11-01-for-one-for-all"
+    },
+    {
+      "folder": "Vedapuriswara_Pondicherry/2026-11-01_Satthiya Nayanar Guru Puja",
+      "title": "Satthiya Nayanar Guru Puja",
+      "date": "2026-11-01",
+      "temples": [
+        "vedapuriswara"
+      ],
+      "note": "2026-11-01-for-one-for-all"
+    },
+    {
+      "folder": "Manimutthumariamman/2026-11-02_visit",
+      "title": "Visit",
+      "date": "2026-11-02",
+      "temples": [
+        "manimutthumariamman"
+      ]
+    },
+    {
+      "folder": "Varadarāja Perumal_Pondicherry/2026-11-04_Manavala Mamunigal Utsavam Day 1",
+      "title": "Manavala Mamunigal Utsavam Day 1",
+      "date": "2026-11-04",
+      "temples": [
+        "varadaraja-perumal"
+      ],
+      "note": "2026-11-04-a-thenkalai-acharyas-utsavam-at-a-vadakalai-temple"
+    },
+    {
+      "folder": "Vedapuriswara_Pondicherry/2026-11-04_visit",
+      "title": "Visit",
+      "date": "2026-11-04",
+      "temples": [
+        "vedapuriswara"
+      ]
+    },
+    {
+      "folder": "other/2026-11-04_Muthialpet Palani Andavar and Kama Koyil",
+      "title": "Palani Andavar and the Kama Koyil",
+      "date": "2026-11-04",
+      "temples": [
+        "palani-andavar-muthialpet"
+      ],
+      "note": "2026-11-04-finally-a-temple-to-kamadeva"
+    },
+    {
+      "folder": "other/2026-11-04_Muthialpet Muthalamman Aalayam",
+      "title": "Mutthalamman Aalayam",
+      "date": "2026-11-04",
+      "temples": [
+        "mutthalamman-muthialpet"
+      ],
+      "note": "2026-11-04-finally-a-temple-to-kamadeva"
+    },
+    {
+      "folder": "Vedapuriswara_Pondicherry/2026-11-05_AM_Thursday Dakshinamurti Abhishekam",
+      "title": "Thursday Dakshinamurti Abhishekam",
+      "date": "2026-11-05",
+      "temples": [
+        "vedapuriswara"
+      ],
+      "note": "2026-11-05-he-called-us-early-morning"
+    },
+    {
+      "folder": "Mutthumariamman_Pondicherry/2026-11-07_PM_Deepavali Nonbu",
+      "title": "Deepavali Nonbu",
+      "date": "2026-11-07",
+      "temples": [
+        "mutthumariamman"
+      ],
+      "note": "2026-11-08-deepavali-begins-with-the-end-of-21-days"
+    },
+    {
+      "folder": "Mutthumariamman_Pondicherry/2026-11-08_AM_Deepavali Amavasya Nonbu",
+      "title": "Deepavali Amavasya Nonbu",
+      "date": "2026-11-08",
+      "temples": [
+        "mutthumariamman"
+      ],
+      "note": "2026-11-08-deepavali-begins-with-the-end-of-21-days"
+    },
+    {
+      "folder": "Aṅkāḷamman _Muthialpet_Pondicherry/2026-11-08_Deepavali Amavasya Nonbu and Unjal",
+      "title": "Deepavali Amavasya Nonbu and Unjal",
+      "date": "2026-11-08",
+      "temples": [
+        "angala-parameswari"
+      ],
+      "note": "2026-11-08-the-temple-as-interface"
+    },
+    {
+      "folder": "Droupathi Amman_Pondicherry/2026-11-08_Deepavali Amavasya Kedara Nonbu",
+      "title": "Deepavali Amavasya, Kedara Gowri Nonbu",
+      "date": "2026-11-08",
+      "temples": [
+        "draupadi-amman"
+      ],
+      "note": "2026-11-08-the-temple-as-interface"
+    },
+    {
+      "folder": "Vedapuriswara_Pondicherry/2026-11-08_Deepavali_Sunday Muttrothal",
+      "title": "Deepavali, Sunday Muttrothal",
+      "date": "2026-11-08",
+      "temples": [
+        "vedapuriswara"
+      ],
+      "note": "2026-11-08-bhajanai-sounds-from-a-shaiva-temple"
+    },
+    {
+      "folder": "Vācavi Kannika Paramecuvarī_Pondicherry/2026-11-08_Laddu Ther and Dhana Akarshana Puja",
+      "title": "Laddu Ther and Dhana Akarshana Puja",
+      "date": "2026-11-08",
+      "temples": [
+        "kanniga-parameswari"
+      ],
+      "note": "2026-11-08-laddoo-alankara-and-dhana-akarshana-puja"
+    },
+    {
+      "folder": "other/2026-11-08_Deepavali Scenes (Spiritual Ethos)",
+      "title": "Deepavali Scenes",
+      "date": "2026-11-08",
+      "temples": [],
+      "ethos": true
+    }
+  ]
+}
