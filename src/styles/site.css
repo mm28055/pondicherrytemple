@@ -1572,6 +1572,9 @@ button.home-strip-photo:focus-visible { outline: 3px solid var(--ochre); outline
 @media (max-width: 900px) {
   .note-layout { grid-template-columns: minmax(0, 1fr); }
   .note-photos { min-height: calc(var(--rows, 0) * 96px + (var(--rows, 0) - 1) * 20px + 16px); }
+  /* once its photos are laid out, only the rows they take: a few photos in
+     fewer than three rows, the text straight after, no gap (10 Nov 2026) */
+  .note-photos:has(.home-strip-row) { min-height: 0; }
   .note-photos-video { padding-top: 16px; }
 }
 .note-head { padding-block: clamp(18px, 3vw, 36px) clamp(16px, 2.5vw, 28px); border-bottom: 2px solid var(--ink); }
@@ -1610,6 +1613,20 @@ button.home-strip-photo:focus-visible { outline: 3px solid var(--ochre); outline
 .note-meta a,
 .note-meta .fl { color: var(--ink); }
 .note-meta a:hover { color: var(--ochre); }
+/* an occasion that is a nakshatram (Poosa Nakshatram): a tag that opens its card, a dotted line under it */
+.nak-open { font: inherit; letter-spacing: inherit; text-transform: inherit; color: var(--ink); background: none; border: 0; padding: 0; cursor: pointer; text-decoration: underline dotted; text-underline-offset: 4px; }
+.nak-open:hover { color: var(--ochre); }
+.nak-card { overflow-y: auto; text-transform: none; letter-spacing: normal; font-family: var(--text); font-weight: 400; font-size: 17px; text-align: left; } /* not the tag row's capitals it sits in */
+.nak-head { align-items: center; }
+.nak-icon { display: inline-flex; width: 34px; height: 34px; color: var(--ink); }
+.nak-icon svg { width: 100%; height: 100%; }
+.nak-name { font-family: var(--display); font-weight: 600; font-size: 22px; line-height: 1.2; }
+.nak-head .day-local { font-family: var(--tamil); }
+.nak-about { margin-top: 6px; font-size: 15.5px; color: var(--ink-2); }
+.nak-notes { margin-top: 10px; display: grid; gap: 6px; }
+.nak-notes a { font-size: 15.5px; color: var(--ink); }
+.nak-notes a:hover { color: var(--ochre); }
+.nak-date { font-size: 12.5px; color: var(--ochre); margin-right: 6px; }
 
 .note-body { max-width: 720px; margin-inline: auto; padding: clamp(18px, 2.5vw, 32px) var(--gutter) clamp(36px, 5vw, 64px); }
 /* the next day's note of the same event, below the first, after a line like the one under the header */

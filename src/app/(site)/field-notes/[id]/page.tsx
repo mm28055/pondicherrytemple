@@ -18,6 +18,8 @@ import {
   hasPage,
 } from "@/lib/data";
 import { FIELD_KIND_LABELS } from "@/content/labels";
+import { NakshatraCard } from "@/components/NakshatraCard";
+import { getNakshatraCard } from "@/lib/nakshatraCard";
 import { formatDate, localDate } from "@/lib/calendar";
 import { noteRow } from "@/lib/view";
 import { Html } from "@/components/Prose";
@@ -64,6 +66,7 @@ export default async function FieldNotePage({ params }: Props) {
     )
   ).filter((t) => t !== null);
   const observances = await getObservancesById(note.observances);
+  const nakshatra = await getNakshatraCard(note.occasion);
   const local = localDate(region.calendar, note.date);
 
   // more from the temple (the first, if several): five, then its page for all of them
@@ -125,6 +128,8 @@ export default async function FieldNotePage({ params }: Props) {
                 <span key={t.id}>{t.knownAs ?? t.name}</span>
               )
             )}
+            {/* an occasion that is a nakshatram (Poosa Nakshatram): opens its card */}
+            {nakshatra && <NakshatraCard label={note.occasion} data={nakshatra} />}
             {observances.map((o) => (
               <FestivalLink key={o.id} id={o.id}>
                 {o.name}
