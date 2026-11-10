@@ -122,6 +122,8 @@ export default async function MonthPage({ params }: Props) {
         <MonthMotif month={slug} className={`month-head-motif month-head-motif-${slug}`} />
       </header>
 
+      {/* where the month opens on a computer, from a link: its calendar (components/LandAtTop) */}
+      <div className="month-land" data-land={`/festivals-and-rituals/month/${slug}/${y}`} aria-hidden="true" />
       {/* Any month, not only those either side: a month and a year, from the calendar's first month to two years on */}
       <MonthJump
         month={slug}

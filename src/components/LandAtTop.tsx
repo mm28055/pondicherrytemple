@@ -14,7 +14,10 @@ import { KEEP_SCROLL, keepingScroll } from "@/lib/keepScroll";
     - where a page is to stay where it is (the month calendar's steps, its
       dropdowns, a swipe: data-keep-scroll on a link, or keepScroll() before
       router.push, lib/keepScroll);
-    - while a pop-up is open (a photo, which has its own address). */
+    - while a pop-up is open (a photo, which has its own address).
+    A page with a place to land (data-land, set to its address: a month of the calendar, at its
+    calendar) opens there on a computer, below the header and the back link
+    (its scroll-margin-top, site.css); on a phone, at its top. */
 export function LandAtTop() {
   const pathname = usePathname();
   const back = useRef(false);
@@ -46,7 +49,18 @@ export function LandAtTop() {
     // on the next frame: after Next's own scroll, and after the browser has
     // kept where the page left was (so Back returns there; at once, or on a
     // timer, it would keep the top)
-    const frame = requestAnimationFrame(() => window.scrollTo({ top: 0, left: 0, behavior: "instant" }));
+    let frame = requestAnimationFrame(() => {
+      window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+      if (!window.matchMedia("(min-width: 901px)").matches) return;
+      // the new page's own place to land (data-land, its address), once it is there: it can come a moment after the address
+      const until = performance.now() + 2000;
+      const look = () => {
+        const land = document.querySelector<HTMLElement>(`[data-land="${window.location.pathname}"]`);
+        if (land) land.scrollIntoView({ block: "start", behavior: "instant" });
+        else if (performance.now() < until) frame = requestAnimationFrame(look);
+      };
+      look();
+    });
     return () => cancelAnimationFrame(frame);
   }, [pathname]);
   return null;
