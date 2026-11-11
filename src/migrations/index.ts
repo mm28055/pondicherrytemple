@@ -88,6 +88,7 @@ import * as migration_20261109_200000_about_centre_team from './20261109_200000_
 import * as migration_20261109_210000_database_log_3 from './20261109_210000_database_log_3';
 import * as migration_20261110_120000_poosa_nakshatram from './20261110_120000_poosa_nakshatram';
 import * as migration_20261110_130000_deepavali_amavasya from './20261110_130000_deepavali_amavasya';
+import * as migration_20261111_120000_british_spellings from './20261111_120000_british_spellings';
 
 export const migrations = [
   {
@@ -539,5 +540,10 @@ export const migrations = [
     up: migration_20261110_130000_deepavali_amavasya.up,
     down: migration_20261110_130000_deepavali_amavasya.down,
     name: '20261110_130000_deepavali_amavasya',
+  },
+  {
+    up: migration_20261111_120000_british_spellings.up,
+    down: migration_20261111_120000_british_spellings.down,
+    name: '20261111_120000_british_spellings',
   },
 ];
