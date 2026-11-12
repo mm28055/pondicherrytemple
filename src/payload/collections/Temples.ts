@@ -223,6 +223,48 @@ export const Temples: CollectionConfig = {
           ],
         },
         {
+          label: 'Festival lengths',
+          description:
+            'How many days each festival lasts, as the temple’s ritual calendar says. In the Ritual Year on its page, a festival shows its number of days only if it is here; a festival not here shows its name alone. Give the month only when the festival comes twice in the temple’s year (two Brahmotsavams).',
+          fields: [
+            {
+              name: 'festivalLengths',
+              label: 'From the ritual calendar',
+              labels: { singular: 'Festival', plural: 'Festivals' },
+              type: 'array',
+              fields: [
+                {
+                  type: 'row',
+                  fields: [
+                    { name: 'festival', type: 'relationship', relationTo: 'observances', required: true, label: 'Festival', admin: { width: '45%' } },
+                    {
+                      name: 'month',
+                      type: 'select',
+                      label: 'Its month (only if it comes twice)',
+                      options: [
+                        { label: 'Chithirai', value: 'chithirai' },
+                        { label: 'Vaikasi', value: 'vaikasi' },
+                        { label: 'Aani', value: 'aani' },
+                        { label: 'Aadi', value: 'aadi' },
+                        { label: 'Aavani', value: 'aavani' },
+                        { label: 'Purattasi', value: 'purattasi' },
+                        { label: 'Aippasi', value: 'aippasi' },
+                        { label: 'Karthikai', value: 'karthigai' },
+                        { label: 'Margazhi', value: 'margazhi' },
+                        { label: 'Thai', value: 'thai' },
+                        { label: 'Masi', value: 'masi' },
+                        { label: 'Panguni', value: 'panguni' },
+                      ],
+                      admin: { width: '35%' },
+                    },
+                    { name: 'days', type: 'number', label: 'Days', required: true, min: 1, admin: { width: '20%' } },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+        {
           label: 'The year so far',
           description:
             'Every date the team was present, oldest first. "Add new" adds a date at this temple. The festivals and rituals tagged on these dates make the "Festivals & rituals seen here" list.',

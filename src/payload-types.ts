@@ -365,6 +365,29 @@ export interface Temple {
    * More about the day, shown after the kalams in a box of its own. A new line here is a new paragraph. Can be left empty.
    */
   dayNotes?: string | null;
+  festivalLengths?:
+    | {
+        festival: number | Observance;
+        month?:
+          | (
+              | 'chithirai'
+              | 'vaikasi'
+              | 'aani'
+              | 'aadi'
+              | 'aavani'
+              | 'purattasi'
+              | 'aippasi'
+              | 'karthigai'
+              | 'margazhi'
+              | 'thai'
+              | 'masi'
+              | 'panguni'
+            )
+          | null;
+        days: number;
+        id?: string | null;
+      }[]
+    | null;
   yearSoFar?: {
     docs?: (number | Occasion)[];
     hasNextPage?: boolean;
@@ -696,6 +719,14 @@ export interface Observance {
    * Shown after its name, in place of a number of days.
    */
   recursWhen?: string | null;
+  /**
+   * Takes it off the Ritual Year at once, instead of ticking each of its dates. Its dates, field notes and photos stay; a date tagged with something else as well counts as that.
+   */
+  notInYear?: boolean | null;
+  /**
+   * Leave empty to leave it out at every temple.
+   */
+  notInYearAt?: (number | Temple)[] | null;
   /**
    * Questions and answers, in order: "What is it?", "When does it happen?", "What happens?", "What to look for", "In Pondicherry"…
    */
@@ -1684,6 +1715,14 @@ export interface TemplesSelect<T extends boolean = true> {
       };
   dayNotesHeading?: T;
   dayNotes?: T;
+  festivalLengths?:
+    | T
+    | {
+        festival?: T;
+        month?: T;
+        days?: T;
+        id?: T;
+      };
   yearSoFar?: T;
   drawings?: T;
   photographs?: T;
@@ -1794,6 +1833,8 @@ export interface ObservancesSelect<T extends boolean = true> {
   months?: T;
   recurs?: T;
   recursWhen?: T;
+  notInYear?: T;
+  notInYearAt?: T;
   about?:
     | T
     | {

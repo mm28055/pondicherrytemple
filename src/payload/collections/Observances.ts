@@ -117,6 +117,33 @@ export const Observances: CollectionConfig = {
               ],
             },
             {
+              type: 'row',
+              fields: [
+                {
+                  name: 'notInYear',
+                  type: 'checkbox',
+                  label: 'Leave out of the temples’ Ritual Year',
+                  admin: {
+                    width: '40%',
+                    description:
+                      'Takes it off the Ritual Year at once, instead of ticking each of its dates. Its dates, field notes and photos stay; a date tagged with something else as well counts as that.',
+                  },
+                },
+                {
+                  name: 'notInYearAt',
+                  type: 'relationship',
+                  relationTo: 'temples',
+                  hasMany: true,
+                  label: 'Only at these temples',
+                  admin: {
+                    width: '60%',
+                    description: 'Leave empty to leave it out at every temple.',
+                    condition: (data) => Boolean(data?.notInYear),
+                  },
+                },
+              ],
+            },
+            {
               name: 'about',
               type: 'array',
               label: 'Explanation',

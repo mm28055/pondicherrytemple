@@ -366,6 +366,13 @@ const toObservance = (o: P.Observance, L: Lookups): Observance => ({
   throughYear: (o.months ?? []).includes("year"),
   recurs: o.recurs ?? "yearly",
   recursWhen: o.recursWhen ?? undefined,
+  ...(o.notInYear
+    ? {
+        notInYear: o.notInYearAt?.length
+          ? o.notInYearAt.map((t) => L.templeKey.get(idOf(t) ?? -1) ?? "").filter(Boolean)
+          : (true as const),
+      }
+    : {}),
 });
 
 const toOccasion = (o: P.Occasion, L: Lookups): Occasion => ({
@@ -1042,7 +1049,9 @@ export async function getOccasionsInMonth(monthSlug: string): Promise<Occasion[]
 
 /** A temple's ritual year, as its page shows it: the twelve months of one
     timeless year, Chithirai to Panguni, and under each what was seen there
-    (in any year), each once with the number of days it was seen. Each day counts as one thing: the first
+    (in any year), each once, with how many days it lasts where the temple's
+    ritual calendar says (the admin's "Festival lengths"; never the days
+    recorded). Each day counts as one thing: the first
     of its festivals and rituals (in the order they are tagged) that comes
     once a year; failing that, one that comes every month; failing that,
     every week. Rites done within other events (a purappadu, an abhishekam)
@@ -1064,7 +1073,11 @@ export async function getOccasionsInMonth(monthSlug: string): Promise<Occasion[]
     its festival's or ritual's. */
 export type TempleYearEntry = {
   observance?: Observance;
+  /** the days recorded of it (not shown: see `length`) */
   days: number;
+  /** how many days it lasts, from the temple's ritual calendar (the admin's
+      "Festival lengths"); none, when the calendar gives no number */
+  length?: number;
   name?: string;
   tamil?: string;
   recurs?: Observance["recurs"];
@@ -1094,8 +1107,13 @@ export async function getTempleRitualYear(regionId: string, templeId: string): P
   // what each day counts as: a festival or ritual of its own; or, on a day
   // of rites alone, the day under its own name, as an instance of the first
   type What = { key: string; observance: Observance; name?: string; recurs?: Observance["recurs"]; when?: string };
+  const key = `${regionId}/${templeId}`;
+  // a festival or ritual left out of the Ritual Year in the admin (at every
+  // temple, or at this one): as if its days were not tagged with it; a day
+  // tagged with nothing else is not counted at all
+  const leftOut = (x: Observance) => x.notInYear === true || (Array.isArray(x.notInYear) && x.notInYear.includes(key));
   const dayOf = (o: Occasion): What | undefined => {
-    const tagged = o.observances.map((id) => byId.get(id)).filter((x): x is Observance => Boolean(x));
+    const tagged = o.observances.map((id) => byId.get(id)).filter((x): x is Observance => Boolean(x) && !leftOut(x!));
     const own =
       tagged.find((x) => x.recurs === "yearly") ??
       tagged.find((x) => x.recurs === "monthly") ??
@@ -1116,7 +1134,6 @@ export async function getTempleRitualYear(regionId: string, templeId: string): P
   // month, every month): each listed under every month; a recorded day that
   // is one of them (its festival or ritual, or its name in the day's)
   // counts as it, and is not listed again
-  const key = `${regionId}/${templeId}`;
   const regular = (await getRegularRituals()).filter((r) => r.temples.some((t) => t.key === key));
   const linked = new Map((await getObservancesById([...new Set(regular.flatMap((r) => r.observances.map((x) => x.id)))])).map((o) => [o.id, o]));
   const plain = (s: string) => ` ${s.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim()} `;
@@ -1218,10 +1235,28 @@ export async function getTempleRitualYear(regionId: string, templeId: string): P
       .filter((e, i, all) => all.findIndex((x) => x.key === e.key) === i)
       .map(clean),
   ];
+  // how long each festival lasts, only as the temple's ritual calendar says
+  // (a festival kept twice in the year, by its month)
+  const L = await lookups();
+  const temple = (await rawTemples()).find((t) => L.templeKey.get(t.id) === key);
+  const lengths = (temple?.festivalLengths ?? []).flatMap((r) => {
+    const slug = L.observanceSlug.get(idOf(r.festival) ?? -1);
+    return slug && r.days ? [{ slug, month: r.month ?? undefined, days: r.days }] : [];
+  });
+  const lengthOf = (e: TempleYearEntry, month: string) => {
+    if (!e.observance || e.name !== undefined) return undefined;
+    const rows = lengths.filter((r) => r.slug === e.observance!.id);
+    return (rows.find((r) => r.month === month) ?? rows.find((r) => !r.month))?.days;
+  };
   return {
     months: TAMIL_MONTHS.map((month) => ({
       month,
-      festivals: months.get(month.slug)!.filter((e) => !recurringOf(e)).sort((a, b) => a.start - b.start).map(clean),
+      festivals: months
+        .get(month.slug)!
+        .filter((e) => !recurringOf(e))
+        .sort((a, b) => a.start - b.start)
+        .map(clean)
+        .map((e) => ({ ...e, length: lengthOf(e, month.slug) })),
     })),
     regular: recurring,
   };

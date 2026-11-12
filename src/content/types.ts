@@ -112,6 +112,9 @@ export interface Observance {
   recurs: "yearly" | "monthly" | "weekly" | "rite";
   /** When a monthly or weekly one comes round: "Every month, on Punarpoosam". */
   recursWhen?: string;
+  /** Left out of the temples' Ritual Year (set in the admin): at every
+      temple (`true`), or at these ("pondicherry/vedapuriswara"). */
+  notInYear?: true | string[];
 }
 
 /** A dated occasion the team was present for, at one temple. These build

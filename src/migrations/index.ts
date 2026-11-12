@@ -89,6 +89,8 @@ import * as migration_20261109_210000_database_log_3 from './20261109_210000_dat
 import * as migration_20261110_120000_poosa_nakshatram from './20261110_120000_poosa_nakshatram';
 import * as migration_20261110_130000_deepavali_amavasya from './20261110_130000_deepavali_amavasya';
 import * as migration_20261111_120000_british_spellings from './20261111_120000_british_spellings';
+import * as migration_20261112_120000_festival_lengths from './20261112_120000_festival_lengths';
+import * as migration_20261112_130000_observance_not_in_year from './20261112_130000_observance_not_in_year';
 
 export const migrations = [
   {
@@ -545,5 +547,15 @@ export const migrations = [
     up: migration_20261111_120000_british_spellings.up,
     down: migration_20261111_120000_british_spellings.down,
     name: '20261111_120000_british_spellings',
+  },
+  {
+    up: migration_20261112_120000_festival_lengths.up,
+    down: migration_20261112_120000_festival_lengths.down,
+    name: '20261112_120000_festival_lengths',
+  },
+  {
+    up: migration_20261112_130000_observance_not_in_year.up,
+    down: migration_20261112_130000_observance_not_in_year.down,
+    name: '20261112_130000_observance_not_in_year',
   },
 ];

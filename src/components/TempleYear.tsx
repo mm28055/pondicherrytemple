@@ -64,8 +64,8 @@ function timing(e: TempleYearEntry) {
     The Year: the twelve months from Chithirai to Panguni, the one we
     are in in its own colour; under each its festivals (anything that comes
     once a year, or a few times), each in a pale panel: the Tamil name, the
-    English beneath it with the red mark and the number of days when it was
-    seen on more than one ("Brahmotsavam • 16 days"), and a few words on it.
+    English beneath it with the red mark and the number of days its ritual
+    calendar gives ("Brahmotsavam • 15 days"; none if it gives none), and a few words on it.
     The Month: what comes twice a month and every month; The
     Week: what comes every week. Each once, in a pale panel too, two to a
     line, under its heading: the Tamil, the English, and the day and time
@@ -142,7 +142,7 @@ export function TempleYear({ year, day }: { year: TempleRitualYear; day?: Temple
                   ) : (
                     <div className="year-list">
                       {these.map((e) => (
-                        <Entry key={`${e.name ?? ""}|${e.observance?.id ?? ""}`} e={e} className="festival" after={e.days > 1 ? `${e.days} days` : null}>
+                        <Entry key={`${e.name ?? ""}|${e.observance?.id ?? ""}`} e={e} className="festival" after={e.length ? `${e.length} ${e.length === 1 ? "day" : "days"}` : null}>
                           {e.about && <span className="year-about">{e.about}</span>}
                         </Entry>
                       ))}
