@@ -9,6 +9,7 @@ import { DialogBack } from "@/components/DialogBack";
 import { LandAtTop } from "@/components/LandAtTop";
 import { PageNames } from "@/components/PageNames";
 import { NoImageSave } from "@/components/NoImageSave";
+import { Analytics } from "@/components/Analytics";
 import { SITE_URL, shareMeta } from "@/lib/share";
 
 /* The public site. (The admin, under /admin, has its own layout in (payload).) */
@@ -88,6 +89,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
         <LandAtTop />
         <PageNames />
         <NoImageSave />
+        <Analytics />
       </body>
     </html>
   );
