@@ -59,7 +59,15 @@ export const AboutPage: GlobalConfig = {
             { name: 'role', type: 'text', admin: { width: '50%' } },
           ],
         },
-        { name: 'bio', type: 'textarea', label: 'A line or two about them' },
+        {
+          name: 'bio',
+          type: 'textarea',
+          label: 'A line or two about them',
+          admin: {
+            description:
+              'To make words a link, write them in square brackets with the address after, in round ones: [Heritage Temples](https://heritagetemples.org)',
+          },
+        },
       ],
     },
     {

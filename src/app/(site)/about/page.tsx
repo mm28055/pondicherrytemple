@@ -3,6 +3,24 @@ import Link from "next/link";
 import { getAboutPage } from "@/lib/data";
 import { Html } from "@/components/Prose";
 
+/** A team bio is plain text; "[Heritage Temples](https://heritagetemples.org)"
+    in it becomes a link to that site, opening in a new tab. */
+function withLinks(text: string) {
+  const parts: React.ReactNode[] = [];
+  let last = 0;
+  for (const m of text.matchAll(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g)) {
+    parts.push(text.slice(last, m.index));
+    parts.push(
+      <a key={m.index} href={m[2]} target="_blank" rel="noopener noreferrer">
+        {m[1]}
+      </a>
+    );
+    last = m.index + m[0].length;
+  }
+  parts.push(text.slice(last));
+  return parts;
+}
+
 export const metadata: Metadata = {
   title: "About",
   description: "About Sthalam, a temple documentation project of the Centre for Shaiva Studies, Pondicherry.",
@@ -55,7 +73,7 @@ export default async function AboutPage() {
               <li key={p.name}>
                 <div className="who">{p.name}</div>
                 {p.role && <div className="role caps">{p.role}</div>}
-                {p.bio && <p>{p.bio}</p>}
+                {p.bio && <p>{withLinks(p.bio)}</p>}
               </li>
             ))}
           </ul>

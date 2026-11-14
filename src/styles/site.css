@@ -2174,6 +2174,8 @@ button.home-strip-photo:focus-visible { outline: 3px solid var(--ochre); outline
 .team .who { font-family: var(--display); font-weight: 600; font-size: 22px; }
 .team .role { margin-top: 2px; }
 .team p { color: var(--ink-2); font-size: 17px; margin-top: 8px; }
+.team p a { color: var(--ink); border-bottom: 1px solid var(--rule); }
+.team p a:hover { color: var(--ochre); border-bottom-color: var(--ochre); }
 
 /* ---------- Footer ---------- */
 .site-footer { background: var(--night); color: var(--on-night-dim); }
