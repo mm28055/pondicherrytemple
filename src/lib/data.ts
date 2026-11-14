@@ -685,10 +685,8 @@ async function buildPhotoData() {
           const t = templeByKey.get(key);
           return t ? [{ label: t.knownAs ?? t.name, href: hasPage(t) ? `/${t.region}/${t.id}` : undefined }] : [];
         }),
-        ...[...observances].flatMap((id) => {
-          const o = observanceById.get(id);
-          return o ? [{ label: o.name, href: festivalPath(o.id) }] : [];
-        }),
+        // (its temples only: the viewer's line is its date, temple, occasion
+        // and note; its festival and ritual tags still sort it, not shown)
       ],
       date: dayOf(taken ?? m.createdAt),
       dated: Boolean(taken),

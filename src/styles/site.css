@@ -1839,6 +1839,9 @@ button.home-strip-photo:focus-visible { outline: 3px solid var(--ochre); outline
   cursor: pointer;
   padding: 8px 14px;
 }
+/* a pop-up's buttons (×, ‹ ›) never picked out in blue by a double-click or a tap */
+dialog button { -webkit-user-select: none; user-select: none; -webkit-tap-highlight-color: transparent; }
+dialog button:focus:not(:focus-visible) { outline: none; }
 .film-viewer-close { top: 12px; right: 16px; font-size: 44px; }
 .film-viewer-step { top: 50%; transform: translateY(-50%); font-size: 64px; }
 .film-viewer-step.prev { left: 12px; }
@@ -2005,21 +2008,24 @@ button.home-strip-photo:focus-visible { outline: 3px solid var(--ochre); outline
 }
 .photo-viewer-inner img { max-width: 100%; max-height: calc(100dvh - 194px); object-fit: contain; }
 .photo-viewer:focus { outline: none; }
-/* Previous and Next: all the height of the screen at either side (under the
-   ×), so a press near the arrow does not land outside it and close the photo */
+/* Previous and Next: the arrows at either side, plain (no box); a click
+   anywhere beside the photo, left or right, steps too (PhotoWall) */
 .photo-viewer .film-viewer-step {
-  top: 72px;
-  bottom: 0;
-  width: 112px;
+  /* close beside the photo, level with its middle (PhotoWall measures it) */
+  top: var(--photo-mid, 50%);
+  bottom: auto;
+  width: 72px;
+  height: 120px;
   padding: 0;
-  transform: none;
+  transform: translateY(-50%);
+  font-size: 80px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
-.photo-viewer .film-viewer-step.prev { left: 0; }
-.photo-viewer .film-viewer-step.next { right: 0; }
-.photo-viewer .film-viewer-step:hover { background: rgba(255, 255, 255, 0.06); }
+.photo-viewer .film-viewer-step.prev { left: max(0px, calc(var(--photo-left, 112px) - 96px)); }
+.photo-viewer .film-viewer-step.next { right: 0; left: var(--next-left, auto); }
+.photo-viewer { --next-left: min(calc(100vw - 72px), calc(var(--photo-right) + 24px)); }
 /* a photo with a description: the words beside it */
 .photo-viewer-inner.has-text { grid-template-columns: minmax(0, 1fr) minmax(260px, 24em); gap: 14px 40px; }
 .photo-viewer-text {
@@ -2047,7 +2053,8 @@ button.home-strip-photo:focus-visible { outline: 3px solid var(--ochre); outline
   opacity: 0; transition: opacity 0.2s;
 }
 .zoomable:hover .zoomable-tools, .zoomable-tools:focus-within { opacity: 1; }
-@media (hover: none) { .zoomable-tools { opacity: 1; } }
+/* on a phone or tablet, no bar: fingers pinch to zoom */
+@media (max-width: 860px), (hover: none) and (pointer: coarse) { .zoomable-tools, .photo-viewer .zoomable-tools { display: none; } }
 /* in the photo viewer, under the photo, not on it, and always there (centred
    on it, however narrow the photo is) */
 .photo-viewer .zoomable-tools { position: relative; left: 50%; bottom: auto; width: max-content; margin-top: 8px; background: none; opacity: 1; }
@@ -2081,14 +2088,74 @@ button.home-strip-photo:focus-visible { outline: 3px solid var(--ochre); outline
 .photo-viewer-tags a,
 .photo-viewer-tags .fl { color: var(--on-night); }
 .photo-viewer-tags a:hover { color: var(--lamp); }
+/* The photo viewer frosted, not black (user, 14 Nov 2026): the page behind
+   it blurred under the paper colour of the hamburger menus' frost, a heavier
+   blur so the page reads as colour, not words; its arrows, ×, words and
+   zoom bar in ink, the photo lifted off it by a faint shadow */
+.photo-viewer {
+  background: rgba(245, 244, 240, 0.79); /* (0.74 at first; 5% whiter, user 14 Nov) */
+  -webkit-backdrop-filter: blur(22px);
+  backdrop-filter: blur(22px);
+  color: var(--ink);
+}
+.photo-viewer::backdrop { background: transparent; }
+.photo-viewer .film-viewer-close,
+.photo-viewer .film-viewer-step { color: var(--ink); }
+.photo-viewer .film-viewer-close:hover,
+.photo-viewer .film-viewer-step:hover { color: var(--ochre); }
+/* (a tap leaves no hover colour behind on a phone) */
+@media (hover: none) {
+  .photo-viewer .film-viewer-close:hover,
+  .photo-viewer .film-viewer-step:hover { color: var(--ink); }
+}
+.photo-viewer .zoomable-frame { box-shadow: 0 10px 40px rgba(22, 17, 14, 0.25); }
+.photo-viewer-inner .caps,
+.photo-viewer-credit,
+.photo-viewer-tags { color: var(--muted); }
+.photo-viewer-tags a,
+.photo-viewer-tags .fl,
+.photo-viewer-text { color: var(--ink); }
+.photo-viewer-tags a:hover,
+.photo-viewer .arrow-link:hover { color: var(--ochre); }
+/* each new photo comes in softly: a short fade, sliding a few pixels in from
+   the side it was stepped to (--dir, set by PhotoWall; none when the viewer
+   first opens); its words fade with it */
+@keyframes photo-in { from { opacity: 0; transform: translateX(calc(var(--dir, 0) * 12px)); } }
+@keyframes photo-in-words { from { opacity: 0; } }
+/* (slow and soft, user 14 Nov 2026: 0.26s with an 18px slide was too brisk) */
+.photo-viewer .photo-in { animation: photo-in 0.6s cubic-bezier(0.33, 0, 0.2, 1); }
+.photo-viewer .photo-in-words { animation: photo-in-words 0.6s ease-in-out; }
+@media (prefers-reduced-motion: reduce) {
+  .photo-viewer .photo-in, .photo-viewer .photo-in-words { animation: none; }
+}
+/* "Field Note →" plain, no line under it */
+.photo-viewer .arrow-link { border-bottom: 0; padding-bottom: 0; }
+/* every word under the photo in the temple name's type (user, 14 Nov 2026):
+   its date, temple, occasion, caption, credit and "Field Note →" alike */
+.photo-viewer-inner figcaption > *,
+.photo-viewer-inner figcaption .caps,
+.photo-viewer-inner figcaption .arrow-link,
+.photo-viewer-inner figcaption .photo-viewer-note {
+  font-family: var(--text);
+  font-weight: 400;
+  font-size: 15px;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--ink);
+}
+.photo-viewer-inner figcaption .arrow-link:hover { color: var(--ochre); }
+.photo-viewer .zoomable-tools { color: var(--ink); }
+.photo-viewer .zoomable-tools button:hover:not(:disabled) { color: var(--ochre); }
+.photo-viewer .zoomable-tools button[aria-pressed="true"] { background: rgba(22, 17, 14, 0.1); }
+.photo-viewer .zoomable-sep { background: rgba(22, 17, 14, 0.25); }
 @media (max-width: 860px) {
   .photo-viewer-inner { padding: 64px 12px 24px; }
   .photo-viewer-inner img { max-height: calc(100dvh - 244px); }
   /* at the top, beside each other, each a good thumb's width (a swipe does the same) */
-  .photo-viewer .film-viewer-step { top: 0; bottom: auto; width: 72px; height: 60px; font-size: 44px; }
+  /* no arrows on a phone: a swipe sideways steps (user, 14 Nov 2026) */
+  .photo-viewer .film-viewer-step { display: none; }
   .photo-viewer .film-viewer-step.prev { left: 0; }
   .photo-viewer .film-viewer-step.next { left: 72px; right: auto; }
-  .photo-viewer .film-viewer-step:hover { background: none; }
   /* a photo with a description: the words under it, the viewer scrolling */
   .photo-viewer-inner.has-text { grid-template-columns: minmax(0, 1fr); height: auto; min-height: 100%; }
   .photo-viewer-text { grid-column: 1; grid-row: auto; justify-self: center; max-width: 36em; max-height: none; overflow: visible; }

@@ -1,13 +1,14 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 
 /* An image opened over the page (a photograph in the viewer, a temple's
    layout), made to zoom: the image alone grows inside its own frame, the
    words and the rest of the page stay as they are.
    - The mouse wheel zooms in and out about the pointer.
    - Two tools, chosen in the small bar over the image: the zoom tool (a click
-     zooms in there, a shift- or alt-click out) and the move tool (dragging
+     zooms in there straight to 400%, a click when zoomed at all shows it whole
+     again) and the move tool (dragging
      moves the zoomed image about). Dragging moves it with either tool.
    - "Fit" (or double-click, or 0) shows it whole again; + and − zoom too.
    Shown whole again for each new image (give it a `key`). */
@@ -17,7 +18,7 @@ const STEP = 2;
 
 type Tool = "zoom" | "move";
 
-export function Zoomable({ children, className }: { children: ReactNode; className?: string }) {
+export function Zoomable({ children, className, style }: { children: ReactNode; className?: string; style?: CSSProperties }) {
   const frame = useRef<HTMLDivElement>(null);
   const [view, setView] = useState({ s: 1, x: 0, y: 0 });
   const [tool, setTool] = useState<Tool>("zoom");
@@ -45,6 +46,8 @@ export function Zoomable({ children, className }: { children: ReactNode; classNa
       }),
     [within]
   );
+  const zoomedRef = useRef(false);
+  zoomedRef.current = view.s > 1;
   const fit = () => setView({ s: 1, x: 0, y: 0 });
   const at = (e: { clientX: number; clientY: number }) => {
     const r = frame.current!.getBoundingClientRect();
@@ -57,6 +60,15 @@ export function Zoomable({ children, className }: { children: ReactNode; classNa
     if (!el) return;
     const wheel = (e: WheelEvent) => {
       e.preventDefault();
+      // a sideways swipe on a touchpad: a zoomed image moves about; one shown
+      // whole leaves it to the viewer (the next photo)
+      if (!e.ctrlKey && Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
+        if (zoomedRef.current) {
+          e.stopPropagation();
+          setView((v) => within(v.s, v.x - e.deltaX, v.y - e.deltaY));
+        }
+        return;
+      }
       const [px, py] = at(e);
       setView((v) => {
         const next = Math.min(MAX, Math.max(1, v.s * Math.exp(-e.deltaY * 0.0025)));
@@ -82,10 +94,10 @@ export function Zoomable({ children, className }: { children: ReactNode; classNa
 
   const zoomed = view.s > 1;
   const cursor =
-    dragging ? "grabbing" : tool === "move" ? (zoomed ? "grab" : "default") : view.s >= MAX ? "zoom-out" : "zoom-in";
+    dragging ? "grabbing" : tool === "move" ? (zoomed ? "grab" : "default") : zoomed ? "zoom-out" : "zoom-in";
 
   return (
-    <div className={`zoomable${className ? ` ${className}` : ""}`}>
+    <div className={`zoomable${className ? ` ${className}` : ""}`} style={style}>
       <div
         ref={frame}
         className="zoomable-frame"
@@ -111,8 +123,12 @@ export function Zoomable({ children, className }: { children: ReactNode; classNa
           drag.current = null;
           setDragging(false);
           if (!d || d.moved || tool !== "zoom" || e.pointerType === "touch") return;
-          const [px, py] = at(e);
-          zoomTo(e.shiftKey || e.altKey || view.s >= MAX ? view.s / STEP : view.s * STEP, px, py);
+          // straight to the closest look there; zoomed at all, back to the whole
+          if (zoomed) fit();
+          else {
+            const [px, py] = at(e);
+            zoomTo(MAX, px, py);
+          }
         }}
         onPointerCancel={() => {
           drag.current = null;
@@ -136,7 +152,7 @@ export function Zoomable({ children, className }: { children: ReactNode; classNa
         </div>
       </div>
       <div className="zoomable-tools" role="toolbar" aria-label="Zoom" onClick={(e) => e.stopPropagation()}>
-        <button type="button" aria-pressed={tool === "zoom"} onClick={() => setTool("zoom")} title="Zoom tool: click to zoom in, shift-click to zoom out">
+        <button type="button" aria-pressed={tool === "zoom"} onClick={() => setTool("zoom")} title="Zoom tool: click to zoom in to 400%, click again to see it whole">
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <circle cx="10.5" cy="10.5" r="6.5" />
             <path d="M15.5 15.5 21 21M10.5 7.5v6M7.5 10.5h6" />

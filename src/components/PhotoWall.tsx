@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { FestivalLink } from "@/components/FestivalLink";
-import { Fragment, useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type MouseEvent as ReactMouseEvent, type ReactNode } from "react";
 import type { Photo, PhotoFilter } from "@/content/types";
 import { formatDate } from "@/lib/calendar";
 import { stripeRows, useStripeFit } from "@/lib/stripes";
@@ -168,6 +168,7 @@ export function PhotoWall({ photos: given, pack, total, layout, seeAll, filters 
   };
 
   const show = (i: number) => {
+    setDir(0);
     if (!addressable) return setOpen(i);
     if (open === null) window.history.pushState({ photo: true }, "", addressFor(i));
     else window.history.replaceState(window.history.state, "", addressFor(i));
@@ -185,11 +186,16 @@ export function PhotoWall({ photos: given, pack, total, layout, seeAll, filters 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [order, addressable]);
 
+  // which way the last step went: the next photo comes in a little from that
+  // side (site.css, photo-in); 0 when the viewer first opens, a fade alone
+  const [dir, setDir] = useState(0);
+
   const step = useCallback(
     (by: number) => {
       if (open === null) return;
       const i = (open + by + order.length) % order.length;
       if (addressable) window.history.replaceState(window.history.state, "", addressFor(i));
+      setDir(by > 0 ? 1 : -1);
       setOpen(i);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -225,6 +231,93 @@ export function PhotoWall({ photos: given, pack, total, layout, seeAll, filters 
     window.addEventListener("keydown", key);
     return () => window.removeEventListener("keydown", key);
   }, [open, step]);
+
+  // a two-finger swipe sideways on a touchpad goes to the next or previous
+  // photo: one step a swipe, however long it runs on (its wheel events, the
+  // glide after the fingers lift among them, stop for a moment before the next)
+  const stepRef = useRef(step);
+  stepRef.current = step;
+  const viewing = open !== null && order.length > 1;
+  useEffect(() => {
+    const d = dialog.current;
+    if (!d || !viewing) return;
+    let sum = 0;
+    let done = false;
+    let quiet: number | undefined;
+    const wheel = (e: WheelEvent) => {
+      if (e.ctrlKey || Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return;
+      e.preventDefault(); // (nor the browser's own Back on a sideways swipe)
+      window.clearTimeout(quiet);
+      quiet = window.setTimeout(() => {
+        sum = 0;
+        done = false;
+      }, 220);
+      if (done) return;
+      sum += e.deltaX;
+      if (Math.abs(sum) > 60) {
+        done = true;
+        stepRef.current(sum > 0 ? 1 : -1);
+      }
+    };
+    d.addEventListener("wheel", wheel, { passive: false });
+    return () => {
+      d.removeEventListener("wheel", wheel);
+      window.clearTimeout(quiet);
+    };
+  }, [viewing]);
+
+  // a click on the open ground beside the photo, left or right of it, steps
+  // back or on; above or below it (or with only one photo), closes it
+  const besidePhoto = (e: { clientX: number }): -1 | 0 | 1 => {
+    if (order.length < 2) return 0;
+    const frame = dialog.current?.querySelector(".zoomable-frame");
+    if (!frame) return 0;
+    const r = frame.getBoundingClientRect();
+    return e.clientX < r.left ? -1 : e.clientX > r.right ? 1 : 0;
+  };
+  const onGround = (e: ReactMouseEvent) => {
+    if (e.target !== e.currentTarget) return;
+    const by = besidePhoto(e);
+    if (by) step(by);
+    else close();
+  };
+  // (a quick second click steps again, not picking out words in blue)
+  const noSelect = (e: ReactMouseEvent) => e.detail > 1 && e.target === e.currentTarget && e.preventDefault();
+  const pointer = (e: ReactMouseEvent<HTMLElement>) => {
+    const ground = e.target === dialog.current || (e.target as HTMLElement).classList?.contains("photo-viewer-inner");
+    dialog.current!.style.cursor = ground && besidePhoto(e) ? "pointer" : "";
+  };
+
+  // the arrows beside the photo, at its middle (site.css): where the photo's
+  // frame is, measured again as it loads and as the window changes. With words
+  // beside it, the right arrow keeps to the screen's edge, clear of them.
+  useEffect(() => {
+    const d = dialog.current;
+    const frame = d?.querySelector<HTMLElement>(".zoomable-frame");
+    if (!d || !frame) return;
+    // (where it lies, not where it is drawn: as it slides in, it is drawn a
+    // little to one side, and the arrows must not slide with it)
+    const place = () => {
+      let left = 0;
+      let top = 0;
+      for (let el: HTMLElement | null = frame; el && el !== d; el = el.offsetParent as HTMLElement | null) {
+        left += el.offsetLeft;
+        top += el.offsetTop;
+      }
+      d.style.setProperty("--photo-left", `${left}px`);
+      d.style.setProperty("--photo-mid", `${top + frame.offsetHeight / 2}px`);
+      if (frame.closest(".has-text")) d.style.removeProperty("--photo-right");
+      else d.style.setProperty("--photo-right", `${left + frame.offsetWidth}px`);
+    };
+    place();
+    const ro = new ResizeObserver(place);
+    ro.observe(frame);
+    window.addEventListener("resize", place);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", place);
+    };
+  }, [open]);
 
   // fetch the next and previous photos ahead, so stepping is instant
   useEffect(() => {
@@ -423,7 +516,9 @@ export function PhotoWall({ photos: given, pack, total, layout, seeAll, filters 
           e.preventDefault();
           close();
         }}
-        onClick={(e) => e.target === e.currentTarget && close()}
+        onClick={onGround}
+        onMouseDown={noSelect}
+        onMouseMove={pointer}
         // a swipe sideways goes to the next photo; a swipe down closes it
         onTouchStart={(e) => (touch.current = { x: e.touches[0].clientX, y: e.touches[0].clientY })}
         onTouchEnd={(e) => {
@@ -437,11 +532,11 @@ export function PhotoWall({ photos: given, pack, total, layout, seeAll, filters 
         }}
       >
         {photo && (
-          <figure className={`photo-viewer-inner${photo.description ? " has-text" : ""}`} onClick={(e) => e.target === e.currentTarget && close()}>
-            <Zoomable key={photo.id}>
+          <figure className={`photo-viewer-inner${photo.description ? " has-text" : ""}`} onClick={onGround} onMouseDown={noSelect}>
+            <Zoomable key={photo.id} className="photo-in" style={{ "--dir": dir } as CSSProperties}>
               <img src={photo.src} alt={photo.alt || photo.caption || ""} />
             </Zoomable>
-            <figcaption>
+            <figcaption key={`cap-${photo.id}`} className="photo-in-words">
               {note && <span className="photo-viewer-note">{note}</span>}
               {/* its date, where it was, what for, then who took it (not "12 of 2,600": no help in so many) */}
               {photo.dated && <span className="caps">{formatDate(photo.date)}</span>}
@@ -455,15 +550,13 @@ export function PhotoWall({ photos: given, pack, total, layout, seeAll, filters 
                   ))}
                 </span>
               )}
-              {/* the occasion, in its shortest form (unless a festival named the same is linked already) */}
-              {photo.short && !photo.tags.some((t) => t.label.toLowerCase() === photo.short!.toLowerCase()) && (
-                <span className="caps">{photo.short}</span>
-              )}
+              {/* the occasion, in its shortest form */}
+              {photo.short && <span className="caps">{photo.short}</span>}
               {photo.caption && <span className="photo-viewer-caption">{photo.caption}</span>}
               {photo.credit && <span className="photo-viewer-credit">{photo.credit}</span>}
               {photo.note && (
-                <Link className="arrow-link" href={photo.note.href}>
-                  From the field note: {photo.note.title}
+                <Link className="arrow-link" href={photo.note.href} title={photo.note.title} aria-label={`Field note: ${photo.note.title}`}>
+                  Field Note
                 </Link>
               )}
             </figcaption>
