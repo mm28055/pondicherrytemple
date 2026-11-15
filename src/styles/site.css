@@ -2004,9 +2004,15 @@ dialog button:focus:not(:focus-visible) { outline: none; }
   gap: 14px;
   height: 100%;
   margin: 0;
-  padding: 32px 112px;
+  /* the photo as tall as leaves 20px round the whole and the zoom bar and
+     line of words under it (82px: 8 + 36 bar, 14 gap, 24 words) the same
+     82px above it too (--fit), then 7% taller, grown upwards only: its foot
+     stays where it was, the room above it given up (user, 15 Nov 2026) */
+  --below: 82px;
+  --fit: calc(100dvh - 40px - 2 * var(--below));
+  padding: calc(20px + var(--below) - 0.07 * var(--fit)) 112px 20px;
 }
-.photo-viewer-inner img { max-width: 100%; max-height: calc(100dvh - 194px); object-fit: contain; }
+.photo-viewer-inner img { max-width: 100%; max-height: calc(1.07 * var(--fit)); object-fit: contain; }
 .photo-viewer:focus { outline: none; }
 /* Previous and Next: the arrows at either side, plain (no box); a click
    anywhere beside the photo, left or right, steps too (PhotoWall) */

@@ -7,13 +7,14 @@ import { useCallback, useEffect, useRef, useState, type CSSProperties, type Reac
    words and the rest of the page stay as they are.
    - The mouse wheel zooms in and out about the pointer.
    - Two tools, chosen in the small bar over the image: the zoom tool (a click
-     zooms in there straight to 400%, a click when zoomed at all shows it whole
+     zooms in there straight to 300% (the wheel goes on to 400%), a click when zoomed at all shows it whole
      again) and the move tool (dragging
      moves the zoomed image about). Dragging moves it with either tool.
    - "Fit" (or double-click, or 0) shows it whole again; + and − zoom too.
    Shown whole again for each new image (give it a `key`). */
 
-const MAX = 4;
+const MAX = 4; // the wheel and + zoom up to 400%
+const CLICK = 3; // a click with the zoom tool goes straight to 300%
 const STEP = 2;
 
 type Tool = "zoom" | "move";
@@ -127,7 +128,7 @@ export function Zoomable({ children, className, style }: { children: ReactNode; 
           if (zoomed) fit();
           else {
             const [px, py] = at(e);
-            zoomTo(MAX, px, py);
+            zoomTo(CLICK, px, py);
           }
         }}
         onPointerCancel={() => {
@@ -152,7 +153,7 @@ export function Zoomable({ children, className, style }: { children: ReactNode; 
         </div>
       </div>
       <div className="zoomable-tools" role="toolbar" aria-label="Zoom" onClick={(e) => e.stopPropagation()}>
-        <button type="button" aria-pressed={tool === "zoom"} onClick={() => setTool("zoom")} title="Zoom tool: click to zoom in to 400%, click again to see it whole">
+        <button type="button" aria-pressed={tool === "zoom"} onClick={() => setTool("zoom")} title="Zoom tool: click to zoom in to 300%, click again to see it whole">
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <circle cx="10.5" cy="10.5" r="6.5" />
             <path d="M15.5 15.5 21 21M10.5 7.5v6M7.5 10.5h6" />
