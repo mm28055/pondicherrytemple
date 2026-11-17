@@ -91,6 +91,7 @@ import * as migration_20261110_130000_deepavali_amavasya from './20261110_130000
 import * as migration_20261111_120000_british_spellings from './20261111_120000_british_spellings';
 import * as migration_20261112_120000_festival_lengths from './20261112_120000_festival_lengths';
 import * as migration_20261112_130000_observance_not_in_year from './20261112_130000_observance_not_in_year';
+import * as migration_20261117_120000_kanda_sashti_photos from './20261117_120000_kanda_sashti_photos';
 
 export const migrations = [
   {
@@ -557,5 +558,10 @@ export const migrations = [
     up: migration_20261112_130000_observance_not_in_year.up,
     down: migration_20261112_130000_observance_not_in_year.down,
     name: '20261112_130000_observance_not_in_year',
+  },
+  {
+    up: migration_20261117_120000_kanda_sashti_photos.up,
+    down: migration_20261117_120000_kanda_sashti_photos.down,
+    name: '20261117_120000_kanda_sashti_photos',
   },
 ];

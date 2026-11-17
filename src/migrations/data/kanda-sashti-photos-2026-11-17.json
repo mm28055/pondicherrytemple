@@ -1,0 +1,484 @@
+{
+  "observances": [
+    {
+      "slug": "vishwaksena-jayanti",
+      "name": "Vishwaksena Jayanti",
+      "tamil": "விஷ்வக்சேனர் ஜெயந்தி",
+      "kind": "festival"
+    },
+    {
+      "slug": "rahu-ketu-peyarchi",
+      "name": "Rahu Ketu Peyarchi",
+      "tamil": "ராகு கேது பெயர்ச்சி",
+      "kind": "ritual"
+    },
+    {
+      "slug": "kanda-sashti",
+      "name": "Kanda Sashti",
+      "tamil": "கந்த சஷ்டி",
+      "kind": "festival",
+      "alsoKnownAs": "Skanda Sashti",
+      "months": [
+        "aippasi"
+      ]
+    }
+  ],
+  "occasions": [
+    {
+      "date": "2026-11-09",
+      "temple": "siva-subramania-lawspet",
+      "label": "Kanda Sashti, Vigneswara Puja",
+      "observances": [
+        "kanda-sashti",
+        "vigneswara-puja"
+      ]
+    },
+    {
+      "date": "2026-11-09",
+      "temple": "ghousika-balasubramaniar",
+      "label": "Kanda Sashti, Vigneswara Puja",
+      "observances": [
+        "kanda-sashti",
+        "vigneswara-puja",
+        "mrtsangrahanam"
+      ]
+    },
+    {
+      "date": "2026-11-10",
+      "temple": "vedapuriswara",
+      "label": "Kanda Sashti Day 1",
+      "observances": [
+        "kanda-sashti"
+      ]
+    },
+    {
+      "date": "2026-11-10",
+      "temple": "siva-subramania-lawspet",
+      "label": "Kanda Sashti Day 1",
+      "observances": [
+        "kanda-sashti",
+        "dhvajarohanam",
+        "abhishekam"
+      ]
+    },
+    {
+      "date": "2026-11-10",
+      "temple": "ghousika-balasubramaniar",
+      "label": "Kanda Sashti Day 1",
+      "observances": [
+        "kanda-sashti",
+        "dhvajarohanam"
+      ]
+    },
+    {
+      "date": "2026-11-11",
+      "temple": "nandhikeswara",
+      "label": "Kanda Sashti Day 2",
+      "observances": [
+        "kanda-sashti",
+        "alankaram"
+      ]
+    },
+    {
+      "date": "2026-11-11",
+      "temple": "chetty-koil",
+      "label": "Kanda Sashti Day 2",
+      "observances": [
+        "kanda-sashti",
+        "abhishekam"
+      ]
+    },
+    {
+      "date": "2026-11-11",
+      "temple": "ghousika-balasubramaniar",
+      "label": "Kanda Sashti Day 2",
+      "observances": [
+        "kanda-sashti"
+      ]
+    },
+    {
+      "date": "2026-11-12",
+      "temple": "nandhikeswara",
+      "label": "Kanda Sashti Day 3",
+      "observances": [
+        "kanda-sashti",
+        "alankaram"
+      ]
+    },
+    {
+      "date": "2026-11-12",
+      "temple": "chetty-koil",
+      "label": "Kanda Sashti Day 3",
+      "observances": [
+        "kanda-sashti",
+        "purappadu"
+      ]
+    },
+    {
+      "date": "2026-11-12",
+      "temple": "siva-subramania-lawspet",
+      "label": "Kanda Sashti Day 3",
+      "observances": [
+        "kanda-sashti"
+      ]
+    },
+    {
+      "date": "2026-11-12",
+      "temple": "ghousika-balasubramaniar",
+      "label": "Kanda Sashti Day 3",
+      "observances": [
+        "kanda-sashti"
+      ]
+    },
+    {
+      "date": "2026-11-13",
+      "temple": "varadaraja-perumal",
+      "label": "Manavala Mamunigal Utsavam, Concluding Yethir Sevai",
+      "observances": [
+        "manavala-mamunigal-utsavam"
+      ]
+    },
+    {
+      "date": "2026-11-13",
+      "temple": "kamakshi-amman",
+      "label": "Rahu Ketu Peyarchi",
+      "observances": [
+        "rahu-ketu-peyarchi"
+      ]
+    },
+    {
+      "date": "2026-11-13",
+      "temple": "sundara-vinayakar",
+      "label": "Kanda Sashti Day 4, Rahu Ketu Peyarchi",
+      "observances": [
+        "kanda-sashti",
+        "rahu-ketu-peyarchi"
+      ]
+    },
+    {
+      "date": "2026-11-13",
+      "temple": "nandhikeswara",
+      "label": "Kanda Sashti Day 4",
+      "observances": [
+        "kanda-sashti",
+        "alankaram"
+      ]
+    },
+    {
+      "date": "2026-11-13",
+      "temple": "siva-subramania-lawspet",
+      "label": "Kanda Sashti Day 4",
+      "observances": [
+        "kanda-sashti"
+      ]
+    },
+    {
+      "date": "2026-11-13",
+      "temple": "ghousika-balasubramaniar",
+      "label": "Kanda Sashti Day 4",
+      "observances": [
+        "kanda-sashti"
+      ]
+    },
+    {
+      "date": "2026-11-14",
+      "temple": "varadaraja-perumal",
+      "label": "Vishwaksena Jayanti",
+      "observances": [
+        "vishwaksena-jayanti"
+      ]
+    },
+    {
+      "date": "2026-11-14",
+      "temple": "siva-subramania-lawspet",
+      "label": "Kanda Sashti Day 5",
+      "observances": [
+        "kanda-sashti"
+      ]
+    },
+    {
+      "date": "2026-11-14",
+      "temple": "ghousika-balasubramaniar",
+      "label": "Kanda Sashti Day 5",
+      "observances": [
+        "kanda-sashti"
+      ]
+    },
+    {
+      "date": "2026-11-15",
+      "temple": "siva-subramania-lawspet",
+      "label": "Kanda Sashti Day 6, Soorasamharam",
+      "observances": [
+        "kanda-sashti"
+      ]
+    },
+    {
+      "date": "2026-11-15",
+      "temple": "ghousika-balasubramaniar",
+      "label": "Kanda Sashti Day 6, Soorasamharam",
+      "observances": [
+        "kanda-sashti"
+      ]
+    },
+    {
+      "date": "2026-11-16",
+      "temple": "sundara-vinayakar",
+      "label": "Kanda Sashti Day 7, Thirukalyanam",
+      "observances": [
+        "kanda-sashti",
+        "thirukalyanam"
+      ]
+    },
+    {
+      "date": "2026-11-16",
+      "temple": "nandhikeswara",
+      "label": "Kanda Sashti Day 7, Thirukalyanam",
+      "observances": [
+        "kanda-sashti",
+        "thirukalyanam"
+      ]
+    },
+    {
+      "date": "2026-11-16",
+      "temple": "siva-subramania-lawspet",
+      "label": "Kanda Sashti Day 7, Thirukalyanam",
+      "observances": [
+        "kanda-sashti",
+        "thirukalyanam"
+      ]
+    },
+    {
+      "date": "2026-11-16",
+      "temple": "ghousika-balasubramaniar",
+      "label": "Kanda Sashti Day 7, Thirukalyanam",
+      "observances": [
+        "kanda-sashti",
+        "thirukalyanam"
+      ]
+    }
+  ],
+  "sets": [
+    {
+      "date": "2026-11-09",
+      "title": "Vigneswara Puja",
+      "folder": "Siva Subramaniaswamy_Lawspet_Pondicherry/2026-11-09_Vighneshvara Puja",
+      "temples": [
+        "siva-subramania-lawspet"
+      ]
+    },
+    {
+      "date": "2026-11-09",
+      "title": "Vigneswara Puja, Mrtsangrahanam",
+      "folder": "Ghousiga Balasubramania Swamy_Pondicherry/2026-11-09_Vighneshvara Puja_Mrtsangrahanam",
+      "temples": [
+        "ghousika-balasubramaniar"
+      ]
+    },
+    {
+      "date": "2026-11-10",
+      "title": "Kanda Sashti Day 1",
+      "folder": "Vedapuriswara_Pondicherry/2026-11-10_Skanda Sashti Day 1",
+      "temples": [
+        "vedapuriswara"
+      ]
+    },
+    {
+      "date": "2026-11-10",
+      "title": "Kanda Sashti Day 1, Navaveerargal Abhishekam, Dhvajarohanam",
+      "folder": "Siva Subramaniaswamy_Lawspet_Pondicherry/2026-11-10_Skanda Sashti Day 1_Navaveerargal Abhishekam_Dhvajarohanam",
+      "temples": [
+        "siva-subramania-lawspet"
+      ]
+    },
+    {
+      "date": "2026-11-10",
+      "title": "Dhvajarohanam, Surya Prabhai, Chandra Prabhai",
+      "folder": "Ghousiga Balasubramania Swamy_Pondicherry/2026-11-10_Dhvajarohanam_Surya Prabhai_Chandra Prabhai",
+      "temples": [
+        "ghousika-balasubramaniar"
+      ]
+    },
+    {
+      "date": "2026-11-11",
+      "title": "Kanda Sashti Day 2, Pazhamudircholai Alankaram",
+      "folder": "Nandhikeswara_Pondicherry/2026-11-11_Skanda Sashti Day 2_Pazhamudircholai Alankaram",
+      "temples": [
+        "nandhikeswara"
+      ]
+    },
+    {
+      "date": "2026-11-11",
+      "title": "Kanda Sashti Day 2, Abhishekam",
+      "folder": "Kāḻattīsvarar Chetty Koyil_Pondicherry/2026-11-11_Skanda Sashti Day 2_Abhishekam",
+      "temples": [
+        "chetty-koil"
+      ]
+    },
+    {
+      "date": "2026-11-11",
+      "title": "Kanda Sashti Day 2, Rishabha, Kamadhenu",
+      "folder": "Ghousiga Balasubramania Swamy_Pondicherry/2026-11-11_Skanda Sashti Day 2_Rishabha_Kamadhenu",
+      "temples": [
+        "ghousika-balasubramaniar"
+      ]
+    },
+    {
+      "date": "2026-11-12",
+      "title": "Kanda Sashti Day 3",
+      "folder": "Siva Subramaniaswamy_Lawspet_Pondicherry/2026-11-12_Skanda Sashti Day 3",
+      "temples": [
+        "siva-subramania-lawspet"
+      ]
+    },
+    {
+      "date": "2026-11-12",
+      "title": "Kanda Sashti Day 3, Raja Alankaram",
+      "folder": "Nandhikeswara_Pondicherry/2026-11-12_Skanda Sashti Day 3_Raja Alankaram",
+      "temples": [
+        "nandhikeswara"
+      ]
+    },
+    {
+      "date": "2026-11-12",
+      "title": "Kanda Sashti Day 3, PM Purappadu",
+      "folder": "Kāḻattīsvarar Chetty Koyil_Pondicherry/2026-11-12_Skanda Sashti Day 3_PM Purappadu",
+      "temples": [
+        "chetty-koil"
+      ]
+    },
+    {
+      "date": "2026-11-12",
+      "title": "Kanda Sashti Day 3",
+      "folder": "Ghousiga Balasubramania Swamy_Pondicherry/2026-11-12_Skanda Sashti Day 3",
+      "temples": [
+        "ghousika-balasubramaniar"
+      ]
+    },
+    {
+      "date": "2026-11-13",
+      "title": "Manavala Mamunigal Utsavam Concluding Yethir Sevai",
+      "folder": "Varadarāja Perumal_Pondicherry/2026-11-13_Manavala Mamunigal Utsavam Concluding Yethir Sevai",
+      "temples": [
+        "varadaraja-perumal"
+      ]
+    },
+    {
+      "date": "2026-11-13",
+      "title": "Kanda Sashti Day 4, Gajamukhasooran Samharam",
+      "folder": "Siva Subramaniaswamy_Lawspet_Pondicherry/2026-11-13_Skanda Sashti Day 4_Gajamukhasooran Samharam",
+      "temples": [
+        "siva-subramania-lawspet"
+      ]
+    },
+    {
+      "date": "2026-11-13",
+      "title": "Kanda Sashti Day 4, Mohini Alankaram",
+      "folder": "Nandhikeswara_Pondicherry/2026-11-13_Skanda Sashti Day 4_Mohini Alankaram",
+      "temples": [
+        "nandhikeswara"
+      ]
+    },
+    {
+      "date": "2026-11-13",
+      "title": "Rahu Ketu Peyarchi",
+      "folder": "Kamatchi Amman_Pondicherry/2026-11-13_Rahu Kethu Peyarchi",
+      "temples": [
+        "kamakshi-amman"
+      ]
+    },
+    {
+      "date": "2026-11-13",
+      "title": "Kanda Sashti Day 4, Gajamukhasooran Samharam",
+      "folder": "Ghousiga Balasubramania Swamy_Pondicherry/2026-11-13_Skanda Sashti Day 4_Gajamukhasooran Samharam",
+      "temples": [
+        "ghousika-balasubramaniar"
+      ]
+    },
+    {
+      "date": "2026-11-13",
+      "title": "Kanda Sashti Day 4, Rahu Ketu Peyarchi",
+      "folder": "Bhavani Sundara Vinayaka/2026-11-13_Skanda Sashti Day 4_Rahu Kethu Peyarchi",
+      "temples": [
+        "sundara-vinayakar"
+      ]
+    },
+    {
+      "date": "2026-11-14",
+      "title": "Vishwaksena Jayanti",
+      "folder": "Varadarāja Perumal_Pondicherry/2026-11-14_Vishwaksena Jayanti",
+      "temples": [
+        "varadaraja-perumal"
+      ]
+    },
+    {
+      "date": "2026-11-14",
+      "title": "Kanda Sashti Day 5, Simhamukhasooran Samharam and Vel Vanguthal",
+      "folder": "Siva Subramaniaswamy_Lawspet_Pondicherry/2026-11-14_Skanda Sashti Day 5_Simhamukhasooran Samharam and Vel Vanguthal",
+      "temples": [
+        "siva-subramania-lawspet"
+      ]
+    },
+    {
+      "date": "2026-11-14",
+      "title": "Kanda Sashti Day 5, Simhamukhasooran Samharam",
+      "folder": "Ghousiga Balasubramania Swamy_Pondicherry/2026-11-14_Skanda Sashti Day 5_Simhamukhasooran Samharam",
+      "temples": [
+        "ghousika-balasubramaniar"
+      ]
+    },
+    {
+      "date": "2026-11-15",
+      "title": "Kanda Sashti Day 6, Vajrabahu Spine Climbing and Soorasamharam",
+      "folder": "Siva Subramaniaswamy_Lawspet_Pondicherry/2026-11-15_Skanda Sashti Day 6_Vajrabahu Spine Climbing and Soorasamharam",
+      "temples": [
+        "siva-subramania-lawspet"
+      ]
+    },
+    {
+      "date": "2026-11-15",
+      "title": "Kanda Sashti Day 6, Soorasamharam",
+      "folder": "Ghousiga Balasubramania Swamy_Pondicherry/2026-11-15_Skanda Sashti Day 6_Soorasamharam",
+      "temples": [
+        "ghousika-balasubramaniar"
+      ]
+    },
+    {
+      "date": "2026-11-16",
+      "title": "Kanda Sashti Day 7, Thirukalyanam",
+      "folder": "Siva Subramaniaswamy_Lawspet_Pondicherry/2026-11-16_Skanda Sashti Day 7_Thirukalyanam",
+      "temples": [
+        "siva-subramania-lawspet"
+      ]
+    },
+    {
+      "date": "2026-11-16",
+      "title": "Kanda Sashti Day 7, Thirukalyanam",
+      "folder": "Nandhikeswara_Pondicherry/2026-11-16_Skanda Sashti Day 7_Thirukalyanam",
+      "temples": [
+        "nandhikeswara"
+      ]
+    },
+    {
+      "date": "2026-11-16",
+      "title": "Kanda Sashti Day 7, Thirukalyanam",
+      "folder": "Ghousiga Balasubramania Swamy_Pondicherry/2026-11-16_Skanda Sashti Day 7_Thirukalyanam",
+      "temples": [
+        "ghousika-balasubramaniar"
+      ]
+    },
+    {
+      "date": "2026-11-16",
+      "title": "Kanda Sashti Day 7, Thirukalyanam",
+      "folder": "Bhavani Sundara Vinayaka/2026-11-16_Skanda Sashti Day 7_Thirukalyanam",
+      "temples": [
+        "sundara-vinayakar"
+      ]
+    }
+  ],
+  "renamedFolders": [
+    {
+      "from": "Varadarāja Perumal_Pondicherry/2026-11-04_Manavala Mamunigal Utsavam Day 1",
+      "to": "Varadarāja Perumal_Pondicherry/2026-11-04_Manavala Mamunigal Utsavam Day 1 (Occasion = Manavala Mamunigal Utsavam)"
+    }
+  ]
+}
