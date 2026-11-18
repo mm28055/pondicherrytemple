@@ -93,6 +93,7 @@ import * as migration_20261112_120000_festival_lengths from './20261112_120000_f
 import * as migration_20261112_130000_observance_not_in_year from './20261112_130000_observance_not_in_year';
 import * as migration_20261117_120000_kanda_sashti_photos from './20261117_120000_kanda_sashti_photos';
 import * as migration_20261118_120000_database_log_4 from './20261118_120000_database_log_4';
+import * as migration_20261118_180000_special_nakshatram_twice from './20261118_180000_special_nakshatram_twice';
 
 export const migrations = [
   {
@@ -569,5 +570,10 @@ export const migrations = [
     up: migration_20261118_120000_database_log_4.up,
     down: migration_20261118_120000_database_log_4.down,
     name: '20261118_120000_database_log_4',
+  },
+  {
+    up: migration_20261118_180000_special_nakshatram_twice.up,
+    down: migration_20261118_180000_special_nakshatram_twice.down,
+    name: '20261118_180000_special_nakshatram_twice',
   },
 ];

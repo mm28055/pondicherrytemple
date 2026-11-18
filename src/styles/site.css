@@ -3619,6 +3619,11 @@ span.month-obs .month-obs-more { display: none; }
   .where-short { display: inline; }
 }
 
+/* a line of parts (date · temples · occasion): each part kept whole, so one
+   that will not fit goes to the next line entire ("Kanda Sashti Vizha Day 8",
+   not "... Day" and "8" below); only a part wider than the line breaks inside */
+.unbroken { display: inline-block; max-width: 100%; }
+
 
 /* a film (or a field note's video) whose file cannot be had: a plain line in its place */
 .film-unavailable { display: flex; align-items: center; justify-content: center; min-height: 160px; padding: 24px; background: var(--chalk-2); color: var(--ink-2); text-align: center; }
@@ -3736,3 +3741,8 @@ span.month-obs .month-obs-more { display: none; }
   color: var(--ochre);
 }
 .gloss-card span { display: block; }
+
+/* under a field note (from margin to margin, the photographs having stopped
+   level with its text): more from its temple, each with its photograph, as on
+   the Field Notes page; then the note before or after */
+.note-after .note-foot { max-width: none; margin: 0; padding: clamp(24px, 3vw, 40px) 0 clamp(56px, 7vw, 88px); }

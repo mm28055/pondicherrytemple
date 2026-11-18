@@ -535,18 +535,24 @@ const occasions = cache(async () => {
     );
 });
 
-// (a note's first photograph, for lists: its own, or else the first of its photo sets')
+// (a note's photograph for lists, chosen without being asked: the first of
+// its photographs as put in order by hand in its photo grid, if they were;
+// else its own first, or else the first of its photo sets')
 const fieldNotes = cache(async () => {
   const L = await lookups();
   const { byNote } = await photoData();
-  return (await rawNotes())
-    .filter((n) => n.slug)
-    .map((n) => toFieldNote(n, L, false))
-    // (its 960 px copy: lists show it small)
-    .map((n) => {
-      const first = byNote.get(n.id)?.[0];
-      return n.lead || !first ? n : { ...n, lead: { ...first, src: first.medium } };
-    });
+  const raw = (await rawNotes()).filter((n) => n.slug);
+  const rawId = new Map(raw.map((n) => [n.slug!, n.id]));
+  const notes = raw.map((n) => toFieldNote(n, L, false));
+  return Promise.all(
+    notes.map(async (n) => {
+      const list = byNote.get(n.id) ?? [];
+      const ordered = await inPhotoOrder(list, `field-notes:${rawId.get(n.id)}`);
+      const first = ordered.ordered ? ordered.photos[0] : n.lead ? undefined : list[0];
+      // (its 960 px copy: lists show it small)
+      return first ? { ...n, lead: { ...first, src: first.medium } } : n;
+    }),
+  );
 });
 
 const articles = cache(async () => {
@@ -910,10 +916,10 @@ export async function getLineBegins(): Promise<string> {
 }
 
 /** The nakshatrams kept specially in a Tamil month (set in the admin as rules): month → nakshatram names. */
-export const getSpecialNakshatras = cache(async (): Promise<Record<string, { name: string; nakshatram: string; icon: SpecialIconKey | null }[]>> => {
+export const getSpecialNakshatras = cache(async (): Promise<Record<string, { name: string; nakshatram: string; twice: 'both' | 'first' | 'second'; icon: SpecialIconKey | null }[]>> => {
   const docs = (await find({ ...base, collection: "special-nakshatras", depth: 0 })).docs;
-  const out: Record<string, { name: string; nakshatram: string; icon: SpecialIconKey | null }[]> = {};
-  for (const d of docs) (out[d.month] ??= []).push({ name: d.name, nakshatram: d.nakshatram, icon: d.replaceIcon && d.icon ? (d.icon as SpecialIconKey) : null });
+  const out: Record<string, { name: string; nakshatram: string; twice: 'both' | 'first' | 'second'; icon: SpecialIconKey | null }[]> = {};
+  for (const d of docs) (out[d.month] ??= []).push({ name: d.name, nakshatram: d.nakshatram, twice: (d.twice ?? "both") as "both" | "first" | "second", icon: d.replaceIcon && d.icon ? (d.icon as SpecialIconKey) : null });
   return out;
 });
 

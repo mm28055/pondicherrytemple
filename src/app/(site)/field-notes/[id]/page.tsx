@@ -187,43 +187,49 @@ export default async function FieldNotePage({ params }: Props) {
               {n.body && <Html className="rich" html={markDictionary(n.body, dictionary)} />}
             </article>
           ))}
-
-          {temple && related.length > 0 && (
-            <div className="note-foot">
-              <h2 className="sub-head">More from {temple.knownAs ?? temple.name}</h2>
-              {related.slice(0, 5).map((n) => (
-                <NoteRow key={n.id} row={noteRow(n, allTemples, region.calendar)} />
-              ))}
-              {related.length > 5 && (
-                <Link className="more-button" href={`/${temple.region}/${temple.id}#all-field-notes`}>
-                  See all field notes →
-                </Link>
-              )}
-            </div>
-          )}
-
-          {/* on to the note before or after this one */}
-          {(older || newer) && (
-            <nav className="note-step" aria-label="More field notes">
-              {older ? (
-                <Link className="note-step-link prev" href={`/field-notes/${older.id}`}>
-                  <span className="note-step-label">← Previous</span>
-                  <span className="note-step-title">{older.title}</span>
-                  <span className="note-step-date">{formatDate(older.date)}</span>
-                </Link>
-              ) : (
-                <span />
-              )}
-              {newer && (
-                <Link className="note-step-link next" href={`/field-notes/${newer.id}`}>
-                  <span className="note-step-label">Next →</span>
-                  <span className="note-step-title">{newer.title}</span>
-                  <span className="note-step-date">{formatDate(newer.date)}</span>
-                </Link>
-              )}
-            </nav>
-          )}
         </div>
+      </div>
+
+      {/* under the note and its photographs, across the page from margin to
+          margin: more from its temple, each with its photograph, as on the
+          Field Notes page; then on to the note before or after (decided 18
+          November 2026: the photographs stop level with the text) */}
+      <div className="wrap note-after">
+        {temple && related.length > 0 && (
+          <div className="note-foot">
+            <h2 className="sub-head">More from {temple.knownAs ?? temple.name}</h2>
+            {related.slice(0, 5).map((n) => (
+              <NoteRow key={n.id} row={noteRow(n, allTemples, region.calendar)} withPicture />
+            ))}
+            {related.length > 5 && (
+              <Link className="more-button" href={`/${temple.region}/${temple.id}#all-field-notes`}>
+                See all field notes →
+              </Link>
+            )}
+          </div>
+        )}
+  
+        {/* on to the note before or after this one */}
+        {(older || newer) && (
+          <nav className="note-step" aria-label="More field notes">
+            {older ? (
+              <Link className="note-step-link prev" href={`/field-notes/${older.id}`}>
+                <span className="note-step-label">← Previous</span>
+                <span className="note-step-title">{older.title}</span>
+                <span className="note-step-date">{formatDate(older.date)}</span>
+              </Link>
+            ) : (
+              <span />
+            )}
+            {newer && (
+              <Link className="note-step-link next" href={`/field-notes/${newer.id}`}>
+                <span className="note-step-label">Next →</span>
+                <span className="note-step-title">{newer.title}</span>
+                <span className="note-step-date">{formatDate(newer.date)}</span>
+              </Link>
+            )}
+          </nav>
+        )}
       </div>
     </>
   );

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Fragment } from "react";
 import { FestivalLink } from "@/components/FestivalLink";
 import type { NoteRowData, ObservanceRowData } from "@/lib/view";
 import type { Temple } from "@/content/types";
@@ -89,16 +90,34 @@ export function ObservanceRow({
   );
 }
 
+/** A line of parts ("Ghousiga Koyil · Kanda Sashti Vizha Day 8", or temples
+    joined by commas), each part kept whole: one that will not fit goes to the
+    next line entire, never leaving a word ("8") behind on its own; only a part
+    wider than the whole line breaks within itself. The separator stays at the
+    end of the part before it. */
+export function Unbroken({ text }: { text: string }) {
+  return (
+    <>
+      {text.split(/(?<= ·|,) /).map((part, i) => (
+        <Fragment key={i}>
+          {i > 0 && " "}
+          <span className="unbroken">{part}</span>
+        </Fragment>
+      ))}
+    </>
+  );
+}
+
 /** Where a field note was written: its temples by their names; on a phone, by
-    their shortest names. */
+    their shortest names. Each name and the occasion kept whole (Unbroken). */
 export function Where({ row }: { row: { where: string; whereShort?: string } }) {
   return row.whereShort && row.whereShort !== row.where ? (
     <>
-      <span className="where-full">{row.where}</span>
-      <span className="where-short">{row.whereShort}</span>
+      <span className="where-full"><Unbroken text={row.where} /></span>
+      <span className="where-short"><Unbroken text={row.whereShort} /></span>
     </>
   ) : (
-    <>{row.where}</>
+    <Unbroken text={row.where} />
   );
 }
 

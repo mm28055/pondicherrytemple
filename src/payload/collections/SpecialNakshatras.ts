@@ -50,6 +50,20 @@ export const SpecialNakshatras: CollectionConfig = {
       ],
     },
     {
+      // a nakshatram comes about every 27 days, so in a Tamil month of 29 to
+      // 32 days it can fall twice: which of the two is kept
+      name: 'twice',
+      type: 'select',
+      label: 'When it falls twice in the month',
+      defaultValue: 'both',
+      options: [
+        { label: 'Mark both', value: 'both' },
+        { label: 'Mark the first only', value: 'first' },
+        { label: 'Mark the second only', value: 'second' },
+      ],
+      admin: { description: 'Aippasi Pooradam, Vishwaksena’s thirunakshatram, is the second (near the month’s end).' },
+    },
+    {
       type: 'row',
       fields: [
         {

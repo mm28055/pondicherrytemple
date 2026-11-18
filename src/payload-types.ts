@@ -1218,6 +1218,10 @@ export interface SpecialNakshatra {
     | 'Uthirattadhi'
     | 'Revathi';
   /**
+   * Aippasi Pooradam, Vishwaksena’s thirunakshatram, is the second (near the month’s end).
+   */
+  twice?: ('both' | 'first' | 'second') | null;
+  /**
    * Show the day by another icon (below) in place of the nakshatram’s own.
    */
   replaceIcon?: boolean | null;
@@ -1877,6 +1881,7 @@ export interface SpecialNakshatrasSelect<T extends boolean = true> {
   name?: T;
   month?: T;
   nakshatram?: T;
+  twice?: T;
   replaceIcon?: T;
   icon?: T;
   updatedAt?: T;
@@ -2143,6 +2148,9 @@ export interface AboutPage {
     | {
         name: string;
         role?: string | null;
+        /**
+         * To make words a link, write them in square brackets with the address after, in round ones: [Heritage Temples](https://heritagetemples.org)
+         */
         bio?: string | null;
         id?: string | null;
       }[]

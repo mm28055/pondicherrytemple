@@ -117,10 +117,14 @@ export default async function HomePage() {
                     <span className="caps">
                       {/* what it is — a film, an article — unless it is a plain field note */}
                       {r.kind !== "note" && <span className="kind">{r.kindLabel} · </span>}
-                      {r.day} {r.shortMonth}
+                      {/* the date, each temple and the occasion each kept whole (Unbroken) */}
+                      <span className="unbroken">
+                        {r.day} {r.shortMonth}
+                        {r.where && " ·"}
+                      </span>
                       {r.where && (
                         <span className="where">
-                          {" · "}
+                          {" "}
                           <Where row={r} />
                         </span>
                       )}

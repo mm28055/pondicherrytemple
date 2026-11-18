@@ -232,9 +232,17 @@ function tithisIn(slug: string, year: number) {
 }
 
 /** The days a month's special nakshatrams fall on, in a year. */
-function specialIn(slug: string, year: number, rules: Record<string, { nakshatram: string }[]>) {
+function specialIn(slug: string, year: number, rules: Record<string, { nakshatram: string; twice?: "both" | "first" | "second" }[]>) {
   const { first, last } = monthDates(slug, year);
-  return specialDays(first, last, (rules[slug] ?? []).map((r) => r.nakshatram));
+  const out: Record<string, number[]> = {};
+  for (const r of rules[slug] ?? []) {
+    // a nakshatram can fall twice in a Tamil month: the rule says which to mark
+    let days = Object.entries(specialDays(first, last, [r.nakshatram])).sort(([a], [b]) => (a < b ? -1 : 1));
+    if (days.length > 1 && r.twice === "first") days = days.slice(0, 1);
+    if (days.length > 1 && r.twice === "second") days = days.slice(-1);
+    for (const [day, kept] of days) out[day] = [...new Set([...(out[day] ?? []), ...kept])];
+  }
+  return out;
 }
 
 /** The icons chosen (in the admin) to show a month's special nakshatrams by,

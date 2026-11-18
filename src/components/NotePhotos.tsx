@@ -100,16 +100,24 @@ function NoteColumn({ photos, videos, seed, open }: { photos: Photo[]; videos: F
   useLayoutEffect(() => {
     const el = frame.current;
     if (!el) return;
+    // the column ends level with the end of the text (the note's, and any
+    // following it on the page), not with "More from…" under it: a short note
+    // with many photos shows as many as sit beside its words, the last saying
+    // how many more (decided 18 November 2026)
+    const bodies = () => document.querySelectorAll(".note-text > .note-body");
     const measure = () => {
       const r = el.getBoundingClientRect();
       const units = Math.floor((r.width - BESIDE - GAP) / STRIPE);
-      const height = Math.round(r.height);
+      const all = bodies();
+      const end = all.length ? all[all.length - 1].getBoundingClientRect().bottom : undefined;
+      const height = Math.round(end !== undefined && end > r.top ? Math.min(r.height, end - r.top) : r.height);
       setFit((f) => (f && f.units === units && f.height === height ? f : { units, height }));
     };
     measure();
     const ro = new ResizeObserver(measure);
     ro.observe(el);
     ro.observe(document.documentElement);
+    bodies().forEach((b) => ro.observe(b));
     return () => ro.disconnect();
   }, []);
 
