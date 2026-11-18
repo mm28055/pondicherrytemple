@@ -723,8 +723,12 @@ async function buildPhotoData() {
   }
   const place = (p: Photo) => (dayPlace.has(eventOf(p)) ? String(dayPlace.get(eventOf(p))).padStart(4, "0") : "~");
   const startOf = (p: Photo) => (p.set ? `${place(p)}|${began.get(eventOf(p))}|${eventOf(p)}` : "");
+  // by character code, so "~" (no time known) comes after every time, as meant
+  // (localeCompare puts it before the digits: Dewan Kandappa's photo of 14
+  // November 2026, which has no time, came first in its note)
+  const byCode = (a: string, b: string) => (a < b ? -1 : a > b ? 1 : 0);
   const inSetOrder = (a: Photo, b: Photo) =>
-    (a.set && b.set ? `${setBegan.get(a.set)}|${a.set}`.localeCompare(`${setBegan.get(b.set)}|${b.set}`) : 0) ||
+    (a.set && b.set ? byCode(`${setBegan.get(a.set)}|${a.set}`, `${setBegan.get(b.set)}|${b.set}`) : 0) ||
     (a.set && a.set === b.set ? (placeIn.get(a) ?? Infinity) - (placeIn.get(b) ?? Infinity) : 0) ||
     (timeOf.get(a) ?? "").localeCompare(timeOf.get(b) ?? "") ||
     Number(a.id) - Number(b.id);
@@ -732,7 +736,7 @@ async function buildPhotoData() {
     (a, b) =>
       Number(b.dated) - Number(a.dated) ||
       b.date.localeCompare(a.date) ||
-      startOf(a).localeCompare(startOf(b)) ||
+      byCode(startOf(a), startOf(b)) ||
       inSetOrder(a, b)
   );
   for (const [, list] of byNote) list.sort(inSetOrder);

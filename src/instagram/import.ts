@@ -95,7 +95,7 @@ async function stored(doc: { url?: string | null; filename?: string | null }, by
       const check = await checkVideoAt(doc.url)
       return check.found && check.size === bytes
     }
-    const dir = process.env.MEDIA_DIR || path.resolve(process.cwd(), '.data/media')
+    const dir = process.env.MEDIA_DIR || path.resolve(/* turbopackIgnore: true */ process.cwd(), '.data/media')
     return (await stat(path.join(dir, doc.filename ?? ''))).size === bytes
   } catch {
     return false

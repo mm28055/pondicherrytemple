@@ -37,6 +37,11 @@ const nextConfig: NextConfig = {
 
   turbopack: { root: path.resolve(dirname) },
 
+  // The local database and the photographs kept on this laptop (.data, 16 GB
+  // by 18 November 2026) are never part of the build: tracing them ran it
+  // out of memory.
+  outputFileTracingExcludes: { "*": [".data/**"] },
+
   // Building against the local database: fewer parallel workers, so they
   // don't crowd its connections. (With Neon, the default.)
   experimental: process.env.PGLITE_DIR ? { cpus: 2 } : {},

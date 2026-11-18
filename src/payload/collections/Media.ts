@@ -71,7 +71,7 @@ export const Media: CollectionConfig = {
   hooks: { ...refreshHooks, beforeChange: [refuseHevc, tagPhotoOfSet] },
   upload: {
     // On this laptop: MEDIA_DIR (see .env). With R2 keys in .env: Cloudflare R2.
-    staticDir: process.env.MEDIA_DIR || path.resolve(dirname, '../../../.data/media'),
+    staticDir: process.env.MEDIA_DIR || path.resolve(/* turbopackIgnore: true */ dirname, '../../../.data/media'),
     mimeTypes: ['image/*', 'video/*', 'audio/*', 'application/pdf'],
     // Smaller copies of every photo, made automatically, so pages load fast.
     imageSizes: [

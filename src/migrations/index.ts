@@ -92,6 +92,7 @@ import * as migration_20261111_120000_british_spellings from './20261111_120000_
 import * as migration_20261112_120000_festival_lengths from './20261112_120000_festival_lengths';
 import * as migration_20261112_130000_observance_not_in_year from './20261112_130000_observance_not_in_year';
 import * as migration_20261117_120000_kanda_sashti_photos from './20261117_120000_kanda_sashti_photos';
+import * as migration_20261118_120000_database_log_4 from './20261118_120000_database_log_4';
 
 export const migrations = [
   {
@@ -563,5 +564,10 @@ export const migrations = [
     up: migration_20261117_120000_kanda_sashti_photos.up,
     down: migration_20261117_120000_kanda_sashti_photos.down,
     name: '20261117_120000_kanda_sashti_photos',
+  },
+  {
+    up: migration_20261118_120000_database_log_4.up,
+    down: migration_20261118_120000_database_log_4.down,
+    name: '20261118_120000_database_log_4',
   },
 ];

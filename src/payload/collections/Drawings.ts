@@ -19,7 +19,7 @@ const idOf = (v: unknown) => (typeof v === 'object' && v ? (v as { id: number })
 async function fileOf(media: { filename?: string | null; url?: string | null; prefix?: string | null }): Promise<Buffer | null> {
   if (!media.filename) return null
   const local = await fs
-    .readFile(path.join(process.env.MEDIA_DIR || path.resolve(process.cwd(), '.data/media'), media.filename))
+    .readFile(path.join(process.env.MEDIA_DIR || path.resolve(/* turbopackIgnore: true */ process.cwd(), '.data/media'), media.filename))
     .catch(() => null)
   if (local) return local
   const base = (process.env.R2_PUBLIC_URL || '').replace(/\/$/, '')

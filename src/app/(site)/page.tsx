@@ -32,7 +32,7 @@ export default async function HomePage() {
   const temples = await getTemples(region.id);
 
   // Just added: the newest things, whatever they are. No upkeep.
-  // as many as reach down to the film beside them (DownTo), at least four
+  // as many as fit down to the bottom of the film beside them (DownTo), at least four
   const latest = (await getLatest(16)).map((l) =>
     l.type === "field-note"
       ? noteRow(l.item, temples, region.calendar)
