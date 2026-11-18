@@ -21,8 +21,8 @@ import { richText } from './20261031_120500_database_log_2'
 type Log = typeof log
 const noonIST = (day: string) => `${day}T06:30:00.000Z`
 
-export async function up({ payload, req }: MigrateUpArgs): Promise<void> {
-  await databaseLog4Data({ payload, req })
+export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
+  await databaseLog4Data({ db, payload, req })
 }
 
 export async function down(_: MigrateDownArgs): Promise<void> {
@@ -110,7 +110,7 @@ const NEW_SETS: { folder: string; title: string; date: string; note: string; tem
 const VISHWAKSENA_SET ='Varadarāja Perumal_Pondicherry/2026-11-14_Vishwaksena Jayanti'
 const VISHWAKSENA_TITLE = 'Vishwaksena Varuda Thirunakshatra Sattrumurai Utsavam'
 
-export async function databaseLog4Data({ payload, req }: Pick<MigrateUpArgs, 'payload' | 'req'>): Promise<void> {
+export async function databaseLog4Data({ db, payload, req }: Pick<MigrateUpArgs, 'db' | 'payload' | 'req'>): Promise<void> {
   const quiet = { req, overrideAccess: true, depth: 0, context: { skipRevalidate: true } } as const
   const data = log as Log
   const idOf = (r: any): number | undefined => (r == null ? undefined : typeof r === 'object' ? r.id : r)
@@ -246,11 +246,11 @@ export async function databaseLog4Data({ payload, req }: Pick<MigrateUpArgs, 'pa
   const set = await setByFolder(VISHWAKSENA_SET)
   const naal = observanceId.get('nakshatra-naal')
   if (set && vishwaksena && naal) {
-    await payload.db.drizzle.execute(
+    await db.execute(
       sql`DELETE FROM "media_rels" WHERE "path" = 'observances' AND "observances_id" = ${vishwaksena}
           AND "parent_id" IN (SELECT "id" FROM "media" WHERE "set_id" = ${set.id})`,
     )
-    await payload.db.drizzle.execute(
+    await db.execute(
       sql`INSERT INTO "media_rels" ("order", "parent_id", "path", "observances_id")
           SELECT 1000, m."id", 'observances', ${naal} FROM "media" m
           WHERE m."set_id" = ${set.id} AND NOT EXISTS (
