@@ -2126,7 +2126,7 @@ dialog button:focus:not(:focus-visible) { outline: none; }
 /* each new photo comes in softly: a short fade, sliding a few pixels in from
    the side it was stepped to (--dir, set by PhotoWall; none when the viewer
    first opens); its words fade with it */
-@keyframes photo-in { from { opacity: 0; transform: translateX(calc(var(--dir, 0) * 12px)); } }
+@keyframes photo-in { from { opacity: 0; transform: translate(calc(var(--dir, 0) * 12px), calc(var(--dir-y, 0) * 12px)); } }
 @keyframes photo-in-words { from { opacity: 0; } }
 /* (slow and soft, user 14 Nov 2026: 0.26s with an 18px slide was too brisk) */
 .photo-viewer .photo-in { animation: photo-in 0.6s cubic-bezier(0.33, 0, 0.2, 1); }

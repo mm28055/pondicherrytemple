@@ -97,7 +97,11 @@ export function PhotoWall({ photos: given, pack, total, layout, seeAll, filters 
   const wall = useRef<HTMLDivElement>(null);
   const fit = useStripeFit(wall);
   const dialog = useRef<HTMLDialogElement>(null);
-  const touch = useRef<{ x: number; y: number } | null>(null);
+  // a finger on the viewer: where it went down, whether two were (a pinch),
+  // and whether the words under a photo were scrolled to their top or end then
+  const touch = useRef<{ x: number; y: number; pinch: boolean; top: boolean; foot: boolean } | null>(null);
+  // whether the last press was a finger: a tap beside the photo does nothing
+  const byFinger = useRef(false);
 
   // the photos in the order they are shown, and stepped through
   const order = useMemo(() => {
@@ -169,6 +173,7 @@ export function PhotoWall({ photos: given, pack, total, layout, seeAll, filters 
 
   const show = (i: number) => {
     setDir(0);
+    setUpDown(false);
     if (!addressable) return setOpen(i);
     if (open === null) window.history.pushState({ photo: true }, "", addressFor(i));
     else window.history.replaceState(window.history.state, "", addressFor(i));
@@ -189,13 +194,17 @@ export function PhotoWall({ photos: given, pack, total, layout, seeAll, filters 
   // which way the last step went: the next photo comes in a little from that
   // side (site.css, photo-in); 0 when the viewer first opens, a fade alone
   const [dir, setDir] = useState(0);
+  // (an up-or-down swipe's photo comes in from below or above instead)
+  const [upDown, setUpDown] = useState(false);
 
   const step = useCallback(
-    (by: number) => {
+    (by: number, vertical = false) => {
       if (open === null) return;
       const i = (open + by + order.length) % order.length;
       if (addressable) window.history.replaceState(window.history.state, "", addressFor(i));
       setDir(by > 0 ? 1 : -1);
+      setUpDown(vertical);
+      dialog.current?.scrollTo(0, 0);
       setOpen(i);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -214,9 +223,17 @@ export function PhotoWall({ photos: given, pack, total, layout, seeAll, filters 
       d.focus();
     } else if (open === null && d.open) d.close();
     document.documentElement.style.overflow = open !== null ? "hidden" : "";
+    // (and a swipe down to the photo before never pulls the page to reload)
+    document.documentElement.style.overscrollBehavior = open !== null ? "none" : "";
   }, [open]);
 
-  useEffect(() => () => void (document.documentElement.style.overflow = ""), []);
+  useEffect(
+    () => () => {
+      document.documentElement.style.overflow = "";
+      document.documentElement.style.overscrollBehavior = "";
+    },
+    []
+  );
 
   // the cursor keys go on through the photos wherever the focus is (a click on
   // the photo, or on a button that went with the last photo, leaves it nowhere)
@@ -267,7 +284,9 @@ export function PhotoWall({ photos: given, pack, total, layout, seeAll, filters 
   }, [viewing]);
 
   // a click on the open ground beside the photo, left or right of it, steps
-  // back or on; above or below it (or with only one photo), closes it
+  // back or on; above or below it (or with only one photo), closes it. A tap
+  // with a finger does neither: on a phone the ground is too easily touched,
+  // so there only the × closes it (user, 19 Nov 2026)
   const besidePhoto = (e: { clientX: number }): -1 | 0 | 1 => {
     if (order.length < 2) return 0;
     const frame = dialog.current?.querySelector(".zoomable-frame");
@@ -276,7 +295,7 @@ export function PhotoWall({ photos: given, pack, total, layout, seeAll, filters 
     return e.clientX < r.left ? -1 : e.clientX > r.right ? 1 : 0;
   };
   const onGround = (e: ReactMouseEvent) => {
-    if (e.target !== e.currentTarget) return;
+    if (e.target !== e.currentTarget || byFinger.current) return;
     const by = besidePhoto(e);
     if (by) step(by);
     else close();
@@ -516,24 +535,40 @@ export function PhotoWall({ photos: given, pack, total, layout, seeAll, filters 
           e.preventDefault();
           close();
         }}
+        onPointerDownCapture={(e) => (byFinger.current = e.pointerType === "touch")}
         onClick={onGround}
         onMouseDown={noSelect}
         onMouseMove={pointer}
-        // a swipe sideways goes to the next photo; a swipe down closes it
-        onTouchStart={(e) => (touch.current = { x: e.touches[0].clientX, y: e.touches[0].clientY })}
+        // a swipe sideways goes to the next photo, and so does a swipe up (down,
+        // to the one before), unless it is scrolling the words under the photo:
+        // only one begun with them already at their end steps (user, 19 Nov 2026)
+        onTouchStart={(e) => {
+          const d = e.currentTarget;
+          if (touch.current && e.touches.length > 1) touch.current.pinch = true;
+          else
+            touch.current = {
+              x: e.touches[0].clientX,
+              y: e.touches[0].clientY,
+              pinch: e.touches.length > 1,
+              top: d.scrollTop <= 1,
+              foot: d.scrollTop + d.clientHeight >= d.scrollHeight - 1,
+            };
+        }}
         onTouchEnd={(e) => {
+          if (e.touches.length > 0) return; // (a finger still down)
           const t = touch.current;
           touch.current = null;
-          if (!t) return;
+          // (not after a pinch, nor while the page is pinched larger)
+          if (!t || t.pinch || (window.visualViewport?.scale ?? 1) > 1.01) return;
           const dx = e.changedTouches[0].clientX - t.x;
           const dy = e.changedTouches[0].clientY - t.y;
           if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) step(dx < 0 ? 1 : -1);
-          else if (dy > 90 && dy > Math.abs(dx)) close();
+          else if (Math.abs(dy) > 60 && Math.abs(dy) > Math.abs(dx) && (dy < 0 ? t.foot : t.top)) step(dy < 0 ? 1 : -1, true);
         }}
       >
         {photo && (
           <figure className={`photo-viewer-inner${photo.description ? " has-text" : ""}`} onClick={onGround} onMouseDown={noSelect}>
-            <Zoomable key={photo.id} className="photo-in" style={{ "--dir": dir } as CSSProperties}>
+            <Zoomable key={photo.id} className="photo-in" style={{ "--dir": upDown ? 0 : dir, "--dir-y": upDown ? dir : 0 } as CSSProperties}>
               <img src={photo.src} alt={photo.alt || photo.caption || ""} />
             </Zoomable>
             <figcaption key={`cap-${photo.id}`} className="photo-in-words">
