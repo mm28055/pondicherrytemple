@@ -1,4 +1,5 @@
 import { shareMeta, sharePicture } from "@/lib/share";
+import { EditPhotos } from "@/components/edit/EditPhotos";
 import type { Metadata } from "next";
 import { BackLink } from "@/components/BackLink";
 import Link from "next/link";
@@ -110,7 +111,7 @@ export default async function FieldNotePage({ params }: Props) {
     const ed = editable[id];
     if (!ed) return null;
     const { html, blocks } = ed.rich("body");
-    return <EditRich className="rich" target={{ collection: "field-notes", id: ed.id, field: "body", label: title }} html={html} blocks={blocks} />;
+    return <EditRich className="rich" target={{ collection: "field-notes", id: ed.id, field: "body", label: title }} html={html} blocks={blocks} photos={{ slug: id, tags: { temples: ed.refs("temples"), observances: ed.refs("observances") } }} />;
   };
   const mine = editable[note.id];
 
@@ -162,6 +163,8 @@ export default async function FieldNotePage({ params }: Props) {
       {/* the text in a column at the right, ending where the line above
           ends; the photographs down the left beside it (on a phone, in rows
           above the text) */}
+      {/* Admin2: its photos, for the bar's Photos button */}
+      <EditPhotos kind="field-notes" slug={note.id} label={note.title} />
       <GlossCard />
       <div className="wrap note-layout">
         {/* its videos first among its media, at the top of the column; recordings stay with the text */}

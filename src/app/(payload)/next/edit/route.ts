@@ -32,7 +32,28 @@ export async function POST(request: Request) {
   if (!kind || body?.id === undefined) return json({ error: 'That can’t be edited here' }, 400)
 
   let value: unknown
-  if (kind === 'rich') {
+  if (kind === 'date') {
+    // a day ("14 November 2026", "14 Nov 2026" or "2026-11-14"), kept as the site keeps days (noon in India); empty clears it
+    const raw = typeof body.value === 'string' ? body.value.trim() : ''
+    if (raw) {
+      const MONTHS = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec']
+      const iso = raw.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/)
+      const words = raw.match(/^(\d{1,2})\s+([a-z]+)\.?,?\s+(\d{4})$/i)
+      const [y, m, d] = iso
+        ? [Number(iso[1]), Number(iso[2]), Number(iso[3])]
+        : words
+          ? [Number(words[3]), MONTHS.indexOf(words[2].slice(0, 3).toLowerCase()) + 1, Number(words[1])]
+          : [0, 0, 0]
+      const day = new Date(Date.UTC(y, m - 1, d, 6, 30))
+      if (!y || m < 1 || day.getUTCDate() !== d) return json({ error: 'A day, please, as 14 November 2026' }, 400)
+      value = day.toISOString()
+    } else value = null
+  } else if (kind === 'add-ids') {
+    // entries (photos) to add to a list of them
+    if (!Array.isArray(body.value) || !body.value.every((x) => Number.isInteger(x)) || body.value.length > 500)
+      return json({ error: 'Not a list of photos' }, 400)
+    value = body.value
+  } else if (kind === 'rich') {
     const rich = body.rich as { root?: { children?: unknown } } | undefined
     if (!rich || !Array.isArray(rich.root?.children)) return json({ error: 'Not a text' }, 400)
     value = rich
@@ -62,7 +83,10 @@ export async function POST(request: Request) {
     // list too: "atTemples.0.times.1.time")
     const [top, ...rest] = field.split('.')
     let data: Record<string, unknown>
-    if (!rest.length) data = { [top]: value }
+    if (kind === 'add-ids') {
+      const had = ((latest[top] as unknown[]) ?? []).map((r) => (r && typeof r === 'object' ? (r as { id: number }).id : r))
+      data = { [top]: [...had, ...(value as number[]).filter((x) => !had.includes(x))] }
+    } else if (!rest.length) data = { [top]: value }
     else if (rest[0] === 'new') {
       // a new row at the end of the list ("festivalLengths.new.<festival>.<month or any>")
       // — or, if the festival has a row for it already (added a moment ago,

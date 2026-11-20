@@ -1,6 +1,6 @@
 import { revalidateTag } from 'next/cache'
 import type { CollectionAfterChangeHook, CollectionAfterDeleteHook, GlobalAfterChangeHook, PayloadRequest } from 'payload'
-import { PHOTOS_TAG, SITE_CONTENT_TAG, photosChanged } from '../lib/siteCache'
+import { PHOTOS_TAG, SITE_CONTENT_TAG, photoSaved, photosChanged } from '../lib/siteCache'
 
 /* When anything is saved or deleted, the whole site is refreshed: pages are
    built ahead of time, and what they read from the database is kept between
@@ -19,8 +19,9 @@ import { PHOTOS_TAG, SITE_CONTENT_TAG, photosChanged } from '../lib/siteCache'
 
 export function refresh(context: Record<string, unknown>, collection?: string) {
   if (context.skipRevalidate) return
-  // the photographs kept in memory while previewing (lib/siteCache)
-  if (collection === 'media' || collection === 'photo-sets') photosChanged()
+  // the photographs kept in memory while previewing (lib/siteCache): read
+  // again, unless only one photo's details changed (put in) or only an order
+  if ((collection === 'media' || collection === 'photo-sets') && !context.photoSavedOnly && !context.orderOnly) photosChanged()
   try {
     revalidateTag(SITE_CONTENT_TAG, 'max')
     // the photographs, read apart from the rest (lib/siteCache)
@@ -37,8 +38,13 @@ function draftOnly(req: PayloadRequest, doc: { _status?: string | null }) {
   return asDraft && doc?._status === 'draft'
 }
 
-export const refreshAfterChange: CollectionAfterChangeHook = ({ collection, doc, req }) => {
-  if (!draftOnly(req, doc)) refresh(req.context, collection.slug)
+export const refreshAfterChange: CollectionAfterChangeHook = ({ collection, doc, operation, req }) => {
+  if (draftOnly(req, doc)) return doc
+  // a photo's details changed (not a new photo): put into the copy kept in memory
+  if (collection.slug === 'media' && operation === 'update') {
+    photoSaved(doc)
+    refresh({ ...req.context, photoSavedOnly: true }, collection.slug)
+  } else refresh(req.context, collection.slug)
   return doc
 }
 

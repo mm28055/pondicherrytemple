@@ -1,4 +1,5 @@
 import { shareMeta, sharePicture } from "@/lib/share";
+import { EditPhotos } from "@/components/edit/EditPhotos";
 import type { Metadata } from "next";
 import { BackLink } from "@/components/BackLink";
 import Link from "next/link";
@@ -104,6 +105,7 @@ export default async function TemplePage({ params }: Props) {
 
   return (
     <div className="wrap">
+      <EditPhotos kind="temples" slug={t.id} label={t.knownAs ?? t.name} />
       <header className="page-head temple-head">
         <div>
           <BackLink className="crumb" href={`/${region.id}`}>
@@ -259,6 +261,7 @@ async function AroundTemplePage({ regionId, regionName, templeId }: { regionId: 
 
   return (
     <div className="wrap">
+      <EditPhotos kind="temples" slug={t.id} label={t.knownAs ?? t.name} />
       <header className="page-head">
         <BackLink className="crumb" href={`/${town}#${regionId}`}>
           ← {regionName}

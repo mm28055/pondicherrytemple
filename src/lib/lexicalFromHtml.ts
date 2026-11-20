@@ -36,6 +36,17 @@ const element = (type: string, children: LNode[], extra: LNode = {}): LNode => (
   ...extra,
 });
 
+/** A photo placed in the text, as the admin's editor stores one. */
+const uploadNode = (id: number, size: string): LNode => ({
+  type: "upload",
+  version: 3,
+  format: "",
+  id: [...crypto.getRandomValues(new Uint8Array(12))].map((b) => b.toString(16).padStart(2, "0")).join(""),
+  fields: { size },
+  relationTo: "media",
+  value: id,
+});
+
 const paragraph = (children: LNode[]) => element("paragraph", children, { textFormat: 0, textStyle: "" });
 
 function formatOf(el: HTMLElement, format: number): number {
@@ -145,8 +156,20 @@ export function lexicalFromHtml(box: HTMLElement, kept: unknown[]): LNode {
 
     if (el.dataset.keep !== undefined) {
       flush();
-      const original = kept[Number(el.dataset.keep)];
-      if (original) blocks.push(original as LNode);
+      const original = kept[Number(el.dataset.keep)] as LNode | undefined;
+      if (!original) return;
+      if (original.type !== "upload") return void blocks.push(original);
+      // a photo: its size as chosen in Admin2 (components/edit/PhotosInText), the photo by its number
+      const value = original.value && typeof original.value === "object" ? (original.value as { id: number }).id : original.value;
+      const fields = { ...((original.fields as LNode | null) ?? {}), ...(el.dataset.size ? { size: el.dataset.size } : {}) };
+      blocks.push({ ...original, value, fields });
+      return;
+    }
+    // a photo dropped into the text in Admin2, once it is in the photo library
+    if (el.dataset.newPhoto !== undefined) {
+      flush();
+      const id = Number(el.dataset.newPhoto);
+      if (id) blocks.push(uploadNode(id, el.dataset.size ?? "column"));
       return;
     }
     if (["b", "strong", "i", "em", "u", "a", "span", "br"].includes(tag)) {

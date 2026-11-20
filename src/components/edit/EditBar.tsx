@@ -6,7 +6,8 @@
    before the page is left. */
 
 import { useRouter } from "next/navigation";
-import { useEffect, useSyncExternalStore } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
+import { PhotoArranger } from "./PhotoArranger";
 import { editStore } from "./editStore";
 
 const keepFocus = (e: React.MouseEvent) => e.preventDefault();
@@ -19,7 +20,53 @@ function link() {
 }
 
 export function EditBar() {
-  const { open, busy, message } = useSyncExternalStore(editStore.subscribe, editStore.get, editStore.get);
+  const { open, busy, message, photos, arranging } = useSyncExternalStore(editStore.subscribe, editStore.get, editStore.get);
+  const [dropping, setDropping] = useState(false);
+
+  // Admin2 is on: the photo viewer shows its boxes too (PhotoDetails)
+  useEffect(() => {
+    editStore.setEditing(true);
+    return () => editStore.setEditing(false);
+  }, []);
+
+  // photos dragged from the computer onto a page that has photographs: a
+  // sign over the page; dropped, the photos panel opens and adds them
+  useEffect(() => {
+    if (!photos || arranging) return;
+    let depth = 0;
+    const files = (e: DragEvent) => Boolean(e.dataTransfer?.types.includes("Files"));
+    const enter = (e: DragEvent) => {
+      if (!files(e) || editStore.get().open) return; // (a text open: photos go into the text, PhotosInText)
+      depth++;
+      setDropping(true);
+    };
+    const leave = (e: DragEvent) => {
+      if (!files(e)) return;
+      if (--depth <= 0) setDropping(false);
+    };
+    const over = (e: DragEvent) => {
+      if (files(e)) e.preventDefault();
+    };
+    const drop = (e: DragEvent) => {
+      if (!files(e)) return;
+      e.preventDefault();
+      depth = 0;
+      setDropping(false);
+      const list = [...(e.dataTransfer?.files ?? [])].filter((f) => f.type.startsWith("image/"));
+      if (list.length && !editStore.get().open) editStore.arrange(list);
+    };
+    window.addEventListener("dragenter", enter);
+    window.addEventListener("dragleave", leave);
+    window.addEventListener("dragover", over);
+    window.addEventListener("drop", drop);
+    return () => {
+      window.removeEventListener("dragenter", enter);
+      window.removeEventListener("dragleave", leave);
+      window.removeEventListener("dragover", over);
+      window.removeEventListener("drop", drop);
+      setDropping(false);
+    };
+  }, [photos, arranging]);
 
   useEffect(() => {
     if (!open) return;
@@ -60,6 +107,7 @@ export function EditBar() {
   }, [router]);
 
   return (
+    <>
     <div className="edit-bar" role="toolbar" aria-label="Admin2">
       {open ? (
         <>
@@ -100,6 +148,11 @@ export function EditBar() {
         <>
           <span className="edit-bar-label">Admin2</span>
           <span className="edit-bar-hint">Double-click any outlined text to change it</span>
+          {photos && (
+            <button type="button" className="edit-bar-photos" onClick={() => editStore.arrange()} title={`Arrange or add the photos of ${photos.label}`}>
+              Photos
+            </button>
+          )}
           <a href="/admin">/admin</a>
           <a href="/admin2/exit">Leave</a>
         </>
@@ -107,5 +160,9 @@ export function EditBar() {
       {/* "Saved", or what is in the way: just above the bar, at every width */}
       {message && <span className="edit-bar-say">{message}</span>}
     </div>
+    {/* outside the bar (which is shifted to the centre), over the whole page */}
+    {dropping && photos && <div className="edit-drop">Drop to add these photos to {photos.label}</div>}
+    {arranging && photos && <PhotoArranger area={photos} files={arranging.files} />}
+    </>
   );
 }

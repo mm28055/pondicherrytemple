@@ -2,13 +2,17 @@
 
 import Link from "next/link";
 import { FestivalLink } from "@/components/FestivalLink";
-import { Fragment, useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type MouseEvent as ReactMouseEvent, type ReactNode } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore, type CSSProperties, type MouseEvent as ReactMouseEvent, type ReactNode } from "react";
 import type { Photo, PhotoFilter } from "@/content/types";
 import { formatDate } from "@/lib/calendar";
 import { stripeRows, useStripeFit } from "@/lib/stripes";
 import { FilterBar } from "@/components/FilterBar";
 import { Zoomable } from "@/components/Zoomable";
 import { eventOf, photoCount, unpackPhotos, type PhotoPack } from "@/lib/photoPack";
+import { editStore } from "@/components/edit/editStore";
+import dynamic from "next/dynamic";
+// (loaded only in Admin2, never for visitors)
+const PhotoDetails = dynamic(() => import("@/components/edit/PhotoDetails").then((m) => m.PhotoDetails));
 
 const PAGE = 30;
 /** How many the "lead" layout shows: one large, five small. */
@@ -83,6 +87,8 @@ const valuesOf = (p: Photo, key: PhotoFilter["key"]) => (key === "years" ? [p.da
     belongs; the arrows (or a swipe) go through all of them. An open photo has
     its own address, so it can be sent to someone, and Back closes it. */
 export function PhotoWall({ photos: given, pack, total, layout, seeAll, filters = [], note, addressable = true, moreLink, heads, reveal = false, asGiven = false, render }: Props) {
+  // Admin2 on: the viewer shows the photo's details as boxes (components/edit/PhotoDetails)
+  const editing = useSyncExternalStore(editStore.subscribe, () => editStore.get().editing, () => false);
   const photos = useMemo(() => (pack ? unpackPhotos(pack) : (given ?? [])), [pack, given]);
   const [chosen, setChosen] = useState<Partial<Record<PhotoFilter["key"], string>>>({});
   const [oldestFirst, setOldestFirst] = useState(false);
@@ -242,6 +248,8 @@ export function PhotoWall({ photos: given, pack, total, layout, seeAll, filters 
     const key = (e: KeyboardEvent) => {
       if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return; // (Alt+← is the browser's Back)
       if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+      // (not while typing in a detail, in Admin2: there they move the cursor)
+      if (e.target instanceof HTMLElement && e.target.isContentEditable) return;
       e.preventDefault();
       step(e.key === "ArrowRight" ? 1 : -1);
     };
@@ -574,7 +582,7 @@ export function PhotoWall({ photos: given, pack, total, layout, seeAll, filters 
             <figcaption key={`cap-${photo.id}`} className="photo-in-words">
               {note && <span className="photo-viewer-note">{note}</span>}
               {/* its date, where it was, what for, then who took it (not "12 of 2,600": no help in so many) */}
-              {photo.dated && <span className="caps">{formatDate(photo.date)}</span>}
+              {!editing && photo.dated && <span className="caps">{formatDate(photo.date)}</span>}
               {photo.tags.length > 0 && (
                 <span className="photo-viewer-tags">
                   {photo.tags.map((t, i) => (
@@ -587,15 +595,22 @@ export function PhotoWall({ photos: given, pack, total, layout, seeAll, filters 
               )}
               {/* the occasion, in its shortest form */}
               {photo.short && <span className="caps">{photo.short}</span>}
-              {photo.caption && <span className="photo-viewer-caption">{photo.caption}</span>}
-              {photo.credit && <span className="photo-viewer-credit">{photo.credit}</span>}
+              {/* Admin2: its day, caption, credit and few words as boxes (components/edit/PhotoDetails) */}
+              {editing ? (
+                <PhotoDetails id={photo.id} date={photo.date} dated={photo.dated} caption={photo.caption} credit={photo.credit} description={photo.description} />
+              ) : (
+                <>
+                  {photo.caption && <span className="photo-viewer-caption">{photo.caption}</span>}
+                  {photo.credit && <span className="photo-viewer-credit">{photo.credit}</span>}
+                </>
+              )}
               {photo.note && (
                 <Link className="arrow-link" href={photo.note.href} title={photo.note.title} aria-label={`Field note: ${photo.note.title}`}>
                   Field Note
                 </Link>
               )}
             </figcaption>
-            {photo.description && <p className="photo-viewer-text">{photo.description}</p>}
+            {!editing && photo.description && <p className="photo-viewer-text">{photo.description}</p>}
           </figure>
         )}
         <button className="film-viewer-close" onClick={close} aria-label="Close">

@@ -3795,3 +3795,89 @@ div.edit-empty, p.edit-empty, h4.edit-empty { display: block; }
   .edit-bar { gap: 8px; font-size: 13px; padding-left: 12px; }
   .edit-bar-hint { display: none; }
 }
+
+/* Admin2's photos panel (components/edit/PhotoArranger): the page's
+   photographs as small pictures, to drag into order or add to; over the
+   page, frosted as the photo viewer is. And the sign while photos are
+   dragged over the page from the computer. */
+.edit-bar .edit-bar-photos { border-color: var(--turmeric); color: var(--turmeric); }
+.edit-drop {
+  position: fixed; inset: 12px; z-index: 95; pointer-events: none;
+  display: grid; place-items: center;
+  border: 2px dashed var(--turmeric); border-radius: 14px;
+  background: color-mix(in srgb, var(--chalk) 72%, transparent);
+  -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+  font-family: var(--display); font-size: 22px; font-weight: 600; color: var(--turmeric);
+}
+.arrange-dialog {
+  margin: auto; border: 0; padding: 22px 24px 18px; width: min(1100px, 94vw); height: min(88vh, 900px);
+  display: flex; flex-direction: column; gap: 10px;
+  background: var(--chalk); color: var(--ink); box-shadow: 0 24px 60px rgba(22, 17, 14, 0.3);
+}
+.arrange-dialog:not([open]) { display: none; }
+.arrange-dialog::backdrop {
+  background: color-mix(in srgb, var(--chalk) 79%, transparent);
+  -webkit-backdrop-filter: blur(14px) saturate(1.1); backdrop-filter: blur(14px) saturate(1.1);
+}
+.arrange-dialog.drop-on { outline: 2px dashed var(--turmeric); outline-offset: -8px; }
+.arrange-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; border-bottom: 1px solid var(--ink); padding-bottom: 8px; }
+.arrange-head h2 { margin: 0; font-family: var(--title-face); font-size: 26px; line-height: 1.1; }
+.arrange-count { font-family: var(--display); font-size: 15px; font-weight: 400; color: var(--muted); }
+.arrange-x { border: 0; background: none; font-size: 30px; line-height: 1; cursor: pointer; color: var(--ink); padding: 0 4px; }
+.arrange-tools { display: flex; flex-wrap: wrap; gap: 8px; }
+.arrange-tools button {
+  font: inherit; font-family: var(--display); font-size: 15px; color: var(--ink); background: transparent; cursor: pointer;
+  border: 1px solid var(--rule); border-radius: 999px; padding: 5px 14px;
+}
+.arrange-tools button:hover:not(:disabled) { border-color: var(--ink-2); }
+.arrange-tools button:disabled { opacity: 0.5; cursor: default; }
+.arrange-tools .arrange-main { background: var(--turmeric); border-color: var(--turmeric); color: #fff; }
+.arrange-tools .arrange-main:hover:not(:disabled) { background: var(--ochre-deep); border-color: var(--ochre-deep); }
+.arrange-status { margin: 0; font-size: 14px; color: var(--muted); min-height: 1.4em; }
+.arrange-grid {
+  flex: 1; overflow-y: auto; display: grid; gap: 8px; align-content: start;
+  grid-template-columns: repeat(auto-fill, minmax(132px, 1fr)); padding: 4px 2px;
+}
+.arrange-photo { position: relative; aspect-ratio: 1; background: var(--chalk-2); cursor: grab; user-select: none; outline: 2px solid transparent; outline-offset: 2px; }
+.arrange-photo img { width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; }
+.arrange-photo.chosen { outline-color: var(--turmeric); }
+.arrange-photo.chosen::after { content: "✓"; position: absolute; top: 6px; right: 6px; width: 22px; height: 22px; border-radius: 50%; background: var(--turmeric); color: #fff; font-size: 13px; display: grid; place-items: center; }
+.arrange-photo.over { box-shadow: -5px 0 0 var(--ochre); }
+.arrange-photo.moving { opacity: 0.4; }
+.arrange-n { position: absolute; left: 6px; bottom: 5px; padding: 0 6px; border-radius: 9px; background: rgba(22, 17, 14, 0.6); color: #fff; font-family: var(--display); font-size: 12.5px; }
+@media (max-width: 640px) {
+  .arrange-dialog { padding: 16px 14px 12px; width: 100vw; height: 100dvh; max-width: none; max-height: none; }
+  .arrange-grid { grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); }
+}
+/* Admin2 in the photo viewer (components/edit/PhotoDetails): its details as
+   boxes, and a line of Save and Cancel (the viewer covers the bar) */
+.photo-in-words .edit-box { display: block; }
+.photo-in-words .edit-empty { display: block; min-width: 10em; }
+.photo-viewer-about { font-size: 14px; line-height: 1.5; color: var(--ink-2); max-width: 46ch; }
+.photo-edit-line { display: flex; gap: 8px; align-items: center; margin-top: 6px; font-family: var(--display); font-size: 13px; color: var(--muted); }
+.photo-edit-line button {
+  font: inherit; font-size: 14px; color: var(--ink); background: transparent; cursor: pointer;
+  border: 1px solid var(--rule); border-radius: 999px; padding: 3px 12px;
+}
+.photo-edit-line .save { background: var(--turmeric); border-color: var(--turmeric); color: #fff; }
+
+/* A photo placed in a note's text at half size (the admin's Size, or Admin2):
+   at the right, the words running round it; on a phone, the full width
+   (decided 20 Nov 2026: column or half, no other sizes) */
+.rich-media.size-half { float: right; width: 48%; margin: 0.35em 0 1em 28px; }
+.rich::after, .note-body::after { content: ""; display: block; clear: both; }
+@media (max-width: 640px) { .rich-media.size-half { float: none; width: auto; margin: 1.6em 0; } }
+/* Admin2: photos in a note's open text (components/edit/PhotosInText) */
+.edit-open > .edit-kept { opacity: 1; cursor: grab; }
+.edit-open > .edit-kept.intext-chosen figure { outline: 2px solid var(--turmeric); outline-offset: 3px; }
+.edit-open > .intext-before { box-shadow: 0 -3px 0 var(--ochre); }
+.edit-open > .intext-after { box-shadow: 0 3px 0 var(--ochre); }
+.intext-sending { opacity: 0.55 !important; }
+.intext-menu { position: fixed; z-index: 92; display: flex; gap: 4px; padding: 4px; border-radius: 999px; background: color-mix(in srgb, var(--chalk) 88%, transparent); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); box-shadow: 0 4px 16px rgba(22, 17, 14, 0.2); }
+.intext-menu[hidden] { display: none; }
+.intext-menu button { font-family: var(--display); font-size: 14px; color: var(--ink); background: transparent; border: 1px solid var(--rule); border-radius: 999px; padding: 3px 11px; cursor: pointer; }
+.intext-menu button[aria-pressed="true"] { background: var(--turmeric); border-color: var(--turmeric); color: #fff; }
+.intext-menu button[data-do="remove"] { color: var(--ochre); }
+/* the note's photos beside its open text: to be dragged in (PhotosInText) */
+.intext-source { cursor: grab; }
+.intext-source:hover { outline: 2px dashed var(--turmeric); outline-offset: 2px; }

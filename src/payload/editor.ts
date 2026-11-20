@@ -36,7 +36,22 @@ export const fullEditor = lexicalEditor({
     BlockquoteFeature(),
     UploadFeature({
       collections: {
-        media: { fields: [{ name: 'caption', type: 'text', label: 'Caption (if different)' }] },
+        media: {
+          fields: [
+            { name: 'caption', type: 'text', label: 'Caption (if different)' },
+            // (decided 20 Nov 2026: the width of the text, or half of it with the words running round it; set in Admin2 or here)
+            {
+              name: 'size',
+              type: 'select',
+              label: 'Size',
+              defaultValue: 'column',
+              options: [
+                { label: 'Width of the text', value: 'column' },
+                { label: 'Half, beside the text', value: 'half' },
+              ],
+            },
+          ],
+        },
       },
     }),
     HorizontalRuleFeature(),

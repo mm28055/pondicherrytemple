@@ -20,7 +20,7 @@ export const EDIT_COOKIE = "sthalam-edit";
 
 /** What a box holds: a line, several lines (a box of the admin's that keeps
     its line breaks), or text written in the admin's editor. */
-export type EditKind = "text" | "long" | "rich" | "number";
+export type EditKind = "text" | "long" | "rich" | "number" | "add-ids" | "date";
 
 /** What can be edited on the page, by collection: each field (a path into
     a list, "ritualDay.2.time", for a field of one of its rows) and its kind. */
@@ -35,11 +35,19 @@ export const EDITABLE: Record<string, [RegExp, EditKind][]> = {
     // new row for a festival with none ("festivalLengths.new.<festival>.<month or any>")
     [/^festivalLengths\.(\d+\.days|new\.\d+\.[a-z]+)$/, "number"],
   ],
+  // a photo's own details, from the photo viewer
+  media: [
+    [/^(caption|credit)$/, "text"],
+    [/^description$/, "long"],
+    [/^takenOn$/, "date"],
+  ],
   // a day: its line below the festival's name in the Ritual Year
   occasions: [[/^yearNote$/, "text"]],
   "field-notes": [
     [/^(title|occasion)$/, "text"],
     [/^body$/, "rich"],
+    // photos added in Admin2 to a note with no photo set: put in its Photographs
+    [/^photos\.add$/, "add-ids"],
   ],
   // a festival's or ritual's names, wherever they are shown
   observances: [[/^(name|tamil)$/, "text"]],
@@ -66,7 +74,7 @@ export async function isEditing(): Promise<boolean> {
 }
 
 /** An entry's latest text (its draft, if it has one), for an editable box. */
-export async function getEditable(collection: "temples" | "field-notes", slug: string) {
+export async function getEditable(collection: "temples" | "field-notes" | "observances", slug: string) {
   const payload = await getPayload({ config });
   const found = await payload.find({
     collection,
@@ -83,6 +91,11 @@ export async function getEditable(collection: "temples" | "field-notes", slug: s
     status: (doc._status as string | undefined) ?? "published",
     text: (field: string) => (typeof doc[field] === "string" ? (doc[field] as string) : ""),
     rich: (field: string) => editHTML(doc[field] as RichText),
+    /** the entries a field links to, by number (a note's temples, its festivals) */
+    refs: (field: string) =>
+      (Array.isArray(doc[field]) ? (doc[field] as unknown[]) : [])
+        .map((r) => (r && typeof r === "object" ? (r as { id: number }).id : r))
+        .filter((x): x is number => typeof x === "number"),
   };
 }
 

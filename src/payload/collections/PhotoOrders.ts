@@ -37,7 +37,7 @@ export const PhotoOrders: CollectionConfig = {
         const { kind, id, ids } = ((await req.json?.()) ?? {}) as { kind?: string; id?: number; ids?: number[] }
         if (!id || !Array.isArray(ids)) throw new APIError('Which photos, in what order?', 400)
         await saveOrder(req.payload, req, kindOf(kind), id, ids.map(Number).filter(Boolean))
-        refresh({}, 'media')
+        refresh({ orderOnly: true }, 'media') // (no photo itself changed: the copy in memory kept)
         return Response.json({ saved: ids.length })
       },
     },

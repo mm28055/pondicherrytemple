@@ -1,5 +1,6 @@
 /* Admin2: which editable box is open, shared between the boxes (Editable)
-   and the bar at the foot of the screen (EditBar). */
+   and the bar at the foot of the screen (EditBar); and the page's
+   photographs, if it has any (PhotoArea), for the bar's Photos button. */
 
 export type OpenBox = {
   label: string;
@@ -16,9 +17,31 @@ export type OpenBox = {
   done: () => void;
 };
 
-type State = { open: OpenBox | null; busy: boolean; message: string };
+/** A page's photographs, as Admin2 arranges them: a festival's, a temple's
+    or a field note's (their order kept in photo-orders, lib/photoOrders). */
+export type PhotoAreaInfo = {
+  kind: "observances" | "temples" | "field-notes";
+  id: number;
+  /** its name, for the panel's heading ("Ghousiga Balasubramaniya Koyil") */
+  label: string;
+  /** for file names ("ghousika-balasubramaniar") */
+  slug: string;
+  /** the tags a photo added here is given (a note's: its temples and festivals) */
+  tags: { temples?: number[]; observances?: number[] };
+};
 
-let state: State = { open: null, busy: false, message: "" };
+type State = {
+  open: OpenBox | null;
+  busy: boolean;
+  message: string;
+  photos: PhotoAreaInfo | null;
+  /** the photos panel: open, and any files dropped to be added */
+  arranging: { files: File[] } | null;
+  /** true while Admin2 is on (its bar is on the page): the photo viewer shows boxes too */
+  editing: boolean;
+};
+
+let state: State = { open: null, busy: false, message: "", photos: null, arranging: null, editing: false };
 const listeners = new Set<() => void>();
 let timer: ReturnType<typeof setTimeout> | undefined;
 
@@ -45,4 +68,9 @@ export const editStore = {
     set({ message });
     timer = setTimeout(() => set({ message: "" }), 4000);
   },
+  /** the page's photographs (or none, when it goes) */
+  setPhotos: (photos: PhotoAreaInfo | null) => set({ photos }),
+  arrange: (files: File[] = []) => set({ arranging: { files } }),
+  doneArranging: () => set({ arranging: null }),
+  setEditing: (editing: boolean) => set({ editing }),
 };

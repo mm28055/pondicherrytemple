@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { EditPhotos } from "@/components/edit/EditPhotos";
 import { BackLink } from "@/components/BackLink";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
@@ -44,6 +45,7 @@ export default async function TemplePhotosPage({ params }: Props) {
 
   return (
     <div className="wrap">
+      <EditPhotos kind="temples" slug={t.id} label={t.knownAs ?? t.name} />
       <header className="page-head">
         <BackLink className="crumb" href={`/${region.id}/${t.id}`}>
           ← {t.knownAs ?? t.name}

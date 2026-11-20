@@ -13,6 +13,7 @@ import { useRouter } from "next/navigation";
 import { useRef, useState, type CSSProperties, type MouseEvent } from "react";
 import { lexicalFromHtml } from "@/lib/lexicalFromHtml";
 import { editStore } from "./editStore";
+import { photosInText, sendingInText, type InTextPhotos } from "./PhotosInText";
 
 export type Target = { collection: string; id: number | string; field: string; label: string };
 
@@ -28,7 +29,13 @@ async function save(target: Target, body: { value?: string; rich?: unknown }) {
   return out.status === "draft" ? "Saved as a draft: publish it in /admin" : "Saved";
 }
 
-function useBox(target: Target, mode: "text" | "long" | "rich", read: (el: HTMLElement) => { value?: string; rich?: unknown } | null) {
+function useBox(
+  target: Target,
+  mode: "text" | "long" | "rich",
+  read: (el: HTMLElement) => { value?: string; rich?: unknown } | null,
+  // anything more while it is open (a note's photos in its text: PhotosInText); what it returns undoes it
+  onOpen?: (el: HTMLElement) => () => void,
+) {
   const ref = useRef<HTMLElement>(null);
   const [version, setVersion] = useState(0);
   const router = useRouter();
@@ -61,7 +68,7 @@ function useBox(target: Target, mode: "text" | "long" | "rich", read: (el: HTMLE
       el.classList.remove("edit-empty");
       el.textContent = "";
     }
-    const before = el.innerHTML;
+    let before = el.innerHTML;
     el.contentEditable = mode === "rich" ? "true" : "plaintext-only";
     if (!el.isContentEditable) el.contentEditable = "true";
     el.classList.add("edit-open");
@@ -102,10 +109,14 @@ function useBox(target: Target, mode: "text" | "long" | "rich", read: (el: HTMLE
     // stays open out of sight
     const leave = (f: FocusEvent) => {
       if (f.relatedTarget instanceof Node && el.contains(f.relatedTarget)) return;
+      // (to one of the note's photos beside, to drag it into the text: PhotosInText)
+      if (f.relatedTarget instanceof Element && f.relatedTarget.closest(".intext-source")) return;
       if (el.innerHTML === before) cancel();
     };
     el.addEventListener("keydown", keys);
     el.addEventListener("focusout", leave);
+    const undo = onOpen?.(el);
+    before = el.innerHTML; // (as set up for editing: only what is done after counts as a change)
     editStore.open({
       label: target.label,
       rich: mode === "rich",
@@ -121,6 +132,7 @@ function useBox(target: Target, mode: "text" | "long" | "rich", read: (el: HTMLE
       done: () => {
         el.removeEventListener("keydown", keys);
         el.removeEventListener("focusout", leave);
+        undo?.();
       },
     });
   };
@@ -191,13 +203,27 @@ export function EditRich({
   html,
   blocks,
   className,
+  photos,
 }: {
   target: Target;
   html: string;
   blocks: unknown[];
   className?: string;
+  /** a field note's text: its photos can be moved, sized and added (the tags a new one is given) */
+  photos?: InTextPhotos;
 }) {
-  const { ref, version, open } = useBox(target, "rich", (el) => ({ rich: lexicalFromHtml(el, blocks) }));
+  const { ref, version, open } = useBox(
+    target,
+    "rich",
+    (el) => {
+      if (sendingInText(el)) {
+        editStore.flash("A photo is still being added: save in a moment");
+        return null;
+      }
+      return { rich: lexicalFromHtml(el, blocks) };
+    },
+    photos ? (el) => photosInText(el, photos) : undefined,
+  );
   return (
     <div
       key={`${version}:${hash(html)}`}

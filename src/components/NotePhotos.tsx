@@ -169,6 +169,9 @@ function NoteColumn({ photos, videos, seed, open }: { photos: Photo[]; videos: F
                     className={more ? "note-photos-photo note-photos-more" : "note-photos-photo"}
                     onClick={more ? openRest : () => open(p)}
                     aria-label={more ? undefined : p.alt || p.caption || "Photograph"}
+                    // (Admin2: dragged from here into the note's open text, components/edit/PhotosInText)
+                    data-photo-id={more ? undefined : p.id}
+                    data-photo-src={more ? undefined : p.medium}
                     style={{ width: stripeWidth(units) }}
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -233,6 +236,8 @@ function MoreRows({ photos, open, fewer }: { photos: Photo[]; open: Open; fewer:
                     className="photo-tile"
                     style={{ width: fit.width(units) }}
                     onClick={() => open(p)}
+                    data-photo-id={p.id}
+                    data-photo-src={p.medium}
                     aria-label={p.alt || p.caption || "Photograph"}
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -308,6 +313,8 @@ function NoteStrip({ photos, open }: { photos: Photo[]; open: Open }) {
                   className={more || back ? "home-strip-photo home-strip-all" : "home-strip-photo"}
                   onClick={more ? () => setAll(true) : back ? fewer : () => open(p)}
                   aria-label={more || back ? undefined : p.alt || p.caption || "Photograph"}
+                  data-photo-id={more || back ? undefined : p.id}
+                  data-photo-src={more || back ? undefined : p.medium}
                   style={{ width: fit?.width(units) }}
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}

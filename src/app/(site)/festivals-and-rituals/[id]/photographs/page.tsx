@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { EditPhotos } from "@/components/edit/EditPhotos";
 import { BackLink } from "@/components/BackLink";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
@@ -31,6 +32,7 @@ export default async function ObservancePhotosPage({ params }: Props) {
 
   return (
     <div className="wrap">
+      <EditPhotos kind="observances" slug={o.id} label={o.name} />
       <header className="page-head">
         <BackLink className="crumb" href={`/festivals-and-rituals/${o.id}`}>
           ← {o.name}

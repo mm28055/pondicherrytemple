@@ -29,58 +29,14 @@ type Photo = {
   url?: string | null
 }
 
-const MAX = 2400
-export const AT_ONCE = 3
-// Deepa's camera runs this far ahead of Arunaditya's (scripts/import-photos)
-const DEEPA_AHEAD_MS = 40 * 60 * 1000
-export const isDeepas = (name: string) => /^IMG/i.test(name)
-
-export const slugify = (text: string) =>
-  text
-    .normalize('NFKD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
+// made ready in the browser before sending: shared with Admin2 (lib/photoUpload)
+import { AT_ONCE, isDeepas, minutes, shrink, slugify, takenAtOf } from "../../lib/photoUpload"
+export { AT_ONCE, isDeepas, minutes, shrink, slugify, takenAtOf }
 
 const inOrder = (a: Photo, b: Photo) =>
   (a.position ?? Infinity) - (b.position ?? Infinity) ||
   (a.takenAt ?? '').localeCompare(b.takenAt ?? '') ||
   a.id - b.id
-
-/** When the camera says it was taken: the earliest time in the file's details, in Pondicherry's time. */
-export async function takenAtOf(file: File): Promise<string | undefined> {
-  const head = new TextDecoder('latin1').decode(await file.slice(0, 256 * 1024).arrayBuffer())
-  const stamp = (head.match(/\d{4}:\d\d:\d\d \d\d:\d\d:\d\d/g) ?? []).filter((t) => !t.startsWith('0000')).sort()[0]
-  if (!stamp) return undefined
-  const camera = new Date(`${stamp.slice(0, 10).replace(/:/g, '-')}T${stamp.slice(11)}+05:30`)
-  if (isNaN(camera.getTime())) return undefined
-  return new Date(camera.getTime() - (isDeepas(file.name) ? DEEPA_AHEAD_MS : 0)).toISOString()
-}
-
-/** The photo upright, at most MAX pixels long, as a JPEG. */
-export async function shrink(file: File): Promise<Blob> {
-  const bitmap = await createImageBitmap(file, { imageOrientation: 'from-image' })
-  const scale = Math.min(1, MAX / Math.max(bitmap.width, bitmap.height))
-  const canvas = document.createElement('canvas')
-  canvas.width = Math.round(bitmap.width * scale)
-  canvas.height = Math.round(bitmap.height * scale)
-  const ctx = canvas.getContext('2d')!
-  ctx.imageSmoothingQuality = 'high'
-  ctx.drawImage(bitmap, 0, 0, canvas.width, canvas.height)
-  bitmap.close()
-  // under the website's 4.5 MB limit for what is sent to it
-  for (const quality of [0.85, 0.78, 0.7]) {
-    const blob = await new Promise<Blob | null>((ok) => canvas.toBlob(ok, 'image/jpeg', quality))
-    if (blob && blob.size < 4 * 1024 * 1024) return blob
-  }
-  throw new Error('too large even made smaller')
-}
-
-export const minutes = (ms: number) => {
-  const m = Math.round(ms / 60000)
-  return m < 1 ? 'under a minute' : m === 1 ? 'about a minute' : `about ${m} minutes`
-}
 
 export function PhotoGrid() {
   const { id } = useDocumentInfo()

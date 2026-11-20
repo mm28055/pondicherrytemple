@@ -19,7 +19,7 @@ import { draftMode } from "next/headers";
 import { unstable_cache } from "next/cache";
 import { buildDictionary, type DictionaryEntry } from "./dictionary";
 import { getPayload, type Payload, type Where } from "payload";
-import { PHOTOS_TAG, PREVIEW_PHOTOS_FOR, SITE_CONTENT_TAG, photosVersionNow } from "./siteCache";
+import { PHOTOS_TAG, PREVIEW_PHOTOS_FOR, SITE_CONTENT_TAG, photosSaved, photosVersionNow } from "./siteCache";
 import { cache } from "react";
 import type * as P from "@/payload-types";
 import type {
@@ -198,10 +198,22 @@ const rawPhotos = cache(async () => {
   if (process.env.NODE_ENV === "development" || !(await previewing())) return readPhotos();
   const now = Date.now();
   if (!previewPhotos || previewPhotos.version !== photosVersionNow() || now - previewPhotos.at > PREVIEW_PHOTOS_FOR) {
+    photosSaved().clear(); // (what is read now has them)
     previewPhotos = { at: now, version: photosVersionNow(), docs: readPhotos() };
     previewPhotos.docs.catch(() => (previewPhotos = undefined));
   }
-  return previewPhotos.docs;
+  const docs = await previewPhotos.docs;
+  const saved = photosSaved();
+  if (!saved.size) return docs;
+  // photos whose details were saved since: their new details put in (their links as numbers, as read)
+  const flat = (v: unknown): unknown => (Array.isArray(v) ? v.map(flat) : v && typeof v === "object" && "id" in v ? (v as { id: number }).id : v);
+  return docs.map((m) => {
+    const s = saved.get(m.id);
+    if (!s) return m;
+    const out: Record<string, unknown> = { ...m };
+    for (const k of Object.keys(m)) if (k in s) out[k] = k === "sizes" ? m.sizes : flat(s[k]);
+    return out as unknown as P.Media;
+  });
 });
 
 async function readPhotos() {

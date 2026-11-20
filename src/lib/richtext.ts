@@ -33,7 +33,7 @@ type MediaDoc = {
   sizes?: { large?: { url?: string | null; width?: number | null; height?: number | null } };
 };
 
-type UploadNode = { type: "upload"; value: unknown; fields?: { caption?: string | null } };
+type UploadNode = { type: "upload"; value: unknown; fields?: { caption?: string | null; size?: string | null } };
 
 /** How to find a linked page: temples need their region, so the caller says. */
 export type LinkPaths = { temple: (id: number) => string | null };
@@ -61,7 +61,9 @@ const upload: HTMLConverter<UploadNode> = ({ node }) => {
     const width = large?.width ?? doc.width;
     const height = large?.height ?? doc.height;
     const size = width && height ? ` width="${width}" height="${height}"` : "";
-    return `<figure class="rich-media"><img src="${src}" alt="${escape(doc.alt ?? "")}"${size} loading="lazy">${figcaption}</figure>`;
+    // its size in the text: the text's width, or half of it with the words running round it
+    const half = node.fields?.size === "half" ? " size-half" : "";
+    return `<figure class="rich-media${half}"><img src="${src}" alt="${escape(doc.alt ?? "")}"${size} loading="lazy">${figcaption}</figure>`;
   }
   if (mime.startsWith("video/")) {
     return `<figure class="rich-media"><video controls preload="metadata" src="${url}"></video>${figcaption}</figure>`;
