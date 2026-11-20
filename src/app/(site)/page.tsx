@@ -25,9 +25,14 @@ import { HomeMark } from "@/components/HomeTamil";
 import { plainWithScripts } from "@/lib/richtext";
 import { FilmVideo } from "@/components/FilmVideo";
 import { ReservedSoonTag } from "@/components/ReservedSoon";
+import { getEditableGlobal, isEditing } from "@/lib/editing";
+import { EditRich, EditText } from "@/components/edit/Editable";
 
 export default async function HomePage() {
   const words = await getHomePage();
+  // Admin2 (lib/editing): its words as boxes, saved to Site pages → Home page
+  const ed = (await isEditing()) ? await getEditableGlobal("home-page") : null;
+  const at = (field: string, label: string) => ({ collection: ed!.collection, id: ed!.id, field, label: `${label} (home page)` });
   const region = (await getRegion("pondicherry"))!;
   const temples = await getTemples(region.id);
 
@@ -83,8 +88,17 @@ export default async function HomePage() {
         {/* The words are written in the admin: Settings → Home page. */}
         <section className="home-opening">
           <div>
-            <h1>{words?.headline}</h1>
-            {words?.opening && <Html html={words.opening} />}
+            {ed ? (
+              <>
+                <EditText as="h1" value={ed.text("headline")} required target={at("headline", "Heading")} />
+                <EditRich {...ed.rich("opening")} styles="short" target={at("opening", "Opening")} />
+              </>
+            ) : (
+              <>
+                <h1>{words?.headline}</h1>
+                {words?.opening && <Html html={words.opening} />}
+              </>
+            )}
             {/* the film, after the words: chosen in the admin, Site pages → Home page
                 (until there is one, an empty box its size) */}
             {words?.film ? (
@@ -141,7 +155,26 @@ export default async function HomePage() {
       {/* The dark band: a quotation (each line of the box on its own line),
           who said it, and optionally a second passage and a link. All set in
           the admin: Site pages → Home page. */}
-      {words?.quote && (
+      {/* Admin2: the band's parts as boxes, each shown (faintly, where empty) to be filled in */}
+      {ed && (
+        <section className="voice voice-line">
+          <div className="wrap">
+            <EditText as="div" className="kicker" value={ed.text("quoteLabel")} placeholder="Label over the quotation" target={at("quoteLabel", "Label")} />
+            <blockquote>
+              <EditText as="div" long value={ed.text("quote")} placeholder="The quotation (each line on its own line)" target={at("quote", "Quotation")} />
+            </blockquote>
+            <div className="voice-foot">
+              <EditText as="div" value={ed.text("quoteBy")} placeholder="By" target={at("quoteBy", "By")} />
+            </div>
+            <EditText as="p" className="voice-after" long value={ed.text("quoteAfter")} placeholder="A passage after it" target={at("quoteAfter", "Passage after")} />
+            <div className="voice-foot">
+              <EditText className="arrow-link" value={ed.text("quoteLinkText")} placeholder="Link's words" target={at("quoteLinkText", "Link's words")} />
+              <EditText value={ed.text("quoteLink")} placeholder="Link to (/about#idea)" target={at("quoteLink", "Link to")} />
+            </div>
+          </div>
+        </section>
+      )}
+      {!ed && words?.quote && (
       <section className="voice voice-line">
         <div className="wrap reveal">
           {words.quoteLabel && <div className="kicker">{words.quoteLabel}</div>}
@@ -222,8 +255,17 @@ export default async function HomePage() {
         <section className="section tight">
           <div className="band reveal">
             <div>
-              <h2>{words?.bookHeading ?? "A book is in preparation"}</h2>
-              {words?.bookText && <p>{words.bookText}</p>}
+              {ed ? (
+                <>
+                  <EditText as="h2" value={ed.text("bookHeading") || "A book is in preparation"} target={at("bookHeading", "Book heading")} />
+                  <EditText as="p" value={ed.text("bookText")} placeholder="A line under it" target={at("bookText", "Book line")} />
+                </>
+              ) : (
+                <>
+                  <h2>{words?.bookHeading ?? "A book is in preparation"}</h2>
+                  {words?.bookText && <p>{words.bookText}</p>}
+                </>
+              )}
             </div>
             <Link className="arrow-link" href={`/${region.id}/book`}>
               What it may contain

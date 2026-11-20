@@ -67,17 +67,16 @@ export async function POST(request: Request) {
     value = kind === 'long' ? body.value.replace(/\r\n?/g, '\n').trim() : body.value.replace(/\s+/g, ' ').trim()
   }
 
+  // one of the site's own pages ("global:home-page"), kept without drafts; or an entry of a collection
+  const global = collection.startsWith('global:') ? (collection.slice(7) as 'home-page') : undefined
   const slug = collection as 'temples'
-  const drafts = Boolean(payload.collections[slug]?.config.versions?.drafts)
+  const drafts = !global && Boolean(payload.collections[slug]?.config.versions?.drafts)
   try {
-    const latest = (await payload.findByID({
-      collection: slug,
-      id: body.id,
-      draft: drafts,
-      depth: 0,
-      user,
-      overrideAccess: false,
-    })) as unknown as Record<string, unknown>
+    const latest = (
+      global
+        ? await payload.findGlobal({ slug: global, depth: 0, user, overrideAccess: false })
+        : await payload.findByID({ collection: slug, id: body.id, draft: drafts, depth: 0, user, overrideAccess: false })
+    ) as unknown as Record<string, unknown>
 
     // the field, or its whole list with the one value changed (a row's own
     // list too: "atTemples.0.times.1.time")
@@ -120,6 +119,10 @@ export async function POST(request: Request) {
       data = { [top]: list }
     }
 
+    if (global) {
+      await payload.updateGlobal({ slug: global, data: data as never, depth: 0, user, overrideAccess: false })
+      return json({ status: 'published' })
+    }
     const role = (user as { role?: string }).role
     const publish = !drafts || ((role === 'admin' || role === 'editor') && latest._status !== 'draft')
     await payload.update({

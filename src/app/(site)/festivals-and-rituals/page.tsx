@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { IntroText } from "@/components/edit/IntroText";
+import { isEditing } from "@/lib/editing";
 import {
   countTemplesForObservance,
   getObservances,
@@ -84,7 +86,14 @@ export default async function ObservancesPage() {
             <div className="kicker">The ritual year</div>
             <h1 className="page-title">Festivals &amp; Rituals</h1>
             <ReservedSoon />
-            <ReservedLede intro={intro} />
+            {/* (in Admin2, its words as a box) */}
+            {(await isEditing()) ? (
+              <p className="page-lede">
+                <IntroText name="observances" />
+              </p>
+            ) : (
+              <ReservedLede intro={intro} />
+            )}
           </>
         }
       />

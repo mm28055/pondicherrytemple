@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { IntroText } from "@/components/edit/IntroText";
 import { getFieldNotes, getObservances, getPhotos, getRegion, getSectionIntro, getTemples } from "@/lib/data";
 import { onePerEvent, STRIP_PHOTOS } from "@/lib/photoPack";
 import { FIELD_KIND_LABELS } from "@/content/labels";
@@ -78,7 +79,7 @@ export default async function FieldNotesPage() {
       <FieldNotesBrowser
         rows={rows}
         filters={filters}
-        intro={<p className="page-lede">{await getSectionIntro("fieldNotes")}</p>}
+        intro={<p className="page-lede"><IntroText name="fieldNotes" /></p>}
         strip={stripPhotos.length > 0 && <HomeStrip photos={stripPhotos} />}
       />
     </div>

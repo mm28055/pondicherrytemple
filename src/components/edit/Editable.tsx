@@ -35,6 +35,8 @@ function useBox(
   read: (el: HTMLElement) => { value?: string; rich?: unknown } | null,
   // anything more while it is open (a note's photos in its text: PhotosInText); what it returns undoes it
   onOpen?: (el: HTMLElement) => () => void,
+  // a longer text: the styles its editor in /admin allows (headings and quotations, or lists only)
+  styles?: "full" | "short",
 ) {
   const ref = useRef<HTMLElement>(null);
   const [version, setVersion] = useState(0);
@@ -120,6 +122,7 @@ function useBox(
     editStore.open({
       label: target.label,
       rich: mode === "rich",
+      styles,
       long: mode !== "text",
       save: commit,
       cancel,
@@ -204,6 +207,7 @@ export function EditRich({
   blocks,
   className,
   photos,
+  styles = "full",
 }: {
   target: Target;
   html: string;
@@ -211,6 +215,9 @@ export function EditRich({
   className?: string;
   /** a field note's text: its photos can be moved, sized and added (the tags a new one is given) */
   photos?: InTextPhotos;
+  /** the styles its editor in /admin allows: "full" (headings, quotations, lists: field notes, the About page),
+      "short" (lists only: introductions) */
+  styles?: "full" | "short";
 }) {
   const { ref, version, open } = useBox(
     target,
@@ -223,6 +230,7 @@ export function EditRich({
       return { rich: lexicalFromHtml(el, blocks) };
     },
     photos ? (el) => photosInText(el, photos) : undefined,
+    styles,
   );
   return (
     <div

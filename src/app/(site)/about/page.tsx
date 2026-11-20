@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { getEditableGlobal, isEditing } from "@/lib/editing";
+import { EditRich, EditText } from "@/components/edit/Editable";
 import Link from "next/link";
 import { getAboutPage } from "@/lib/data";
 import { Html } from "@/components/Prose";
@@ -31,11 +33,24 @@ export const metadata: Metadata = {
 export default async function AboutPage() {
   const about = await getAboutPage();
   const email = about?.contactEmail;
-  const sections = about?.sections ?? [];
+  // each section with its place in the admin's list (for Admin2's boxes)
+  const sections = (about?.sections ?? []).map((s, i) => ({ ...s, i }));
+  // Admin2 (lib/editing): its words as boxes, saved to Site pages → About page
+  const ed = (await isEditing()) ? await getEditableGlobal("about-page") : null;
+  const at = (field: string, label: string) => ({ collection: ed!.collection, id: ed!.id, field, label: `${label} (About page)` });
   const block = (s: (typeof sections)[number]) => (
     <section key={s.heading} className="about-block" id={s.anchor ?? undefined}>
-      <h2>{s.heading}</h2>
-      <Html className="prose rich" html={s.body} />
+      {ed ? (
+        <>
+          <EditText as="h2" value={ed.text(`sections.${s.i}.heading`)} required target={at(`sections.${s.i}.heading`, `${s.heading}: heading`)} />
+          <EditRich className="prose rich" {...ed.rich(`sections.${s.i}.body`)} styles="full" target={at(`sections.${s.i}.body`, `${s.heading}: text`)} />
+        </>
+      ) : (
+        <>
+          <h2>{s.heading}</h2>
+          <Html className="prose rich" html={s.body} />
+        </>
+      )}
     </section>
   );
 
@@ -47,7 +62,11 @@ export default async function AboutPage() {
         <h1 className="page-title page-title-tamil" lang="ta">
           ஸ்தலம்
         </h1>
-        {about?.lede && <p className="page-lede">{about.lede}</p>}
+        {ed ? (
+          <EditText as="p" className="page-lede" long value={ed.text("lede")} placeholder="An opening line" target={at("lede", "Opening line")} />
+        ) : (
+          about?.lede && <p className="page-lede">{about.lede}</p>
+        )}
       </header>
 
       {sections.filter((s) => s.anchor !== "centre").map(block)}
@@ -69,13 +88,22 @@ export default async function AboutPage() {
         <section className="about-block" id="team">
           <h2>The team</h2>
           <ul className="team">
-            {about.team.map((p) => (
-              <li key={p.name}>
-                <div className="who">{p.name}</div>
-                {p.role && <div className="role caps">{p.role}</div>}
-                {p.bio && <p>{withLinks(p.bio)}</p>}
-              </li>
-            ))}
+            {about.team.map((p, i) =>
+              ed ? (
+                <li key={p.name}>
+                  <EditText as="div" className="who" value={ed.text(`team.${i}.name`)} required target={at(`team.${i}.name`, `${p.name}: name`)} />
+                  <EditText as="div" className="role caps" value={ed.text(`team.${i}.role`)} placeholder="Role" target={at(`team.${i}.role`, `${p.name}: role`)} />
+                  {/* (its links as written in the admin, shown as they are while editing) */}
+                  <EditText as="p" long value={ed.text(`team.${i}.bio`)} placeholder="A few lines about them" target={at(`team.${i}.bio`, `${p.name}: bio`)} />
+                </li>
+              ) : (
+                <li key={p.name}>
+                  <div className="who">{p.name}</div>
+                  {p.role && <div className="role caps">{p.role}</div>}
+                  {p.bio && <p>{withLinks(p.bio)}</p>}
+                </li>
+              ),
+            )}
           </ul>
         </section>
       )}
@@ -83,7 +111,11 @@ export default async function AboutPage() {
       <section className="about-block" id="contact" style={{ borderBottom: "none", paddingBottom: 96 }}>
         <h2>Contact</h2>
         <div className="prose">
-          {about?.contactText && <p>{about.contactText}</p>}
+          {ed ? (
+            <EditText as="p" long value={ed.text("contactText")} placeholder="A few words on writing to the project" target={at("contactText", "Contact")} />
+          ) : (
+            about?.contactText && <p>{about.contactText}</p>
+          )}
           {email && (
             <a
               className="contact-email"

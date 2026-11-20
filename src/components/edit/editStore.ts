@@ -5,6 +5,8 @@
 export type OpenBox = {
   label: string;
   rich: boolean;
+  /** a longer text's styles: headings and quotations too ("full"), or lists only ("short") */
+  styles?: "full" | "short";
   /** several lines: Enter starts a new line, Ctrl+Enter saves */
   long: boolean;
   save: () => void | Promise<void>;

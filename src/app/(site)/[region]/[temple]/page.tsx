@@ -142,7 +142,7 @@ export default async function TemplePage({ params }: Props) {
                 (lib/dictionary); a note in its place until it is written */}
             {ed ? (
               <div className="temple-intro">
-                <EditRich className="prose" target={{ collection: "temples", id: ed.id, field: "intro", label: "Temple introduction" }} {...ed.rich("intro")} />
+                <EditRich className="prose" target={{ collection: "temples", id: ed.id, field: "intro", label: "Temple introduction" }} {...ed.rich("intro")} styles="short" />
               </div>
             ) : t.intro ? (
               <div className="temple-intro">

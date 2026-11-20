@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { IntroText } from "@/components/edit/IntroText";
 import Link from "next/link";
 import { getArticles, getRegion, getSectionIntro } from "@/lib/data";
 import { articleRow } from "@/lib/view";
@@ -22,7 +23,7 @@ export default async function ArticlesPage() {
         <WritingsTabs current="articles" />
         {!articles.length && <p className="coming-soon">Coming soon</p>}
         <p className="page-lede">
-          {await getSectionIntro("articles")}
+          <IntroText name="articles" />
           {!articles.length && (
             <>
               {" "}

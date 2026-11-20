@@ -12,6 +12,17 @@ import { editStore } from "./editStore";
 
 const keepFocus = (e: React.MouseEvent) => e.preventDefault();
 
+/** The line the cursor is in, as ordinary text, a heading or a quotation (a list item first taken out of its list). */
+function block(tag: "p" | "h2" | "h3" | "blockquote") {
+  const inList = document.queryCommandState("insertUnorderedList")
+    ? "insertUnorderedList"
+    : document.queryCommandState("insertOrderedList")
+      ? "insertOrderedList"
+      : null;
+  if (inList) document.execCommand(inList);
+  document.execCommand("formatBlock", false, tag);
+}
+
 function link() {
   const url = window.prompt("Link to (a web address, or a page here such as /field-notes/…). Leave empty to remove the link.");
   if (url === null) return;
@@ -115,6 +126,33 @@ export function EditBar() {
           <button type="button" className="edit-bar-label" onMouseDown={keepFocus} onClick={() => open.show()} title="Show the text being edited">
             Editing: {open.label}
           </button>
+          {/* the site's own styles for the line the cursor is in: only those its editor in /admin allows */}
+          {open.rich && (
+            <span className="edit-bar-group edit-bar-styles" aria-label="Style">
+              <button type="button" onMouseDown={keepFocus} onClick={() => block("p")} title="Ordinary text">
+                Text
+              </button>
+              {open.styles !== "short" && (
+                <>
+                  <button type="button" onMouseDown={keepFocus} onClick={() => block("h2")} title="Heading">
+                    Heading
+                  </button>
+                  <button type="button" onMouseDown={keepFocus} onClick={() => block("h3")} title="Subheading">
+                    Subheading
+                  </button>
+                  <button type="button" onMouseDown={keepFocus} onClick={() => block("blockquote")} title="Quotation">
+                    Quote
+                  </button>
+                </>
+              )}
+              <button type="button" onMouseDown={keepFocus} onClick={() => document.execCommand("insertUnorderedList")} title="A list with dots">
+                List
+              </button>
+              <button type="button" onMouseDown={keepFocus} onClick={() => document.execCommand("insertOrderedList")} title="A numbered list">
+                1. 2. 3.
+              </button>
+            </span>
+          )}
           {open.rich && (
             <span className="edit-bar-group">
               <button type="button" onMouseDown={keepFocus} onClick={() => document.execCommand("bold")} title="Bold (Ctrl+B)">

@@ -3881,3 +3881,6 @@ div.edit-empty, p.edit-empty, h4.edit-empty { display: block; }
 /* the note's photos beside its open text: to be dragged in (PhotosInText) */
 .intext-source { cursor: grab; }
 .intext-source:hover { outline: 2px dashed var(--turmeric); outline-offset: 2px; }
+/* the bar with a longer text open: its styles too, on two lines if need be */
+.edit-bar:has(.edit-bar-styles) { flex-wrap: wrap; justify-content: center; border-radius: 22px; max-width: min(860px, calc(100vw - 32px)); }
+.edit-bar-styles { border-right: 1px solid var(--rule); padding-right: 10px; }

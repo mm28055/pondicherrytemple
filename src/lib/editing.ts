@@ -41,6 +41,19 @@ export const EDITABLE: Record<string, [RegExp, EditKind][]> = {
     [/^description$/, "long"],
     [/^takenOn$/, "date"],
   ],
+  // the site's own pages (single entries in /admin: Site pages), as "global:<its name>"
+  "global:home-page": [
+    [/^(headline|quoteLabel|quoteBy|quoteLinkText|quoteLink|bookHeading|bookText)$/, "text"],
+    [/^(quote|quoteAfter)$/, "long"],
+    [/^opening$/, "rich"],
+  ],
+  "global:about-page": [
+    [/^(sections\.\d+\.heading|team\.\d+\.(name|role))$/, "text"],
+    [/^(lede|contactText|team\.\d+\.bio)$/, "long"],
+    [/^sections\.\d+\.body$/, "rich"],
+  ],
+  "global:section-descriptions": [[/^(observances|fieldNotes|films|articles|books)$/, "long"]],
+  // a festival's or ritual's page: its names and few words (its names also in Ritual Cycles, above)
   // a day: its line below the festival's name in the Ritual Year
   occasions: [[/^yearNote$/, "text"]],
   "field-notes": [
@@ -50,7 +63,7 @@ export const EDITABLE: Record<string, [RegExp, EditKind][]> = {
     [/^photos\.add$/, "add-ids"],
   ],
   // a festival's or ritual's names, wherever they are shown
-  observances: [[/^(name|tamil)$/, "text"]],
+  observances: [[/^(name|tamil|alsoKnownAs|gloss)$/, "text"]],
   // a regular ritual's names: for every temple, or at one temple only
   "weekly-rituals": [
     [/^(what|tamil)$/, "text"],
@@ -96,6 +109,23 @@ export async function getEditable(collection: "temples" | "field-notes" | "obser
       (Array.isArray(doc[field]) ? (doc[field] as unknown[]) : [])
         .map((r) => (r && typeof r === "object" ? (r as { id: number }).id : r))
         .filter((x): x is number => typeof x === "number"),
+  };
+}
+
+/** One of the site's own pages (Home, About, Section descriptions), for
+    its editable boxes: each field by its path ("sections.2.body"). */
+export async function getEditableGlobal(slug: "home-page" | "about-page" | "section-descriptions") {
+  const payload = await getPayload({ config });
+  const doc = (await payload.findGlobal({ slug, depth: 1, overrideAccess: true })) as unknown as Record<string, unknown>;
+  const at = (path: string) => path.split(".").reduce<unknown>((v, k) => (v && typeof v === "object" ? (v as Record<string, unknown>)[k] : undefined), doc);
+  return {
+    collection: `global:${slug}`,
+    id: slug,
+    text: (path: string) => {
+      const v = at(path);
+      return typeof v === "string" ? v : "";
+    },
+    rich: (path: string) => editHTML(at(path) as RichText),
   };
 }
 

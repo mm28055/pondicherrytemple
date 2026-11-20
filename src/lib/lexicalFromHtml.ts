@@ -145,7 +145,8 @@ export function lexicalFromHtml(box: HTMLElement, kept: unknown[]): LNode {
     loose = [];
   };
 
-  box.childNodes.forEach((node) => {
+  const BLOCKS = new Set(["p", "div", "ul", "ol", "h1", "h2", "h3", "h4", "h5", "h6", "blockquote", "hr", "figure"]);
+  const walk = (container: Node) => container.childNodes.forEach((node) => {
     if (node.nodeType === Node.TEXT_NODE) {
       inline(node, 0, loose);
       return;
@@ -177,6 +178,13 @@ export function lexicalFromHtml(box: HTMLElement, kept: unknown[]): LNode {
       return;
     }
     flush();
+    // a paragraph holding a list, heading or quotation (as the browser makes
+    // one when a line in it is made a list): its parts, each a block of its own
+    if ((tag === "p" || tag === "div") && [...el.children].some((c) => BLOCKS.has(c.tagName.toLowerCase()))) {
+      walk(el);
+      flush();
+      return;
+    }
     if (tag === "ul" || tag === "ol") blocks.push(list(el));
     else if (/^h[1-6]$/.test(tag)) blocks.push(element("heading", inlineOf(el), { tag: tag === "h1" || tag === "h2" ? "h2" : "h3" }));
     else if (tag === "blockquote") blocks.push(element("quote", inlineOf(el)));
@@ -184,6 +192,7 @@ export function lexicalFromHtml(box: HTMLElement, kept: unknown[]): LNode {
     else if (["figure", "img", "video", "audio"].includes(tag)) return; // pasted pictures: not here (stage 2)
     else blocks.push(paragraph(inlineOf(el)));
   });
+  walk(box);
   flush();
 
   // no empty paragraphs left at the end

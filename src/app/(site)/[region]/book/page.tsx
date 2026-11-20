@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { IntroText } from "@/components/edit/IntroText";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getBook, getRegion, getRegions, getSectionIntro } from "@/lib/data";
@@ -29,7 +30,7 @@ export default async function BookPage({ params }: Props) {
           {region.name} · {book.status}
         </div>
         <h1 className="page-title">The Book</h1>
-        <p className="page-lede">{await getSectionIntro("books")}</p>
+        <p className="page-lede"><IntroText name="books" /></p>
         <div className="credits">
           <span>
             By <b>{book.byline}</b>

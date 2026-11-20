@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { IntroText } from "@/components/edit/IntroText";
 import { getFilms, getObservances, getRegion, getSectionIntro, getTemples } from "@/lib/data";
 import { filmTile, shortTempleName } from "@/lib/view";
 import { FilmWall } from "@/components/FilmWall";
@@ -35,7 +36,7 @@ export default async function FilmsPage() {
       <header className={`page-head landing-head${top ? " with-film" : ""}`}>
         <div className="kicker">From the temples</div>
         <h1 className="page-title">Films</h1>
-        <p className="page-lede">{await getSectionIntro("films")}</p>
+        <p className="page-lede"><IntroText name="films" /></p>
         {top && <FilmTop film={filmTile(top, temples)} />}
       </header>
       <section className="section">

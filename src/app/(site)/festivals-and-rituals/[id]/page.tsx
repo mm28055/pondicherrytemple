@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { getEditable, isEditing } from "@/lib/editing";
+import { EditText } from "@/components/edit/Editable";
 import { EditPhotos } from "@/components/edit/EditPhotos";
 import { BackLink } from "@/components/BackLink";
 import Link from "next/link";
@@ -98,6 +100,10 @@ export default async function ObservancePage({ params }: Props) {
     .slice(0, 8)
     .map((p) => ({ id: p.id, src: p.src, alt: p.alt, caption: p.caption, focus: p.focus }));
 
+  // Admin2 (lib/editing): its names and few words as boxes (its entry in /admin, every page it is on)
+  const ed = (await isEditing()) ? await getEditable("observances", o.id) : null;
+  const at = (field: string, label: string) => ({ collection: "observances", id: ed!.id, field, label: `${label} (every page)` });
+
   const seenHead = <h2 className="sub-head">Where we&apos;ve seen it</h2>;
   // each temple a name to open: its dates (and its page) beneath when opened
   const seenList = (
@@ -152,21 +158,37 @@ export default async function ObservancePage({ params }: Props) {
         <div className="kicker">
           {o.kind === "festival" ? "Festival" : "Ritual"}
         </div>
-        {o.tamil && (
-          <p className="tamil-title" lang="ta">
-            {o.tamil}
-          </p>
+        {ed ? (
+          <>
+            <EditText as="p" className="tamil-title" lang="ta" value={ed.text("tamil")} placeholder="Name in Tamil" target={at("tamil", "Tamil name")} />
+            <h1 className="name-title">
+              <EditText value={ed.text("name")} required target={at("name", "Name")} />
+              <span style={{ fontStyle: "normal", color: "var(--muted)" }}>
+                {" · "}
+                <EditText value={ed.text("alsoKnownAs")} placeholder="Also known as" target={at("alsoKnownAs", "Also known as")} />
+              </span>
+            </h1>
+            <EditText as="p" className="gloss kicker" value={ed.text("gloss")} placeholder="In a few words" target={at("gloss", "In a few words")} />
+          </>
+        ) : (
+          <>
+            {o.tamil && (
+              <p className="tamil-title" lang="ta">
+                {o.tamil}
+              </p>
+            )}
+            <h1 className="name-title">
+              {o.name}
+              {o.alsoKnownAs && (
+                <span style={{ fontStyle: "normal", color: "var(--muted)" }}>
+                  {" "}
+                  · {o.alsoKnownAs}
+                </span>
+              )}
+            </h1>
+            <p className="gloss kicker">{o.gloss}</p>
+          </>
         )}
-        <h1 className="name-title">
-          {o.name}
-          {o.alsoKnownAs && (
-            <span style={{ fontStyle: "normal", color: "var(--muted)" }}>
-              {" "}
-              · {o.alsoKnownAs}
-            </span>
-          )}
-        </h1>
-        <p className="gloss kicker">{o.gloss}</p>
       </header>
 
       {/* a band of photographs, the whole width of the page, to give it its character */}
