@@ -43,6 +43,9 @@ import { TempleColumns } from "@/components/TempleColumns";
 import { ReservedLink } from "@/components/ReservedLink";
 import { TEMPLE_STORIES_PUBLISHED } from "@/lib/festivals";
 import { titleFit } from "@/lib/titleFit";
+import { getEditable, getYearEdit, isEditing } from "@/lib/editing";
+import { EditRich, EditText } from "@/components/edit/Editable";
+import type { Temple } from "@/content/types";
 
 type Props = { params: Promise<{ region: string; temple: string }> };
 
@@ -75,8 +78,10 @@ export default async function TemplePage({ params }: Props) {
   const region = await getRegion(regionId);
   const t = await getTemple(regionId, templeId);
   if (!region || !t || !hasPage(t)) notFound();
+  // Admin2 (lib/editing): its names, street and introduction as editable boxes
   if (isAround(t)) return <AroundTemplePage regionId={region.id} regionName={region.name} templeId={t.id} />;
 
+  const ed = (await isEditing()) ? await getEditable("temples", t.id) : null;
   const allTemples = await getTemples(region.id);
   const year = await getTempleRitualYear(region.id, t.id);
   const notes = (await getFieldNotesForTemple(region.id, t.id)).map((n) =>
@@ -104,13 +109,7 @@ export default async function TemplePage({ params }: Props) {
           <BackLink className="crumb" href={`/${region.id}`}>
             ← {templesOf(region.name)}
           </BackLink>
-          <h1 className="temple-title" style={titleFit(t.knownAs ?? t.name)}>{t.knownAs ?? t.name}</h1>
-          <div className="temple-facts caps">
-            {t.knownAs && t.knownAs !== t.name && <span>{t.name}</span>}
-            {/* the red mark between them, as on the home page: a lingam on its base */}
-            {t.knownAs && t.knownAs !== t.name && t.street && <span className="lingam" aria-hidden="true" />}
-            {t.street && <span>{t.street}</span>}
-          </div>
+          <TempleHeadNames t={t} ed={ed} />
         </div>
         {/* The temple's layouts, turned on their sides, stacked, the top one
             hanging over the line below the header at the right of the
@@ -139,7 +138,11 @@ export default async function TemplePage({ params }: Props) {
 
             {/* its introduction (Admin → Temples), its dictionary words marked
                 (lib/dictionary); a note in its place until it is written */}
-            {t.intro ? (
+            {ed ? (
+              <div className="temple-intro">
+                <EditRich className="prose" target={{ collection: "temples", id: ed.id, field: "intro", label: "Temple introduction" }} {...ed.rich("intro")} />
+              </div>
+            ) : t.intro ? (
               <div className="temple-intro">
                 <GlossCard />
                 <FoldedIntro html={markDictionary(t.intro, await getDictionary())} />
@@ -223,7 +226,7 @@ export default async function TemplePage({ params }: Props) {
 
             <section id="ritual-year">
               <h2 id="ritual-cycles" className="sub-head">Ritual Cycles</h2>
-              <TempleYear year={year} day={t.day} />
+              <TempleYear year={year} day={t.day} edit={ed ? await getYearEdit(ed.id) : undefined} />
             </section>
           </>
         }
@@ -240,6 +243,7 @@ export default async function TemplePage({ params }: Props) {
     newest or oldest first), with no page of their own to go to. */
 async function AroundTemplePage({ regionId, regionName, templeId }: { regionId: string; regionName: string; templeId: string }) {
   const t = (await getTemple(regionId, templeId))!;
+  const ed = (await isEditing()) ? await getEditable("temples", t.id) : null;
   // the town these temples are around: its temples, for the notes' tags
   const town = regionId.replace(/^in-and-around-/, "");
   const townRegion = await getRegion(town);
@@ -259,13 +263,7 @@ async function AroundTemplePage({ regionId, regionName, templeId }: { regionId: 
         <BackLink className="crumb" href={`/${town}#${regionId}`}>
           ← {regionName}
         </BackLink>
-        <h1 className="temple-title" style={titleFit(t.knownAs ?? t.name)}>{t.knownAs ?? t.name}</h1>
-        <div className="temple-facts caps">
-          {t.knownAs && t.knownAs !== t.name && <span>{t.name}</span>}
-          {/* the red mark between them, as on the home page: a lingam on its base */}
-          {t.knownAs && t.knownAs !== t.name && t.street && <span className="lingam" aria-hidden="true" />}
-          {t.street && <span>{t.street}</span>}
-        </div>
+        <TempleHeadNames t={t} ed={ed} />
       </header>
       <div className="stack around-temple">
         {/* its films above its photographs: beside its field notes, in a column at the right, if it has any */}
@@ -341,6 +339,40 @@ function LatestPhotos({
         </div>
       ))}
       <PhotoWall photos={photos} total={own.length} layout="lead" seeAll={seeAll} />
+    </>
+  );
+}
+
+/** A temple's names and street, in its header: the name it is known by,
+    large; its other name and street below, split by the red lingam mark.
+    In Admin2 (lib/editing), each a box to edit. */
+function TempleHeadNames({ t, ed }: { t: Temple; ed: Awaited<ReturnType<typeof getEditable>> }) {
+  const title = t.knownAs ?? t.name;
+  const other = t.knownAs && t.knownAs !== t.name;
+  const box = (field: "knownAs" | "name" | "street", label: string, value: string, as?: "h1") =>
+    ed ? (
+      <EditText
+        as={as}
+        className={as ? "temple-title" : undefined}
+        style={as ? titleFit(title) : undefined}
+        value={ed.text(field) || value}
+        target={{ collection: "temples", id: ed.id, field, label }}
+        required={field === "name"}
+      />
+    ) : as ? (
+      <h1 className="temple-title" style={titleFit(title)}>{value}</h1>
+    ) : (
+      <span>{value}</span>
+    );
+  return (
+    <>
+      {box(t.knownAs ? "knownAs" : "name", "Temple name", title, "h1")}
+      <div className="temple-facts caps">
+        {other && box("name", "Other name", t.name)}
+        {/* the red mark between them, as on the home page: a lingam on its base */}
+        {other && t.street && <span className="lingam" aria-hidden="true" />}
+        {t.street && box("street", "Street", t.street)}
+      </div>
     </>
   );
 }

@@ -1,6 +1,6 @@
 import { revalidateTag } from 'next/cache'
 import type { CollectionAfterChangeHook, CollectionAfterDeleteHook, GlobalAfterChangeHook, PayloadRequest } from 'payload'
-import { PHOTOS_TAG, SITE_CONTENT_TAG } from '../lib/siteCache'
+import { PHOTOS_TAG, SITE_CONTENT_TAG, photosChanged } from '../lib/siteCache'
 
 /* When anything is saved or deleted, the whole site is refreshed: pages are
    built ahead of time, and what they read from the database is kept between
@@ -19,6 +19,8 @@ import { PHOTOS_TAG, SITE_CONTENT_TAG } from '../lib/siteCache'
 
 export function refresh(context: Record<string, unknown>, collection?: string) {
   if (context.skipRevalidate) return
+  // the photographs kept in memory while previewing (lib/siteCache)
+  if (collection === 'media' || collection === 'photo-sets') photosChanged()
   try {
     revalidateTag(SITE_CONTENT_TAG, 'max')
     // the photographs, read apart from the rest (lib/siteCache)

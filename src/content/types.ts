@@ -41,6 +41,8 @@ export type DeityGroup = "shiva" | "vishnu" | "amman" | "vinayaka" | "murugan";
 
 /** One kalam of a temple's ritual day (The Day, in Ritual Cycles). */
 export interface Kalam {
+  /** its place among the temple's kaalams in the admin (for Admin2) */
+  at?: number;
   kalam: string;
   tamil?: string;
   time?: string;
@@ -121,6 +123,8 @@ export interface Observance {
     each temple's "year so far", and the "where we've seen it" list on each
     festival or ritual page. */
 export interface Occasion {
+  /** its entry in the admin (for Admin2) */
+  ref?: number;
   date: string; // yyyy-mm-dd
   region: RegionId;
   /** The temple; "" for an event of the whole town (townWide). */

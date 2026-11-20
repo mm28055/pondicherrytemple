@@ -111,6 +111,41 @@ export function toHTML(data: RichText, paths: LinkPaths): string {
   );
 }
 
+/** Admin2: the same text, to be edited on the page (components/edit). Each
+    photo, video or rule placed in it is shown as on the site but can't be
+    typed into, and carries its place among the blocks (data-keep), so Save
+    puts back the very thing it came from (lib/lexicalFromHtml); each link
+    carries its own settings (data-link), so a link to a temple stays one. */
+export function editHTML(data: RichText): { html: string; blocks: unknown[] } {
+  const blocks = (data?.root?.children ?? []) as { type?: string }[];
+  const typed = new Set(["paragraph", "heading", "list", "quote"]);
+  const link: HTMLConverter<{ fields: Record<string, unknown>; children: unknown[] }> = ({ node, nodesToHTML }) => {
+    const children = nodesToHTML({ nodes: node.children as never }).join("");
+    const url = typeof node.fields.url === "string" ? node.fields.url : "#";
+    return `<a href="${escape(url)}" data-link="${escape(JSON.stringify(node.fields))}">${children}</a>`;
+  };
+  const converters: HTMLConvertersFunction = ({ defaultConverters }) => ({
+    ...defaultConverters,
+    link,
+    autolink: link,
+    upload,
+  });
+  const one = (block: unknown) =>
+    convertLexicalToHTML({
+      data: { root: { type: "root", children: [block], direction: "ltr", format: "", indent: 0, version: 1 } } as unknown as SerializedEditorState,
+      converters,
+      disableContainer: true,
+      disableIndent: true,
+      disableTextAlign: true,
+    });
+  const html = blocks
+    .map((b, i) =>
+      typed.has(b.type ?? "") ? one(b) : `<div class="edit-kept" data-keep="${i}" contenteditable="false">${one(b)}</div>`
+    )
+    .join("");
+  return { html: markScripts(html), blocks };
+}
+
 /** Tamil and Sanskrit words typed in the editor get their script's font:
     runs of those letters are wrapped in <span lang="…">. Only the text
     between tags is touched, never the tags or their attributes. */

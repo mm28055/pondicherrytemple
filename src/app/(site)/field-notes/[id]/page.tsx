@@ -30,6 +30,8 @@ import { NotePhotos } from "@/components/NotePhotos";
 import { NoteRow } from "@/components/Rows";
 import { packPhotos } from "@/lib/photoPack";
 import { titleFit } from "@/lib/titleFit";
+import { getEditable, isEditing } from "@/lib/editing";
+import { EditRich, EditText } from "@/components/edit/Editable";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -99,6 +101,19 @@ export default async function FieldNotePage({ params }: Props) {
       observances: await getObservancesById(n.observances),
     }))
   );
+  // Admin2 (lib/editing): its title and texts as editable boxes
+  const editing = await isEditing();
+  const editable = editing
+    ? Object.fromEntries(await Promise.all([note.id, ...following.map((f) => f.note.id)].map(async (id) => [id, await getEditable("field-notes", id)] as const)))
+    : {};
+  const editRich = (id: string, title: string) => {
+    const ed = editable[id];
+    if (!ed) return null;
+    const { html, blocks } = ed.rich("body");
+    return <EditRich className="rich" target={{ collection: "field-notes", id: ed.id, field: "body", label: title }} html={html} blocks={blocks} />;
+  };
+  const mine = editable[note.id];
+
   const photos = (await Promise.all([note.id, ...following.map((f) => f.note.id)].map(photosOf)))
     .flat()
     .filter((p, i, all) => all.findIndex((x) => x.id === p.id) === i);
@@ -116,7 +131,11 @@ export default async function FieldNotePage({ params }: Props) {
             </time>
             {local && <span className="local">{local}</span>}
           </div>
-          <h1 className="note-title" style={titleFit(note.title)}>{note.title}</h1>
+          {mine ? (
+            <EditText as="h1" className="note-title" style={titleFit(note.title)} value={mine.text("title")} target={{ collection: "field-notes", id: mine.id, field: "title", label: "Note title" }} required />
+          ) : (
+            <h1 className="note-title" style={titleFit(note.title)}>{note.title}</h1>
+          )}
           <div className="note-meta caps">
             {note.kind !== "note" && <span>{FIELD_KIND_LABELS[note.kind].one}</span>}
             {temples.map((t) =>
@@ -149,7 +168,7 @@ export default async function FieldNotePage({ params }: Props) {
         <NotePhotos pack={packPhotos(photos)} videos={note.videos?.filter((v) => v.type === "video")} seed={note.id} />
         <div className="note-text">
           <article className="note-body">
-            {note.body && <Html className="rich" html={markDictionary(note.body, dictionary)} />}
+            {editing ? editRich(note.id, "Note text") : note.body && <Html className="rich" html={markDictionary(note.body, dictionary)} />}
 
             {note.videos
               ?.filter((v) => v.type === "audio")
@@ -184,7 +203,7 @@ export default async function FieldNotePage({ params }: Props) {
                   ))}
                 </div>
               )}
-              {n.body && <Html className="rich" html={markDictionary(n.body, dictionary)} />}
+              {editing ? editRich(n.id, `Text of ${formatDate(n.date)}`) : n.body && <Html className="rich" html={markDictionary(n.body, dictionary)} />}
             </article>
           ))}
         </div>

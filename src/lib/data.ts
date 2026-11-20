@@ -19,7 +19,7 @@ import { draftMode } from "next/headers";
 import { unstable_cache } from "next/cache";
 import { buildDictionary, type DictionaryEntry } from "./dictionary";
 import { getPayload, type Payload, type Where } from "payload";
-import { PHOTOS_TAG, SITE_CONTENT_TAG } from "./siteCache";
+import { PHOTOS_TAG, PREVIEW_PHOTOS_FOR, SITE_CONTENT_TAG, photosVersionNow } from "./siteCache";
 import { cache } from "react";
 import type * as P from "@/payload-types";
 import type {
@@ -192,7 +192,19 @@ async function rawOne<C extends "field-notes" | "articles" | "films">(collection
     Read a part at a time, each part kept on its own (the data cache keeps
     nothing over 2 MB), with only what the site shows of each. */
 const PHOTO_PART = 1000; // about 1 KB each: 1 MB a part, well under the limit
+// while previewing: kept in this server's memory (lib/siteCache)
+let previewPhotos: { at: number; version: number; docs: Promise<P.Media[]> } | undefined;
 const rawPhotos = cache(async () => {
+  if (process.env.NODE_ENV === "development" || !(await previewing())) return readPhotos();
+  const now = Date.now();
+  if (!previewPhotos || previewPhotos.version !== photosVersionNow() || now - previewPhotos.at > PREVIEW_PHOTOS_FOR) {
+    previewPhotos = { at: now, version: photosVersionNow(), docs: readPhotos() };
+    previewPhotos.docs.catch(() => (previewPhotos = undefined));
+  }
+  return previewPhotos.docs;
+});
+
+async function readPhotos() {
   const out: P.Media[] = [];
   for (let page = 1; ; page++) {
     const { docs, hasNextPage } = await findPhotos({
@@ -218,7 +230,7 @@ const rawPhotos = cache(async () => {
     out.push(...(docs as P.Media[]));
     if (!hasNextPage) return out;
   }
-});
+}
 
 /** The photo sets: each day's or event's photographs, as kept in their folders. */
 const rawSets = cache(async () =>
@@ -313,10 +325,11 @@ function toTempleDay(t: P.Temple): TempleDay | undefined {
   const day: TempleDay = {
     standard: t.dayStandard?.trim() || undefined,
     intro: t.dayIntro?.trim() || undefined,
-    kalams: (t.ritualDay ?? []).flatMap((k) =>
+    kalams: (t.ritualDay ?? []).flatMap((k, at) =>
       k.kalam?.trim()
         ? [
             {
+              at,
               kalam: k.kalam.trim(),
               tamil: k.tamil?.trim() || undefined,
               time: k.time?.trim() || undefined,
@@ -376,6 +389,7 @@ const toObservance = (o: P.Observance, L: Lookups): Observance => ({
 });
 
 const toOccasion = (o: P.Occasion, L: Lookups): Occasion => ({
+  ref: o.id,
   date: dayOf(o.date),
   region: L.regionOf(o.region),
   temple: L.templeSlug.get(idOf(o.temple) ?? -1) ?? "",
@@ -1081,6 +1095,10 @@ export async function getOccasionsInMonth(monthSlug: string): Promise<Occasion[]
     its festival's or ritual's. */
 export type TempleYearEntry = {
   observance?: Observance;
+  /** a regular ritual's entry in the admin (Regular rituals), for Admin2 */
+  ritualId?: string;
+  /** the day (occasion) its line below the name is written on, or would be (for Admin2) */
+  aboutRef?: number;
   /** the days recorded of it (not shown: see `length`) */
   days: number;
   /** how many days it lasts, from the temple's ritual calendar (the admin's
@@ -1170,6 +1188,7 @@ export async function getTempleRitualYear(regionId: string, templeId: string): P
           : `${r.often === "fortnightly" ? "Twice a month" : "Every month"}${r.on ? `, on ${r.on}` : ""}`;
       return {
         observance,
+        ritualId: r.id,
         days: 0,
         name: r.what,
         tamil: r.tamil ?? observance?.tamil,
@@ -1190,6 +1209,8 @@ export async function getTempleRitualYear(regionId: string, templeId: string): P
   const datesOf = new Map<string, Set<string>>();
   // a line below its name, given to one of its days in the admin
   const aboutOf = new Map<string, string>();
+  // (for Admin2: the day that line is written on; else its latest day, to write it on)
+  const aboutRefOf = new Map<string, { ref?: number; date: string; noted: boolean }>();
   for (const o of seen) {
     const what = dayOf(o);
     if (!what) continue;
@@ -1201,6 +1222,8 @@ export async function getTempleRitualYear(regionId: string, templeId: string): P
     if (((what.recurs ?? what.observance.recurs) !== "yearly" || ownName) && isRegular(o)) continue;
     whatOf.set(what.key, what);
     if (o.yearNote) aboutOf.set(what.key, o.yearNote);
+    const had = aboutRefOf.get(what.key);
+    if (o.yearNote || (!had?.noted && (!had || o.date >= had.date))) aboutRefOf.set(what.key, { ref: o.ref, date: o.date, noted: Boolean(o.yearNote) });
     datesOf.set(what.key, (datesOf.get(what.key) ?? new Set<string>()).add(o.date));
   }
   const DAY = 86400000;
@@ -1228,7 +1251,7 @@ export async function getTempleRitualYear(regionId: string, templeId: string): P
       const entries = months.get(tamilMonthOf(first))!;
       const had = entries.find((x) => x.key === id);
       if (had) had.days += run.length;
-      else entries.push({ key: id, observance, name, recurs, when, about: aboutOf.get(id), days: run.length, start: Date.parse(run[0]) - Date.parse(first) });
+      else entries.push({ key: id, observance, name, recurs, when, about: aboutOf.get(id), aboutRef: aboutRefOf.get(id)?.ref, days: run.length, start: Date.parse(run[0]) - Date.parse(first) });
     }
   }
   // what comes every month or every week comes in each of them: listed under

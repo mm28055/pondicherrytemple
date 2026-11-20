@@ -8,3 +8,13 @@ export const SITE_CONTENT_TAG = "site-content";
    deleted, so that saving a field note or a temple does not have every
    photograph read from the database again. */
 export const PHOTOS_TAG = "site-photos";
+
+/* While previewing (and in Admin2) Next keeps nothing between visits, and
+   reading every photograph afresh made a temple's page take 6 seconds
+   (20 Nov 2026). So there they are kept in this server's memory instead,
+   until a photo or photo set is saved here (photosChanged) or for two
+   minutes at most (another server, on the live site, may have had the save). */
+export const PREVIEW_PHOTOS_FOR = 2 * 60 * 1000;
+let photosVersion = 0;
+export const photosChanged = () => void photosVersion++;
+export const photosVersionNow = () => photosVersion;

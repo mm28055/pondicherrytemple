@@ -10,6 +10,8 @@ import { LandAtTop } from "@/components/LandAtTop";
 import { PageNames } from "@/components/PageNames";
 import { NoImageSave } from "@/components/NoImageSave";
 import { Analytics } from "@/components/Analytics";
+import { EditBar } from "@/components/edit/EditBar";
+import { isEditing } from "@/lib/editing";
 import { SITE_URL, shareMeta } from "@/lib/share";
 
 /* The public site. (The admin, under /admin, has its own layout in (payload).) */
@@ -73,10 +75,12 @@ export const metadata: Metadata = {
 export default async function SiteLayout({ children }: { children: React.ReactNode }) {
   // An editor pressed "Preview" in the admin: the site is showing unpublished drafts.
   const { isEnabled: previewing } = await draftMode();
+  // Admin2 (lib/editing): the site editable, its own bar in place of the preview's
+  const editing = previewing && (await isEditing());
   return (
     <html lang="en" className={`${anekLatin.variable} ${anekTamil.variable} ${anekDevanagari.variable} ${baloo.variable} ${specialGothic.variable}`}>
-      <body>
-        {previewing && (
+      <body className={editing ? "editing" : undefined}>
+        {previewing && !editing && (
           <div className="preview-bar">
             Preview — showing unpublished drafts. <a href="/next/exit-preview">Leave preview</a>
           </div>
@@ -90,6 +94,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
         <PageNames />
         <NoImageSave />
         <Analytics />
+        {editing && <EditBar />}
       </body>
     </html>
   );

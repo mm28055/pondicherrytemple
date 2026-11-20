@@ -3746,3 +3746,52 @@ span.month-obs .month-obs-more { display: none; }
    level with its text): more from its temple, each with its photograph, as on
    the Field Notes page; then the note before or after */
 .note-after .note-foot { max-width: none; margin: 0; padding: clamp(24px, 3vw, 40px) 0 clamp(56px, 7vw, 88px); }
+
+/* ---------- Admin2: the site editable (lib/editing, components/edit) ----------
+   Each editable text has a faint dashed outline on hover, a firmer one while
+   open; the bar sits at the foot of the screen, frosted like the menus. */
+.editing { padding-bottom: 64px; }
+.edit-box { cursor: text; border-radius: 3px; transition: outline-color 0.15s; outline: 1px dashed transparent; outline-offset: 4px; }
+.editing .edit-box:hover { outline-color: color-mix(in srgb, var(--turmeric) 55%, transparent); }
+.edit-box.edit-open,
+.editing .edit-box.edit-open:hover { outline: 2px solid var(--turmeric); outline-offset: 6px; background: color-mix(in srgb, var(--chalk) 70%, #fff); cursor: text; }
+.edit-box.edit-open:focus { outline-style: solid; }
+.edit-kept { user-select: none; opacity: 0.85; }
+.edit-long { white-space: pre-line; }
+/* an empty box: its placeholder, faintly, until it is opened */
+.edit-empty { display: inline-block; min-width: 4em; }
+.edit-empty::before { content: attr(data-placeholder); color: var(--muted); opacity: 0.55; font-style: italic; text-transform: none; letter-spacing: 0; font-size: 0.85em; }
+.edit-empty:not([data-placeholder])::before { content: none; }
+div.edit-empty, p.edit-empty, h4.edit-empty { display: block; }
+.edit-box.edit-open .edit-kept { outline: 1px dotted var(--rule); }
+.edit-bar {
+  position: fixed; z-index: 90; left: 50%; bottom: 14px; transform: translateX(-50%);
+  display: flex; align-items: center; gap: 14px; flex-wrap: nowrap;
+  max-width: calc(100vw - 32px); padding: 8px 10px 8px 16px;
+  background: color-mix(in srgb, var(--chalk) 79%, transparent);
+  -webkit-backdrop-filter: blur(14px) saturate(1.2); backdrop-filter: blur(14px) saturate(1.2);
+  border: 1px solid var(--rule); border-radius: 999px;
+  box-shadow: 0 6px 24px rgba(25, 21, 18, 0.14);
+  font-family: var(--display); font-size: 15px; color: var(--ink);
+  white-space: nowrap; user-select: none;
+}
+.edit-bar-label { font-weight: 600; letter-spacing: 0.04em; color: var(--turmeric); }
+.edit-bar button.edit-bar-label { border: 0; padding: 0; min-width: 0; color: var(--turmeric); overflow: hidden; text-overflow: ellipsis; max-width: 40vw; }
+.edit-bar button.edit-bar-label:hover { text-decoration: underline; }
+.edit-bar-hint { color: var(--muted); overflow: hidden; text-overflow: ellipsis; }
+.edit-bar a { color: var(--ink); text-decoration: none; }
+.edit-bar a:hover { color: var(--ochre); }
+.edit-bar-group { display: inline-flex; gap: 6px; }
+.edit-bar-say { position: absolute; left: 50%; bottom: calc(100% + 8px); transform: translateX(-50%); padding: 4px 12px; border-radius: 999px; background: var(--chalk); border: 1px solid var(--rule); color: var(--ink-2); white-space: nowrap; box-shadow: 0 4px 14px rgba(25, 21, 18, 0.1); }
+.edit-bar button {
+  font: inherit; color: var(--ink); background: transparent; cursor: pointer;
+  border: 1px solid var(--rule); border-radius: 999px; padding: 4px 13px; min-width: 34px;
+}
+.edit-bar button:hover:not(:disabled) { border-color: var(--ink-2); }
+.edit-bar button:disabled { opacity: 0.5; cursor: default; }
+.edit-bar .edit-bar-save { background: var(--turmeric); border-color: var(--turmeric); color: #fff; }
+.edit-bar .edit-bar-save:hover:not(:disabled) { background: var(--ochre-deep); border-color: var(--ochre-deep); }
+@media (max-width: 640px) {
+  .edit-bar { gap: 8px; font-size: 13px; padding-left: 12px; }
+  .edit-bar-hint { display: none; }
+}
