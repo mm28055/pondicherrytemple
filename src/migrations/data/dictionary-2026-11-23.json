@@ -1,0 +1,786 @@
+[
+ {
+  "word": "aadheenam",
+  "alsoWritten": null,
+  "meaning": "A Shaiva monastery and its line of heads, keeper of temples and teaching",
+  "exactCase": false,
+  "foundIn": "Field note: The Start of the Festival of Murugan"
+ },
+ {
+  "word": "aalayam",
+  "alsoWritten": "aalaya",
+  "meaning": "Temple; literally, the house of a deity",
+  "exactCase": false,
+  "foundIn": "Sundara Vinayaka Koyil: introduction"
+ },
+ {
+  "word": "Abhimana Sthalam",
+  "alsoWritten": null,
+  "meaning": "A temple held dear by a Vaishnava saint, or tied by tradition to one of the 108 Divya Desams, though not itself one of them",
+  "exactCase": false,
+  "foundIn": "Varadaraja Perumal Koyil: introduction"
+ },
+ {
+  "word": "adheenam",
+  "alsoWritten": null,
+  "meaning": "A Saiva monastery headed by a line of pontiffs, which keeps the Agama tradition and often looks after temples",
+  "exactCase": false,
+  "foundIn": "Nandhikeswara Koyil: introduction"
+ },
+ {
+  "word": "aideegam",
+  "alsoWritten": "aitheegam",
+  "meaning": "Belief handed down: what tradition holds to be so",
+  "exactCase": false,
+  "foundIn": "Field note: The Temple as Interface"
+ },
+ {
+  "word": "Akarshana",
+  "alsoWritten": null,
+  "meaning": "Drawing towards, attracting; in Dhana Akarshana, the drawing in of wealth",
+  "exactCase": false,
+  "foundIn": "Field note: Laddoo Alankara and Dhana Akarshana Puja"
+ },
+ {
+  "word": "arulmigu",
+  "alsoWritten": null,
+  "meaning": "Full of grace: a word of honour put before a deity's name, often in a temple's full name",
+  "exactCase": false,
+  "foundIn": "Manonmani Mariamman Koyil: introduction"
+ },
+ {
+  "word": "Arupadaiveedu",
+  "alsoWritten": null,
+  "meaning": "Murugan's six sacred abodes in Tamil Nadu",
+  "exactCase": false,
+  "foundIn": "Field note: Sashti Dwitiya or Sashti Irandaam-Naal"
+ },
+ {
+  "word": "astrar",
+  "alsoWritten": null,
+  "meaning": "A small protective form of the deity, usually depicted against a larger trident.",
+  "exactCase": false,
+  "foundIn": "Field note: Sashti by the Sea"
+ },
+ {
+  "word": "asura",
+  "alsoWritten": "asuras",
+  "meaning": "Sons of Diti, as opposed to Devas who are sons of Aditi",
+  "exactCase": false,
+  "foundIn": "Field note: The Battle Continues and Murugan Gets the Vel"
+ },
+ {
+  "word": "beeja mantra",
+  "alsoWritten": "beeja",
+  "meaning": "Seed syllable: a sound of one syllable held to contain a deity's power, the core of a mantra",
+  "exactCase": false,
+  "foundIn": "Nandhikeswara Koyil: introduction"
+ },
+ {
+  "word": "bheri",
+  "alsoWritten": null,
+  "meaning": "A drum, honoured before the flag goes up",
+  "exactCase": false,
+  "foundIn": "Field note: The Flag Goes Up on Sashti Muthal Naal"
+ },
+ {
+  "word": "bilvam",
+  "alsoWritten": "bilva",
+  "meaning": "The bael tree (Aegle marmelos), whose three-part leaf is sacred to Siva and offered in his puja",
+  "exactCase": false,
+  "foundIn": "Vedapuriswara Koyil: introduction"
+ },
+ {
+  "word": "Brahmahati",
+  "alsoWritten": "Brahmahatya",
+  "meaning": "The sin of killing a Brahmin; in the story, the curse that clung to Siva after he cut off one of Brahma's five heads",
+  "exactCase": false,
+  "foundIn": "Angala Parameswari Koyil: introduction"
+ },
+ {
+  "word": "brahmandam",
+  "alsoWritten": null,
+  "meaning": "The cosmic egg: the whole universe",
+  "exactCase": false,
+  "foundIn": "Field note: A Camera-Happy Temple"
+ },
+ {
+  "word": "Chaturdasi",
+  "alsoWritten": "chaturdashi",
+  "meaning": "The fourteenth day of the moon's fortnight; before Deepavali, Naraka Chaturdasi",
+  "exactCase": false,
+  "foundIn": "Field note: Deepavali Begins with the End of 21 Days"
+ },
+ {
+  "word": "damaru",
+  "alsoWritten": null,
+  "meaning": "A small two-headed hand drum shaped like an hourglass, held by Siva",
+  "exactCase": false,
+  "foundIn": "Vedapuriswara Koyil: introduction"
+ },
+ {
+  "word": "devasthanam",
+  "alsoWritten": null,
+  "meaning": "A temple and its estate as an institution: the name a temple goes by under its board or trust",
+  "exactCase": false,
+  "foundIn": "Kalatthiswara Koyil: introduction"
+ },
+ {
+  "word": "Dhana",
+  "alsoWritten": null,
+  "meaning": "Wealth",
+  "exactCase": false,
+  "foundIn": "Field note: Laddoo Alankara and Dhana Akarshana Puja"
+ },
+ {
+  "word": "dinapadi",
+  "alsoWritten": null,
+  "meaning": "Daily; the temple's everyday round of worship",
+  "exactCase": false,
+  "foundIn": "Field note: Sashti by the Sea"
+ },
+ {
+  "word": "Gandharva",
+  "alsoWritten": null,
+  "meaning": "A celestial musician",
+  "exactCase": false,
+  "foundIn": "Field note: The Temple as Interface"
+ },
+ {
+  "word": "giridam",
+  "alsoWritten": "kireedam",
+  "meaning": "Crown",
+  "exactCase": false,
+  "foundIn": "Field note: May the Battles Begin! (Vidula Joined Us)"
+ },
+ {
+  "word": "goshala",
+  "alsoWritten": null,
+  "meaning": "A shelter for cows",
+  "exactCase": false,
+  "foundIn": "Field note: Preparations for Karthikai Somavaram Shankhabhishekam"
+ },
+ {
+  "word": "Guru puja",
+  "alsoWritten": null,
+  "meaning": "The yearly worship of a saint, on the day of his birth star or of his passing",
+  "exactCase": false,
+  "foundIn": "Vedapuriswara Koyil: introduction"
+ },
+ {
+  "word": "Hecharige",
+  "alsoWritten": null,
+  "meaning": "\"Attention!\", the call that closes a Vaishnava procession",
+  "exactCase": false,
+  "foundIn": "Field note: A Thenkalai Acharya’s Utsavam at a Vadakalai Temple"
+ },
+ {
+  "word": "Ishti",
+  "alsoWritten": null,
+  "meaning": "A Vedic offering into the fire",
+  "exactCase": false,
+  "foundIn": "Field note: Preparations for Karthikai Somavaram Shankhabhishekam"
+ },
+ {
+  "word": "kapala",
+  "alsoWritten": null,
+  "meaning": "A skull carried as a begging bowl; in the story, Brahma's skull, which stuck to Siva's hand",
+  "exactCase": false,
+  "foundIn": "Angala Parameswari Koyil: introduction"
+ },
+ {
+  "word": "karathalam",
+  "alsoWritten": null,
+  "meaning": "Small hand cymbals that keep the beat in bhajanai",
+  "exactCase": false,
+  "foundIn": "Field note: Bhajanai Sounds from a Shaiva Temple"
+ },
+ {
+  "word": "keerthanai",
+  "alsoWritten": "keerthanais",
+  "meaning": "A devotional song in set verses, sung in a raga",
+  "exactCase": false,
+  "foundIn": "Field note: A Thenkalai Acharya’s Utsavam at a Vadakalai Temple"
+ },
+ {
+  "word": "kinnam",
+  "alsoWritten": "kinni",
+  "meaning": "A small metal cup or bowl",
+  "exactCase": false,
+  "foundIn": "Kamakshi Amman Aalayam: introduction"
+ },
+ {
+  "word": "koorcham",
+  "alsoWritten": "koorchatthil",
+  "meaning": "A knot of darbha grass in which a deity is invoked for a puja",
+  "exactCase": false,
+  "foundIn": "Field note: Laddoo Alankara and Dhana Akarshana Puja"
+ },
+ {
+  "word": "Koothu",
+  "alsoWritten": null,
+  "meaning": "Tamil folk theatre of song, dance and story",
+  "exactCase": false,
+  "foundIn": "Field note: Kanda Sashti Vizha Day 9"
+ },
+ {
+  "word": "koottu",
+  "alsoWritten": null,
+  "meaning": "Vegetables cooked with lentils",
+  "exactCase": false,
+  "foundIn": "Field note: The Battle Continues and Murugan Gets the Vel"
+ },
+ {
+  "word": "kuladaivam",
+  "alsoWritten": "kuladeivam",
+  "meaning": "Family deity: the deity a family or lineage worships as its own, whose temple it returns to for its important events",
+  "exactCase": false,
+  "foundIn": "Mutthumariamman Koyil: introduction"
+ },
+ {
+  "word": "Lalitasahasranama",
+  "alsoWritten": null,
+  "meaning": "The thousand names of the Goddess Lalita",
+  "exactCase": false,
+  "foundIn": "Field note: Homams Taller and Broader"
+ },
+ {
+  "word": "Leela",
+  "alsoWritten": null,
+  "meaning": "Divine play",
+  "exactCase": false,
+  "foundIn": "Field note: May the Battles Begin! (Vidula Joined Us)"
+ },
+ {
+  "word": "maada veethi",
+  "alsoWritten": "mada veethi",
+  "meaning": "The streets round a temple, along which its processions go",
+  "exactCase": false,
+  "foundIn": "Field note: A Camera-Happy Temple"
+ },
+ {
+  "word": "Magudi",
+  "alsoWritten": null,
+  "meaning": "The snake charmer's gourd pipe",
+  "exactCase": false,
+  "foundIn": "Field note: Kanda Sashti Vizha Day 9"
+ },
+ {
+  "word": "Mahamrityunjaya",
+  "alsoWritten": null,
+  "meaning": "The great mantra to Siva as conqueror of death",
+  "exactCase": false,
+  "foundIn": "Field note: Homams Taller and Broader"
+ },
+ {
+  "word": "manjaneer",
+  "alsoWritten": "manjal neer, manjal-water",
+  "meaning": "Turmeric water, sprinkled on the deities and devotees",
+  "exactCase": false,
+  "foundIn": "Field note: Manjal Neer Utsavam"
+ },
+ {
+  "word": "mukham",
+  "alsoWritten": null,
+  "meaning": "Face",
+  "exactCase": false,
+  "foundIn": "Field note: May the Battles Begin! (Vidula Joined Us)"
+ },
+ {
+  "word": "mulaippu",
+  "alsoWritten": null,
+  "meaning": "Sprouting; the sowing of grains that begins a festival",
+  "exactCase": false,
+  "foundIn": "Field note: Kanda Sashti Vizha Day 9"
+ },
+ {
+  "word": "murungai",
+  "alsoWritten": null,
+  "meaning": "The drumstick tree (Moringa Olifera)",
+  "exactCase": false,
+  "foundIn": "Field note: The Battle Continues and Murugan Gets the Vel"
+ },
+ {
+  "word": "Naraka",
+  "alsoWritten": null,
+  "meaning": "The nether regions; also the demon Narakasura, whose death Deepavali marks",
+  "exactCase": false,
+  "foundIn": "Field note: Deepavali Begins with the End of 21 Days"
+ },
+ {
+  "word": "nava-danyam",
+  "alsoWritten": null,
+  "meaning": "The nine grains, sown to sprout as a sign of fertility",
+  "exactCase": false,
+  "foundIn": "Field note: Kanda Sashti Vizha Day 9"
+ },
+ {
+  "word": "Navaveerargal",
+  "alsoWritten": "Navaveerangal, Navaveeras, Navaveera",
+  "meaning": "The nine heroes, Murugan's companions in battle, led by Veerabahu",
+  "exactCase": false,
+  "foundIn": "Field note: The Flag Goes Up on Sashti Muthal Naal"
+ },
+ {
+  "word": "Neithal",
+  "alsoWritten": null,
+  "meaning": "In Sangam poetry, the seashore landscape and its life",
+  "exactCase": false,
+  "foundIn": "Field note: Deepavali Begins with the End of 21 Days"
+ },
+ {
+  "word": "nonbu",
+  "alsoWritten": null,
+  "meaning": "A vow kept for a deity on a set day, usually with fasting",
+  "exactCase": false,
+  "foundIn": "Mutthumariamman Koyil: introduction"
+ },
+ {
+  "word": "paal-naivedyam",
+  "alsoWritten": null,
+  "meaning": "Milk offered to the deity",
+  "exactCase": false,
+  "foundIn": "Field note: Homams Taller and Broader"
+ },
+ {
+  "word": "Paalikai",
+  "alsoWritten": null,
+  "meaning": "Small earthen pots in which grains are sown to sprout at a festival's start",
+  "exactCase": false,
+  "foundIn": "Field note: Kanda Sashti Vizha Day 9"
+ },
+ {
+  "word": "Paatu",
+  "alsoWritten": null,
+  "meaning": "Song",
+  "exactCase": false,
+  "foundIn": "Field note: Kanda Sashti Vizha Day 9"
+ },
+ {
+  "word": "panchaloham",
+  "alsoWritten": null,
+  "meaning": "An alloy of five metals, used for utsava murtis",
+  "exactCase": false,
+  "foundIn": "Nandhikeswara Koyil: introduction"
+ },
+ {
+  "word": "Panchamukha",
+  "alsoWritten": null,
+  "meaning": "Five-faced; Panchamukha Anjaneya is Hanuman with five faces",
+  "exactCase": false,
+  "foundIn": "Ghousiga Balasubramaniar Koyil: introduction"
+ },
+ {
+  "word": "panchapatra",
+  "alsoWritten": null,
+  "meaning": "A small vessel of water used in worship",
+  "exactCase": false,
+  "foundIn": "Field note: Preparation for Tomorrow’s Celebrations"
+ },
+ {
+  "word": "pariharam",
+  "alsoWritten": null,
+  "meaning": "A remedy: a rite done to ward off harm or set something right",
+  "exactCase": false,
+  "foundIn": "Field note: A Thenkalai Acharya’s Utsavam at a Vadakalai Temple"
+ },
+ {
+  "word": "parikrama",
+  "alsoWritten": null,
+  "meaning": "Walking around a shrine or temple, keeping it on one's right; the path for it. Another word for pradakshina",
+  "exactCase": false,
+  "foundIn": "Arulmigu Manakkula Vinayagar Devasthanam: introduction"
+ },
+ {
+  "word": "partivattan",
+  "alsoWritten": "parivattam",
+  "meaning": "A cloth of honour tied around the head",
+  "exactCase": false,
+  "foundIn": "Field note: A Thenkalai Acharya’s Utsavam at a Vadakalai Temple"
+ },
+ {
+  "word": "pathashala",
+  "alsoWritten": null,
+  "meaning": "A school for Vedic learning",
+  "exactCase": false,
+  "foundIn": "Field note: Preparations for Karthikai Somavaram Shankhabhishekam"
+ },
+ {
+  "word": "poosani",
+  "alsoWritten": null,
+  "meaning": "Ash gourd",
+  "exactCase": false,
+  "foundIn": "Field note: The Battle Continues and Murugan Gets the Vel"
+ },
+ {
+  "word": "poriyal",
+  "alsoWritten": null,
+  "meaning": "A dry dish of vegetables stir-fried with spices",
+  "exactCase": false,
+  "foundIn": "Field note: The Battle Continues and Murugan Gets the Vel"
+ },
+ {
+  "word": "pradakshinam",
+  "alsoWritten": null,
+  "meaning": "Going round clockwise, the deity on the right",
+  "exactCase": false,
+  "foundIn": "Field note: May the Battles Begin! (Vidula Joined Us)"
+ },
+ {
+  "word": "Pratipada",
+  "alsoWritten": null,
+  "meaning": "The first day of the moon's fortnight",
+  "exactCase": false,
+  "foundIn": "Field note: The Flag Goes Up on Sashti Muthal Naal"
+ },
+ {
+  "word": "punnai",
+  "alsoWritten": null,
+  "meaning": "The Alexandrian laurel, a large shade tree of the coast",
+  "exactCase": false,
+  "foundIn": "Field note: Deepavali Begins with the End of 21 Days"
+ },
+ {
+  "word": "Pushya",
+  "alsoWritten": null,
+  "meaning": "The eighth nakshatra, Poosam in Tamil",
+  "exactCase": false,
+  "foundIn": "Field note: Laddoo Alankara and Dhana Akarshana Puja"
+ },
+ {
+  "word": "rajagopuram",
+  "alsoWritten": null,
+  "meaning": "The tallest gopuram of a temple, over its main entrance",
+  "exactCase": false,
+  "foundIn": "Kamakshi Amman Aalayam: introduction"
+ },
+ {
+  "word": "saar",
+  "alsoWritten": null,
+  "meaning": "A thin spiced broth, like rasam",
+  "exactCase": false,
+  "foundIn": "Field note: The Battle Continues and Murugan Gets the Vel"
+ },
+ {
+  "word": "sabhai",
+  "alsoWritten": null,
+  "meaning": "A hall; also a society of devotees that serves a temple",
+  "exactCase": false,
+  "foundIn": "Vedapuriswara Koyil: introduction"
+ },
+ {
+  "word": "Saiva",
+  "alsoWritten": null,
+  "meaning": "Of Siva and his worship; a worshipper of Siva",
+  "exactCase": false,
+  "foundIn": "Kalatthiswara Koyil: introduction"
+ },
+ {
+  "word": "samadhi",
+  "alsoWritten": null,
+  "meaning": "The tomb of a holy person, often itself a place of worship",
+  "exactCase": false,
+  "foundIn": "Arulmigu Manakkula Vinayagar Devasthanam: introduction"
+ },
+ {
+  "word": "samedha",
+  "alsoWritten": null,
+  "meaning": "Together with: joins the goddess's name to her lord's in a temple's full name, as in Tripurasundari Samedha Vedapuriswarar",
+  "exactCase": false,
+  "foundIn": "Vedapuriswara Koyil: introduction"
+ },
+ {
+  "word": "Santanagopala",
+  "alsoWritten": null,
+  "meaning": "Krishna as the giver of children; his homam is made for children",
+  "exactCase": false,
+  "foundIn": "Field note: Homams Taller and Broader"
+ },
+ {
+  "word": "Saptamatrikas",
+  "alsoWritten": null,
+  "meaning": "The Seven Mothers: seven goddesses, each the power of a god, worshipped together",
+  "exactCase": false,
+  "foundIn": "Sundara Vinayaka Koyil: introduction"
+ },
+ {
+  "word": "Shakti",
+  "alsoWritten": null,
+  "meaning": "Power, divine energy; the goddess as that power, Siva's consort",
+  "exactCase": false,
+  "foundIn": "Angala Parameswari Koyil: introduction"
+ },
+ {
+  "word": "shatari",
+  "alsoWritten": null,
+  "meaning": "The crown bearing Perumal's feet, placed on devotees' heads",
+  "exactCase": false,
+  "foundIn": "Field note: Pooradam Nakshatram"
+ },
+ {
+  "word": "Shodashopachara",
+  "alsoWritten": null,
+  "meaning": "The sixteen offerings of worship",
+  "exactCase": false,
+  "foundIn": "Field note: The Flag Goes Up on Sashti Muthal Naal"
+ },
+ {
+  "word": "Sivanadiyar",
+  "alsoWritten": null,
+  "meaning": "A devotee of Siva; literally, one at Siva's feet",
+  "exactCase": false,
+  "foundIn": "Field note: Bhajanai Sounds from a Shaiva Temple"
+ },
+ {
+  "word": "sphatika",
+  "alsoWritten": null,
+  "meaning": "Quartz crystal, of which some lingams and beads are made",
+  "exactCase": false,
+  "foundIn": "Arulmigu Manakkula Vinayagar Devasthanam: introduction"
+ },
+ {
+  "word": "sthalapurana",
+  "alsoWritten": "sthalapuranam",
+  "meaning": "A temple's own purana or story: the deity's origin in that sthalam",
+  "exactCase": false,
+  "foundIn": "Field note: Deepavali Begins with the End of 21 Days"
+ },
+ {
+  "word": "Svayamvara",
+  "alsoWritten": null,
+  "meaning": "A bride's choosing of her husband; Parvati's choosing of Siva",
+  "exactCase": false,
+  "foundIn": "Field note: Homams Taller and Broader"
+ },
+ {
+  "word": "swamigal",
+  "alsoWritten": null,
+  "meaning": "A word of honour for a holy man or ascetic, put after his name",
+  "exactCase": false,
+  "foundIn": "Nandhikeswara Koyil: introduction"
+ },
+ {
+  "word": "thanga ther",
+  "alsoWritten": null,
+  "meaning": "Golden chariot: a ther covered in gold or gold foil, drawn in procession",
+  "exactCase": false,
+  "foundIn": "Siva Subramania Swamy Devasthanam: introduction"
+ },
+ {
+  "word": "thattu kaasu",
+  "alsoWritten": "thattu-kaasu",
+  "meaning": "Money placed on the priest's arati plate",
+  "exactCase": false,
+  "foundIn": "Field note: Deepavali Begins with the End of 21 Days"
+ },
+ {
+  "word": "theertham",
+  "alsoWritten": null,
+  "meaning": "Holy water: water from a temple's tank, or the water of an abhishekam, given to devotees",
+  "exactCase": false,
+  "foundIn": "Vedapuriswara Koyil: introduction"
+ },
+ {
+  "word": "thidal",
+  "alsoWritten": null,
+  "meaning": "An open ground",
+  "exactCase": false,
+  "foundIn": "Field note: Sashti by the Sea"
+ },
+ {
+  "word": "thirai",
+  "alsoWritten": null,
+  "meaning": "The screen drawn before a deity",
+  "exactCase": false,
+  "foundIn": "Field note: May the Battles Begin! (Vidula Joined Us)"
+ },
+ {
+  "word": "Thiruanthikappu",
+  "alsoWritten": null,
+  "meaning": "The rite at a procession's end that wards off the evil eye from the deity",
+  "exactCase": false,
+  "foundIn": "Field note: A Thenkalai Acharya’s Utsavam at a Vadakalai Temple"
+ },
+ {
+  "word": "thirukoyil",
+  "alsoWritten": null,
+  "meaning": "Temple, with a word of honour (thiru, sacred): the word that ends many temples' full names",
+  "exactCase": false,
+  "foundIn": "Vedapuriswara Koyil: introduction"
+ },
+ {
+  "word": "Thirunakshatra",
+  "alsoWritten": "thirunakshatram",
+  "meaning": "The birth-star day of a deity, saint or acharya, kept every year",
+  "exactCase": false,
+  "foundIn": "Field note: Pooradam Nakshatram"
+ },
+ {
+  "word": "thiruthondu",
+  "alsoWritten": null,
+  "meaning": "Divine service: work done for a temple and its devotees, as the Nayanmars did",
+  "exactCase": false,
+  "foundIn": "Vedapuriswara Koyil: introduction"
+ },
+ {
+  "word": "thiruvachi",
+  "alsoWritten": null,
+  "meaning": "The arch framing a deity",
+  "exactCase": false,
+  "foundIn": "Field note: May the Battles Begin! (Vidula Joined Us)"
+ },
+ {
+  "word": "Thiruvathirai",
+  "alsoWritten": "Ardra, Arudra",
+  "meaning": "The sixth nakshatram, Siva's star; in Margazhi, the festival of Nataraja",
+  "exactCase": false,
+  "foundIn": "Nandhikeswara Koyil: introduction"
+ },
+ {
+  "word": "thiruvodu",
+  "alsoWritten": null,
+  "meaning": "Sacred bowl: the begging bowl of a Saiva ascetic, made from the hard fruit of the calabash tree (Crescentia cujete); also the tree",
+  "exactCase": false,
+  "foundIn": "Vedapuriswara Koyil: introduction"
+ },
+ {
+  "word": "thol-oda",
+  "alsoWritten": null,
+  "meaning": "On the shoulders (a deity carried by bearers, not on a vehicle)",
+  "exactCase": false,
+  "foundIn": "Field note: Wait, Not Such Lonely Trails After All"
+ },
+ {
+  "word": "thonnai",
+  "alsoWritten": "thonnais",
+  "meaning": "A small cup folded from a leaf",
+  "exactCase": false,
+  "foundIn": "Field note: Laddoo Alankara and Dhana Akarshana Puja"
+ },
+ {
+  "word": "thundu",
+  "alsoWritten": null,
+  "meaning": "A short length of cloth, a towel or shoulder cloth",
+  "exactCase": false,
+  "foundIn": "Field note: Laddoo Alankara and Dhana Akarshana Puja"
+ },
+ {
+  "word": "Tripundram",
+  "alsoWritten": null,
+  "meaning": "Three lines of sacred ash across the forehead",
+  "exactCase": false,
+  "foundIn": "Field note: May the Battles Begin! (Vidula Joined Us)"
+ },
+ {
+  "word": "udharini",
+  "alsoWritten": null,
+  "meaning": "The little spoon that pours water from the panchapatra",
+  "exactCase": false,
+  "foundIn": "Field note: Preparation for Tomorrow’s Celebrations"
+ },
+ {
+  "word": "ugra",
+  "alsoWritten": null,
+  "meaning": "Fierce: the fierce, wrathful form of a deity, as against the calm form",
+  "exactCase": false,
+  "foundIn": "Angala Parameswari Koyil: introduction"
+ },
+ {
+  "word": "ul-prakaram",
+  "alsoWritten": "ul-prakara",
+  "meaning": "The inner path round the sanctum",
+  "exactCase": false,
+  "foundIn": "Field note: Pooradam Nakshatram"
+ },
+ {
+  "word": "umikkal",
+  "alsoWritten": null,
+  "meaning": "A heavy stone block used for pounding",
+  "exactCase": false,
+  "foundIn": "Field note: The Greatest Battle of Them All: Soora Samharam"
+ },
+ {
+  "word": "ural",
+  "alsoWritten": null,
+  "meaning": "A stone mortar, for pounding with a long pestle",
+  "exactCase": true,
+  "foundIn": "Field note: Kanda Sashti Vizha Day 9"
+ },
+ {
+  "word": "Vaikhanasa",
+  "alsoWritten": null,
+  "meaning": "One of the two Agama traditions of worship in Vishnu temples (the other is Pancharatra), kept by hereditary Vaikhanasa priests",
+  "exactCase": false,
+  "foundIn": "Varadaraja Perumal Koyil: introduction"
+ },
+ {
+  "word": "Vaishnava",
+  "alsoWritten": null,
+  "meaning": "Of Vishnu and his worship; a worshipper of Vishnu",
+  "exactCase": false,
+  "foundIn": "Varadaraja Perumal Koyil: introduction"
+ },
+ {
+  "word": "Varisai",
+  "alsoWritten": null,
+  "meaning": "Any series or row of objects",
+  "exactCase": false,
+  "foundIn": "Field note: Three Family Weddings in a Single Morning"
+ },
+ {
+  "word": "Varuda",
+  "alsoWritten": null,
+  "meaning": "Yearly",
+  "exactCase": false,
+  "foundIn": "Field note: Pooradam Nakshatram"
+ },
+ {
+  "word": "Vedaparayanam",
+  "alsoWritten": null,
+  "meaning": "Recitation of the Vedas",
+  "exactCase": false,
+  "foundIn": "Field note: Homams Taller and Broader"
+ },
+ {
+  "word": "Veeravesham",
+  "alsoWritten": null,
+  "meaning": "A warrior's fervour",
+  "exactCase": false,
+  "foundIn": "Field note: The Battle Continues and Murugan Gets the Vel"
+ },
+ {
+  "word": "veethi",
+  "alsoWritten": null,
+  "meaning": "Street; a veethi purappadu is a procession through the streets",
+  "exactCase": false,
+  "foundIn": "Sundara Vinayaka Koyil: introduction"
+ },
+ {
+  "word": "Vel Vanguthal",
+  "alsoWritten": "vel-vanguthal, Vel Vaangum",
+  "meaning": "Murugan's receiving of the vel from his mother before battle",
+  "exactCase": false,
+  "foundIn": "Field note: Tracking Sashti on Pratipada (Muthal Naal) Across Three Temples"
+ },
+ {
+  "word": "ven-pongal",
+  "alsoWritten": null,
+  "meaning": "Savoury pongal of rice and lentils with pepper, cumin and ghee",
+  "exactCase": false,
+  "foundIn": "Field note: Homams Taller and Broader"
+ },
+ {
+  "word": "vratam",
+  "alsoWritten": "vrata",
+  "meaning": "A vow kept for a set time: a fast, a discipline, a promise to a deity",
+  "exactCase": false,
+  "foundIn": "Field note: The Temple as Interface"
+ },
+ {
+  "word": "yajnopavitam",
+  "alsoWritten": "yajnopaveetham, yajnopaveethams",
+  "meaning": "The sacred thread, worn over the left shoulder",
+  "exactCase": false,
+  "foundIn": "Field note: The Flag Goes Up on Sashti Muthal Naal"
+ }
+]

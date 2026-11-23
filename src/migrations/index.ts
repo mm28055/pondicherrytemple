@@ -95,6 +95,7 @@ import * as migration_20261117_120000_kanda_sashti_photos from './20261117_12000
 import * as migration_20261118_120000_database_log_4 from './20261118_120000_database_log_4';
 import * as migration_20261118_180000_special_nakshatram_twice from './20261118_180000_special_nakshatram_twice';
 import * as migration_20261123_120000_database_log_5 from './20261123_120000_database_log_5';
+import * as migration_20261123_150000_dictionary_approved from './20261123_150000_dictionary_approved';
 
 export const migrations = [
   {
@@ -581,5 +582,10 @@ export const migrations = [
     up: migration_20261123_120000_database_log_5.up,
     down: migration_20261123_120000_database_log_5.down,
     name: '20261123_120000_database_log_5',
+  },
+  {
+    up: migration_20261123_150000_dictionary_approved.up,
+    down: migration_20261123_150000_dictionary_approved.down,
+    name: '20261123_150000_dictionary_approved',
   },
 ];
