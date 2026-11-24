@@ -1060,15 +1060,19 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
 /* on a phone, today's date smaller, so the photographs and the opening come
    up into view */
 @media (max-width: 640px) {
-  /* the first screen filled: the photographs at its foot, the opening below
-     it; the header takes the room over, kept under the name for the calendar
-     (svh: the screen with the browser's own bars showing; 63px: the menu's
-     bar, with the stripes) */
+  /* the first screen filled: the name, the photographs, a line, then today's
+     date and the room kept under it for the calendar; the opening just below
+     the screen (svh: the screen with the browser's own bars showing; 63px: the
+     menu's bar, with the stripes). The header itself gives way, so the
+     photographs can stand between its name and its date. */
   .home-first { display: flex; flex-direction: column; min-height: calc(100svh - 63px); padding-bottom: 16px; }
-  .home-first > .home-hero { flex: 1 0 auto; grid-template-rows: auto 1fr; align-items: start; }
+  .home-first > .home-hero { display: contents; }
+  .home-first .home-mark { margin-top: calc(max(-14vw, -64px) + 14px); }
+  .home-first > .home-strip { order: 1; padding-bottom: 16px; border-bottom: 2px solid var(--ink); }
+  .home-first .today { order: 2; align-self: flex-start; }
   .home-hero { padding-bottom: 14px; row-gap: 0; }
   /* on a phone at the left under the name, as it was before */
-  .today { min-height: 64px; min-width: 0; margin-top: 4px; padding-left: 12px; justify-self: start; }
+  .today { min-height: 64px; min-width: 0; margin-top: 16px; padding-left: 12px; justify-self: start; }
   .today .kicker { margin-bottom: 0; font-size: 10.5px; }
   /* a quarter smaller than they were (19px, 14px); the capitals stay at 10.5px */
   .today-tamil { font-size: 14.25px; }

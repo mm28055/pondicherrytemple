@@ -76,7 +76,7 @@ export default async function HomePage() {
   return (
     <>
       <div className="wrap">
-        {/* on a phone, the first screen: the photographs at its foot, the rest below it */}
+        {/* on a phone, the first screen: the photographs between the name and the date, the rest below it */}
         <div className="home-first">
           <section className="home-hero">
             {/* the name in black letters; the play button at its end opens the film large */}
