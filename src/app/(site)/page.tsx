@@ -76,13 +76,16 @@ export default async function HomePage() {
   return (
     <>
       <div className="wrap">
-        <section className="home-hero">
-          {/* the name in black letters; the play button at its end opens the film large */}
-          <HomeMark film={words?.film} />
-          <TodayTamil events={todayEvents} />
-        </section>
+        {/* on a phone, the first screen: the photographs at its foot, the rest below it */}
+        <div className="home-first">
+          <section className="home-hero">
+            {/* the name in black letters; the play button at its end opens the film large */}
+            <HomeMark film={words?.film} />
+            <TodayTamil events={todayEvents} />
+          </section>
 
-        {stripPhotos.length > 0 && <HomeStrip photos={stripPhotos} />}
+          {stripPhotos.length > 0 && <HomeStrip photos={stripPhotos} />}
+        </div>
 
         {/* Why the temple matters to a town; the rest of the story is on the About page. */}
         {/* The words are written in the admin: Settings → Home page. */}
