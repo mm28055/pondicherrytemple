@@ -54,11 +54,17 @@ export function Nav() {
   const home = pathname === "/";
   const name = (t: Tab) => (ta ? (NAV_TA[t.href] ?? t.label) : t.label);
   const [open, setOpen] = useState(false);
+  const bar = useRef<HTMLElement>(null);
   // there, the bar's line comes only once the page has moved under it
   const [scrolled, setScrolled] = useState(false);
   useEffect(() => {
     if (!home) return;
-    const on = () => setScrolled(window.scrollY > 4);
+    // (where the stylesheet cannot itself follow the scroll: how far the bar's paper has come down on a phone, .nav-home)
+    const follow = !CSS.supports("animation-timeline: scroll()");
+    const on = () => {
+      setScrolled(window.scrollY > 4);
+      if (follow) bar.current?.style.setProperty("--y", `${Math.min(72, Math.max(0, window.scrollY))}px`);
+    };
     on();
     window.addEventListener("scroll", on, { passive: true });
     return () => window.removeEventListener("scroll", on);
@@ -74,7 +80,6 @@ export function Nav() {
   useEffect(() => setOpen(false), [address]);
 
   // and when the page is tapped outside it, or scrolled
-  const bar = useRef<HTMLElement>(null);
   useEffect(() => {
     if (!open) return;
     const from = window.scrollY;
@@ -91,8 +96,7 @@ export function Nav() {
   }, [open]);
 
   return (
-    <>
-    <header className={home ? `nav nav-home${scrolled ? " scrolled" : ""}` : "nav"} ref={bar}>
+    <header className={`nav${home ? ` nav-home${scrolled ? " scrolled" : ""}` : ""}${ta ? " nav-ta" : ""}`} ref={bar}>
       <div className="stripes" aria-hidden="true" />
       <div className="wrap nav-inner">
         {!home && (
@@ -188,14 +192,5 @@ export function Nav() {
         </div>
       </div>
     </header>
-    {/* on a computer, under the languages, level with the link back (and in its bar: BackLink) */}
-    {ta && (
-      <div className="ai-line" lang="ta">
-        <div className="wrap">
-          <span className="ai-words">{AI_TA}</span>
-        </div>
-      </div>
-    )}
-    </>
   );
 }

@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState, type MouseEvent, type ReactNode } from "react";
-import { AI_TA } from "@/content/homeTa";
 import { englishOf, isTamil, tamilOf } from "@/lib/tamilPages";
 import { PAGE_NAMES_EVENT, pageName } from "@/components/PageNames";
 
@@ -114,7 +113,6 @@ export function BackLink({
             <Link className="crumb" href={to} onClick={onClick}>
               {words}
             </Link>
-            {isTamil(pathname) && <span className="ai-words" lang="ta">{AI_TA}</span>}
           </div>
         </div>
       )}
