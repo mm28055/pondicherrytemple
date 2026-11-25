@@ -19,6 +19,7 @@ const MONTHS = ["January", "February", "March", "April", "May", "June", "July", 
 export function TodayTamil({ events, month = false }: { events: CalendarEvent[]; month?: boolean }) {
   const [today, setToday] = useState<{ t: TamilDate; civil: string; short: string; iso: string } | null>(null);
   const [open, setOpen] = useState(false);
+  const [phone, setPhone] = useState(false); // the Calendar page as a circle (site.css)
   const [place, setPlace] = useState<CSSProperties | undefined>();
   const box = useRef<HTMLElement>(null);
   const tamil = useRef<HTMLSpanElement>(null);
@@ -34,6 +35,14 @@ export function TodayTamil({ events, month = false }: { events: CalendarEvent[];
       short: `${WEEKDAYS[weekday].slice(0, 3)}, ${d} ${MONTHS[m - 1].slice(0, 3)}`,
       iso: `${y}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`,
     });
+  }, []);
+
+  useEffect(() => {
+    const narrow = window.matchMedia("(max-width: 860px)");
+    const look = () => setPhone(narrow.matches);
+    look();
+    narrow.addEventListener("change", look);
+    return () => narrow.removeEventListener("change", look);
   }, []);
 
   // Under the Tamil date, over the rest of the box, its right edge on the
@@ -95,9 +104,9 @@ export function TodayTamil({ events, month = false }: { events: CalendarEvent[];
         ) : (
           <div className="today-link is-plain">{words}</div>
         ))}
-      {/* the year's calendar, scrolled to, on the Calendar page */}
+      {/* the Calendar page: on a computer, scrolled to its chart; on a phone, its top */}
       {today && (
-        <Link className="arrow-link today-more" href="/calendar#calendar">
+        <Link className="arrow-link today-more" href={phone ? "/calendar" : "/calendar#calendar"}>
           {/* "Calendar" alone in the small box beside a page's title, on a phone */}
           <span className="today-more-long">Full calendar</span>
           <span className="today-more-short">Calendar</span>
