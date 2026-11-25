@@ -15,10 +15,12 @@ export function ReservedLink({
   published,
   className,
   children,
+  soon = "(coming soon)",
 }: {
   href: string;
   published: boolean;
   className?: string;
+  soon?: string;
   children: ReactNode;
 }) {
   const team = useTeam(!published);
@@ -32,7 +34,7 @@ export function ReservedLink({
   }
   return (
     <span className={`${className ?? ""} reserved`}>
-      {children} <span className="reserved-soon">(coming soon)</span>
+      {children} <span className="reserved-soon">{soon}</span>
     </span>
   );
 }

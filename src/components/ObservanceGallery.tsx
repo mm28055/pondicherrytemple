@@ -5,6 +5,7 @@ import { useState, type CSSProperties, type ReactNode } from "react";
 import type { ObservanceRowData } from "@/lib/view";
 import { FESTIVALS_PUBLISHED } from "@/lib/festivals";
 import { useTeam } from "@/lib/team";
+import { FESTIVALS_TA } from "@/content/festivalsTa";
 
 export type GalleryItem = {
   row: ObservanceRowData;
@@ -28,7 +29,10 @@ export function ObservanceGallery({
   items,
   head,
   lists,
+  ta = false,
 }: {
+  /** on the Tamil page */
+  ta?: boolean;
   lead: GalleryItem;
   items: GalleryItem[];
   /** the page's heading and introduction: the search sits under them, on the right */
@@ -40,10 +44,11 @@ export function ObservanceGallery({
   // until then, for someone signed in to the admin (asked in the browser, lib/team)
   const team = useTeam(!FESTIVALS_PUBLISHED);
   const linked = FESTIVALS_PUBLISHED || team;
+  const T = ta ? FESTIVALS_TA : null;
   const [q, setQ] = useState("");
   const words = q.trim().toLowerCase();
   const matches = (it: GalleryItem) =>
-    [it.row.name, it.row.tamil ?? "", it.row.gloss, it.kind]
+    [it.row.name, it.row.tamil ?? "", it.row.gloss, T ? T[it.kind] : it.kind]
       .join(" ")
       .toLowerCase()
       .includes(words);
@@ -68,7 +73,7 @@ export function ObservanceGallery({
         <div className="gallery-search">
           {words && (
             <span className="gallery-count">
-              {shown.length === 0 ? "Nothing found" : `${shown.length} found`}
+              {shown.length === 0 ? (T?.nothing ?? "Nothing found") : (T?.found(shown.length) ?? `${shown.length} found`)}
             </span>
           )}
           <label className="gallery-find">
@@ -93,18 +98,18 @@ export function ObservanceGallery({
               type="search"
               value={q}
               onChange={(e) => setQ(e.target.value)}
-              placeholder="Search"
-              aria-label="Search the festivals and rituals"
+              placeholder={T?.search ?? "Search"}
+              aria-label={T?.searchLabel ?? "Search the festivals and rituals"}
             />
           </label>
         </div>
       </header>
 
       <section className="section">
-        {!words && <Card it={lead} lead linked={linked} />}
+        {!words && <Card it={lead} lead linked={linked} ta={ta} />}
         <div className="gallery mosaic">
           {shown.map((it) => (
-            <Card key={it.row.id} it={it} linked={linked} />
+            <Card key={it.row.id} it={it} linked={linked} ta={ta} />
           ))}
         </div>
       </section>
@@ -112,7 +117,7 @@ export function ObservanceGallery({
   );
 }
 
-function Card({ it, lead = false, linked }: { it: GalleryItem; lead?: boolean; linked: boolean }) {
+function Card({ it, lead = false, linked, ta }: { it: GalleryItem; lead?: boolean; linked: boolean; ta: boolean }) {
   const { row, photo, kind } = it;
   const className = `gallery-card${lead ? " lead" : ""}${photo ? "" : " no-photo"}`;
   const inside = (
@@ -139,7 +144,7 @@ function Card({ it, lead = false, linked }: { it: GalleryItem; lead?: boolean; l
       </span>
       <span className="gallery-text">
         {/* festival or ritual: straight under the photograph */}
-        <span className="gallery-kind">{kind}</span>
+        <span className="gallery-kind">{ta ? FESTIVALS_TA[kind] : kind}</span>
         {/* its Tamil name and its English one, side by side, a small red dot
             between (on the lead, one above the other) */}
         <span className={lead ? "gallery-names stacked" : "gallery-names"}>
@@ -149,13 +154,15 @@ function Card({ it, lead = false, linked }: { it: GalleryItem; lead?: boolean; l
           {row.tamil && (
             <>
               {!lead && <span className="gallery-dot" aria-hidden="true" />}
-              <span className="gallery-name">{row.name}</span>
+              <span className="gallery-name" lang="en">
+                {row.name}
+              </span>
             </>
           )}
         </span>
         <span className="gallery-gloss">{row.gloss}</span>
         <span className="caps gallery-seen">
-          {row.seenAt} temple{row.seenAt === 1 ? "" : "s"}
+          {ta ? FESTIVALS_TA.temples(row.seenAt) : `${row.seenAt} temple${row.seenAt === 1 ? "" : "s"}`}
         </span>
       </span>
     </>

@@ -8,6 +8,8 @@ import { tamilPlace, tamilYearName } from "@/lib/tamilDate";
 import { MonthMotif } from "@/components/MonthMotif";
 import { inGlide, startGlide } from "@/components/MonthSwipe";
 import { DropBand } from "@/components/DropBand";
+import { CALENDAR_TA, spanTa } from "@/content/festivalsTa";
+import { MONTHS_TA } from "@/content/homeTa";
 import { MonthRing, type RingMonth } from "@/components/MonthRing";
 
 /** The ritual year as a chart after the South Indian rasi kattam: the twelve
@@ -28,13 +30,17 @@ export function RitualYear({
   today: built,
   begins,
   head,
+  ta = false,
 }: {
+  /** on the Tamil page */
+  ta?: boolean;
   /** the day the page was built, and the first day of the line of months (Masi 2026) */
   today: string;
   begins: string;
   /** the page's header: the way back, and its title */
   head: ReactNode;
 }) {
+  const T = ta ? CALENDAR_TA : null;
   const today = useToday(built);
   // the year a date's ritual year begins in (it begins at Chithirai)
   const yearOf = (iso: string) => {
@@ -142,7 +148,7 @@ export function RitualYear({
       ? {
           ta: `${month.tamil} ${place.day}`,
           en: month.name,
-          date: new Date(Date.UTC(ty, tm - 1, td)).toLocaleDateString("en-GB", { day: "numeric", month: "long", timeZone: "UTC" }),
+          date: ta ? `${td} ${MONTHS_TA[tm - 1]}` : new Date(Date.UTC(ty, tm - 1, td)).toLocaleDateString("en-GB", { day: "numeric", month: "long", timeZone: "UTC" }),
         }
       : null;
 
@@ -157,12 +163,12 @@ export function RitualYear({
             className="rasi-year-step"
             onClick={() => go(-1)}
             disabled={year <= first}
-            aria-label={`The year before, ${labelOf(year - 1)}`}
+            aria-label={T?.yearBefore(labelOf(year - 1)) ?? `The year before, ${labelOf(year - 1)}`}
           >
             ‹
           </button>
           <span className="rasi-year-num">{label}</span>
-          <button type="button" className="rasi-year-step" onClick={() => go(1)} aria-label={`The year after, ${labelOf(year + 1)}`}>
+          <button type="button" className="rasi-year-step" onClick={() => go(1)} aria-label={T?.yearAfter(labelOf(year + 1)) ?? `The year after, ${labelOf(year + 1)}`}>
             ›
           </button>
         </div>
@@ -177,7 +183,7 @@ export function RitualYear({
       drops={[
         {
           key: "year",
-          label: "Year",
+          label: T?.year ?? "Year",
           value: label,
           chosen: String(year),
           choices: years.map((y) => ({ id: String(y), label: labelOf(y) })),
@@ -198,32 +204,32 @@ export function RitualYear({
           const inside = (
             <>
               {/* the month's drawing, as at the top of its page */}
-              <MonthMotif month={m.slug} className="rasi-motif" fit />
+              <MonthMotif month={m.slug} className="rasi-motif" fit ta={ta} />
               <span className="rasi-ta" lang="ta">
                 {m.tamil}
               </span>
               <span className="caps">
-                {m.name}
-                {now && <span className="rasi-now"> · Now</span>}
+                <span lang="en">{m.name}</span>
+                {now && <span className="rasi-now"> · {T?.now ?? "Now"}</span>}
               </span>
-              <span className="rasi-span">{m.span}</span>
+              <span className="rasi-span">{ta ? spanTa(m.span) : m.span}</span>
             </>
           );
           ringMonths.push({
             slug: m.slug,
-            name: m.name,
+            name: ta ? m.tamil : m.name,
             colour: m.colour,
-            href: before ? null : `/festivals-and-rituals/month/${m.slug}/${y}`,
+            href: before ? null : `${ta ? "/ta" : ""}/festivals-and-rituals/month/${m.slug}/${y}`,
             now,
           });
           return before ? (
-            <div key={m.slug} className="rasi-month before" style={style} title="Before the documentation began">
+            <div key={m.slug} className="rasi-month before" style={style} title={T?.before ?? "Before the documentation began"}>
               {inside}
             </div>
           ) : (
             <Link
               key={m.slug}
-              href={`/festivals-and-rituals/month/${m.slug}/${y}`}
+              href={`${ta ? "/ta" : ""}/festivals-and-rituals/month/${m.slug}/${y}`}
               className={`rasi-month${now ? " now" : ""}`}
               style={style}
             >
@@ -233,15 +239,15 @@ export function RitualYear({
         })}
 
         <div className="rasi-centre">
-          <div className="kicker">The ritual year</div>
+          <div className="kicker">{T?.kicker ?? "The ritual year"}</div>
           {/* the year, and its name in the sixty-year cycle */}
           <div className="rasi-year">
             <span className="rasi-year-num">{label}</span>
           </div>
           <p className="rasi-year-name">
-            <span lang="ta">{name.ta}</span> · {name.en}
+            <span lang="ta">{name.ta}</span> · <span lang="en">{name.en}</span>
           </p>
-          <p>Open a month to see what the temples keep in it.</p>
+          <p>{T?.open ?? "Open a month to see what the temples keep in it."}</p>
         </div>
         {/* (filled as the months above are laid out) */}
         <MonthRing months={ringMonths} today={ringToday} year={{ label, ...name }} />

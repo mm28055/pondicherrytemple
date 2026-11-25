@@ -45,13 +45,13 @@ function foldAt(html: string) {
 }
 
 /** The words that open it, at the end of the text's last line. */
-const MORE = '<button type="button" class="intro-more" aria-expanded="false">Read more →</button>';
+const moreButton = (words: string) => `<button type="button" class="intro-more" aria-expanded="false">${words}</button>`;
 const closing = (tags: string[]) => [...tags].reverse().map((t) => `</${/^<(\w+)/.exec(t)![1]}>`).join("");
 
 /** A temple's introduction: about its first 250 words, to the end of a
     sentence, then "Read more →"; pressed, the whole of it, and it stays open.
     All of it is in the page from the start; a short introduction shows whole. */
-export function FoldedIntro({ html }: { html: string }) {
+export function FoldedIntro({ html, more = "Read more →" }: { html: string; more?: string }) {
   const [open, setOpen] = useState(false);
   const fold = foldAt(html);
   if (open || !fold) return <Html className="prose" html={html} />;
@@ -71,7 +71,7 @@ export function FoldedIntro({ html }: { html: string }) {
 
   return (
     <div onClick={read}>
-      <Html className="prose" html={`${html.slice(0, fold.at)} ${MORE}${closing(fold.open)}`} />
+      <Html className="prose" html={`${html.slice(0, fold.at)} ${moreButton(more)}${closing(fold.open)}`} />
       <div hidden>
         <Html className="prose" html={`${fold.open.join("")}${html.slice(fold.at)}`} />
       </div>

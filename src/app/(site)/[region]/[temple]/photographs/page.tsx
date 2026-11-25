@@ -1,20 +1,6 @@
-import Link from "next/link";
-import { EditPhotos } from "@/components/edit/EditPhotos";
-import { BackLink } from "@/components/BackLink";
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
-import {
-  getPhotoFilters,
-  getPhotosForTemple,
-  getRegion,
-  getRegions,
-  getTemple,
-  getTemplesWithPages,
-  hasPage,
-} from "@/lib/data";
-import { PhotoWall } from "@/components/PhotoWall";
-import { packPhotos } from "@/lib/photoPack";
-import { titleFit } from "@/lib/titleFit";
+import { TemplePhotosView } from "@/components/TemplePhotosView";
+import { getRegions, getTemple, getTemplesWithPages } from "@/lib/data";
 
 type Props = { params: Promise<{ region: string; temple: string }> };
 
@@ -32,29 +18,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return t ? { title: `${t.knownAs ?? t.name}: photographs` } : {};
 }
 
-/** Every photograph of a temple, which can be narrowed by festival and year. */
+/** Every photograph of a temple (components/TemplePhotosView). */
 export default async function TemplePhotosPage({ params }: Props) {
-  const { region: regionId, temple: templeId } = await params;
-  const region = await getRegion(regionId);
-  const t = await getTemple(regionId, templeId);
-  if (!region || !t || !hasPage(t)) notFound();
-  const photos = await getPhotosForTemple(region.id, t.id);
-  if (!photos.length) notFound();
-
-  const filters = await getPhotoFilters(photos, ["observances", "years"]);
-
-  return (
-    <div className="wrap">
-      <EditPhotos kind="temples" slug={t.id} label={t.knownAs ?? t.name} />
-      <header className="page-head">
-        <BackLink className="crumb" href={`/${region.id}/${t.id}`}>
-          ← {t.knownAs ?? t.name}
-        </BackLink>
-        <h1 className="temple-title" style={titleFit(t.knownAs ?? t.name)}>{t.knownAs ?? t.name}</h1>
-      </header>
-      <section className="section">
-        <PhotoWall pack={packPhotos(photos)} layout="all" filters={filters} heads={{ here: t.shortName ?? t.knownAs ?? t.name }} />
-      </section>
-    </div>
-  );
+  const { region, temple } = await params;
+  return <TemplePhotosView regionId={region} templeId={temple} />;
 }

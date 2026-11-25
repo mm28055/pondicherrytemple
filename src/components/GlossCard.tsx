@@ -8,10 +8,11 @@ import { useEffect } from "react";
    <dialog>). A hover is not a step in the history, so a card from a hover is
    marked data-own-history for DialogBack to leave alone. Below the word only
    where there is no room above it under the menu bar. */
-export function GlossCard() {
+export function GlossCard({ ta = false }: { /** on a Tamil page */ ta?: boolean }) {
   useEffect(() => {
     const card = document.createElement("dialog");
-    card.className = "gloss-card";
+    card.className = ta ? "gloss-card in-ta" : "gloss-card";
+    if (ta) card.lang = "ta";
     const name = document.createElement("b");
     const meaning = document.createElement("span");
     card.append(name, meaning);
@@ -87,6 +88,6 @@ export function GlossCard() {
       document.removeEventListener("keydown", key);
       card.remove();
     };
-  }, []);
+  }, [ta]);
   return null;
 }

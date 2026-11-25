@@ -1,5 +1,6 @@
 "use client";
 
+import { HIDDEN_TA } from "@/content/hiddenTa";
 import { useEffect, useRef, useState } from "react";
 import type { FilmTile } from "@/lib/view";
 import { FilmVideo } from "./FilmVideo";
@@ -10,7 +11,7 @@ import { FilmViewerText } from "./FilmWall";
     play button. Pressed, it opens over the page as the other films do, in the
     same dark viewer, but the film across the screen and its words below it,
     scrolling on their own. */
-export function FilmTop({ film }: { film: FilmTile }) {
+export function FilmTop({ film, ta = false }: { film: FilmTile; ta?: boolean }) {
   const [open, setOpen] = useState(false);
   const dialog = useRef<HTMLDialogElement>(null);
 
@@ -36,7 +37,7 @@ export function FilmTop({ film }: { film: FilmTile }) {
 
   return (
     <>
-      <button type="button" className="film-top video-tile" onClick={() => setOpen(true)} aria-label={`Play the film ${film.title}`}>
+      <button type="button" className="film-top video-tile" onClick={() => setOpen(true)} aria-label={ta ? `${film.title}: காணொளியைக் காண்க` : `Play the film ${film.title}`}>
         <span className="still">
           {film.poster ? (
             <img src={film.poster} alt="" />
@@ -63,10 +64,10 @@ export function FilmTop({ film }: { film: FilmTile }) {
           <div className="film-viewer-inner">
             <FilmVideo controls autoPlay playsInline preload="auto" controlsList="nodownload" src={film.src} poster={film.poster} />
             {/* (no link to its own page: it is this page's own) */}
-            <FilmViewerText film={film} link={false} />
+            <FilmViewerText film={film} link={false} ta={ta} />
           </div>
         )}
-        <button className="film-viewer-close" onClick={() => setOpen(false)} aria-label="Close">
+        <button className="film-viewer-close" onClick={() => setOpen(false)} aria-label={ta ? HIDDEN_TA.close : "Close"}>
           ×
         </button>
       </dialog>

@@ -8,25 +8,34 @@ import { useTeam } from "@/lib/team";
     festivals' own pages are held in reserve (lib/festivals): for the public;
     not for someone signed in to the admin, who can open them. Asked in the
     browser (lib/team), so the page is built ahead, the same for all. */
-export function ReservedSoon() {
+export function ReservedSoon({ words = "Coming soon" }: { words?: string }) {
   const team = useTeam(!FESTIVALS_PUBLISHED);
-  return FESTIVALS_PUBLISHED || team ? null : <p className="coming-soon">Coming soon</p>;
+  return FESTIVALS_PUBLISHED || team ? null : <p className="coming-soon">{words}</p>;
 }
 
 /** "Coming soon" at the right of the home page's Festivals & Rituals heading,
     in red, as "All field notes" is beside Just added; for the public only,
     while the festivals' pages are held in reserve. */
-export function ReservedSoonTag() {
+export function ReservedSoonTag({ words = "Coming soon" }: { words?: string }) {
   const team = useTeam(!FESTIVALS_PUBLISHED);
-  return FESTIVALS_PUBLISHED || team ? null : <span className="soon-tag">Coming soon</span>;
+  return FESTIVALS_PUBLISHED || team ? null : <span className="soon-tag">{words}</span>;
 }
 
 /** The page's introduction: `intro`, from the admin (Section descriptions), once
     the festivals' pages can be opened; until then, for the public, these words,
     the way to the field notes meanwhile. */
-export function ReservedLede({ intro }: { intro: string }) {
+export function ReservedLede({ intro, words }: { intro: string; /** on a Tamil page */ words?: { lede: string; link: string } }) {
   const team = useTeam(!FESTIVALS_PUBLISHED);
   if (FESTIVALS_PUBLISHED || team) return <p className="page-lede">{intro}</p>;
+  if (words)
+    return (
+      <p className="page-lede">
+        {words.lede}
+        <Link className="lede-link" href="/field-notes">
+          {words.link}
+        </Link>
+      </p>
+    );
   return (
     <p className="page-lede">
       The festivals and rituals we were present for, described and explained with all relevant detail, connected to

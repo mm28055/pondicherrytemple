@@ -1,5 +1,6 @@
 "use client";
 
+import { HIDDEN_TA } from "@/content/hiddenTa";
 import { useId, useState, type ReactNode } from "react";
 
 export type RitualTab = { key: string; ta: string; en: string; count: string; panel: ReactNode };
@@ -8,12 +9,12 @@ export type RitualTab = { key: string; ta: string; en: string; count: string; pa
     day, chosen at the top: a switch, each with its Tamil and
     English name and how many there are, the one shown dark. All of them are
     in the page (for those without scripts, and for search); one is shown. */
-export function RitualTabs({ tabs }: { tabs: RitualTab[] }) {
+export function RitualTabs({ tabs, ta = false }: { tabs: RitualTab[]; /** on a Tamil page */ ta?: boolean }) {
   const [on, setOn] = useState(tabs[0]?.key);
   const id = useId();
   return (
     <div className="ritual-tabs">
-      <div className="ritual-switch" role="tablist" aria-label="The temple’s ritual calendar">
+      <div className="ritual-switch" role="tablist" aria-label={ta ? HIDDEN_TA.rituals : "The temple’s ritual calendar"}>
         {tabs.map((t) => (
           <button
             key={t.key}
@@ -28,7 +29,9 @@ export function RitualTabs({ tabs }: { tabs: RitualTab[] }) {
             <span className="ta" lang="ta">
               {t.ta}
             </span>
-            <span className="en">{t.en}</span>
+            <span className="en" lang="en">
+              {t.en}
+            </span>
             <span className="n">{t.count}</span>
           </button>
         ))}

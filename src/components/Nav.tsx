@@ -1,8 +1,13 @@
 "use client";
 
+import { HIDDEN_TA } from "@/content/hiddenTa";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { KEEP_SCROLL } from "@/lib/keepScroll";
+import { keepPlace, returnToPlace } from "@/lib/langPlace";
+import { AI_TA, NAV_TA } from "@/content/homeTa";
+import { englishOf, isTamil, tamilOf } from "@/lib/tamilPages";
 
 type Tab = {
   href: string;
@@ -40,9 +45,14 @@ const TABS: Tab[] = [
 ];
 
 export function Nav() {
-  const pathname = usePathname();
+  const address = usePathname();
+  // the page, whichever language it is shown in (a Tamil page: /ta, then its English address)
+  const ta = isTamil(address);
+  const pathname = englishOf(address);
+  const tamil = tamilOf(address);
   // the home page has the name large in its masthead: none in the bar, there only
   const home = pathname === "/";
+  const name = (t: Tab) => (ta ? (NAV_TA[t.href] ?? t.label) : t.label);
   const [open, setOpen] = useState(false);
   // there, the bar's line comes only once the page has moved under it
   const [scrolled, setScrolled] = useState(false);
@@ -56,8 +66,12 @@ export function Nav() {
   // a dropdown just clicked through stays shut until the pointer leaves it
   const [shut, setShut] = useState<string | null>(null);
 
+  // the other language: the page stays where it was (lib/langPlace)
+  const stay = { [KEEP_SCROLL]: "", onClick: keepPlace };
+  useLayoutEffect(returnToPlace, [address]);
+
   // close the mobile menu whenever the route changes
-  useEffect(() => setOpen(false), [pathname]);
+  useEffect(() => setOpen(false), [address]);
 
   // and when the page is tapped outside it, or scrolled
   const bar = useRef<HTMLElement>(null);
@@ -77,11 +91,12 @@ export function Nav() {
   }, [open]);
 
   return (
+    <>
     <header className={home ? `nav nav-home${scrolled ? " scrolled" : ""}` : "nav"} ref={bar}>
       <div className="stripes" aria-hidden="true" />
       <div className="wrap nav-inner">
         {!home && (
-          <Link className="brand" href="/" aria-label="Sthalam — home">
+          <Link className="brand" href={ta ? "/ta" : "/"} aria-label={ta ? HIDDEN_TA.home : "Sthalam — home"}>
             <span>
               <span className="brand-word">Sthalam</span>
               <span className="brand-tamil" lang="ta">
@@ -90,8 +105,8 @@ export function Nav() {
             </span>
           </Link>
         )}
-        <nav aria-label="Main">
-          <ul className={`nav-links${open ? " open" : ""}`} id="primary-nav">
+        <nav aria-label={ta ? HIDDEN_TA.main : "Main"} lang={ta ? "ta" : undefined}>
+          <ul className={`nav-links${ta ? " in-ta" : ""}${open ? " open" : ""}`} id="primary-nav">
             {TABS.map((t) => {
               const active = t.match(pathname);
               return (
@@ -102,22 +117,22 @@ export function Nav() {
                   onMouseLeave={t.sub ? () => setShut(null) : undefined}
                 >
                   <Link
-                    href={t.href}
+                    href={(ta && tamilOf(t.href)) || t.href}
                     className={active ? "active" : undefined}
                     aria-current={active && !t.sub?.some((u) => u.match(pathname)) ? "page" : undefined}
                   >
-                    {t.label}
+                    {name(t)}
                   </Link>
                   {t.sub && (
                     <ul className="nav-sub">
                       {t.sub.map((u) => (
                         <li key={u.href}>
                           <Link
-                            href={u.href}
+                            href={(ta && tamilOf(u.href)) || u.href}
                             className={u.match(pathname) ? "active" : undefined}
                             aria-current={u.match(pathname) ? "page" : undefined}
                           >
-                            {u.label}
+                            {name(u)}
                           </Link>
                         </li>
                       ))}
@@ -128,9 +143,40 @@ export function Nav() {
             })}
           </ul>
         </nav>
+        {/* the languages; on a phone or tablet, the menu button under them */}
+        <div className="nav-side">
+        <div className="nav-lang" role="group" aria-label={ta ? HIDDEN_TA.language : "Language"} lang={ta ? "ta" : undefined}>
+          {ta && <span className="nav-ai" lang="ta">{AI_TA}</span>}
+          {ta ? (
+            // (in place of this page in the tab's history: the same page)
+            <Link className="en" href={pathname} replace scroll={false} {...stay} lang="en" hrefLang="en" aria-label="English">
+              EN
+            </Link>
+          ) : (
+            <span className="on en" aria-current="true">
+              EN
+            </span>
+          )}
+          <span className="nav-lang-bar" aria-hidden="true" />
+          {ta ? (
+            <span className="on ta" lang="ta" aria-current="true">
+              த
+            </span>
+          ) : tamil ? (
+            <Link className="ta" href={tamil} replace scroll={false} {...stay} lang="ta" hrefLang="ta" aria-label="தமிழ்">
+              த
+            </Link>
+          ) : (
+            // (no Tamil version of this page to go to yet)
+            <button className="ta" type="button" lang="ta" aria-label="Tamil" aria-disabled="true">
+              த
+            </button>
+          )}
+        </div>
         <button
           className="nav-toggle"
-          aria-label="Menu"
+          aria-label={ta ? HIDDEN_TA.menu : "Menu"}
+          lang={ta ? "ta" : undefined}
           aria-expanded={open}
           aria-controls="primary-nav"
           onClick={() => setOpen((o) => !o)}
@@ -139,7 +185,17 @@ export function Nav() {
             <path d="M3 6h18M3 12h18M3 18h18" />
           </svg>
         </button>
+        </div>
       </div>
     </header>
+    {/* on a computer, under the languages, level with the link back (and in its bar: BackLink) */}
+    {ta && (
+      <div className="ai-line" lang="ta">
+        <div className="wrap">
+          <span className="ai-words">{AI_TA}</span>
+        </div>
+      </div>
+    )}
+    </>
   );
 }

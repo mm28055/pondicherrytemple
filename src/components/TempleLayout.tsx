@@ -1,5 +1,6 @@
 "use client";
 
+import { HIDDEN_TA } from "@/content/hiddenTa";
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import type { Facing, Illustration } from "@/content/types";
 import { LAYOUT_STEP, LAYOUT_UNDER } from "@/lib/layoutStack";
@@ -35,7 +36,7 @@ function shapeOf(d: Illustration) {
     in a box of the turned shape (an SVG, which takes its width from its
     height, or its height from its width, as an image does). `fill`: covering
     a box of its own shape (the cards under the top one). */
-function LayoutImage({ d, alt, style, fill }: { d: Illustration; alt: string; style?: CSSProperties; fill?: boolean }) {
+function LayoutImage({ d, alt, style, fill, soon }: { d: Illustration; alt: string; style?: CSSProperties; fill?: boolean; soon?: [string, string] }) {
   const { turn, w, h } = shapeOf(d);
   // eslint-disable-next-line @next/next/no-img-element
   if (!turn && !d.comingSoon) return <img src={d.src} alt={alt} style={style} width={fill ? undefined : d.width} height={fill ? undefined : d.height} />;
@@ -43,10 +44,10 @@ function LayoutImage({ d, alt, style, fill }: { d: Illustration; alt: string; st
   const words = d.comingSoon && (
     <g className="layout-soon" transform={`translate(${d.comingSoon.x - d.width / 2} ${d.comingSoon.y - d.height / 2})`}>
       <text y={-22} textAnchor="middle">
-        ILLUSTRATION
+        {soon?.[0] ?? "ILLUSTRATION"}
       </text>
       <text y={68} textAnchor="middle">
-        COMING SOON
+        {soon?.[1] ?? "COMING SOON"}
       </text>
     </g>
   );
@@ -74,7 +75,7 @@ function LayoutImage({ d, alt, style, fill }: { d: Illustration; alt: string; st
     deeper it is. Clicking opens the layouts large over the page, but for a
     cover (shown only on the page); with more than one, the arrows (or the
     arrow keys, or a swipe) go through them. */
-export function TempleLayout({ layouts }: { layouts: Illustration[] }) {
+export function TempleLayout({ layouts, words }: { layouts: Illustration[]; words?: { see: string; soon: [string, string] } }) {
   const dialog = useRef<HTMLDialogElement>(null);
   const touch = useRef<number | null>(null);
   const [at, setAt] = useState(0);
@@ -119,7 +120,7 @@ export function TempleLayout({ layouts }: { layouts: Illustration[] }) {
           .map((u, k) => (
             <span key={u.id} className="layout-under" aria-hidden="true" style={{ "--depth": k + 1 } as CSSProperties}>
               <span className="layout-mount">
-                <LayoutImage d={u} alt="" fill />
+                <LayoutImage d={u} alt="" fill soon={words?.soon} />
               </span>
             </span>
           ))
@@ -128,14 +129,14 @@ export function TempleLayout({ layouts }: { layouts: Illustration[] }) {
           type="button"
           className="layout-frame"
           onClick={open}
-          title={n > 1 ? `See the ${n} layouts` : "See the full drawing"}
+          title={words?.see ?? (n > 1 ? `See the ${n} layouts` : "See the full drawing")}
         >
           <span className="layout-mount">
             <span
               className="layout-turned upright"
               style={{ aspectRatio: `${shapeOf(d).ratio}`, "--ratio": shapeOf(d).ratio } as CSSProperties}
             >
-              <LayoutImage d={d} alt={d.alt} />
+              <LayoutImage d={d} alt={d.alt} soon={words?.soon} />
             </span>
           </span>
         </button>
@@ -152,16 +153,16 @@ export function TempleLayout({ layouts }: { layouts: Illustration[] }) {
           if (Math.abs(dx) > 40) step(dx < 0 ? 1 : -1);
         }}
       >
-        <button type="button" className="layout-close" onClick={() => dialog.current?.close()} aria-label="Close">
+        <button type="button" className="layout-close" onClick={() => dialog.current?.close()} aria-label={words ? HIDDEN_TA.close : "Close"}>
           ×
         </button>
         {n > 1 && (
-          <button type="button" className="day-step prev" onClick={() => step(-1)} aria-label="The layout before">
+          <button type="button" className="day-step prev" onClick={() => step(-1)} aria-label={words ? HIDDEN_TA.layoutBefore : "The layout before"}>
             ‹
           </button>
         )}
         <Zoomable key={shown.id}>
-          <LayoutImage d={shown} alt={shown.alt} style={{ "--ratio": shapeOf(shown).ratio } as CSSProperties} />
+          <LayoutImage d={shown} alt={shown.alt} soon={words?.soon} style={{ "--ratio": shapeOf(shown).ratio } as CSSProperties} />
         </Zoomable>
         <p className="layout-dialog-caption">
           {shown.title}
@@ -172,7 +173,7 @@ export function TempleLayout({ layouts }: { layouts: Illustration[] }) {
           )}
         </p>
         {n > 1 && (
-          <button type="button" className="day-step next" onClick={() => step(1)} aria-label="The next layout">
+          <button type="button" className="day-step next" onClick={() => step(1)} aria-label={words ? HIDDEN_TA.layoutAfter : "The next layout"}>
             ›
           </button>
         )}

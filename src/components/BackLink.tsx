@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState, type MouseEvent, type ReactNode } from "react";
+import { AI_TA } from "@/content/homeTa";
+import { englishOf, isTamil, tamilOf } from "@/lib/tamilPages";
 import { PAGE_NAMES_EVENT, pageName } from "@/components/PageNames";
 
 type Entry = { url: string | null; key: string; index: number };
@@ -78,15 +80,23 @@ export function BackLink({
     return () => io.disconnect();
   }, []);
 
+  /** whether a page is in the other language than this one */
+  const other = (path: string) => isTamil(path) !== isTamil(pathname);
   const onClick = (e: MouseEvent<HTMLAnchorElement>) => {
     if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
     const b = cameFrom(always ? href : undefined);
-    if (!b) return;
+    // (come to in the other language: the link's own address, in this one)
+    if (!b || other(b.path)) return;
     e.preventDefault();
     (window as unknown as { navigation: Navigation }).navigation.traverseTo(b.key);
   };
-  const words = back?.name ? <>← {back.name}</> : children;
-  const to = back ? back.path : href;
+  // the page come from, in this page's language (EN | த may have been pressed since):
+  // where it has no such version, the link's own words and place
+  const here = back && other(back.path) ? (isTamil(pathname) ? tamilOf(back.path) : englishOf(back.path)) : back?.path;
+  const name = !back || !here ? undefined : here === back.path ? back.name : here === "/ta" ? "முகப்பு" : here === "/" ? "Home" : here === href ? undefined : pageName(here);
+  const words = name ? <>← {name}</> : children;
+  // (its name not known here, were it another page: to the link's own)
+  const to = here && (name || here === back?.path || here === href) ? here : href;
   // with it out of sight, the bar under the header shown: a bar that stays under the
   // header too (the photographs' filters) moves below it (site.css, .crumb-floating)
   useEffect(() => {
@@ -104,6 +114,7 @@ export function BackLink({
             <Link className="crumb" href={to} onClick={onClick}>
               {words}
             </Link>
+            {isTamil(pathname) && <span className="ai-words" lang="ta">{AI_TA}</span>}
           </div>
         </div>
       )}

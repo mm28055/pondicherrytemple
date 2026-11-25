@@ -1,3 +1,4 @@
+import { MOTIFS_TA } from "@/content/hiddenTa";
 import type { CSSProperties, ReactNode } from "react";
 
 /* A small line drawing for each Tamil month, of what the month is known
@@ -463,11 +464,14 @@ const MOTIFS: Record<string, { art: ReactNode; label: string; box: string }> = {
 export function MonthMotif({
   month,
   className,
+  ta = false,
   fit,
   frame,
 }: {
   month: string;
   className?: string;
+  /** on a Tamil page */
+  ta?: boolean;
   /** fitted to the drawing and its movement, standing on the frame's foot */
   fit?: boolean;
   /** shown in this frame (a viewBox) instead, in its middle */
@@ -481,7 +485,7 @@ export function MonthMotif({
       viewBox={frame ?? (fit ? m.box : "0 0 100 100")}
       preserveAspectRatio={fit ? "xMidYMax meet" : undefined}
       role="img"
-      aria-label={m.label}
+      aria-label={ta ? MOTIFS_TA[month] : m.label}
     >
       {m.art}
     </svg>

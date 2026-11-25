@@ -96,6 +96,9 @@ import * as migration_20261118_120000_database_log_4 from './20261118_120000_dat
 import * as migration_20261118_180000_special_nakshatram_twice from './20261118_180000_special_nakshatram_twice';
 import * as migration_20261123_120000_database_log_5 from './20261123_120000_database_log_5';
 import * as migration_20261123_150000_dictionary_approved from './20261123_150000_dictionary_approved';
+import * as migration_20261125_170000_poosai from './20261125_170000_poosai';
+import * as migration_20261125_180000_panduranga_sunday from './20261125_180000_panduranga_sunday';
+import * as migration_20261125_190000_panduranga_tamil from './20261125_190000_panduranga_tamil';
 
 export const migrations = [
   {
@@ -587,5 +590,20 @@ export const migrations = [
     up: migration_20261123_150000_dictionary_approved.up,
     down: migration_20261123_150000_dictionary_approved.down,
     name: '20261123_150000_dictionary_approved',
+  },
+  {
+    up: migration_20261125_170000_poosai.up,
+    down: migration_20261125_170000_poosai.down,
+    name: '20261125_170000_poosai',
+  },
+  {
+    up: migration_20261125_180000_panduranga_sunday.up,
+    down: migration_20261125_180000_panduranga_sunday.down,
+    name: '20261125_180000_panduranga_sunday',
+  },
+  {
+    up: migration_20261125_190000_panduranga_tamil.up,
+    down: migration_20261125_190000_panduranga_tamil.down,
+    name: '20261125_190000_panduranga_tamil',
   },
 ];

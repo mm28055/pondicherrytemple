@@ -71,7 +71,7 @@ function compose(photos: StripPhoto[], from: number, units: number, h: number): 
   return { rows: [first, second], next: (from + first.length + second.length) % photos.length };
 }
 
-export function HomeStrip({ photos }: { photos: StripPhoto[] }) {
+export function HomeStrip({ photos, all = "See all photos", base = "/photographs" }: { photos: StripPhoto[]; all?: string; /** the Photographs page, in this page's language */ base?: string }) {
   const box = useRef<HTMLDivElement>(null);
   const [from, setFrom] = useState(0);
   const [faded, setFaded] = useState(false);
@@ -133,7 +133,7 @@ export function HomeStrip({ photos }: { photos: StripPhoto[] }) {
                 <Link
                   key={`${p.id}-${i}`}
                   className={last ? "home-strip-photo home-strip-all" : "home-strip-photo"}
-                  href={last ? "/photographs" : `/photographs?photo=${p.id}`}
+                  href={last ? base : `${base}?photo=${p.id}`}
                   style={{ width: fit?.width(units) }}
                   // closed, the photo comes back here (not from a new tab)
                   onClick={(e) => {
@@ -144,7 +144,7 @@ export function HomeStrip({ photos }: { photos: StripPhoto[] }) {
                   <img src={p.small} alt={last ? "" : p.alt} style={{ objectPosition: `${p.focus[0]}% ${p.focus[1]}%` }} />
                   {last && (
                     <span>
-                      <span>See all photos</span>
+                      <span>{all}</span>
                     </span>
                   )}
                 </Link>

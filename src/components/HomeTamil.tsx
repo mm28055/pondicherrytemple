@@ -19,19 +19,21 @@ const COME_FOR = 900; // ms for the rest of the film, and the black round it, to
 const CLOSE_FOR = 3500; // ms for the film, once over, to go back into the name, in one movement
 const FROST = "rgba(245, 244, 240, 0.74)"; // the page behind the moving name, as the menus frost it (site.css)
 
-function Name() {
+function Name({ place }: { place: string }) {
   return (
     <p className="home-name">
       <span className="home-latin">Sthalam</span>
       <span className="home-gloss">
         {/* the red mark between them: a lingam on its base */}
-        <span className="home-lingam" aria-hidden="true" />Pondicherry
+        <span className="home-lingam" aria-hidden="true" />{place}
       </span>
     </p>
   );
 }
 
-export function HomeMark({ film }: { film?: { src: string; poster?: string } }) {
+const EN = { place: "Pondicherry", watch: "Watch the film", close: "Close" };
+
+export function HomeMark({ film, words = EN }: { film?: { src: string; poster?: string }; words?: typeof EN & { watchShort?: string } }) {
   const mark = useRef<HTMLDivElement>(null);
   const viewer = useRef<HTMLDialogElement>(null);
   const [open, setOpen] = useState(false);
@@ -435,11 +437,19 @@ export function HomeMark({ film }: { film?: { src: string; poster?: string } }) 
       <p className="home-tamil" lang="ta">
         ஸ்தலம்
       </p>
-      <Name />
+      <Name place={words.place} />
       {film && (
         <>
           <button type="button" className="home-play" onClick={play}>
-            <span className="home-play-label">Watch the film</span>
+            <span className="home-play-label">{words.watchShort ? (
+                <>
+                  <span className="watch-long">{words.watch}</span>
+                  <span className="watch-short">{words.watchShort}</span>
+                </>
+              ) : (
+                words.watch
+              )}
+            </span>
             <svg viewBox="0 0 48 48" aria-hidden="true">
               <circle cx="24" cy="24" r="21.5" />
               <path d="M19 15.5 L34 24 L19 32.5 Z" />
@@ -458,7 +468,7 @@ export function HomeMark({ film }: { film?: { src: string; poster?: string } }) 
             }}
             onClick={(e) => e.target === viewer.current && viewer.current?.close()}
           >
-            <button type="button" className="day-close" onClick={() => viewer.current?.close()} aria-label="Close">
+            <button type="button" className="day-close" onClick={() => viewer.current?.close()} aria-label={words.close}>
               ×
             </button>
             {/* (started by play; its controls the browser's own, as for the

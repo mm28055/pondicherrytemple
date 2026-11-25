@@ -66,7 +66,7 @@ export function ObservanceRow({
         {row.tamil ?? row.name}
       </span>
       {compact ? (
-        <span className="caps">{row.name}</span>
+        <span className="caps" lang="en">{row.name}</span>
       ) : (
         <>
           <span>
@@ -125,9 +125,9 @@ export function Where({ row }: { row: { where: string; whereShort?: string } }) 
     `formal`, on the Temples page) its formal name when the two differ, and its
     street; at the right, `meta` (how much has been recorded), if given. Its
     deity is recorded, not shown. */
-export function TempleRow({ temple: t, meta, formal = false }: { temple: Temple; meta?: string; formal?: boolean }) {
+export function TempleRow({ temple: t, meta, formal = false, href }: { temple: Temple; meta?: string; formal?: boolean; href?: string }) {
   return (
-    <Link className="temple-row reveal" href={`/${t.region}/${t.id}`}>
+    <Link className="temple-row reveal" href={href ?? `/${t.region}/${t.id}`}>
       <div>
         <div className="temple-name">{t.knownAs ?? t.name}</div>
         <div className="temple-sub">

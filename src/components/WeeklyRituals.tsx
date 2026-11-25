@@ -6,6 +6,7 @@ import { FestivalLink } from "@/components/FestivalLink";
 import { PhotoWall } from "@/components/PhotoWall";
 import type { Photo } from "@/content/types";
 import type { WeeklyRitual } from "@/lib/data";
+import { CAL_TA } from "@/content/monthTa";
 
 const DAYS = [
   { key: "sun", en: "Sunday", short: "Sun", ta: "ஞாயிறு" },
@@ -45,8 +46,12 @@ export function WeeklyRituals({
   rituals,
   photos,
   character,
+  ta = false,
 }: {
-  rituals: WeeklyRitual[];
+  /** on a Tamil page: the days as they are, the rest in Tamil */
+  ta?: boolean;
+  /** `shown`: its time as shown, where that is not `time` (in Tamil) */
+  rituals: (WeeklyRitual & { shown?: string })[];
   photos: Record<string, Photo[]>;
   /** what each day is like, as written in the admin (sun…sat) */
   character: Record<string, string>;
@@ -67,7 +72,7 @@ export function WeeklyRituals({
 
   return (
     <div className="varam">
-      <div className="varam-days" role="tablist" aria-label="Days of the week">
+      <div className="varam-days" role="tablist" aria-label={ta ? CAL_TA.days : "Days of the week"}>
         {DAYS.map((d) => (
           <button
             key={d.key}
@@ -77,19 +82,21 @@ export function WeeklyRituals({
             onClick={() => setOpen(d.key)}
           >
             <span lang="ta">{d.ta}</span>
-            <span className="caps">{d.short}</span>
-            {d.key === today && <span className="varam-today">Today</span>}
+            <span className="caps" lang="en">
+              {d.short}
+            </span>
+            {d.key === today && <span className="varam-today">{ta ? CAL_TA.today : "Today"}</span>}
           </button>
         ))}
       </div>
 
-      <div className="varam-open" role="tabpanel" aria-label={day.en}>
+      <div className="varam-open" role="tabpanel" aria-label={ta ? day.ta : day.en}>
         {on.length > 0 ? (
           <ul className="varam-list">
             {on.map((r) => (
               // a ritual may come more than once in a day: at another temple, or another time
               <li key={`${r.id}|${r.time}|${r.temples.map((t) => t.key).join()}`}>
-                <span className="varam-time">{r.time}</span>
+                <span className="varam-time">{r.shown ?? r.time}</span>
                 <span className="varam-what">
                   {r.what}
                   {r.temples.length > 0 && (
@@ -117,7 +124,7 @@ export function WeeklyRituals({
             ))}
           </ul>
         ) : (
-          <p className="varam-none">Nothing recorded yet for {day.en}s.</p>
+          <p className="varam-none">{ta ? CAL_TA.nothingWeekly(day.ta) : `Nothing recorded yet for ${day.en}s.`}</p>
         )}
 
         {/* the day's photographs, temple by temple: one row each, the last a link to all of them */}
@@ -125,7 +132,7 @@ export function WeeklyRituals({
           (photos[`${shown}|${t.key}`] ?? []).length > 0 ? (
             <div key={t.key} className="varam-photos">
               <h3 className="caps">{t.name}</h3>
-              <PhotoWall photos={photos[`${shown}|${t.key}`]} layout="strip" seeAll={t.href ? `${t.href}/photographs` : "/photographs"} />
+              <PhotoWall photos={photos[`${shown}|${t.key}`]} layout="strip" ta={ta} seeAllWords={ta ? CAL_TA.morePhotos : undefined} seeAll={t.href ? `${t.href}/photographs` : ta ? "/ta/photographs" : "/photographs"} />
             </div>
           ) : null
         )}
@@ -134,7 +141,7 @@ export function WeeklyRituals({
             in the admin (Site pages → Varam); until then nothing */}
         {character[shown]?.trim() && (
           <div className="varam-character">
-            <h3 className="caps">{day.en}s</h3>
+            <h3 className="caps">{ta ? day.ta : `${day.en}s`}</h3>
             {character[shown].split(/\n\s*\n/).map((p, i) => (
               <p key={i}>{p.trim()}</p>
             ))}

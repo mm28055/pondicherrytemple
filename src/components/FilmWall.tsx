@@ -1,5 +1,6 @@
 "use client";
 
+import { HIDDEN_TA } from "@/content/hiddenTa";
 import { FilmVideo } from "@/components/FilmVideo";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -27,9 +28,12 @@ const PAGE = 24;
 export function FilmWall({
   tiles,
   filters = [],
+  ta = false,
 }: {
   tiles: FilmTile[];
   filters?: Filter[];
+  /** on a Tamil page */
+  ta?: boolean;
 }) {
   // a temple, a festival or ritual, or both; and the order
   const [chosen, setChosen] = useState<Partial<Record<Filter["key"], string>>>({});
@@ -95,8 +99,8 @@ export function FilmWall({
   const withFilters = filters.length > 1;
   // a dropdown for temples, one for festivals and rituals (if there are any)
   const bar = [
-    { key: "temples", label: "Temple" },
-    { key: "observances", label: "Festival/Ritual" },
+    { key: "temples", label: ta ? "கோயில்" : "Temple" },
+    { key: "observances", label: ta ? "திருவிழா/வழிபாடு" : "Festival/Ritual" },
   ]
     .map((b) => ({ ...b, options: filters.filter((f) => f.key === b.key).map(({ id, label, short }) => ({ id, label, short })) }))
     .filter((b) => b.options.length > 0);
@@ -107,6 +111,7 @@ export function FilmWall({
           Photographs page, and the films in three columns below it */}
       {withFilters && (
         <FilterBar
+          ta={ta}
           filters={bar}
           chosen={chosen}
           onPick={(key, id) => choose(key as Filter["key"], id)}
@@ -152,7 +157,7 @@ export function FilmWall({
       <dialog
         ref={dialog}
         className="film-viewer"
-        aria-label={film?.title ?? "Film"}
+        aria-label={film?.title ?? (ta ? HIDDEN_TA.film : "Film")}
         // Esc: close it ourselves, so the page is always let go
         onCancel={(e) => {
           e.preventDefault();
@@ -176,13 +181,13 @@ export function FilmWall({
               src={film.src}
               poster={film.poster}
             />
-            <FilmViewerText film={film} />
+            <FilmViewerText film={film} ta={ta} />
           </div>
         )}
         <button
           className="film-viewer-close"
           onClick={close}
-          aria-label="Close"
+          aria-label={ta ? HIDDEN_TA.close : "Close"}
         >
           ×
         </button>
@@ -191,14 +196,14 @@ export function FilmWall({
             <button
               className="film-viewer-step prev"
               onClick={() => step(-1)}
-              aria-label="Previous film"
+              aria-label={ta ? HIDDEN_TA.filmBefore : "Previous film"}
             >
               ‹
             </button>
             <button
               className="film-viewer-step next"
               onClick={() => step(1)}
-              aria-label="Next film"
+              aria-label={ta ? HIDDEN_TA.filmAfter : "Next film"}
             >
               ›
             </button>
@@ -212,7 +217,7 @@ export function FilmWall({
 /** A film's words in its viewer: its date and places, title, maker, text and
     links (beside the film in the wall's viewer; below it at the top of the
     Films page, FilmTop). */
-export function FilmViewerText({ film, link = true }: { film: FilmTile; link?: boolean }) {
+export function FilmViewerText({ film, link = true, ta = false }: { film: FilmTile; link?: boolean; ta?: boolean }) {
   return (
     <div className="film-viewer-text">
       <div className="caps">
@@ -220,17 +225,17 @@ export function FilmViewerText({ film, link = true }: { film: FilmTile; link?: b
         {film.where && ` · ${film.where}`}
       </div>
       <h2 className="film-viewer-title">{film.title}</h2>
-      {film.madeBy && <p className="film-viewer-by">By {film.madeBy}</p>}
+      {film.madeBy && <p className="film-viewer-by">{ta ? film.madeBy : `By ${film.madeBy}`}</p>}
       {film.html && <Html className="rich film-text" html={film.html} />}
       <div className="film-viewer-links">
         {link && (
             <Link className="arrow-link" href={film.href}>
-              Link to this film
+              {ta ? "இக்காணொளியின் இணைப்பு" : "Link to this film"}
             </Link>
           )}
         {film.instagram && (
           <a className="arrow-link" href={film.instagram} target="_blank" rel="noopener noreferrer">
-            On Instagram
+            {ta ? "இன்ஸ்டாகிராமில்" : "On Instagram"}
           </a>
         )}
       </div>

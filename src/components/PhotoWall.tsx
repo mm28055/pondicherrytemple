@@ -1,5 +1,6 @@
 "use client";
 
+import { HIDDEN_TA } from "@/content/hiddenTa";
 import Link from "next/link";
 import { FestivalLink } from "@/components/FestivalLink";
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore, type CSSProperties, type MouseEvent as ReactMouseEvent, type ReactNode } from "react";
@@ -8,6 +9,7 @@ import { formatDate } from "@/lib/calendar";
 import { stripeRows, useStripeFit } from "@/lib/stripes";
 import { takeFromHome } from "@/lib/photoFrom";
 import { FilterBar } from "@/components/FilterBar";
+import { dateTa, monthTa } from "@/lib/dateTa";
 import { Zoomable } from "@/components/Zoomable";
 import { eventOf, photoCount, unpackPhotos, type PhotoPack } from "@/lib/photoPack";
 import { editStore } from "@/components/edit/editStore";
@@ -42,6 +44,10 @@ type Props = {
   /** "own": draws the photos; `open` opens the one at that place in the list */
   render?: (photos: Photo[], open: (i: number) => void) => ReactNode;
   seeAll?: string;
+  /** on a Tamil page: the days, the bar and its choices in Tamil */
+  ta?: boolean;
+  /** the words of that link, in place of "See all 2.7K photographs" (a Tamil page) */
+  seeAllWords?: string;
   /** Rows of buttons to narrow the photos: by temple, festival, deity, year. */
   filters?: PhotoFilter[];
   /** a line shown over every photo in the viewer ("Latest from this temple") */
@@ -87,7 +93,7 @@ const valuesOf = (p: Photo, key: PhotoFilter["key"]) => (key === "years" ? [p.da
     whole and as large as the screen allows, with its caption and where it
     belongs; the arrows (or a swipe) go through all of them. An open photo has
     its own address, so it can be sent to someone, and Back closes it. */
-export function PhotoWall({ photos: given, pack, total, layout, seeAll, filters = [], note, addressable = true, moreLink, heads, reveal = false, asGiven = false, render }: Props) {
+export function PhotoWall({ photos: given, pack, total, layout, seeAll, seeAllWords, filters = [], note, addressable = true, moreLink, heads, reveal = false, asGiven = false, ta = false, render }: Props) {
   // Admin2 on: the viewer shows the photo's details as boxes (components/edit/PhotoDetails)
   const editing = useSyncExternalStore(editStore.subscribe, () => editStore.get().editing, () => false);
   const photos = useMemo(() => (pack ? unpackPhotos(pack) : (given ?? [])), [pack, given]);
@@ -130,10 +136,10 @@ export function PhotoWall({ photos: given, pack, total, layout, seeAll, filters 
     groups.forEach((g, at) => {
       const p = g[0];
       const id = p.dated ? p.date.slice(0, 7) : "";
-      if (id && !out.some((m) => m.id === id)) out.push({ id, label: monthLabel(id), at });
+      if (id && !out.some((m) => m.id === id)) out.push({ id, label: ta ? monthTa(id) : monthLabel(id), at });
     });
     return out;
-  }, [groups]);
+  }, [groups, ta]);
   // going to one: its day loaded (and those before it), then brought up under the bar
   const [goTo, setGoTo] = useState<string | null>(null);
   const jumpTo = (id: string) => {
@@ -384,7 +390,7 @@ export function PhotoWall({ photos: given, pack, total, layout, seeAll, filters 
       key={p.id}
       className={`photo-tile${big ? " big" : ""}`}
       onClick={() => show(i)}
-      aria-label={p.alt || p.caption || "Photograph"}
+      aria-label={p.alt || p.caption || (ta ? HIDDEN_TA.photo : "Photograph")}
       style={width ? { width } : undefined}
     >
       <img
@@ -403,13 +409,14 @@ export function PhotoWall({ photos: given, pack, total, layout, seeAll, filters 
     <>
       {layout === "all" && (
         <FilterBar
+          ta={ta}
           filters={filters}
           chosen={chosen}
           onPick={(key, id) => choose(key as PhotoFilter["key"], id)}
           oldestFirst={oldestFirst}
           onOrder={() => setOldestFirst(!oldestFirst)}
           stripes
-          jump={heads ? { label: "Month", options: months, onJump: jumpTo } : undefined}
+          jump={heads ? { label: ta ? "மாதம்" : "Month", options: months, onJump: jumpTo } : undefined}
         />
       )}
 
@@ -427,7 +434,7 @@ export function PhotoWall({ photos: given, pack, total, layout, seeAll, filters 
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={order[Math.min(order.length - 1, STRIP)].small} alt="" loading="lazy" />
                 <span>
-                  <span>See more images</span>
+                  <span>{seeAllWords ?? "See more images"}</span>
                 </span>
               </Link>
             )}
@@ -444,7 +451,7 @@ export function PhotoWall({ photos: given, pack, total, layout, seeAll, filters 
           )}
           {seeAll && (total ?? order.length) > LEAD && (
             <Link className="arrow-link photo-all" href={seeAll}>
-              See all {photoCount(total ?? order.length)} photographs
+              {seeAllWords ?? `See all ${photoCount(total ?? order.length)} photographs`}
             </Link>
           )}
         </>
@@ -486,7 +493,7 @@ export function PhotoWall({ photos: given, pack, total, layout, seeAll, filters 
                     return (
                       <Fragment key={`head-${p.id}`}>
                         <div id={`photos-${p.id}`} className="photo-group-head">
-                          <span className="date">{p.dated ? formatDate(p.date) : "Day not known"}</span>
+                          <span className="date">{p.dated ? (ta ? dateTa(p.date) : formatDate(p.date)) : ta ? "நாள் தெரியவில்லை" : "Day not known"}</span>
                           {p.place && (heads.temple || (heads.here && p.place !== heads.here)) && <span>{p.place}</span>}
                           {p.occasion && <span>{p.occasion}</span>}
                           {heads.note && p.note && (
@@ -514,7 +521,7 @@ export function PhotoWall({ photos: given, pack, total, layout, seeAll, filters 
                                   >
                                     {/* eslint-disable-next-line @next/next/no-img-element */}
                                     <img src={width > 240 ? p.medium : p.small} alt="" loading="lazy" style={{ objectPosition: `${p.focus[0]}% ${p.focus[1]}%` }} />
-                                    <span>See fewer</span>
+                                    <span>{ta ? "குறைவாக" : "See fewer"}</span>
                                   </button>
                                 );
                               if (cut && r === rows.length - 1 && k === row.length - 1)
@@ -524,7 +531,7 @@ export function PhotoWall({ photos: given, pack, total, layout, seeAll, filters 
                                     className="photo-tile photo-line-more"
                                     style={{ width }}
                                     onClick={() => toggle(true)}
-                                    aria-label={`All ${photoCount(run.length)} photographs of this day`}
+                                    aria-label={ta ? HIDDEN_TA.dayPhotos(photoCount(run.length)) : `All ${photoCount(run.length)} photographs of this day`}
                                   >
                                     {/* eslint-disable-next-line @next/next/no-img-element */}
                                     <img src={width > 240 ? c.medium : c.small} alt="" loading="lazy" style={{ objectPosition: `${c.focus[0]}% ${c.focus[1]}%` }} />
@@ -542,7 +549,7 @@ export function PhotoWall({ photos: given, pack, total, layout, seeAll, filters 
               </div>
             )}
           </div>
-          {order.length === 0 && <p className="note-line">No photographs match.</p>}
+          {order.length === 0 && <p className="note-line">{ta ? "பொருந்தும் புகைப்படங்கள் இல்லை." : "No photographs match."}</p>}
           {(heads ? Math.round(limit / 3) < groups.length : limit < order.length) && (
             <div ref={more} aria-hidden="true" style={{ height: 1 }} />
           )}
@@ -553,7 +560,7 @@ export function PhotoWall({ photos: given, pack, total, layout, seeAll, filters 
         ref={dialog}
         className="film-viewer photo-viewer"
         data-own-history={addressable ? "" : undefined}
-        aria-label={photo?.caption ?? "Photograph"}
+        aria-label={photo?.caption ?? (ta ? HIDDEN_TA.photo : "Photograph")}
         tabIndex={-1}
         onCancel={(e) => {
           e.preventDefault();
@@ -598,7 +605,7 @@ export function PhotoWall({ photos: given, pack, total, layout, seeAll, filters 
             <figcaption key={`cap-${photo.id}`} className="photo-in-words">
               {note && <span className="photo-viewer-note">{note}</span>}
               {/* its date, where it was, what for, then who took it (not "12 of 2,600": no help in so many) */}
-              {!editing && photo.dated && <span className="caps">{formatDate(photo.date)}</span>}
+              {!editing && photo.dated && <span className="caps">{ta ? dateTa(photo.date) : formatDate(photo.date)}</span>}
               {photo.tags.length > 0 && (
                 <span className="photo-viewer-tags">
                   {photo.tags.map((t, i) => (
@@ -621,23 +628,23 @@ export function PhotoWall({ photos: given, pack, total, layout, seeAll, filters 
                 </>
               )}
               {photo.note && (
-                <Link className="arrow-link" href={photo.note.href} title={photo.note.title} aria-label={`Field note: ${photo.note.title}`}>
-                  Field Note
+                <Link className="arrow-link" href={photo.note.href} title={photo.note.title} aria-label={ta ? HIDDEN_TA.note(photo.note.title) : `Field note: ${photo.note.title}`}>
+                  {ta ? "களக்குறிப்பு" : "Field Note"}
                 </Link>
               )}
             </figcaption>
             {!editing && photo.description && <p className="photo-viewer-text">{photo.description}</p>}
           </figure>
         )}
-        <button className="film-viewer-close" onClick={close} aria-label="Close">
+        <button className="film-viewer-close" onClick={close} aria-label={ta ? HIDDEN_TA.close : "Close"}>
           ×
         </button>
         {order.length > 1 && (
           <>
-            <button className="film-viewer-step prev" onClick={() => step(-1)} aria-label="Previous photograph">
+            <button className="film-viewer-step prev" onClick={() => step(-1)} aria-label={ta ? HIDDEN_TA.photoBefore : "Previous photograph"}>
               ‹
             </button>
-            <button className="film-viewer-step next" onClick={() => step(1)} aria-label="Next photograph">
+            <button className="film-viewer-step next" onClick={() => step(1)} aria-label={ta ? HIDDEN_TA.photoAfter : "Next photograph"}>
               ›
             </button>
           </>

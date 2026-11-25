@@ -1,14 +1,8 @@
 import { shareMeta, sharePicture } from "@/lib/share";
 import type { Metadata } from "next";
-import { BackLink } from "@/components/BackLink";
-import { FilmVideo } from "@/components/FilmVideo";
-import Link from "next/link";
-import { notFound } from "next/navigation";
-import { getFilm, getFilms, getObservancesById, getRegion, getTemple, hasPage } from "@/lib/data";
-import { formatDate, localDate } from "@/lib/calendar";
-import { Html } from "@/components/Prose";
-import { FestivalLink } from "@/components/FestivalLink";
-import { titleFit } from "@/lib/titleFit";
+import { FilmView } from "@/components/FilmView";
+import { getFilm, getFilms } from "@/lib/data";
+import { formatDate } from "@/lib/calendar";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -23,60 +17,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return f ? shareMeta({ title: f.title, description: f.excerpt || formatDate(f.date), image: sharePicture({ src: f.video.poster }) }) : {};
 }
 
+/** A film's own page (components/FilmView). In Tamil: /ta/films/…. */
 export default async function FilmPage({ params }: Props) {
-  const film = await getFilm((await params).id);
-  if (!film) notFound();
-
-  const region = (await getRegion(film.region))!;
-  const temples = (await Promise.all(film.temples.map((id) => getTemple(film.region, id)))).filter(
-    (t) => t !== null
-  );
-  const observances = await getObservancesById(film.observances);
-  const local = localDate(region.calendar, film.date);
-
-  return (
-    <div className="wrap">
-      <header className="note-head">
-        <BackLink className="crumb" href="/films">
-          ← Films
-        </BackLink>
-        <div className="note-dateline">
-          <time className="date" dateTime={film.date}>
-            {formatDate(film.date)}
-          </time>
-          {local && <span className="local">{local}</span>}
-        </div>
-        <h1 className="note-title" style={titleFit(film.title)}>{film.title}</h1>
-        <div className="note-meta caps">
-          {temples.map((t) =>
-            hasPage(t) ? (
-              <Link key={t.id} href={`/${t.region}/${t.id}`}>
-                {t.knownAs ?? t.name}
-              </Link>
-            ) : (
-              <span key={t.id}>{t.knownAs ?? t.name}</span>
-            )
-          )}
-          {observances.map((o) => (
-            <FestivalLink key={o.id} id={o.id}>
-              {o.name}
-            </FestivalLink>
-          ))}
-          {film.madeBy && <span>By {film.madeBy}</span>}
-        </div>
-      </header>
-
-      <div className="film">
-        <FilmVideo controls playsInline preload="metadata" src={film.video.src} poster={film.video.poster} />
-        <div>
-          {film.body && <Html className="rich film-text" html={film.body} />}
-          {film.instagram && (
-            <a className="arrow-link" href={film.instagram} target="_blank" rel="noopener noreferrer">
-              On Instagram
-            </a>
-          )}
-        </div>
-      </div>
-    </div>
-  );
+  return <FilmView id={(await params).id} />;
 }

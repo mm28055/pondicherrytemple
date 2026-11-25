@@ -6,6 +6,7 @@ import { RitualTabs } from "@/components/RitualTabs";
 import type { ReactNode } from "react";
 import { EditText, type Target } from "@/components/edit/Editable";
 import type { YearEdit } from "@/lib/editing";
+import { said, YEAR_TA } from "@/content/templeTa";
 
 /* A few words on each festival, below its name: to be written (for now, a stand-in). */
 
@@ -42,7 +43,10 @@ function timing(e: TempleYearEntry) {
     const said = (on: string) => plain(name).includes(plain(on)) || (/first day of the month/i.test(on) && /pirappu/i.test(name));
     const day =
       group === "weekly"
-        ? [(e.weekdays ?? []).map((d) => DAYS[d] ?? d).join(" and "), e.on].filter(Boolean).join(", ")
+        ? // (the day said once, where its "On" is the day itself: "Sunday, morning")
+          [(e.weekdays ?? []).map((d) => DAYS[d] ?? d).join(" and "), (e.weekdays ?? []).some((d) => plain(DAYS[d] ?? d) === plain(e.on ?? "")) ? "" : e.on]
+            .filter(Boolean)
+            .join(", ")
         : e.on && !said(e.on)
           ? `on ${e.on}`
           : "";
@@ -77,7 +81,10 @@ function timing(e: TempleYearEntry) {
     name. A day listed
     under its own name ("Bhairava Abhishekam") shows that name, its rite's
     Tamil above it, and leads to the rite's page. */
-export function TempleYear({ year, day, edit }: { year: TempleRitualYear; day?: TempleDay; edit?: YearEdit }) {
+export function TempleYear({ year, day, edit, ta = false }: { year: TempleRitualYear; day?: TempleDay; edit?: YearEdit; /** in Tamil (content/templeTa) */ ta?: boolean }) {
+  const T = ta ? YEAR_TA : null;
+  const say = (s: string) => (ta ? said(s) : s);
+  const groupLabel = (key: string, label: string) => (T ? (key === "fortnightly" ? T.twiceAMonth : T.everyMonth) : label);
   // the tab's count: the kaalams its puja names ("4 kaalam puja"), else the kalams written
   const kaalams = Number(day?.standard?.match(/^\s*(\d+)/)?.[1] ?? day?.kalams.length ?? 0);
   const regular = year.regular.map((e) => ({ e, ...timing(e) }));
@@ -88,14 +95,14 @@ export function TempleYear({ year, day, edit }: { year: TempleRitualYear; day?: 
   const grid = (these: typeof regular) => (
     <div className="year-regular-list">
       {these.map(({ e, short }) => (
-        <Entry key={`${e.name ?? ""}|${e.observance?.id ?? ""}|${e.when ?? ""}`} e={e} className="regular" after={null} edit={edit}>
+        <Entry key={`${e.name ?? ""}|${e.observance?.id ?? ""}|${e.when ?? ""}`} e={e} className="regular" after={null} edit={edit} ta={ta}>
           {edit && e.ritualId && edit.rituals[e.ritualId] ? (
             <RegularEdit e={e} short={short} edit={edit} />
           ) : (
             <>
-              {short && <span className="year-when">{short}</span>}
+              {short && <span className="year-when">{say(short)}</span>}
               {/* its few words at this temple (the admin: "In a few words, here") */}
-              {e.about && <span className="year-regular-about">{e.about}</span>}
+              {e.about && <span className="year-regular-about">{say(e.about)}</span>}
             </>
           )}
         </Entry>
@@ -110,16 +117,16 @@ export function TempleYear({ year, day, edit }: { year: TempleRitualYear; day?: 
         {grid(these.filter((x) => !x.e.partOf))}
         {sets.map((set) => {
           const members = these.filter((x) => x.e.partOf === set).sort((a, b) => setOrder(a.e.name) - setOrder(b.e.name));
-          const ta = members.find((x) => x.e.partOfTamil)?.e.partOfTamil;
+          const tamil = members.find((x) => x.e.partOfTamil)?.e.partOfTamil;
           return (
             <div key={set} className="year-set">
               <h5 className="year-set-head">
-                {ta && (
+                {tamil && (
                   <span className="t" lang="ta">
-                    {ta}
+                    {tamil}
                   </span>
                 )}
-                <span className="caps">{set}</span>
+                <span className="caps" lang={ta ? "en" : undefined}>{set}</span>
               </h5>
               {grid(members)}
             </div>
@@ -128,34 +135,35 @@ export function TempleYear({ year, day, edit }: { year: TempleRitualYear; day?: 
       </>
     );
   };
-  const none = <p className="year-none">Nothing recorded yet.</p>;
+  const none = <p className="year-none">{T?.none ?? "Nothing recorded yet."}</p>;
 
   return (
     <RitualTabs
+      ta={ta}
       tabs={[
         {
           key: "year",
           ta: "வருடம்",
           en: "The Year",
-          count: many(festivals, "festival", "festivals"),
+          count: T?.festivals(festivals) ?? many(festivals, "festival", "festivals"),
           panel: (
             <div>
               {/* only the months with something recorded in them */}
               {festivals === 0 && none}
               {year.months.filter(({ festivals: these }) => these.length > 0).map(({ month, festivals: these }) => (
                 <section key={month.slug} className="year-month">
-                  <MonthHead month={month} />
+                  <MonthHead month={month} nowTa={T?.now} />
                   {these.length === 0 ? (
                     none
                   ) : (
                     <div className="year-list">
                       {these.map((e) => (
-                        <Entry key={`${e.name ?? ""}|${e.observance?.id ?? ""}`} e={e} className="festival" after={e.length ? `${e.length} ${e.length === 1 ? "day" : "days"}` : null} edit={edit} month={month.slug}>
+                        <Entry key={`${e.name ?? ""}|${e.observance?.id ?? ""}`} e={e} className="festival" after={e.length ? (T?.days(e.length) ?? `${e.length} ${e.length === 1 ? "day" : "days"}`) : null} edit={edit} month={month.slug} ta={ta}>
                           {/* its line below the name (Admin2: a box, on the day it is written on) */}
                           {edit && e.aboutRef ? (
                             <EditText className="year-about" value={e.about ?? ""} placeholder="A line below its name" target={{ collection: "occasions", id: e.aboutRef, field: "yearNote", label: "Line below its name (this temple)" }} />
                           ) : (
-                            e.about && <span className="year-about">{e.about}</span>
+                            e.about && <span className="year-about">{say(e.about)}</span>
                           )}
                         </Entry>
                       ))}
@@ -170,13 +178,13 @@ export function TempleYear({ year, day, edit }: { year: TempleRitualYear; day?: 
           key: "month",
           ta: "மாதம்",
           en: "The Month",
-          count: many(monthly.length, "ritual", "rituals"),
+          count: T?.rituals(monthly.length) ?? many(monthly.length, "ritual", "rituals"),
           panel: monthly.length
             ? GROUPS.filter((g) => g.key !== "weekly").map(({ key, label }) => {
                 const these = monthly.filter((x) => x.group === key);
                 return these.length ? (
                   <section key={key} className="year-regular">
-                    <h4 className="year-regular-head">{label}</h4>
+                    <h4 className="year-regular-head">{groupLabel(key, label)}</h4>
                     {list(these)}
                   </section>
                 ) : null;
@@ -187,10 +195,10 @@ export function TempleYear({ year, day, edit }: { year: TempleRitualYear; day?: 
           key: "week",
           ta: "வாரம்",
           en: "The Week",
-          count: many(weekly.length, "ritual", "rituals"),
+          count: T?.rituals(weekly.length) ?? many(weekly.length, "ritual", "rituals"),
           panel: weekly.length ? (
             <section className="year-regular">
-              <h4 className="year-regular-head">Every week</h4>
+              <h4 className="year-regular-head">{T?.everyWeek ?? "Every week"}</h4>
               {list(weekly)}
             </section>
           ) : (
@@ -204,8 +212,8 @@ export function TempleYear({ year, day, edit }: { year: TempleRitualYear; day?: 
                 key: "day",
                 ta: "நாள்",
                 en: "The Day",
-                count: kaalams ? many(kaalams, "kaalam", "kaalams") : "",
-                panel: <RitualDay day={day} temple={edit?.temple} />,
+                count: kaalams ? (T?.kaalams(kaalams) ?? many(kaalams, "kaalam", "kaalams")) : "",
+                panel: <RitualDay day={day} temple={edit?.temple} ta={ta} />,
               },
             ]
           : []),
@@ -237,7 +245,24 @@ function Paras({ text }: { text?: string }) {
     kaalam (its Tamil, its name and time, a note on the time, what happens,
     and its naivedyam, each only when it is written), then any text after
     them in a box of its own. */
-function RitualDay({ day, temple }: { day: TempleDay; temple?: number }) {
+function RitualDay({ day: written, temple, ta = false }: { day: TempleDay; temple?: number; ta?: boolean }) {
+  const say = (s?: string) => (ta && s ? said(s) : s);
+  const day: TempleDay = ta
+    ? {
+        ...written,
+        standard: say(written.standard),
+        intro: say(written.intro),
+        notesHeading: say(written.notesHeading),
+        notes: say(written.notes),
+        kalams: written.kalams.map((k) => ({
+          ...k,
+          time: say(k.time),
+          timingNote: say(k.timingNote),
+          whatHappens: say(k.whatHappens),
+          naivedyam: say(k.naivedyam),
+        })),
+      }
+    : written;
   // Admin2 (lib/editing): each written part a box to edit, the temple's own;
   // the parts not yet written there too, faintly, to be filled in
   const box = (field: string, label: string, value: string | undefined, as: "h4" | "div", className?: string, long = false) =>
@@ -263,7 +288,7 @@ function RitualDay({ day, temple }: { day: TempleDay; temple?: number }) {
       <section className="year-regular">
         {day.standard && <h4 className="year-regular-head">{day.standard}</h4>}
         <Paras text={day.intro} />
-        {day.kalams.length > 0 && <Kalams kalams={day.kalams} />}
+        {day.kalams.length > 0 && <Kalams kalams={day.kalams} ta={ta} />}
       </section>
       {day.notes && (
         <section className="year-regular">
@@ -275,7 +300,7 @@ function RitualDay({ day, temple }: { day: TempleDay; temple?: number }) {
   );
 }
 
-function Kalams({ kalams, temple }: { kalams: Kalam[]; temple?: number }) {
+function Kalams({ kalams, temple, ta = false }: { kalams: Kalam[]; temple?: number; ta?: boolean }) {
   // Admin2: each part of a kaalam a box (its row in the temple's Ritual Day)
   const box = (k: Kalam, field: string, label: string, as: "span" | "p" | "div", className?: string, long = false, lang?: string) => {
     const value = (k[field as keyof Kalam] as string | undefined) ?? "";
@@ -316,17 +341,27 @@ function Kalams({ kalams, temple }: { kalams: Kalam[]; temple?: number }) {
                 {k.tamil}
               </span>
             )}
-            <span className="caps">{[k.kalam, k.time].filter(Boolean).join(" · ")}</span>
+            <span className="caps">
+              {ta ? (
+                <>
+                  <span lang="en">{k.kalam}</span>
+                  {k.kalam && k.time && " · "}
+                  {k.time}
+                </>
+              ) : (
+                [k.kalam, k.time].filter(Boolean).join(" · ")
+              )}
+            </span>
             {k.timingNote && <p className="day-when">{k.timingNote}</p>}
             {k.whatHappens && (
               <>
-                <h5>What happens</h5>
+                <h5>{ta ? YEAR_TA.happens : "What happens"}</h5>
                 <p>{k.whatHappens}</p>
               </>
             )}
             {k.naivedyam && (
               <>
-                <h5>Naivedyam</h5>
+                <h5>{ta ? YEAR_TA.naivedyam : "Naivedyam"}</h5>
                 <p>{k.naivedyam}</p>
               </>
             )}
@@ -434,12 +469,15 @@ function weekdayOf(short: string) {
 /** One of them: its Tamil, its English (TBC when to be confirmed; the red mark
     and `after` beside it), and what follows; a link to its festival's or
     ritual's page when it has one. */
-function Entry({ e, className, after, children, edit, month }: { e: TempleYearEntry; className: string; after: string | null; children?: ReactNode; edit?: YearEdit; month?: string }) {
+function Entry({ e, className, after, children, edit, month, ta: inTamil = false }: { e: TempleYearEntry; className: string; after: string | null; children?: ReactNode; edit?: YearEdit; month?: string; ta?: boolean }) {
   // its own Tamil; else its festival's, when it goes by that festival's name
   // (a day under a name of its own, "Aani Utthiram", is not "Abhishekam")
   const named = e.name && e.name !== e.observance?.name;
-  const ta = e.tamil ?? (named ? undefined : e.observance?.tamil);
-  const name = e.name ?? e.observance?.name;
+  const english = e.name ?? e.observance?.name;
+  const own = e.tamil ?? (named ? undefined : e.observance?.tamil);
+  // (on a Tamil page, its English kept beside its Tamil)
+  const ta = own ?? (inTamil && english ? said(english) : undefined);
+  const name = english;
   // Admin2 (lib/editing): its names as boxes, each saved where it comes from
   const { nameAt, tamilAt } = edit ? sources(e, edit) : { nameAt: undefined, tamilAt: undefined };
   const lengthAt = edit && month ? lengthSource(e, edit, month) : undefined;
@@ -456,11 +494,11 @@ function Entry({ e, className, after, children, edit, month }: { e: TempleYearEn
       )}
       <span className="caps">
         {e.tbc && (
-          <abbr className="tbc-mark" title="To be confirmed">
-            TBC
+          <abbr className="tbc-mark" title={inTamil ? YEAR_TA.tbc : "To be confirmed"}>
+            {inTamil ? YEAR_TA.tbcShort : "TBC"}
           </abbr>
         )}
-        {nameAt ? <EditText value={name ?? ""} target={nameAt} required /> : name}
+        {nameAt ? <EditText value={name ?? ""} target={nameAt} required /> : inTamil ? <span lang="en">{name}</span> : name}
         {lengthAt ? (
           // Admin2: its length here, a box (the number alone; faint "days" while it has none)
           <span className="year-days">

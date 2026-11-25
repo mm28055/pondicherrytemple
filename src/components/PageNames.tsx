@@ -14,7 +14,7 @@ export function PageNames() {
   useEffect(() => {
     const keep = () => {
       const t = document.title.trim();
-      const name = /^Sthalam\b/.test(t) ? "Home" : t.replace(/\s+—\s+Sthalam$/, "");
+      const name = /^Sthalam\b/.test(t) ? "Home" : /^ஸ்தலம்/.test(t) ? "முகப்பு" : t.replace(/\s+—\s+(Sthalam|ஸ்தலம்)$/, "");
       if (!name) return;
       try {
         const all = JSON.parse(sessionStorage.getItem(KEY) || "{}") as Record<string, string>;

@@ -30,6 +30,9 @@ import type { SpecialIconKey } from "@/lib/specialIcons";
 import { NAKSHATRAS, nakshatraName } from "@/lib/nakshatraNames";
 import { NakshatraIcon } from "@/components/NakshatraIcon";
 import { SpecialIcon, TithiIcon } from "@/components/TithiIcon";
+import { CAL_TA } from "@/content/monthTa";
+import { MONTHS_TA, WEEKDAYS_TA } from "@/content/homeTa";
+import { dateTa } from "@/lib/dateTa";
 
 export interface CalendarEvent {
   date: string;
@@ -40,6 +43,8 @@ export interface CalendarEvent {
   /** What happened, and the field note about it. */
   label: string;
   noteHref?: string;
+  /** the field note's title, the words of the link to it */
+  noteTitle?: string;
   /** The festivals and rituals it was part of, each with its page. */
   observances: { label: string; href?: string }[];
   /** Still to be confirmed: shown fainter, marked "TBC". */
@@ -92,6 +97,8 @@ const nakFace = (swap: Swap, great: Great, day: string, k: number) => {
 /** The tithis shown on a day: all but those kept only where a rule names them. */
 const shownOf = (keys: TithiKey[] | undefined, great: Great | undefined, day: string) =>
   othersOf(keys).filter((k) => !HIDDEN_TITHIS.has(k) || tithiMark(great, day, k));
+/** A nakshatra's name on the page: in Tamil on a Tamil page. */
+const nakName = (k: number, ta: boolean) => (ta ? NAKSHATRAS[k].tamil : nakshatraName(k));
 const nakMarks = (great: Great | undefined, day: string) => (great?.[day] ?? []).filter((m) => m.nakshatra !== undefined);
 /** The full or new moon's disc; on a great day, in its halo. Every halo (the
     circle round a great day's moon or icon) is one box, the same in each view
@@ -106,10 +113,10 @@ function MoonDot({ halo }: { halo: boolean }) {
   );
 }
 /** A great day's name, then the tithi it is (when the name doesn't say it), for the pop-up. */
-function GreatName({ g, plain }: { g: { name: string; tamil: string }; plain: string }) {
+function GreatName({ g, plain, shown = plain }: { g: { name: string; tamil: string }; plain: string; /** as shown: a nakshatram in Tamil, on a Tamil page */ shown?: string }) {
   return (
     <>
-      {g.name}
+      <span lang="en">{g.name}</span>
       {g.tamil && (
         <>
           {" · "}
@@ -119,7 +126,9 @@ function GreatName({ g, plain }: { g: { name: string; tamil: string }; plain: st
       {!g.name.toLowerCase().includes(plain.toLowerCase()) && (
         <>
           {" "}
-          <span className="great-plain">{plain}</span>
+          <span className="great-plain" lang={shown === plain ? "en" : "ta"}>
+            {shown}
+          </span>
         </>
       )}
     </>
@@ -128,13 +137,13 @@ function GreatName({ g, plain }: { g: { name: string; tamil: string }; plain: st
 
 /** The temple, what happened, and the festivals it was part of — each its own
     link — the day's schedule, and the field note about it. */
-function item(e: CalendarEvent) {
+function item(e: CalendarEvent, ta: boolean) {
   return (
     <>
       <span className={e.tbc ? "cal-line tbc" : "cal-line"}>
         {e.tbc && (
-          <abbr className="tbc-mark" title="To be confirmed">
-            TBC
+          <abbr className="tbc-mark" title={ta ? CAL_TA.tbcIs : "To be confirmed"}>
+            {ta ? CAL_TA.tbc : "TBC"}
           </abbr>
         )}
         {e.placeHref ? (
@@ -167,7 +176,7 @@ function item(e: CalendarEvent) {
       )}
       {e.noteHref && (
         <Link className="cal-read arrow-link" href={e.noteHref}>
-          Read the field note
+          {e.noteTitle}
         </Link>
       )}
     </>
@@ -193,7 +202,10 @@ export function DayDialog({
   great,
   className,
   style,
+  ta = false,
 }: {
+  /** on a Tamil page */
+  ta?: boolean;
   day: string | null;
   events: CalendarEvent[];
   onClose: () => void;
@@ -251,8 +263,10 @@ export function DayDialog({
   const [way, setWay] = useState<"next" | "prev" | null>(null);
   const step = (dir: -1 | 1) => {
     const to = dir > 0 ? after : before;
-    follow(0, true);
-    if (!to || !onDay) return;
+    if (!to || !onDay) return follow(0, true);
+    // back in its place at once, unseen: gliding back, it carried the new day
+    // in from the side the old one had left by
+    follow(0);
     setWay(dir > 0 ? "next" : "prev");
     onDay(to);
   };
@@ -271,10 +285,27 @@ export function DayDialog({
     el.style.opacity = x ? String(Math.max(0.35, 1 - Math.abs(x) / 400)) : "";
   };
 
+  // swiped: the day goes on out the way it was going, then the next comes in
+  // from the other side
+  const leaving = useRef<number | undefined>(undefined);
+  useEffect(() => () => window.clearTimeout(leaving.current), []);
+  const leave = (dir: -1 | 1, dx: number) => {
+    const el = body.current;
+    if (!el || !(dir > 0 ? after : before) || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return step(dir);
+    el.style.transition = "transform 0.13s ease-in, opacity 0.13s ease-in";
+    el.style.transform = `translateX(${dx - dir * 90}px)`;
+    el.style.opacity = "0";
+    leaving.current = window.setTimeout(() => {
+      leaving.current = undefined;
+      latest.current(dir);
+    }, 130);
+  };
+
   // a swipe or drag: decided once, after a little movement, across or not
   const start = useRef<{ x: number; y: number; t: number; along: boolean | null } | null>(null);
   const moved = useRef(false);
   const begin = (x: number, y: number) => {
+    if (leaving.current !== undefined) return;
     start.current = { x, y, t: Date.now(), along: null };
     moved.current = false;
   };
@@ -296,7 +327,7 @@ export function DayDialog({
     const dx = x - s.x;
     const flick = Math.abs(dx) / Math.max(1, Date.now() - s.t) > 0.5 && Math.abs(dx) > 30;
     if (Math.abs(dx) < 80 && !flick) return follow(0, true); // back into place
-    step(dx < 0 ? 1 : -1);
+    leave(dx < 0 ? 1 : -1, dx);
   };
 
   // on the month's page, the calendar itself swipes to the next month: a
@@ -386,6 +417,8 @@ export function DayDialog({
       className={`day-dialog${days ? " stepped" : ""}${className ? ` ${className}` : ""}`}
       style={{ ...(month ? ({ "--m": month.colour } as CSSProperties) : {}), ...style }}
       onClose={() => {
+        window.clearTimeout(leaving.current);
+        leaving.current = undefined;
         setWay(null);
         onClose();
       }}
@@ -403,7 +436,7 @@ export function DayDialog({
     >
       {day && month && (
         <>
-          <button type="button" className="day-close" onClick={() => dialog.current?.close()} aria-label="Close">
+          <button type="button" className="day-close" onClick={() => dialog.current?.close()} aria-label={ta ? CAL_TA.close : "Close"}>
             ×
           </button>
           {days && (
@@ -413,7 +446,7 @@ export function DayDialog({
                 className="day-step prev"
                 onClick={() => step(-1)}
                 disabled={!before}
-                aria-label="The day before"
+                aria-label={ta ? CAL_TA.before : "The day before"}
               >
                 <svg viewBox="0 0 12 26" aria-hidden="true">
                   <polyline points="10,2 2,13 10,24" />
@@ -424,7 +457,7 @@ export function DayDialog({
                 className="day-step next"
                 onClick={() => step(1)}
                 disabled={!after}
-                aria-label="The day after"
+                aria-label={ta ? CAL_TA.after : "The day after"}
               >
                 <svg viewBox="0 0 12 26" aria-hidden="true">
                   <polyline points="2,2 10,13 2,24" />
@@ -439,11 +472,14 @@ export function DayDialog({
                 <span>
                   {/* the day of the month is the large number: here only its month, year and weekday */}
                   <span className="day-date">
-                    {dateParts(day).month} {dateParts(day).year},{" "}
-                    {["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][new Date(`${day}T00:00:00Z`).getUTCDay()]}
+                    {ta ? MONTHS_TA[Number(day.slice(5, 7)) - 1] : dateParts(day).month} {dateParts(day).year},{" "}
+                    {(ta ? WEEKDAYS_TA : ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"])[new Date(`${day}T00:00:00Z`).getUTCDay()]}
                   </span>
                   <span className="day-local">
-                    {month.name} {dayOfMonth} ·{" "}
+                    <span lang="en">
+                      {month.name} {dayOfMonth}
+                    </span>{" "}
+                    ·{" "}
                     <span lang="ta">
                       {month.tamil} {dayOfMonth}
                     </span>
@@ -462,7 +498,7 @@ export function DayDialog({
                           <GreatName g={tithiMark(great, day, MOON_KEY[moon])!} plain={MOON[moon].en} />
                         ) : (
                           <>
-                            {MOON[moon].en} · <span lang="ta">{MOON[moon].ta}</span>
+                            <span lang="en">{MOON[moon].en}</span> · <span lang="ta">{MOON[moon].ta}</span>
                           </>
                         )}
                       </span>
@@ -480,7 +516,7 @@ export function DayDialog({
                           <GreatName g={tithiMark(great, day, k)!} plain={TITHI_NAMES[k].name} />
                         ) : (
                           <>
-                            {TITHI_NAMES[k].name} · <span lang="ta">{TITHI_NAMES[k].tamil}</span>
+                            <span lang="en">{TITHI_NAMES[k].name}</span> · <span lang="ta">{TITHI_NAMES[k].tamil}</span>
                           </>
                         )}
                       </span>
@@ -494,7 +530,7 @@ export function DayDialog({
                         </span>
                       </span>
                       <span className="day-text">
-                        <GreatName g={m} plain={nakshatraName(m.nakshatra!)} />
+                        <GreatName g={m} plain={nakshatraName(m.nakshatra!)} shown={nakName(m.nakshatra!, ta)} />
                       </span>
                     </span>
                   ))}
@@ -511,8 +547,8 @@ export function DayDialog({
                         )}
                       </span>
                       <span className="day-text">
-                        {i > 0 && <span className="cal-nak-then">then </span>}
-                        <span className="cal-nak-name">{nakshatraName(k)}</span>
+                        {i > 0 && <span className="cal-nak-then">{ta ? CAL_TA.then : "then"} </span>}
+                        <span className="cal-nak-name">{nakName(k, ta)}</span>
                       </span>
                     </span>
                   ))}
@@ -521,19 +557,19 @@ export function DayDialog({
               {on.length > 0 ? (
                 <ul className="day-events">
                   {on.map((e) => (
-                    <li key={e.place + e.label}>{item(e)}</li>
+                    <li key={e.place + e.label}>{item(e, ta)}</li>
                   ))}
                 </ul>
               ) : (
-                <p className="day-none">Nothing recorded on this day.</p>
+                <p className="day-none">{ta ? CAL_TA.nothing : "Nothing recorded on this day."}</p>
               )}
               {/* what "TBC" means, when there is one */}
               {on.some((e) => e.tbc) && (
                 <p className="tbc-key">
-                  <abbr className="tbc-mark" title="To be confirmed">
-                    TBC
+                  <abbr className="tbc-mark" title={ta ? CAL_TA.tbcIs : "To be confirmed"}>
+                    {ta ? CAL_TA.tbc : "TBC"}
                   </abbr>
-                  to be confirmed
+                  {ta ? CAL_TA.tbcIs : "to be confirmed"}
                 </p>
               )}
             </div>
@@ -558,7 +594,10 @@ export function MonthCalendar({
   swap = {},
   great = {},
   today: built,
+  ta = false,
 }: {
+  /** on a Tamil page: the names in both languages as they are, the nakshatrams in Tamil */
+  ta?: boolean;
   month: TamilMonth;
   year: number;
   events: CalendarEvent[];
@@ -581,6 +620,15 @@ export function MonthCalendar({
   const count = (day: string) => events.filter((e) => e.date === day).length;
   const weeks = Math.ceil((blanks + days.length) / 7); // the boxes share the screen's height
 
+  // the names of a tithi and a moon on a day, for the pointer
+  const tithiName = (day: string, k: TithiKey) => {
+    const g = tithiMark(great, day, k);
+    return ta ? g?.tamil || TITHI_NAMES[k].tamil : (g?.name ?? TITHI_NAMES[k].name);
+  };
+  const moonName = (day: string, moon: "full" | "new") => {
+    const g = tithiMark(great, day, MOON_KEY[moon]);
+    return ta ? g?.tamil || MOON[moon].ta : (g?.name ?? MOON[moon].en);
+  };
   const [open, setOpen] = useState<string | null>(null);
   const choose = (e: { preventDefault: () => void }, day: string) => {
     e.preventDefault();
@@ -592,13 +640,15 @@ export function MonthCalendar({
       <div
         className="cal"
         role="grid"
-        aria-label={`${month.name} ${year}`}
+        aria-label={`${ta ? month.tamil : month.name} ${year}`}
         style={{ "--weeks": weeks } as CSSProperties}
       >
         {WEEK.map(([en, ta]) => (
           <div key={en} className="cal-wd" role="columnheader">
             <span lang="ta">{ta}</span>
-            <span className="caps">{en}</span>
+            <span className="caps" lang="en">
+              {en}
+            </span>
           </div>
         ))}
         {Array.from({ length: blanks }, (_, i) => (
@@ -613,7 +663,7 @@ export function MonthCalendar({
               key={day}
               role="gridcell"
               tabIndex={0}
-              aria-label={`${formatDate(day)}${others.length ? `, ${others.map((k) => tithiMark(great, day, k)?.name ?? TITHI_NAMES[k].name).join(", ")}` : ""}${n ? `: ${n} recorded` : ""}`}
+              aria-label={`${ta ? dateTa(day) : formatDate(day)}${others.length ? `, ${others.map((k) => tithiName(day, k)).join(", ")}` : ""}${n ? `: ${ta ? CAL_TA.recorded(n) : `${n} recorded`}` : ""}`}
               onClick={(e) => choose(e, day)}
               onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && choose(e, day)}
               className={`cal-day${n ? " has" : ""}${day === today ? " is-today" : ""}`}
@@ -626,8 +676,8 @@ export function MonthCalendar({
                     {moon && (
                       <span
                         className={`cal-moon in-box ${moon}${tithiMark(great, day, MOON_KEY[moon]) ? " great" : ""}`}
-                        title={tithiMark(great, day, MOON_KEY[moon])?.name ?? MOON[moon].en}
-                        aria-label={tithiMark(great, day, MOON_KEY[moon])?.name ?? MOON[moon].en}
+                        title={moonName(day, moon)}
+                        aria-label={moonName(day, moon)}
                       >
                         <MoonDot halo={Boolean(tithiMark(great, day, MOON_KEY[moon]))} />
                       </span>
@@ -638,22 +688,22 @@ export function MonthCalendar({
                     <span
                       key={k}
                       className={`cal-tithi${tithiMark(great, day, k) ? " great halo" : ""}`}
-                      title={tithiMark(great, day, k)?.name ?? TITHI_NAMES[k].name}
-                      aria-label={tithiMark(great, day, k)?.name ?? TITHI_NAMES[k].name}
+                      title={tithiName(day, k)}
+                      aria-label={tithiName(day, k)}
                       role="img"
                     >
                       {tithiFace(great, day, k)}
                     </span>
                   ))}
                 </span>
-                <span className="cal-ta" title={`${month.name} ${i + 1}`}>
+                <span className="cal-ta" title={`${ta ? month.tamil : month.name} ${i + 1}`}>
                   {i + 1}
                 </span>
               </div>
               {/* the day's nakshatras: the one at sunrise, then any that begin before the next */}
               <ul className="cal-naks">
                 {(nakshatras[day] ?? []).map((k) => (
-                  <li key={k} title={nakshatraName(k)} className={special[day]?.includes(k) || nakMarks(great, day).some((m) => m.nakshatra === k) ? "special" : undefined}>
+                  <li key={k} title={nakName(k, ta)} className={special[day]?.includes(k) || nakMarks(great, day).some((m) => m.nakshatra === k) ? "special" : undefined}>
                     {special[day]?.includes(k) || nakMarks(great, day).some((m) => m.nakshatra === k) ? (
                       <span className="cal-nak-mark great halo">
                         {nakFace(swap, great, day, k)}
@@ -661,7 +711,7 @@ export function MonthCalendar({
                     ) : (
                       <NakshatraIcon n={k} />
                     )}
-                    <span className="cal-nak-name">{nakshatraName(k)}</span>
+                    <span className="cal-nak-name">{nakName(k, ta)}</span>
                   </li>
                 ))}
               </ul>
@@ -672,22 +722,22 @@ export function MonthCalendar({
               <span className="cal-foot" aria-hidden="true">
                 <span className="cal-icons">
                   {moon && (
-                    <span className={`cal-moon ${moon}${tithiMark(great, day, MOON_KEY[moon]) ? " great" : ""}`} title={tithiMark(great, day, MOON_KEY[moon])?.name ?? MOON[moon].en}>
+                    <span className={`cal-moon ${moon}${tithiMark(great, day, MOON_KEY[moon]) ? " great" : ""}`} title={moonName(day, moon)}>
                       <MoonDot halo={Boolean(tithiMark(great, day, MOON_KEY[moon]))} />
                     </span>
                   )}
                   {(special[day] ?? []).map((k) => (
-                    <span key={`n${k}`} className="cal-nak-mark great halo" title={nakshatraName(k)}>
+                    <span key={`n${k}`} className="cal-nak-mark great halo" title={nakName(k, ta)}>
                       {swap[day]?.[k] ? <SpecialIcon k={swap[day][k]} /> : <NakshatraIcon n={k} />}
                     </span>
                   ))}
                   {nakMarks(great, day).filter((m) => !special[day]?.includes(m.nakshatra!)).map((m) => (
-                    <span key={m.name} className="cal-nak-mark great halo" title={m.name}>
+                    <span key={m.name} className="cal-nak-mark great halo" title={(ta && m.tamil) || m.name}>
                       {m.icon ? <SpecialIcon k={m.icon} /> : <NakshatraIcon n={m.nakshatra!} />}
                     </span>
                   ))}
                   {others.map((k) => (
-                    <span key={k} className={`cal-tithi${tithiMark(great, day, k) ? " great halo" : ""}`} title={tithiMark(great, day, k)?.name ?? TITHI_NAMES[k].name}>
+                    <span key={k} className={`cal-tithi${tithiMark(great, day, k) ? " great halo" : ""}`} title={tithiName(day, k)}>
                       {tithiFace(great, day, k)}
                     </span>
                   ))}
@@ -706,12 +756,12 @@ export function MonthCalendar({
 
       {!events.length && (
         <p className="note-line month-cal-none">
-          No days recorded yet in {month.name} {year}.
+          {ta ? CAL_TA.none(month.tamil, year) : `No days recorded yet in ${month.name} ${year}.`}
         </p>
       )}
 
       {/* A day, large, over the page; from it, the days either side */}
-      <DayDialog day={open} events={events} days={days} tithis={tithis} nakshatras={nakshatras} special={special} swap={swap} great={great} onDay={setOpen} onClose={() => setOpen(null)} />
+      <DayDialog day={open} events={events} days={days} tithis={tithis} nakshatras={nakshatras} special={special} swap={swap} great={great} ta={ta} onDay={setOpen} onClose={() => setOpen(null)} />
     </section>
   );
 }

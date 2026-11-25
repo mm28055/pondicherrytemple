@@ -128,7 +128,9 @@ export function MonthRing({
         <span className="ring-ta" lang="ta">
           {today ? today.ta : year.ta}
         </span>
-        <span className="caps">{today ? today.en : year.en}</span>
+        <span className="caps" lang="en">
+          {today ? today.en : year.en}
+        </span>
         <span className="ring-date">{today ? today.date : year.label}</span>
       </div>
     </div>

@@ -8,7 +8,7 @@ import { todayInIndia } from "@/lib/tamilDate";
     in, in its own colour, as on the calendar, marked "Now". Today is found
     in the visitor's browser, the page being built ahead (so it moves on by
     itself, month to month). */
-export function MonthHead({ month }: { month: TamilMonth }) {
+export function MonthHead({ month, nowTa }: { month: TamilMonth; /** on a Tamil page: its word for "Now", and the month's Tamil name */ nowTa?: string }) {
   const [now, setNow] = useState(false);
   useEffect(() => {
     const { y, m, d } = todayInIndia();
@@ -16,8 +16,8 @@ export function MonthHead({ month }: { month: TamilMonth }) {
   }, [month.slug]);
   return (
     <h3 className={now ? "now" : undefined} style={now ? ({ "--m": month.colour } as CSSProperties) : undefined}>
-      {month.name}
-      {now && <span className="year-now"> · Now</span>}
+      {nowTa ? month.tamil : month.name}
+      {now && <span className="year-now"> · {nowTa ?? "Now"}</span>}
     </h3>
   );
 }

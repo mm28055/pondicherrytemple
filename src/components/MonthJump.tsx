@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { DropBand } from "@/components/DropBand";
 import { monthDates, TAMIL_MONTHS } from "@/lib/calendar";
 import { keepScroll } from "@/lib/keepScroll";
+import { CAL_TA } from "@/content/monthTa";
 
 /** Any month, not only the one before or after: a band of dropdowns, a
     year and a month, in the month's colour, and a link down the page to
@@ -11,9 +12,11 @@ import { keepScroll } from "@/lib/keepScroll";
     the calendar staying where it was on the screen. A month's year is the
     year it falls in (Thai 2027 is January 2027); the months before the
     calendar begins are not offered. */
-export function MonthJump({ month, year, begins, years }: { month: string; year: number; begins: string; years: number[] }) {
+export function MonthJump({ month, year, begins, years, ta = false }: { month: string; year: number; begins: string; years: number[]; ta?: boolean }) {
+  const T = ta ? CAL_TA : null;
+  const nameOf = (m: (typeof TAMIL_MONTHS)[number]) => (ta ? m.tamil : m.name);
   const router = useRouter();
-  const go = (slug: string, y: number) => (keepScroll(), router.push(`/festivals-and-rituals/month/${slug}/${y}`, { scroll: false }));
+  const go = (slug: string, y: number) => (keepScroll(), router.push(`${ta ? "/ta" : ""}/festivals-and-rituals/month/${slug}/${y}`, { scroll: false }));
   // whether a month is in the calendar's line (on or after its first month)
   const open = (slug: string, y: number) => monthDates(slug, y).first >= begins;
   // a year without this month in the line (2026 has no Thai): its first month that is
@@ -23,15 +26,18 @@ export function MonthJump({ month, year, begins, years }: { month: string; year:
     <DropBand
       className="month-jump"
       note={
-        <>
-          <span className="on-mouse">Click</span>
-          <span className="on-touch">Tap</span> on a day to see what the temples keep in it
-        </>
+        // the Tamil page goes without it
+        T ? undefined : (
+          <>
+            <span className="on-mouse">Click</span>
+            <span className="on-touch">Tap</span> on a day to see what the temples keep in it
+          </>
+        )
       }
       drops={[
         {
           key: "year",
-          label: "Year",
+          label: T?.year ?? "Year",
           value: String(year),
           chosen: String(year),
           choices: years.map((y) => ({ id: String(y), label: String(y) })),
@@ -39,14 +45,14 @@ export function MonthJump({ month, year, begins, years }: { month: string; year:
         },
         {
           key: "month",
-          label: "Month",
-          value: TAMIL_MONTHS.find((m) => m.slug === month)!.name,
+          label: T?.month ?? "Month",
+          value: nameOf(TAMIL_MONTHS.find((m) => m.slug === month)!),
           chosen: month,
-          choices: TAMIL_MONTHS.map((m) => ({ id: m.slug, label: m.name, disabled: !open(m.slug, year) })),
+          choices: TAMIL_MONTHS.map((m) => ({ id: m.slug, label: nameOf(m), disabled: !open(m.slug, year) })),
           onPick: (slug) => go(slug, year),
         },
       ]}
-      links={[{ label: "Varam · Every week", href: "#varam" }]}
+      links={[{ label: T ? `வாரம் · ${T.weekly}` : "Varam · Every week", href: "#varam" }]}
     />
   );
 }

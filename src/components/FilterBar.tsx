@@ -1,5 +1,6 @@
 "use client";
 
+import { HIDDEN_TA } from "@/content/hiddenTa";
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
 import { useStripeFit } from "@/lib/stripes";
 import { useOneLine } from "@/lib/oneLine";
@@ -29,7 +30,10 @@ export function FilterBar({
   onOrder,
   stripes = false,
   jump,
+  ta = false,
 }: {
+  /** on a Tamil page */
+  ta?: boolean;
   filters: BarFilter[];
   chosen: Partial<Record<string, string>>;
   onPick: (key: string, id: string | null) => void;
@@ -124,7 +128,7 @@ export function FilterBar({
                 <i aria-hidden="true">▾</i>
               </button>
               {chosen[fl.key] && (
-                <button className="filter-bar-clear" aria-label={`Show all, not only ${nameOf(fl)}`} onClick={() => pick(fl.key, null)}>
+                <button className="filter-bar-clear" aria-label={ta ? HIDDEN_TA.notOnly(nameOf(fl)) : `Show all, not only ${nameOf(fl)}`} onClick={() => pick(fl.key, null)}>
                   ×
                 </button>
               )}
@@ -143,7 +147,7 @@ export function FilterBar({
             </span>
           )}
           <button className="filter-bar-btn filter-bar-sort" onClick={onOrder}>
-            {oldestFirst ? "Oldest first" : "Newest first"} <i aria-hidden="true">⇅</i>
+            {ta ? (oldestFirst ? "பழையவை முதலில்" : "புதியவை முதலில்") : oldestFirst ? "Oldest first" : "Newest first"} <i aria-hidden="true">⇅</i>
           </button>
         </div>
         {filters
@@ -151,7 +155,7 @@ export function FilterBar({
           .map((fl) => (
             <div key={fl.key} className="filters filter-bar-panel" role="group" aria-label={fl.label}>
               <button aria-pressed={!chosen[fl.key]} onClick={() => pick(fl.key, null)}>
-                All
+                {ta ? "எல்லாம்" : "All"}
               </button>
               {alphabetical(fl).map((o) => (
                 <button key={o.id} aria-pressed={chosen[fl.key] === o.id} onClick={() => pick(fl.key, o.id)}>

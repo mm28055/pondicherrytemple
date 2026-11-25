@@ -121,12 +121,13 @@ export interface TamilDate {
   day: number;
   month: { en: string; ta: string };
   year: string;
+  yearTa: string;
 }
 
 /** The Tamil date for a civil date in India (year, month 1–12, day). */
 export function tamilDate(y: number, m: number, d: number): TamilDate {
   const p = tamilPlace(y, m, d);
-  return { day: p.day, month: TAMIL_MONTHS[p.month], year: tamilYearName(p.year).en };
+  return { day: p.day, month: TAMIL_MONTHS[p.month], year: tamilYearName(p.year).en, yearTa: tamilYearName(p.year).ta };
 }
 
 /** Today in India, as a civil date. */
