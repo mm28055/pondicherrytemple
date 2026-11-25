@@ -24,6 +24,7 @@ import {
   tamilMonthOf,
   type TamilMonth,
 } from "@/lib/calendar";
+import { useToday } from "@/lib/useToday";
 import { HIDDEN_TITHIS, TITHI_NAMES, type TithiKey } from "@/lib/tithiNames";
 import type { SpecialIconKey } from "@/lib/specialIcons";
 import { NAKSHATRAS, nakshatraName } from "@/lib/nakshatraNames";
@@ -556,7 +557,7 @@ export function MonthCalendar({
   special,
   swap = {},
   great = {},
-  today,
+  today: built,
 }: {
   month: TamilMonth;
   year: number;
@@ -570,8 +571,10 @@ export function MonthCalendar({
   swap?: Swap;
   /** day → the tithis kept on it as great days (rules set in the admin) */
   great?: Great;
+  /** the day the page was built */
   today: string;
 }) {
+  const today = useToday(built);
   const { first, last } = monthDates(month.slug, year);
   const days = daysBetween(first, last);
   const blanks = new Date(`${first}T00:00:00Z`).getUTCDay();

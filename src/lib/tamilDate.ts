@@ -1,13 +1,15 @@
-/* Today's date in the Tamil solar calendar, worked out from the sun, so it
-   never needs a new table.
+/* The Tamil solar calendar, worked out, so it never needs a new table. The
+   one reckoning for the whole site: today's date, the months' first days
+   (lib/calendar), the dates beside field notes.
 
    A Tamil month is the time the sun spends in one sidereal sign (Chithirai =
-   Mesha, and so on), measured with the Lahiri ayanamsa. By the usual rule, if
-   the sun enters a sign before sunset the month begins that day, otherwise
-   the next day. Sunset is taken as 6 pm in Pondicherry, and the sun's
-   position comes from Meeus's short formula (good to about 0.01°, a quarter
-   of an hour), so on the rare day a sankranti falls right at dusk the day
-   number can be one out. */
+   Mesha, and so on), by the Vakya panchangam's own reckoning: a year of
+   365d 15n 31v 15t, each month of its own fixed length. If the sun enters the
+   sign before sunset the month begins that day, otherwise the next day (by
+   Chennai's sunset). Checked against the Prokerala Tamil calendar, every month
+   of 2025, 2026 and 2027 (scripts/check-tamil-months.ts). The true sun with
+   the Lahiri ayanamsa, used until November 2026, began some months (Aavani
+   and Purattasi 2026 among them) a day early. */
 
 export const TAMIL_MONTHS = [
   { en: "Chithirai", ta: "சித்திரை" },
@@ -57,24 +59,62 @@ export function tamilYearName(startYear: number): { en: string; ta: string } {
 const rad = (d: number) => (d * Math.PI) / 180;
 const DAY = 86_400_000;
 
-/** The sun's sidereal (Lahiri) longitude, in degrees, at a moment. */
-function siderealSun(ms: number): number {
-  const jd = ms / DAY + 2440587.5;
-  const t = (jd - 2451545) / 36525;
-  const l0 = 280.46646 + 36000.76983 * t + 0.0003032 * t * t;
-  const m = rad(357.52911 + 35999.05029 * t - 0.0001537 * t * t);
-  const c =
-    (1.914602 - 0.004817 * t - 0.000014 * t * t) * Math.sin(m) +
-    (0.019993 - 0.000101 * t) * Math.sin(2 * m) +
-    0.000289 * Math.sin(3 * m);
-  const apparent = l0 + c - 0.00569 - 0.00478 * Math.sin(rad(125.04 - 1934.136 * t));
-  const ayanamsa = 23.853 + ((jd - 2451545) / 365.25) * (50.29 / 3600);
-  return (((apparent - ayanamsa) % 360) + 360) % 360;
+// the months' lengths, in days, nadis and vinadis (Vakyakarana)
+const LENGTHS = [
+  [30, 55, 32], [31, 24, 12], [31, 36, 38], [31, 28, 12], [31, 2, 10], [30, 27, 22],
+  [29, 54, 7], [29, 30, 24], [29, 20, 53], [29, 27, 16], [29, 48, 24], [30, 20, 21],
+].map(([d, n, v]) => d + n / 60 + v / 3600);
+const YEAR_DAYS = 365 + 15 / 60 + 31 / 3600 + 15 / 216_000;
+// the start of the Kali era, sunrise at Ujjain, less the Vakya's constant (2d 8n 51v 15t)
+const KALI = 588465.75 - (2 + 8 / 60 + 51 / 3600 + 15 / 216_000);
+const UJJAIN_TO_IST = (82.5 - 75.77) / 360;
+
+/** When the sun sets in Chennai on a civil day, as a part of the day (IST);
+    good to a minute or two. */
+function sunset(ms: number): number {
+  const n = (ms - Date.UTC(2000, 0, 1, 12)) / DAY;
+  const g = rad((357.529 + 0.98560028 * n) % 360);
+  const q = (280.459 + 0.98564736 * n) % 360;
+  const l = rad(q + 1.915 * Math.sin(g) + 0.02 * Math.sin(2 * g));
+  const dec = Math.asin(Math.sin(rad(23.44)) * Math.sin(l));
+  const ra = Math.atan2(Math.cos(rad(23.44)) * Math.sin(l), Math.cos(l)) / rad(1);
+  const slow = -((((q - ra + 180) % 360) + 360) % 360) + 180; // degrees the sun is behind the clock
+  const lat = rad(13.0827);
+  const h = Math.acos((Math.sin(rad(-0.833)) - Math.sin(lat) * Math.sin(dec)) / (Math.cos(lat) * Math.cos(dec)));
+  return 0.5 + (82.5 - 80.2707) / 360 + slow / 360 + h / (2 * Math.PI);
 }
 
-/** Which sign (0 = Mesha) the sun is in at 6 pm India time on a civil date. */
-function signAtDusk(y: number, m: number, d: number): number {
-  return Math.floor(siderealSun(Date.UTC(y, m - 1, d, 12, 30)) / 30); // 18:00 IST = 12:30 UTC
+const starts = new Map<number, number>();
+/** The first day (UTC midnight, ms) of a month (0 = Chithirai) in the Tamil
+    year that begins in April of a given year (Thai of 2026 is January 2027). */
+function startOf(month: number, year: number): number {
+  const key = year * 12 + month;
+  let day = starts.get(key);
+  if (day === undefined) {
+    let jd = KALI + YEAR_DAYS * (year + 3101) + UJJAIN_TO_IST;
+    for (let i = 0; i < month; i++) jd += LENGTHS[i];
+    const enters = (jd - 2440587.5) * DAY; // the Indian clock, kept as UTC
+    day = Math.floor(enters / DAY) * DAY;
+    if ((enters - day) / DAY >= sunset(day)) day += DAY;
+    starts.set(key, day);
+  }
+  return day;
+}
+
+/** The first day (ISO) of a month (0 = Chithirai) that begins in a civil
+    year: Thai (9), Masi and Panguni belong to the Tamil year before. */
+export function tamilMonthStart(month: number, civilYear: number): string {
+  return new Date(startOf(month, month >= 9 ? civilYear - 1 : civilYear)).toISOString().slice(0, 10);
+}
+
+/** The month a civil date is in (0 = Chithirai), the Tamil year it belongs
+    to (the year of its April), and the day in the month. */
+export function tamilPlace(y: number, m: number, d: number): { month: number; year: number; day: number } {
+  const at = Date.UTC(y, m - 1, d);
+  const year = at >= startOf(0, y) ? y : y - 1;
+  let month = 11;
+  while (startOf(month, year) > at) month--;
+  return { month, year, day: Math.round((at - startOf(month, year)) / DAY) + 1 };
 }
 
 export interface TamilDate {
@@ -85,21 +125,18 @@ export interface TamilDate {
 
 /** The Tamil date for a civil date in India (year, month 1–12, day). */
 export function tamilDate(y: number, m: number, d: number): TamilDate {
-  const sign = signAtDusk(y, m, d);
-  let day = 1;
-  // Walk back to the first day of this month
-  for (let back = 1; back < 35; back++) {
-    const prev = new Date(Date.UTC(y, m - 1, d - back));
-    if (signAtDusk(prev.getUTCFullYear(), prev.getUTCMonth() + 1, prev.getUTCDate()) !== sign) break;
-    day++;
-  }
-  // The year turns at Chithirai; Thai, Masi and Panguni belong to the year begun the April before
-  const startYear = m <= 4 && sign >= 9 ? y - 1 : y;
-  return { day, month: TAMIL_MONTHS[sign], year: YEAR_NAMES[(((startYear - 1987) % 60) + 60) % 60] };
+  const p = tamilPlace(y, m, d);
+  return { day: p.day, month: TAMIL_MONTHS[p.month], year: tamilYearName(p.year).en };
 }
 
 /** Today in India, as a civil date. */
 export function todayInIndia(now = Date.now()): { y: number; m: number; d: number; weekday: number } {
   const ist = new Date(now + 5.5 * 3_600_000);
   return { y: ist.getUTCFullYear(), m: ist.getUTCMonth() + 1, d: ist.getUTCDate(), weekday: ist.getUTCDay() };
+}
+
+/** Today in India, as an ISO date. */
+export function todayISO(): string {
+  const { y, m, d } = todayInIndia();
+  return `${y}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
 }

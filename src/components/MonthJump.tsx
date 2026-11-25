@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { DropBand } from "@/components/DropBand";
-import { TAMIL_MONTHS } from "@/lib/calendar";
+import { monthDates, TAMIL_MONTHS } from "@/lib/calendar";
 import { keepScroll } from "@/lib/keepScroll";
 
 /** Any month, not only the one before or after: a band of dropdowns, a
@@ -15,7 +15,7 @@ export function MonthJump({ month, year, begins, years }: { month: string; year:
   const router = useRouter();
   const go = (slug: string, y: number) => (keepScroll(), router.push(`/festivals-and-rituals/month/${slug}/${y}`, { scroll: false }));
   // whether a month is in the calendar's line (on or after its first month)
-  const open = (slug: string, y: number) => `${y}-${TAMIL_MONTHS.find((m) => m.slug === slug)!.starts}` >= begins;
+  const open = (slug: string, y: number) => monthDates(slug, y).first >= begins;
   // a year without this month in the line (2026 has no Thai): its first month that is
   const toYear = (y: number) => go(open(month, y) ? month : TAMIL_MONTHS.find((m) => open(m.slug, y))!.slug, y);
 

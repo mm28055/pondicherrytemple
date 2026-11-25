@@ -1,11 +1,10 @@
 /* Local calendar labels. Dates are stored as ordinary ISO dates everywhere;
    a region's local date is only ever a display label, so adding a region
    with a different calendar means adding its reckoning here — nothing else.
-   The Tamil date is worked out from the sun (lib/tamilDate), as the home
-   page's date for today is. */
+   The Tamil date is worked out in lib/tamilDate, for every page alike. */
 
 import type { CalendarSystem } from "@/content/types";
-import { tamilDate } from "./tamilDate";
+import { tamilDate, tamilMonthStart, tamilPlace } from "./tamilDate";
 
 /** The local date of a date: its month and the day in it ("Aippasi 10"). */
 export function localDate(calendar: CalendarSystem, isoDate: string): string | null {
@@ -17,8 +16,9 @@ export function localDate(calendar: CalendarSystem, isoDate: string): string | n
 }
 
 /* The ritual year: the twelve Tamil solar months, one timeless year. Each
-   begins when the sun enters a sign, on much the same day every year, so a
-   date in any year can be placed in its month. `rasi` is where the month
+   begins when the sun enters a sign, on much the same day every year (which
+   day exactly, lib/tamilDate works out for each year), so a date in any year
+   can be placed in its month. `rasi` is where the month
    sits in the chart of the year (after the South Indian rasi kattam): row
    and column in a 4 × 4 square, Chithirai, the year's first month, in the
    top-left box, going round clockwise. */
@@ -29,8 +29,6 @@ export interface TamilMonth {
   tamil: string;
   /** "mid-April to mid-May" */
   span: string;
-  /** The day it usually begins, MM-DD. */
-  starts: string;
   rasi: [row: number, col: number];
   /** The month's colour, taken from what it is known for: konrai gold,
       lamp flame, sugarcane green… Used for its heading and its motif. */
@@ -38,28 +36,29 @@ export interface TamilMonth {
 }
 
 export const TAMIL_MONTHS: TamilMonth[] = [
-  { slug: "chithirai", name: "Chithirai", tamil: "சித்திரை", span: "mid-April to mid-May", starts: "04-14", rasi: [1, 1], colour: "#a87a0c" },
-  { slug: "vaikasi", name: "Vaikasi", tamil: "வைகாசி", span: "mid-May to mid-June", starts: "05-15", rasi: [1, 2], colour: "#b5412b" },
-  { slug: "aani", name: "Aani", tamil: "ஆனி", span: "mid-June to mid-July", starts: "06-15", rasi: [1, 3], colour: "#8a5a2b" },
-  { slug: "aadi", name: "Aadi", tamil: "ஆடி", span: "mid-July to mid-August", starts: "07-17", rasi: [1, 4], colour: "#b3202e" },
-  { slug: "aavani", name: "Aavani", tamil: "ஆவணி", span: "mid-August to mid-September", starts: "08-17", rasi: [2, 4], colour: "#9b2d3f" },
-  { slug: "purattasi", name: "Purattasi", tamil: "புரட்டாசி", span: "mid-September to mid-October", starts: "09-17", rasi: [3, 4], colour: "#3b4f8c" },
-  { slug: "aippasi", name: "Aippasi", tamil: "ஐப்பசி", span: "mid-October to mid-November", starts: "10-17", rasi: [4, 4], colour: "#4d6878" },
-  { slug: "karthigai", name: "Karthikai", tamil: "கார்த்திகை", span: "mid-November to mid-December", starts: "11-16", rasi: [4, 3], colour: "#c0561b" },
-  { slug: "margazhi", name: "Margazhi", tamil: "மார்கழி", span: "mid-December to mid-January", starts: "12-16", rasi: [4, 2], colour: "#9a4a68" },
-  { slug: "thai", name: "Thai", tamil: "தை", span: "mid-January to mid-February", starts: "01-14", rasi: [4, 1], colour: "#4e7d34" },
-  { slug: "masi", name: "Masi", tamil: "மாசி", span: "mid-February to mid-March", starts: "02-13", rasi: [3, 1], colour: "#1f5d7f" },
-  { slug: "panguni", name: "Panguni", tamil: "பங்குனி", span: "mid-March to mid-April", starts: "03-15", rasi: [2, 1], colour: "#5f7a2e" },
+  { slug: "chithirai", name: "Chithirai", tamil: "சித்திரை", span: "mid-April to mid-May", rasi: [1, 1], colour: "#a87a0c" },
+  { slug: "vaikasi", name: "Vaikasi", tamil: "வைகாசி", span: "mid-May to mid-June", rasi: [1, 2], colour: "#b5412b" },
+  { slug: "aani", name: "Aani", tamil: "ஆனி", span: "mid-June to mid-July", rasi: [1, 3], colour: "#8a5a2b" },
+  { slug: "aadi", name: "Aadi", tamil: "ஆடி", span: "mid-July to mid-August", rasi: [1, 4], colour: "#b3202e" },
+  { slug: "aavani", name: "Aavani", tamil: "ஆவணி", span: "mid-August to mid-September", rasi: [2, 4], colour: "#9b2d3f" },
+  { slug: "purattasi", name: "Purattasi", tamil: "புரட்டாசி", span: "mid-September to mid-October", rasi: [3, 4], colour: "#3b4f8c" },
+  { slug: "aippasi", name: "Aippasi", tamil: "ஐப்பசி", span: "mid-October to mid-November", rasi: [4, 4], colour: "#4d6878" },
+  { slug: "karthigai", name: "Karthikai", tamil: "கார்த்திகை", span: "mid-November to mid-December", rasi: [4, 3], colour: "#c0561b" },
+  { slug: "margazhi", name: "Margazhi", tamil: "மார்கழி", span: "mid-December to mid-January", rasi: [4, 2], colour: "#9a4a68" },
+  { slug: "thai", name: "Thai", tamil: "தை", span: "mid-January to mid-February", rasi: [4, 1], colour: "#4e7d34" },
+  { slug: "masi", name: "Masi", tamil: "மாசி", span: "mid-February to mid-March", rasi: [3, 1], colour: "#1f5d7f" },
+  { slug: "panguni", name: "Panguni", tamil: "பங்குனி", span: "mid-March to mid-April", rasi: [2, 1], colour: "#5f7a2e" },
 ];
 
 /** The Tamil month (its slug) a date in any year falls in. */
 export function tamilMonthOf(isoDate: string): string {
-  const day = isoDate.slice(5, 10);
-  const byStart = [...TAMIL_MONTHS].sort((a, b) => a.starts.localeCompare(b.starts));
-  let found = byStart[byStart.length - 1]; // before Thai begins: still Margazhi
-  for (const m of byStart) if (day >= m.starts) found = m;
-  return found.slug;
+  return TAMIL_MONTHS[placeOf(isoDate).month].slug;
 }
+
+const placeOf = (isoDate: string) => {
+  const [y, m, d] = isoDate.slice(0, 10).split("-").map(Number);
+  return tamilPlace(y, m, d);
+};
 
 const DAY = 86_400_000;
 const toISO = (ms: number) => new Date(ms).toISOString().slice(0, 10);
@@ -69,18 +68,15 @@ const fromISO = (iso: string) => Date.parse(`${iso}T00:00:00Z`);
     the next January). */
 export function monthDates(slug: string, startYear: number): { first: string; last: string } {
   const at = TAMIL_MONTHS.findIndex((m) => m.slug === slug);
-  const m = TAMIL_MONTHS[at];
-  const next = TAMIL_MONTHS[(at + 1) % 12];
-  const first = `${startYear}-${m.starts}`;
-  const nextYear = next.starts < m.starts ? startYear + 1 : startYear;
-  return { first, last: toISO(fromISO(`${nextYear}-${next.starts}`) - DAY) };
+  // Margazhi (8) begins in December, and runs to Thai, in the next year
+  const last = fromISO(tamilMonthStart((at + 1) % 12, at === 8 ? startYear + 1 : startYear)) - DAY;
+  return { first: tamilMonthStart(at, startYear), last: toISO(last) };
 }
 
 /** The year in which the month containing this date began. */
 export function monthYearOf(isoDate: string): number {
-  const m = TAMIL_MONTHS.find((x) => x.slug === tamilMonthOf(isoDate))!;
-  const year = Number(isoDate.slice(0, 4));
-  return isoDate.slice(5, 10) < m.starts ? year - 1 : year;
+  const { month, year } = placeOf(isoDate);
+  return month >= 9 ? year + 1 : year;
 }
 
 /** Every day from first to last, as ISO dates. */

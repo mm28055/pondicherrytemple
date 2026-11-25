@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useRef, useState, type CSSProperties, type TouchEvent } from "react";
 import { monthDates, TAMIL_MONTHS } from "@/lib/calendar";
+import { useToday } from "@/lib/useToday";
 import { tamilYearName } from "@/lib/tamilDate";
 import { MonthMotif } from "@/components/MonthMotif";
 import { inGlide, startGlide } from "@/components/MonthSwipe";
@@ -25,16 +26,17 @@ import { MonthWheel, type WheelMonth } from "@/components/MonthWheel";
     plain list, in order; or, with `wheel` (as on the Calendar page), a
     wheel that turns, arriving on the month we are in (components/MonthWheel). */
 export function RitualYear({
-  today,
+  today: built,
   begins,
   wheel = false,
 }: {
-  /** today, and the first day of the line of months (Masi 2026) */
+  /** the day the page was built, and the first day of the line of months (Masi 2026) */
   today: string;
   begins: string;
   /** on a phone, the months as a turning wheel in place of the list */
   wheel?: boolean;
 }) {
+  const today = useToday(built);
   // the year a date's ritual year begins in (it begins at Chithirai)
   const yearOf = (iso: string) => {
     const y = Number(iso.slice(0, 4));
@@ -42,6 +44,11 @@ export function RitualYear({
   };
   const first = yearOf(begins);
   const [year, setYear] = useState(yearOf(today));
+  // a new year begun since the page was built
+  useEffect(() => {
+    setYear((y) => (y === yearOf(built) ? yearOf(today) : y));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [today]);
   const [came, setCame] = useState<"" | "from-left" | "from-right">("");
   const grid = useRef<HTMLDivElement>(null);
 

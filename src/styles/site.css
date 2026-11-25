@@ -949,6 +949,10 @@ button.today-link:hover .today-tamil,
 button.today-link:focus-visible .today-tamil { color: var(--ochre); }
 
 
+/* "Pondicherry", over the photographs, in STHALAM's own letters, size and spacing */
+.home-place { margin-top: clamp(18px, 1.8vw, 24px); font-family: var(--display); font-weight: 800; font-variation-settings: "wdth" 75; font-size: clamp(20px, 2.6vw, 32px); line-height: 1.05; letter-spacing: 0.32em; text-transform: uppercase; color: var(--ochre); }
+.home-place + .home-strip { padding-top: 14px; }
+
 /* The opening paragraph, with the latest field notes beside it */
 /* The strip of photographs under the masthead, hung from the stripes at the
    top of the page: each photo spans whole red stripes, the gaps fall under
@@ -1060,7 +1064,7 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
 /* on a phone, today's date smaller, so the photographs and the opening come
    up into view */
 @media (max-width: 640px) {
-  /* the first screen filled: the name, the photographs, a line, then today's
+  /* the first screen filled: the name, the photographs, then today's
      date and the room kept under it for the calendar; the opening just below
      the screen (svh: the screen with the browser's own bars showing; 63px: the
      menu's bar, with the stripes). The header itself gives way, so the
@@ -1068,25 +1072,43 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
   .home-first { display: flex; flex-direction: column; min-height: calc(100svh - 63px); padding-bottom: 16px; }
   .home-first > .home-hero { display: contents; }
   .home-first .home-mark { margin-top: calc(max(-14vw, -64px) + 14px); }
-  .home-first > .home-strip { order: 1; padding-bottom: 16px; border-bottom: 2px solid var(--ink); }
-  .home-first .today { order: 2; align-self: flex-start; }
+  .home-first > .home-strip { order: 1; padding-top: 16px; }
+  .home-first > .home-place { order: 2; margin-top: 11px; }
+  .home-first .today { order: 3; flex: 1 0 auto; align-self: stretch; }
   .home-hero { padding-bottom: 14px; row-gap: 0; }
   /* on a phone at the left under the name, as it was before */
-  .today { min-height: 64px; min-width: 0; margin-top: 16px; padding-left: 12px; justify-self: start; }
+  .today { min-height: 64px; min-width: 0; margin-top: 19px; padding-left: 12px; justify-self: start; }
   .today .kicker { margin-bottom: 0; font-size: 10.5px; }
   /* a quarter smaller than they were (19px, 14px); the capitals stay at 10.5px */
   .today-tamil { font-size: 14.25px; }
   .today-en { font-size: 10.5px; margin-top: 0; }
   .today .caps { font-size: 10.5px; margin-top: 1px; }
   .today-more { margin-top: 2px; font-size: 10.5px; }
-  /* its lines a little closer and evenly spaced, nothing added between
-     them, so the box and its red bar are shorter too (96px to 64px);
-     1.25 looked cramped. "7 Karthikai, Parabhava year" left out */
-  .home-hero .today { line-height: 1.5; }
+  /* the home page: today, its week, and the button to the calendar, filling
+     the room down to the foot of the first screen. The English date first,
+     the Tamil one large under it */
+  .home-hero .today { display: flex; flex-direction: column; justify-content: space-between; gap: 10px; padding-left: 0; border-left: 0; line-height: 1.3; }
+  .home-hero .today-link { display: flex; flex-direction: column; gap: 2px; }
   .home-hero .today-en { display: none; }
-  .home-hero .today .caps { margin-top: 0; }
-  .home-hero .today-more { display: block; width: fit-content; margin-top: 0; }
+  .home-hero .today .caps { order: 1; margin: 0; font-family: var(--text); font-weight: 400; font-size: clamp(15px, 2.1svh, 17px); letter-spacing: 0; text-transform: none; }
+  .home-hero .today-tamil { order: 2; font-size: clamp(34px, 4.8svh, 38px); line-height: 1.2; white-space: nowrap; }
+  .home-hero .today-week { flex: 1 0 66px; max-height: 170px; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); border: 1.5px solid var(--ink); }
+  .today-day { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: clamp(0px, 1svh - 6px, 4px); padding: 4px 0; border: 0; border-left: 1px solid var(--rule); background: none; color: var(--ink); cursor: pointer; }
+  .today-day:first-child { border-left: 0; }
+  .today-day-name { font-family: var(--display); font-weight: 600; font-size: 10.5px; line-height: 1.3; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+  /* the English date large, the Tamil one small under it */
+  .today-day-num { position: relative; font-family: var(--tamil); font-weight: 700; font-size: clamp(20px, 3.4svh, 30px); line-height: 1.15; }
+  .today-day-tamil { font-family: var(--display); font-weight: 600; font-size: 10.5px; line-height: 1.3; letter-spacing: 0.06em; color: var(--muted); }
+  .today-day.now { background: var(--ochre); color: #fff; }
+  .today-day.now .today-day-name, .today-day.now .today-day-tamil { color: #fff; }
+  /* something recorded on the day */
+  .today-day.has .today-day-num::after { content: ""; position: absolute; top: 0.15em; left: calc(100% + 3px); width: 5px; height: 5px; border-radius: 50%; background: var(--ochre); }
+  .today-day.now.has .today-day-num::after { background: #fff; }
+  .home-hero .today-more { display: block; margin: 0; padding: 14px 0; border: 1.5px solid var(--ochre); font-size: 12.5px; line-height: 1; text-align: center; }
 }
+@media (min-width: 641px) { .today-week { display: none; } }
+/* a short phone: the photographs a little lower, so the calendar still fits */
+@media (max-width: 640px) and (max-height: 690px) { .home-first > .home-strip { --h: 78px; } }
 .today-more-short, .today-civil-short { display: none; }
 /* the Temples page on a phone: the date without its "Today" */
 @media (max-width: 640px) {
