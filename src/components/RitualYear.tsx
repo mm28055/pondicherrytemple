@@ -1,14 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState, type CSSProperties, type TouchEvent } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode, type TouchEvent } from "react";
 import { monthDates, TAMIL_MONTHS } from "@/lib/calendar";
 import { useToday } from "@/lib/useToday";
-import { tamilYearName } from "@/lib/tamilDate";
+import { tamilPlace, tamilYearName } from "@/lib/tamilDate";
 import { MonthMotif } from "@/components/MonthMotif";
 import { inGlide, startGlide } from "@/components/MonthSwipe";
 import { DropBand } from "@/components/DropBand";
-import { MonthWheel, type WheelMonth } from "@/components/MonthWheel";
+import { MonthRing, type RingMonth } from "@/components/MonthRing";
 
 /** The ritual year as a chart after the South Indian rasi kattam: the twelve
     Tamil months round the edge of a square, Chithirai in the top-left box,
@@ -17,24 +17,23 @@ import { MonthWheel, type WheelMonth } from "@/components/MonthWheel";
 
     A year runs from Chithirai to Panguni, as the temples keep it. It opens
     on the year we are in; the years listed in the band above the chart (on
-    a computer), the arrows either side of the year (on a phone, in the box
-    at the top of the list), or a swipe across the chart (a finger, or two on
+    a computer), the arrows either side of the year (on a phone, beside the
+    page's title), or a swipe across the chart (a finger, or two on
     a trackpad), go to other years: back as far as the year the documentation began in (where
     the months before it are shown, but cannot be opened), forward without
     end; the band offers up to two years on.
     Each month opens its own page, in that year. On a phone the months are a
-    plain list, in order; or, with `wheel` (as on the Calendar page), a
-    wheel that turns, arriving on the month we are in (components/MonthWheel). */
+    circle (components/MonthRing), just under the title. */
 export function RitualYear({
   today: built,
   begins,
-  wheel = false,
+  head,
 }: {
   /** the day the page was built, and the first day of the line of months (Masi 2026) */
   today: string;
   begins: string;
-  /** on a phone, the months as a turning wheel in place of the list */
-  wheel?: boolean;
+  /** the page's header: the way back, and its title */
+  head: ReactNode;
 }) {
   const today = useToday(built);
   // the year a date's ritual year begins in (it begins at Chithirai)
@@ -129,14 +128,50 @@ export function RitualYear({
     else bounce();
   };
 
-  // for the wheel: the months that can be opened, each as in the chart
-  const wheelMonths: WheelMonth[] = [];
+  // for the circle on a phone (filled as the months of the chart are laid out)
+  const ringMonths: RingMonth[] = [];
 
   const name = tamilYearName(year);
   const label = labelOf(year);
+  // today, in the circle's middle, in the year we are in
+  const [ty, tm, td] = today.split("-").map(Number);
+  const place = tamilPlace(ty, tm, td);
+  const month = TAMIL_MONTHS[place.month];
+  const ringToday =
+    year === yearOf(today)
+      ? {
+          ta: `${month.tamil} ${place.day}`,
+          en: month.name,
+          date: new Date(Date.UTC(ty, tm - 1, td)).toLocaleDateString("en-GB", { day: "numeric", month: "long", timeZone: "UTC" }),
+        }
+      : null;
 
   return (
     <>
+    <header className="page-head landing-head calendar-head">
+      {/* on a phone, at the right, on the title's line */}
+      <div className="ring-year">
+        <div className="rasi-year">
+          <button
+            type="button"
+            className="rasi-year-step"
+            onClick={() => go(-1)}
+            disabled={year <= first}
+            aria-label={`The year before, ${labelOf(year - 1)}`}
+          >
+            ‹
+          </button>
+          <span className="rasi-year-num">{label}</span>
+          <button type="button" className="rasi-year-step" onClick={() => go(1)} aria-label={`The year after, ${labelOf(year + 1)}`}>
+            ›
+          </button>
+        </div>
+      </div>
+      {head}
+    </header>
+    <section className="section tight">
+    {/* the home page's "Full calendar" opens here, the chart filling the screen */}
+    <div id="calendar" className="calendar-anchor">
     <DropBand
       className="year-band"
       drops={[
@@ -152,7 +187,7 @@ export function RitualYear({
       ]}
     />
     <div className="rasi-years" onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}>
-      <div ref={grid} key={year} className={`rasi${came ? ` ${came}` : ""}${wheel ? " has-wheel" : ""}`}>
+      <div ref={grid} key={year} className={`rasi${came ? ` ${came}` : ""}`}>
         {TAMIL_MONTHS.map((m) => {
           // the month in this year: Thai, Masi and Panguni fall in the next calendar year
           const y = monthDates(m.slug, year).first >= monthDates("chithirai", year).first ? year : year + 1;
@@ -174,8 +209,13 @@ export function RitualYear({
               <span className="rasi-span">{m.span}</span>
             </>
           );
-          if (wheel && !before)
-            wheelMonths.push({ slug: m.slug, href: `/festivals-and-rituals/month/${m.slug}/${y}`, now, colour: m.colour, inside });
+          ringMonths.push({
+            slug: m.slug,
+            name: m.name,
+            colour: m.colour,
+            href: before ? null : `/festivals-and-rituals/month/${m.slug}/${y}`,
+            now,
+          });
           return before ? (
             <div key={m.slug} className="rasi-month before" style={style} title="Before the documentation began">
               {inside}
@@ -194,21 +234,9 @@ export function RitualYear({
 
         <div className="rasi-centre">
           <div className="kicker">The ritual year</div>
-          {/* the year, and its name in the sixty-year cycle; on a phone, the years either side */}
+          {/* the year, and its name in the sixty-year cycle */}
           <div className="rasi-year">
-            <button
-              type="button"
-              className="rasi-year-step"
-              onClick={() => go(-1)}
-              disabled={year <= first}
-              aria-label={`The year before, ${labelOf(year - 1)}`}
-            >
-              ‹
-            </button>
             <span className="rasi-year-num">{label}</span>
-            <button type="button" className="rasi-year-step" onClick={() => go(1)} aria-label={`The year after, ${labelOf(year + 1)}`}>
-              ›
-            </button>
           </div>
           <p className="rasi-year-name">
             <span lang="ta">{name.ta}</span> · {name.en}
@@ -216,9 +244,11 @@ export function RitualYear({
           <p>Open a month to see what the temples keep in it.</p>
         </div>
         {/* (filled as the months above are laid out) */}
-        {wheel && <MonthWheel months={wheelMonths} year={year} />}
+        <MonthRing months={ringMonths} today={ringToday} year={{ label, ...name }} />
       </div>
     </div>
+    </div>
+    </section>
     </>
   );
 }

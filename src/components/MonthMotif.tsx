@@ -464,18 +464,21 @@ export function MonthMotif({
   month,
   className,
   fit,
+  frame,
 }: {
   month: string;
   className?: string;
   /** fitted to the drawing and its movement, standing on the frame's foot */
   fit?: boolean;
+  /** shown in this frame (a viewBox) instead, in its middle */
+  frame?: string;
 }) {
   const m = MOTIFS[month];
   if (!m) return null;
   return (
     <svg
       className={`motif${className ? ` ${className}` : ""}`}
-      viewBox={fit ? m.box : "0 0 100 100"}
+      viewBox={frame ?? (fit ? m.box : "0 0 100 100")}
       preserveAspectRatio={fit ? "xMidYMax meet" : undefined}
       role="img"
       aria-label={m.label}
