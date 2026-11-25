@@ -25,7 +25,7 @@ function Name() {
       <span className="home-latin">Sthalam</span>
       <span className="home-gloss">
         {/* the red mark between them: a lingam on its base */}
-        <span className="home-lingam" aria-hidden="true" />a sacred site
+        <span className="home-lingam" aria-hidden="true" />Pondicherry
       </span>
     </p>
   );
@@ -36,7 +36,7 @@ export function HomeMark({ film }: { film?: { src: string; poster?: string } }) 
   const viewer = useRef<HTMLDialogElement>(null);
   const [open, setOpen] = useState(false);
 
-  // the play button's circle resting on the line "a sacred site" stands on: how far
+  // the play button's circle resting on the line "Pondicherry" stands on: how far
   // above the foot of the name that line is (site.css, .home-play, --lift)
   useLayoutEffect(() => {
     const m = mark.current;

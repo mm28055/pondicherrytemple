@@ -6,6 +6,7 @@ import { Fragment, useCallback, useEffect, useMemo, useRef, useState, useSyncExt
 import type { Photo, PhotoFilter } from "@/content/types";
 import { formatDate } from "@/lib/calendar";
 import { stripeRows, useStripeFit } from "@/lib/stripes";
+import { takeFromHome } from "@/lib/photoFrom";
 import { FilterBar } from "@/components/FilterBar";
 import { Zoomable } from "@/components/Zoomable";
 import { eventOf, photoCount, unpackPhotos, type PhotoPack } from "@/lib/photoPack";
@@ -156,8 +157,23 @@ export function PhotoWall({ photos: given, pack, total, layout, seeAll, filters 
 
   /* ----- the open photo, kept in the address as ?photo=… ----- */
 
+  // the page it is on: going back to another (the home page), the viewer stays
+  // as it is until that page is there, rather than showing this one behind it
+  const path = useRef<string | null>(null);
+  // whether the open photo was pressed on the home page: closed, it goes back there
+  const fromHome = useRef(false);
+  useEffect(() => {
+    if (!addressable) return;
+    path.current = window.location.pathname;
+    const photo = new URL(window.location.href).searchParams.has("photo");
+    fromHome.current = (takeFromHome() || Boolean(window.history.state?.photoFromHome)) && photo;
+    // (kept with this step of the history, so it holds after a reload, or Back from a link in the viewer)
+    if (fromHome.current) window.history.replaceState({ ...window.history.state, photoFromHome: true }, "", window.location.href);
+  }, [addressable]);
+
   const fromAddress = useCallback(() => {
     if (!addressable) return;
+    if (path.current && path.current !== window.location.pathname) return;
     const id = new URL(window.location.href).searchParams.get("photo");
     const i = id ? order.findIndex((p) => p.id === id) : -1;
     setOpen(i >= 0 ? i : null);
@@ -188,8 +204,8 @@ export function PhotoWall({ photos: given, pack, total, layout, seeAll, filters 
 
   const close = useCallback(() => {
     if (!addressable) return setOpen(null);
-    if (window.history.state?.photo) {
-      window.history.back(); // the popstate that follows closes it
+    if (window.history.state?.photo || fromHome.current) {
+      window.history.back(); // the popstate that follows closes it (or the page is left for the home page)
     } else {
       window.history.replaceState(window.history.state, "", addressFor(null));
       setOpen(null);

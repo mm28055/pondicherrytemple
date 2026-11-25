@@ -81,11 +81,8 @@ export default async function HomePage() {
           <section className="home-hero">
             {/* the name in black letters; the play button at its end opens the film large */}
             <HomeMark film={words?.film} />
-            <TodayTamil events={todayEvents} week />
+            <TodayTamil events={todayEvents} month />
           </section>
-
-          {/* the town: over the photographs; on a phone, under them */}
-          <p className="home-place">Pondicherry</p>
 
           {stripPhotos.length > 0 && <HomeStrip photos={stripPhotos} />}
         </div>

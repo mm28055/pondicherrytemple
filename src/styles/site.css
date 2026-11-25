@@ -821,7 +821,7 @@ a.temple-row:hover .temple-name { color: var(--ochre); }
 }
 
 /* the play button (HomeTamil), in black like the letters, at the end of the
-   line "Sthalam · a sacred site", its circle standing on that line (--lift,
+   line "Sthalam · Pondicherry", its circle standing on that line (--lift,
    measured); on a computer out towards the rule of "Today" beside it, as far
    from the rule as from the line under it all (the name's own width, by which
    ஸ்தலம் is sized, kept). It opens the film large in a pop-up. */
@@ -830,7 +830,7 @@ a.temple-row:hover .temple-name { color: var(--ochre); }
 .home-play { position: absolute; right: calc(-1 * var(--reach, 0px)); bottom: var(--lift, 0px); display: inline-flex; align-items: baseline; gap: 9px; padding: 0; border: 0; background: none; cursor: pointer; color: var(--ink); }
 .home-play svg { display: block; flex: none; width: var(--cap, 18px); height: var(--cap, 18px); }
 /* "Watch the film" before it, in grey small capitals, its letters on the line
-   "a sacred site" stands on (the circle's foot is that line); darker on hover */
+   "Pondicherry" stands on (the circle's foot is that line); darker on hover */
 .home-play-label { font-family: var(--display); font-weight: 600; font-size: 12.5px; line-height: 1; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); white-space: nowrap; transition: color 0.2s; position: relative; top: calc(-1 * var(--below, 0px)); }
 .home-play:hover .home-play-label, .home-play:focus-visible .home-play-label { color: var(--ink); }
 /* small to see, a finger's width to tap */
@@ -885,7 +885,7 @@ html:has(dialog.home-film[open]) body { padding-right: var(--film-gutter, 0px); 
 /* The site's red dot between a name and what goes with it: the shape of the
    pulli, the dot over a Tamil letter, in the Tamil face of the names (a round
    top, straight sides, a flat foot); it stands on the line of the words
-   beside it. On the home page, between STHALAM and "a sacred site" (on a
+   beside it. On the home page, between STHALAM and "Pondicherry" (on a
    base, as a lingam); on a
    festival's page and in the galleries, between the Tamil and the English. */
 .home-lingam::before,
@@ -893,7 +893,7 @@ html:has(dialog.home-film[open]) body { padding-right: var(--film-gutter, 0px); 
 .gallery-dot,
 .elements-dot { background: var(--ochre); border-radius: 50% 50% 16% 16% / 44% 44% 12% 12%; }
 
-/* "a sacred site" in the small grey capitals of the date in Today, beside it */
+/* "Pondicherry" in the small grey capitals of the date in Today, beside it */
 .home-gloss { position: relative; font-family: var(--display); font-weight: 600; font-size: 12.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-2); }
 @media (max-width: 640px) { .home-gloss { font-size: 10.5px; } }
 /* the red mark between the name and the gloss, midway across the gap (the
@@ -948,10 +948,6 @@ html:has(dialog.home-film[open]) body { padding-right: var(--film-gutter, 0px); 
 button.today-link:hover .today-tamil,
 button.today-link:focus-visible .today-tamil { color: var(--ochre); }
 
-
-/* "Pondicherry", over the photographs, in STHALAM's own letters, size and spacing */
-.home-place { margin-top: clamp(18px, 1.8vw, 24px); font-family: var(--display); font-weight: 800; font-variation-settings: "wdth" 75; font-size: clamp(20px, 2.6vw, 32px); line-height: 1.05; letter-spacing: 0.32em; text-transform: uppercase; color: var(--ochre); }
-.home-place + .home-strip { padding-top: 14px; }
 
 /* The opening paragraph, with the latest field notes beside it */
 /* The strip of photographs under the masthead, hung from the stripes at the
@@ -1064,51 +1060,45 @@ button.today-link:focus-visible .today-tamil { color: var(--ochre); }
 /* on a phone, today's date smaller, so the photographs and the opening come
    up into view */
 @media (max-width: 640px) {
-  /* the first screen filled: the name, the photographs, then today's
-     date and the room kept under it for the calendar; the opening just below
-     the screen (svh: the screen with the browser's own bars showing; 63px: the
-     menu's bar, with the stripes). The header itself gives way, so the
-     photographs can stand between its name and its date. */
-  .home-first { display: flex; flex-direction: column; min-height: calc(100svh - 63px); padding-bottom: 16px; }
+  /* the name, two rows of square photographs, and in place of a third row the
+     month in small squares (as wide as a photograph) with today's date beside it. The header
+     itself gives way, so the photographs can stand between its name and its
+     date. */
+  .home-first { display: flex; flex-direction: column; }
   .home-first > .home-hero { display: contents; }
   .home-first .home-mark { margin-top: calc(max(-14vw, -64px) + 14px); }
-  .home-first > .home-strip { order: 1; padding-top: 16px; }
-  .home-first > .home-place { order: 2; margin-top: 11px; }
-  .home-first .today { order: 3; flex: 1 0 auto; align-self: stretch; }
+  .home-first > .home-strip { order: 1; }
+  .home-first .home-strip-row { height: auto; }
+  .home-first .home-strip-photo { flex: 1 1 0; width: auto !important; height: auto; aspect-ratio: 1; }
+  .home-first .today { order: 2; }
   .home-hero { padding-bottom: 14px; row-gap: 0; }
   /* on a phone at the left under the name, as it was before */
-  .today { min-height: 64px; min-width: 0; margin-top: 19px; padding-left: 12px; justify-self: start; }
+  .today { min-height: 64px; min-width: 0; margin-top: 20px; padding-left: 12px; justify-self: start; }
   .today .kicker { margin-bottom: 0; font-size: 10.5px; }
   /* a quarter smaller than they were (19px, 14px); the capitals stay at 10.5px */
   .today-tamil { font-size: 14.25px; }
   .today-en { font-size: 10.5px; margin-top: 0; }
   .today .caps { font-size: 10.5px; margin-top: 1px; }
   .today-more { margin-top: 2px; font-size: 10.5px; }
-  /* the home page: today, its week, and the button to the calendar, filling
-     the room down to the foot of the first screen. The English date first,
-     the Tamil one large under it */
-  .home-hero .today { display: flex; flex-direction: column; justify-content: space-between; gap: 10px; padding-left: 0; border-left: 0; line-height: 1.3; }
-  .home-hero .today-link { display: flex; flex-direction: column; gap: 2px; }
+  .home-hero .today {
+    --gap: var(--tile-gap, 21px);
+    --tile: calc((100% - (var(--across, 3) - 1) * var(--gap)) / var(--across, 3));
+    display: grid; grid-template-columns: var(--tile) minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) auto; column-gap: var(--gap);
+    align-self: stretch; min-height: 72px; margin-top: var(--gap); padding-left: 0; border-left: 0; line-height: 1.3;
+  }
+  /* (the words from the squares' top to their foot, evenly spaced) */
+  .home-hero .today-link { display: flex; flex-direction: column; justify-content: space-between; }
+  .home-hero .today .kicker, .home-hero .today .caps, .home-hero .today-more { line-height: 1; }
   .home-hero .today-en { display: none; }
-  .home-hero .today .caps { order: 1; margin: 0; font-family: var(--text); font-weight: 400; font-size: clamp(15px, 2.1svh, 17px); letter-spacing: 0; text-transform: none; }
-  .home-hero .today-tamil { order: 2; font-size: clamp(34px, 4.8svh, 38px); line-height: 1.2; white-space: nowrap; }
-  .home-hero .today-week { flex: 1 0 66px; max-height: 170px; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); border: 1.5px solid var(--ink); }
-  .today-day { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: clamp(0px, 1svh - 6px, 4px); padding: 4px 0; border: 0; border-left: 1px solid var(--rule); background: none; color: var(--ink); cursor: pointer; }
-  .today-day:first-child { border-left: 0; }
-  .today-day-name { font-family: var(--display); font-weight: 600; font-size: 10.5px; line-height: 1.3; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
-  /* the English date large, the Tamil one small under it */
-  .today-day-num { position: relative; font-family: var(--tamil); font-weight: 700; font-size: clamp(20px, 3.4svh, 30px); line-height: 1.15; }
-  .today-day-tamil { font-family: var(--display); font-weight: 600; font-size: 10.5px; line-height: 1.3; letter-spacing: 0.06em; color: var(--muted); }
-  .today-day.now { background: var(--ochre); color: #fff; }
-  .today-day.now .today-day-name, .today-day.now .today-day-tamil { color: #fff; }
-  /* something recorded on the day */
-  .today-day.has .today-day-num::after { content: ""; position: absolute; top: 0.15em; left: calc(100% + 3px); width: 5px; height: 5px; border-radius: 50%; background: var(--ochre); }
-  .today-day.now.has .today-day-num::after { background: #fff; }
-  .home-hero .today-more { display: block; margin: 0; padding: 14px 0; border: 1.5px solid var(--ochre); font-size: 12.5px; line-height: 1; text-align: center; }
+  /* as the Tamil names of the festivals' lists on a phone */
+  .home-hero .today-tamil { font-size: 24px; line-height: 1.1; white-space: nowrap; }
+  .home-hero .today .caps { margin-top: 0; }
+  .home-hero .today-more { grid-column: 2; display: block; width: fit-content; margin-top: 5px; }
+  .today-month { grid-row: 1 / 3; align-self: center; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 5px; }
+  .today-month span { aspect-ratio: 1; background: rgba(155, 150, 143, 0.5); }
+  .today-month span.now { background: var(--ochre); }
 }
-@media (min-width: 641px) { .today-week { display: none; } }
-/* a short phone: the photographs a little lower, so the calendar still fits */
-@media (max-width: 640px) and (max-height: 690px) { .home-first > .home-strip { --h: 78px; } }
+@media (min-width: 641px) { .today-month { display: none; } }
 .today-more-short, .today-civil-short { display: none; }
 /* the Temples page on a phone: the date without its "Today" */
 @media (max-width: 640px) {

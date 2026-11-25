@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import type { Photo } from "@/content/types";
+import { leaveFromHome } from "@/lib/photoFrom";
 import { idealUnits, useStripeFit } from "@/lib/stripes";
 
 /* The stripes at the top of the page are 20px red, 20px white. The strip
@@ -11,7 +12,7 @@ import { idealUnits, useStripeFit } from "@/lib/stripes";
    photos; the whole drawn from the page's margin to the other, in line with
    the text above and below (lib/stripes), and filled exactly: the last
    photo takes what is left. On a phone, too narrow for that, there are two rows, as many photos
-   in each as fit, and the last a narrow one. Every so often the whole strip
+   in each as fit, all square (site.css). Every so often the whole strip
    blinks, slowly, to the next photos. */
 const EVERY = 9000; // ms between changes
 const BLINK = 1200; // ms to fade out (and as long to fade back in)
@@ -59,18 +60,15 @@ export function pack<P extends StripPhoto>(photos: P[], from: number, pitch: num
 }
 
 /** The rows of the strip, from photo `from` on: one row; or on a phone (a
-    strip lower than 100px), two, the last photo of the second 2 stripes
-    wide. */
+    strip lower than 100px), two, of as many photos each. */
 function compose(photos: StripPhoto[], from: number, units: number, h: number): { rows: Placed[][]; next: number } {
   if (h >= 100) {
     const { set, next } = fill(photos, from, units, h);
     return { rows: [set], next };
   }
   const first = pack(photos, from, units + 1, h);
-  const second = pack(photos, from + first.length, units + 1 - 3, h);
-  const at = from + first.length + second.length;
-  second.push({ p: photos[at % photos.length], units: 2 });
-  return { rows: [first, second], next: (at + 1) % photos.length };
+  const second = pack(photos, from + first.length, units + 1, h);
+  return { rows: [first, second], next: (from + first.length + second.length) % photos.length };
 }
 
 export function HomeStrip({ photos }: { photos: StripPhoto[] }) {
@@ -137,6 +135,10 @@ export function HomeStrip({ photos }: { photos: StripPhoto[] }) {
                   className={last ? "home-strip-photo home-strip-all" : "home-strip-photo"}
                   href={last ? "/photographs" : `/photographs?photo=${p.id}`}
                   style={{ width: fit?.width(units) }}
+                  // closed, the photo comes back here (not from a new tab)
+                  onClick={(e) => {
+                    if (!last && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey) leaveFromHome();
+                  }}
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={p.small} alt={last ? "" : p.alt} style={{ objectPosition: `${p.focus[0]}% ${p.focus[1]}%` }} />

@@ -3,35 +3,28 @@
 import Link from "next/link";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { DayDialog, type CalendarEvent } from "@/components/MonthCalendar";
+import { daysBetween, monthDates, monthYearOf, tamilMonthOf } from "@/lib/calendar";
+import { useStripeFit } from "@/lib/stripes";
 import { tamilDate, todayInIndia, type TamilDate } from "@/lib/tamilDate";
 
 const WEEKDAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
-/** The week a day is in, Sunday to Saturday: each day's date, English and Tamil. */
-function weekOf(iso: string) {
-  const at = Date.parse(`${iso}T00:00:00Z`);
-  const sunday = at - new Date(at).getUTCDay() * 86_400_000;
-  return Array.from({ length: 7 }, (_, i) => {
-    const day = new Date(sunday + i * 86_400_000);
-    const [y, m, d] = [day.getUTCFullYear(), day.getUTCMonth() + 1, day.getUTCDate()];
-    const t = tamilDate(y, m, d);
-    return { iso: day.toISOString().slice(0, 10), d, tamil: t.day, label: `${WEEKDAYS[i]}, ${d} ${MONTHS[m - 1]}, ${t.month.en} ${t.day}` };
-  });
-}
-
 /* Today's Tamil date. Worked out in the browser,
    because the page itself is built ahead of time and would otherwise show
    the day it was built. A click opens today in the calendar's pop-up,
-   dropping down from just under the Tamil date. With `week` (the home
-   page), on a phone the seven days of the week under it, each opening its
-   day, and "Full calendar" as a button (site.css). */
-export function TodayTamil({ events, week = false }: { events: CalendarEvent[]; week?: boolean }) {
+   dropping down from just under the Tamil date. With `month` (the home
+   page), on a phone the Tamil month drawn small in plain squares, today's red, as wide
+   as a photograph above it, the words beside it (site.css). */
+export function TodayTamil({ events, month = false }: { events: CalendarEvent[]; month?: boolean }) {
   const [today, setToday] = useState<{ t: TamilDate; civil: string; short: string; iso: string } | null>(null);
-  const [open, setOpen] = useState<string | null>(null);
+  const [open, setOpen] = useState(false);
   const [place, setPlace] = useState<CSSProperties | undefined>();
   const box = useRef<HTMLElement>(null);
   const tamil = useRef<HTMLSpanElement>(null);
+  // a photograph's width in the rows above, and the space between two (HomeStrip)
+  const fit = useStripeFit(box);
+  const across = fit ? Math.max(1, Math.floor((fit.units + 1) / 3)) : 3;
 
   useEffect(() => {
     const { y, m, d, weekday } = todayInIndia();
@@ -54,13 +47,7 @@ export function TodayTamil({ events, week = false }: { events: CalendarEvent[]; 
       const left = Math.max(16, Math.min(r.right - width, vw - width - 16));
       setPlace({ left, top: t.bottom + 12 + window.scrollY, width, "--caret": `${r.left + 34 - left}px` } as CSSProperties);
     } else setPlace(undefined);
-    setOpen(today!.iso);
-  };
-  // the week today is in, Sunday to Saturday
-  const days = today ? weekOf(today.iso) : [];
-  const openDay = (iso: string) => {
-    setPlace(undefined);
-    setOpen(iso);
+    setOpen(true);
   };
 
   // it opens only when something was recorded today
@@ -84,44 +71,30 @@ export function TodayTamil({ events, week = false }: { events: CalendarEvent[]; 
   );
 
   return (
-    <aside className="today" aria-label="Today in the Tamil calendar" ref={box}>
+    <aside
+      className="today"
+      aria-label="Today in the Tamil calendar"
+      ref={box}
+      style={month && fit ? ({ "--across": across, "--tile-gap": `${fit.gap}px` } as CSSProperties) : undefined}
+    >
+      {today && month && <MonthTable today={today.iso} />}
       {today &&
         (recorded ? (
-          <button type="button" className="today-link" onClick={show} title="See what was recorded today">
-            {words}
-          </button>
+          <>
+            <button type="button" className="today-link" onClick={show} title="See what was recorded today">
+              {words}
+            </button>
+            <DayDialog
+              day={open ? today.iso : null}
+              events={events}
+              onClose={() => setOpen(false)}
+              className={place ? "day-by-today" : undefined}
+              style={place}
+            />
+          </>
         ) : (
           <div className="today-link is-plain">{words}</div>
         ))}
-      {today && week && (
-        <div className="today-week">
-          {days.map(({ iso, d, tamil, label }, i) => (
-            <button
-              key={iso}
-              type="button"
-              className={`today-day${iso === today.iso ? " now" : ""}${events.some((e) => e.date === iso) ? " has" : ""}`}
-              aria-label={label}
-              aria-current={iso === today.iso ? "date" : undefined}
-              onClick={() => openDay(iso)}
-            >
-              <span className="today-day-name">{WEEKDAYS[i].slice(0, 3)}</span>
-              <span className="today-day-num">{d}</span>
-              <span className="today-day-tamil">{tamil}</span>
-            </button>
-          ))}
-        </div>
-      )}
-      {today && (recorded || week) && (
-        <DayDialog
-          day={open}
-          events={events}
-          onClose={() => setOpen(null)}
-          days={week && !place ? days.map((x) => x.iso) : undefined}
-          onDay={setOpen}
-          className={place ? "day-by-today" : undefined}
-          style={place}
-        />
-      )}
       {/* the year's calendar, scrolled to, on the Calendar page */}
       {today && (
         <Link className="arrow-link today-more" href="/calendar#calendar">
@@ -131,5 +104,22 @@ export function TodayTamil({ events, week = false }: { events: CalendarEvent[]; 
         </Link>
       )}
     </aside>
+  );
+}
+
+/** The Tamil month we are in, drawn in plain squares: one for each of its
+    days, laid out as on the month's own page (Sunday first, the first day
+    under its weekday), today's red. It opens that page. */
+function MonthTable({ today }: { today: string }) {
+  const slug = tamilMonthOf(today);
+  const year = monthYearOf(today);
+  const { first, last } = monthDates(slug, year);
+  const start = new Date(`${first}T00:00:00Z`).getUTCDay() + 1;
+  return (
+    <Link className="today-month" href={`/festivals-and-rituals/month/${slug}/${year}`} aria-label="This month's calendar">
+      {daysBetween(first, last).map((d, i) => (
+        <span key={d} className={d === today ? "now" : undefined} style={i ? undefined : { gridColumnStart: start }} />
+      ))}
+    </Link>
   );
 }
