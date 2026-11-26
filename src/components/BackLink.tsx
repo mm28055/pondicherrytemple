@@ -46,11 +46,14 @@ export function BackLink({
   className,
   children,
   always = false,
+  stays = false,
 }: {
   href: string;
   className?: string;
   children: ReactNode;
   always?: boolean;
+  /** on a line of the page's own that stays in sight (a field note's): no bar of its own */
+  stays?: boolean;
 }) {
   const pathname = usePathname();
   const own = useRef<HTMLAnchorElement>(null);
@@ -69,7 +72,7 @@ export function BackLink({
 
   useEffect(() => {
     const el = own.current;
-    if (!el) return;
+    if (!el || stays) return;
     const nav = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--nav-h")) || 0;
     // out of sight above, under the header: float it
     const io = new IntersectionObserver(([e]) => setFloating(!e.isIntersecting && e.boundingClientRect.top < nav), {
@@ -77,7 +80,7 @@ export function BackLink({
     });
     io.observe(el);
     return () => io.disconnect();
-  }, []);
+  }, [stays]);
 
   /** whether a page is in the other language than this one */
   const other = (path: string) => isTamil(path) !== isTamil(pathname);

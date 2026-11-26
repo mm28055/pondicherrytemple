@@ -36,6 +36,7 @@ import { tamilOf } from "@/lib/tamilPages";
 import { dateTa, photosTa, rowTa, tamilDateOf } from "@/lib/viewTa";
 import { FestivalLink } from "@/components/FestivalLink";
 import { NotePhotos } from "@/components/NotePhotos";
+import { NoteSearch } from "@/components/NoteSearch";
 import { NoteRow } from "@/components/Rows";
 import { packPhotos } from "@/lib/photoPack";
 import { titleFit, titleFitTa } from "@/lib/titleFit";
@@ -139,11 +140,18 @@ export async function NoteView({ id: noteId, ta = false }: { id: string; ta?: bo
 
   const page = (
     <>
-      <div className="wrap">
-        <header className="note-head">
-          <BackLink className="crumb" href={hrefOf("/field-notes")}>
+      {/* the back link and the search, on a line that stays under the site's
+          header once scrolled up to it */}
+      <div className="note-crumb-line">
+        <div className="wrap">
+          <BackLink className="crumb" href={hrefOf("/field-notes")} stays>
             ← {T?.notes ?? "Field notes"}
           </BackLink>
+          <NoteSearch noteId={note.id} ta={ta} />
+        </div>
+      </div>
+      <div className="wrap">
+        <header className="note-head">
           <div className="note-dateline">
             <time className="date" dateTime={note.date}>
               {dayOf(note.date)}
