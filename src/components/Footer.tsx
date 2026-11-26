@@ -31,7 +31,7 @@ export function Footer() {
               <li><Link href={ta ? "/ta/pondicherry" : "/pondicherry"}>{label("/pondicherry", "Temples")}</Link></li>
               <li><Link href={ta ? "/ta/festivals-and-rituals" : "/festivals-and-rituals"}>{label("/festivals-and-rituals", "Festivals & Rituals")}</Link></li>
               <li><Link href={ta ? "/ta/calendar" : "/calendar"}>{label("/calendar", "Calendar")}</Link></li>
-              <li><Link href="/field-notes">{label("/field-notes", "Writings")}</Link></li>
+              <li><Link href={ta ? "/ta/field-notes" : "/field-notes"}>{label("/field-notes", "Writings")}</Link></li>
               <li><Link href={ta ? "/ta/photographs" : "/photographs"}>{label("/photographs", "Photographs")}</Link></li>
               <li><Link href={ta ? "/ta/films" : "/films"}>{label("/films", "Films")}</Link></li>
             </ul>

@@ -447,7 +447,7 @@ const TITLES: Record<string, string> = {
   "2026-09-19-a-sealed-chamber-and-30rs-to-vaikuntham": "மூடிய ஓர் அறையும் வைகுண்டத்திற்கு 30 ரூபாயும்",
   "2026-09-21-conversation-with-venkatesa-archakar": "வெங்கடேச அர்ச்சகருடன் உரையாடல்",
   "2026-09-22-the-ruby-robed-poet-s-rathnangi-sevai": "மாணிக்க ஆடை அணிந்த கவியின் ரத்னாங்கி சேவை",
-  "2026-09-22-desikar-rears-from-the-front": "தேசிகர் முன்னிருந்து எழுகிறார்",
+  "2026-09-22-desikar-rears-from-the-front": "தேசிகர் முன்னிருந்து பின்தொடர்கிறார்",
   "2026-09-24-a-most-gracious-pradosha-nayakar": "மிகவும் அருள்மிகுந்த ஒரு பிரதோஷ நாயகர்",
   "2026-09-26-vedanta-desika-on-the-two-seas": "இரு கடல்களின் மேல் வேதாந்த தேசிகர்",
   "2026-09-26-learning-flower-tossing": "மலர் தூவக் கற்றல்",

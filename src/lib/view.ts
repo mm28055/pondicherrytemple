@@ -23,6 +23,8 @@ export interface NoteRowData {
   by: string;
   /** A field note's first photograph, shown at the right on the Field Notes page. */
   picture?: { src: string; alt: string };
+  /** "Read more", on a Tamil page */
+  more?: string;
   /** More of its words, for the Field Notes page: as many as fit beside the picture. */
   longExcerpt?: string;
 }

@@ -21,7 +21,7 @@ export async function PhotographsView({ ta = false }: { ta?: boolean }) {
   return (
     <div className={ta ? "wrap in-ta" : "wrap"} lang={ta ? "ta" : undefined}>
       <header className="page-head landing-head">
-        <BackLink className="crumb" href="/field-notes">
+        <BackLink className="crumb" href={ta ? "/ta/field-notes" : "/field-notes"}>
           ← {T?.back ?? "Field notes"}
         </BackLink>
         <h1 className="page-title">{T?.title ?? "Photographs"}</h1>

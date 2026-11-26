@@ -9,6 +9,8 @@ import { said } from "@/content/saidTa";
 import { TEMPLE_TA } from "@/content/templeTa";
 import type { FieldNote, Film, Observance, Photo, PhotoFilter, Temple } from "@/content/types";
 import { CREDITS_TA } from "@/content/hiddenTa";
+import { noteWordsTa } from "@/content/noteBodiesTa";
+import { WRITINGS_TA } from "@/content/writingsTa";
 import { tamilOf } from "./tamilPages";
 import { tamilDate } from "./tamilDate";
 import { filmTile, type FilmTile, type NoteRowData } from "./view";
@@ -69,7 +71,7 @@ export function photosTa(photos: Photo[], temples: Temple[], observances: Observ
     short: p.short && occasion(p.short),
     place: p.place && place(p.place),
     credit: p.credit && (CREDITS_TA[p.credit] ?? p.credit),
-    note: p.note && { ...p.note, title: titleTa(p.note.href.replace("/field-notes/", ""), p.note.title) },
+    note: p.note && { ...p.note, href: tamilOf(p.note.href) ?? p.note.href, title: titleTa(p.note.href.replace("/field-notes/", ""), p.note.title) },
   }));
 }
 
@@ -98,14 +100,18 @@ export function rowTa(row: NoteRowData, temples: Temple[], item?: FieldNote | Fi
   const [y, m, d] = row.date.slice(0, 10).split("-").map(Number);
   const t = tamilDate(y, m, d);
   const line = (names: string[]) => [names.join(", "), occasion].filter(Boolean).join(" · ");
+  const words = noteWordsTa(row.id);
   return {
     ...row,
+    href: tamilOf(row.href) ?? row.href,
+    more: WRITINGS_TA.readMore,
+    longExcerpt: words ? words.slice(0, 1500) : row.longExcerpt,
     kindLabel: KINDS_TA[row.kind] ?? row.kindLabel,
     shortMonth: `${(short ? MONTHS_SHORT : MONTHS_TA)[m - 1]} ${y}`,
     local: row.local && `${t.month.ta} ${t.day}`,
     where: line(tagged.map((x) => templeTa(x.id, x.knownAs ?? x.name))),
     whereShort: line(tagged.map((x) => templeShortTa(x.id, x.shortName ?? x.knownAs ?? x.name))),
     title: titleTa(row.id, row.title),
-    excerpt: openingTa(row.id),
+    excerpt: openingTa(row.id) || (words && row.excerpt ? (words.length > 180 ? `${words.slice(0, 180).replace(/\s+\S*$/, "")}…` : words) : ""),
   };
 }

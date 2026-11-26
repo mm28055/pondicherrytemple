@@ -37,7 +37,7 @@ export function NoteRow({
         {withPicture && row.longExcerpt ? (
           <>
             <p className="row-excerpt fill">{row.longExcerpt}</p>
-            <span className="row-more">Read more</span>
+            <span className="row-more">{row.more ?? "Read more"}</span>
           </>
         ) : (
           row.excerpt && <p className="row-excerpt">{row.excerpt}</p>

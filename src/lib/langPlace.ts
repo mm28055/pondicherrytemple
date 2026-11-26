@@ -13,7 +13,7 @@ const PARTS = [
   ".voice", ".home-lists", ".home-lists > div", ".band", ".temple-row", ".obs-row", ".temple-entry", ".temple-cards", ".temple-card", ".around-head",
   ".month-head", ".cal", ".cal-day", ".varam-days", ".varam-open", ".varam-list li", ".varam-photos",
   ".name-list li", ".gallery-card", ".rasi", ".rasi-month",
-  ".about-block", ".about-block p", ".team > li", ".film", ".film-text", ".note-head", ".photo-group-head",
+  ".about-block", ".about-block p", ".team > li", ".film", ".film-text", ".note-head", ".note-dateline", ".note-title", ".note-body .rich > *", ".note-body .rich li", ".note-foot", ".note-step", ".photo-group-head",
   ".page-parts", ".temple-intro", ".stack > section", ".note-row", ".video-tile", ".photo-wall", ".photo-row", ".ritual-switch", ".year-month", ".year-regular",
   ".year-list > *", ".site-footer", ".footer-bottom",
 ];

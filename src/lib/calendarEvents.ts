@@ -29,7 +29,7 @@ export async function calendarEvents(occasions: Occasion[], ta = false): Promise
         short: t ? (ta ? templeShortTa(t.id, t.shortName ?? t.knownAs ?? shortTempleName(t)) : (t.shortName ?? t.knownAs ?? shortTempleName(t))) : o.townWide ? (ta ? MONTH_TA.townWide : "Town-wide") : "",
         placeHref: t && hasPage(t) ? ((ta && tamilOf(`/${t.region}/${t.id}`)) || `/${t.region}/${t.id}`) : undefined,
         label: ta && o.label ? labelTa(o.label) : o.label,
-        noteHref: o.note ? `/field-notes/${o.note}` : undefined,
+        noteHref: o.note ? `${ta ? "/ta" : ""}/field-notes/${o.note}` : undefined,
         noteTitle: o.note ? (ta ? titleTa(o.note, titles.get(o.note) ?? "களக்குறிப்பு") : (titles.get(o.note) ?? "Field note")) : undefined,
         tbc: o.tbc,
         schedule: ta ? o.schedule?.map((s) => ({ time: timeTa(s.time), what: scheduleTa(s.what) })) : o.schedule,

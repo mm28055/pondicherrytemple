@@ -26,15 +26,19 @@ export function searchForm(text: string): string {
 /** What is typed, as words to find: each must be there. */
 export const searchTerms = (typed: string) => searchForm(typed).split(/\s+/).filter(Boolean);
 
+/** A Tamil word without the ending that others take the place of: அபிஷேகம் as
+    அபிஷேக, so that it finds அபிஷேகத்தில் too, and முருகன் as முருகன, முருகனுக்கு. */
+export const stemOf = (term: string) => (term.length > 5 && term.endsWith("ம்") ? term.slice(0, -2) : term.length > 3 && term.endsWith("்") ? term.slice(0, -1) : term);
+
 /** Whether text (in its search form, with a space at each end) has a word
     typed. It must start a word, or, if longer than three letters, end one, so
     that "utsavam" finds Brahmotsavam; never in the middle, where "march" would
     find Kunkumarchana and "adi" a hundred others. */
-export const hasTerm = (text: string, term: string) => text.includes(` ${term}`) || (term.length > 3 && text.includes(`${term} `));
+export const hasTerm = (text: string, term: string) => text.includes(` ${stemOf(term)}`) || (term.length > 3 && text.includes(`${term} `));
 
 /** Whether text starts a word with what is typed: for suggestions, where a
     match must be plain to see. */
-export const startsWord = (text: string, term: string) => text.includes(` ${term}`);
+export const startsWord = (text: string, term: string) => text.includes(` ${stemOf(term)}`);
 
 /** How many slips a word of this length may have and still be taken for
     another: none under four letters, where too much would match. */

@@ -322,6 +322,8 @@ a:focus-visible, button:focus-visible {
   .in-ta .watch-short { display: inline; }
   .in-ta .section-head { flex-wrap: wrap; gap: 2px 16px; }
 }
+.in-ta .note-title { line-height: 1.2; }
+@media (min-width: 901px) { .in-ta .notes-search:not(:focus-within, .filled) { width: 215px; } } /* (its words, whole) */
 .in-ta .home-opening p { line-height: 1.7; }
 .in-ta .voice-line blockquote p { line-height: 1.5; }
 .in-ta .home-strip-all > span { font-size: clamp(10.5px, 9cqi, 21px); line-height: 1.25; }

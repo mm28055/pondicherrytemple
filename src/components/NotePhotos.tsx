@@ -9,6 +9,8 @@ import { seeded } from "@/lib/mahotsavam";
 import type { PhotoPack } from "@/lib/photoPack";
 import { pack } from "./HomeStrip";
 import { PhotoWall } from "./PhotoWall";
+import { HIDDEN_TA } from "@/content/hiddenTa";
+import { WRITINGS_TA } from "@/content/writingsTa";
 
 type Open = (photo: Photo) => void;
 type Row = { h: number; cells: { p: Photo; units: number }[] };
@@ -89,7 +91,7 @@ function NoteVideos({ videos, width, onShape }: { videos: FieldVideo[]; width?: 
     of the page (the gaps a white one's width), as long as the text; as many as
     fit. When more are left, the last says how many, and opens them all in the
     column, carrying on down the page under the text ("See fewer" at the end). */
-function NoteColumn({ photos, videos, seed, open }: { photos: Photo[]; videos: FieldVideo[]; seed: string; open: Open }) {
+function NoteColumn({ photos, videos, seed, open, ta }: { photos: Photo[]; videos: FieldVideo[]; seed: string; open: Open; ta: boolean }) {
   // the space the photos may fill, beside the text (see site.css)
   const frame = useRef<HTMLDivElement>(null);
   const col = useRef<HTMLDivElement>(null);
@@ -168,7 +170,7 @@ function NoteColumn({ photos, videos, seed, open }: { photos: Photo[]; videos: F
                     key={j}
                     className={more ? "note-photos-photo note-photos-more" : "note-photos-photo"}
                     onClick={more ? openRest : () => open(p)}
-                    aria-label={more ? undefined : p.alt || p.caption || "Photograph"}
+                    aria-label={more ? undefined : p.alt || p.caption || (ta ? HIDDEN_TA.photo : "Photograph")}
                     // (Admin2: dragged from here into the note's open text, components/edit/PhotosInText)
                     data-photo-id={more ? undefined : p.id}
                     data-photo-src={more ? undefined : p.medium}
@@ -178,7 +180,7 @@ function NoteColumn({ photos, videos, seed, open }: { photos: Photo[]; videos: F
                     <img src={p.medium} alt="" loading="lazy" style={{ objectPosition: `${p.focus[0]}% ${p.focus[1]}%` }} />
                     {more && (
                       <span>
-                        <span>+ {rest.length + 1} photos</span>
+                        <span>{ta ? WRITINGS_TA.morePhotos(rest.length + 1) : `+ ${rest.length + 1} photos`}</span>
                       </span>
                     )}
                   </button>
@@ -189,7 +191,7 @@ function NoteColumn({ photos, videos, seed, open }: { photos: Photo[]; videos: F
           {/* no room for even one: the way to them, under the videos */}
           {!all && laid.length === 0 && rest.length > 0 && (
             <button className="arrow-link note-photos-fewer" onClick={openRest}>
-              {rest.length} photo{rest.length === 1 ? "" : "s"}
+              {ta ? WRITINGS_TA.photos(rest.length) : `${rest.length} photo${rest.length === 1 ? "" : "s"}`}
             </button>
           )}
         </div>
@@ -199,7 +201,7 @@ function NoteColumn({ photos, videos, seed, open }: { photos: Photo[]; videos: F
         rest.length > 0 &&
         createPortal(
           <section ref={wall} className="note-more">
-            <MoreRows photos={rest} open={open} fewer={fewer} />
+            <MoreRows photos={rest} open={open} fewer={fewer} ta={ta} />
           </section>,
           spot,
         )}
@@ -212,7 +214,7 @@ function NoteColumn({ photos, videos, seed, open }: { photos: Photo[]; videos: F
     a white stripe's width between, the row drawn from margin to margin; at
     the end, as there, the way back: the first of them again, darkened, its
     shape, "See fewer" over it. */
-function MoreRows({ photos, open, fewer }: { photos: Photo[]; open: Open; fewer: () => void }) {
+function MoreRows({ photos, open, fewer, ta }: { photos: Photo[]; open: Open; fewer: () => void; ta: boolean }) {
   const box = useRef<HTMLDivElement>(null);
   const fit = useStripeFit(box);
   const first = photos[0];
@@ -228,7 +230,7 @@ function MoreRows({ photos, open, fewer }: { photos: Photo[]; open: Open; fewer:
                   <button key={p.id} className="photo-tile photo-line-more photo-fewer" style={{ width: fit.width(units) }} onClick={fewer}>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={fit.width(units) > 240 ? first.medium : first.small} alt="" loading="lazy" style={{ objectPosition: `${first.focus[0]}% ${first.focus[1]}%` }} />
-                    <span>See fewer</span>
+                    <span>{ta ? WRITINGS_TA.fewer : "See fewer"}</span>
                   </button>
                 ) : (
                   <button
@@ -238,7 +240,7 @@ function MoreRows({ photos, open, fewer }: { photos: Photo[]; open: Open; fewer:
                     onClick={() => open(p)}
                     data-photo-id={p.id}
                     data-photo-src={p.medium}
-                    aria-label={p.alt || p.caption || "Photograph"}
+                    aria-label={p.alt || p.caption || (ta ? HIDDEN_TA.photo : "Photograph")}
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={fit.width(units) > 240 ? p.medium : p.small} alt="" loading="lazy" style={{ objectPosition: `${p.focus[0]}% ${p.focus[1]}%` }} />
@@ -278,7 +280,7 @@ function stripRows(photos: Photo[], units: number, h: number): Placed[][] {
 
 /** Above a field note's text on a phone: three rows of its photographs, as
     on the Field Notes page, the last a way to the rest of them, opened here. */
-function NoteStrip({ photos, open }: { photos: Photo[]; open: Open }) {
+function NoteStrip({ photos, open, ta }: { photos: Photo[]; open: Open; ta: boolean }) {
   const box = useRef<HTMLDivElement>(null);
   const fit = useStripeFit(box);
   const [all, setAll] = useState(false);
@@ -312,7 +314,7 @@ function NoteStrip({ photos, open }: { photos: Photo[]; open: Open }) {
                   key={`${p.id}-${i}`}
                   className={more || back ? "home-strip-photo home-strip-all" : "home-strip-photo"}
                   onClick={more ? () => setAll(true) : back ? fewer : () => open(p)}
-                  aria-label={more || back ? undefined : p.alt || p.caption || "Photograph"}
+                  aria-label={more || back ? undefined : p.alt || p.caption || (ta ? HIDDEN_TA.photo : "Photograph")}
                   data-photo-id={more || back ? undefined : p.id}
                   data-photo-src={more || back ? undefined : p.medium}
                   style={{ width: fit?.width(units) }}
@@ -321,10 +323,10 @@ function NoteStrip({ photos, open }: { photos: Photo[]; open: Open }) {
                   <img src={p.small} alt="" loading="lazy" style={{ objectPosition: `${p.focus[0]}% ${p.focus[1]}%` }} />
                   {more && (
                     <span>
-                      <span>See all photos</span>
+                      <span>{ta ? WRITINGS_TA.allPhotos : "See all photos"}</span>
                     </span>
                   )}
-                  {back && <span>See fewer</span>}
+                  {back && <span>{ta ? WRITINGS_TA.fewer : "See fewer"}</span>}
                 </button>
               );
             })}
@@ -338,7 +340,7 @@ function NoteStrip({ photos, open }: { photos: Photo[]; open: Open }) {
 /** A field note's videos and its own photographs (those of its photo sets),
     in the order taken: beside its text, or above it on a phone, the videos
     first. Each photo opens in the viewer. */
-export function NotePhotos({ pack: photos, videos = [], seed }: { pack: PhotoPack; videos?: FieldVideo[]; seed: string }) {
+export function NotePhotos({ pack: photos, videos = [], seed, ta = false }: { pack: PhotoPack; videos?: FieldVideo[]; seed: string; /** on a Tamil page */ ta?: boolean }) {
   const [narrow, setNarrow] = useState<boolean>();
 
   useLayoutEffect(() => {
@@ -353,6 +355,7 @@ export function NotePhotos({ pack: photos, videos = [], seed }: { pack: PhotoPac
     <PhotoWall
       pack={photos}
       layout="own"
+      ta={ta}
       render={(list, open) => {
         const show: Open = (p) => open(list.indexOf(p));
         return (
@@ -360,10 +363,10 @@ export function NotePhotos({ pack: photos, videos = [], seed }: { pack: PhotoPac
             {narrow === undefined ? null : narrow ? (
               <>
                 <NoteVideos videos={videos} />
-                <NoteStrip photos={list} open={show} />
+                <NoteStrip photos={list} open={show} ta={ta} />
               </>
             ) : (
-              <NoteColumn photos={list} videos={videos} seed={seed} open={show} />
+              <NoteColumn photos={list} videos={videos} seed={seed} open={show} ta={ta} />
             )}
           </div>
         );

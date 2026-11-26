@@ -142,7 +142,7 @@ export async function HomeView({ ta = false }: { ta?: boolean }) {
           <aside className="home-latest" aria-labelledby="just-added">
             <div className="section-head">
               <h2 id="just-added">{T?.latest ?? "Just added"}</h2>
-              <Link className="arrow-link" href="/field-notes">
+              <Link className="arrow-link" href={ta ? "/ta/field-notes" : "/field-notes"}>
                 {T?.allNotes ?? "All field notes"}
               </Link>
             </div>

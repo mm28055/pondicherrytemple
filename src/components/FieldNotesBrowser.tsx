@@ -4,7 +4,9 @@ import { useRouter } from "next/navigation";
 import { useCallback, useDeferredValue, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { flushSync } from "react-dom";
 import type { NoteRowData } from "@/lib/view";
-import { hasTerm, nearestWords, searchForm, searchTerms, slips, slipsFor, startsWord } from "@/lib/searchWords";
+import { hasTerm, nearestWords, searchForm, searchTerms, slips, slipsFor, startsWord, stemOf } from "@/lib/searchWords";
+import { HIDDEN_TA } from "@/content/hiddenTa";
+import { WRITINGS_TA } from "@/content/writingsTa";
 import { NoteRow } from "./Rows";
 import { WritingsTabs } from "./WritingsTabs";
 
@@ -14,6 +16,8 @@ export type BrowsedNote = NoteRowData & {
   observances: string[];
   /** words it can be found by that the row doesn't show: the temples' other names, the festivals' names */
   also: string;
+  /** its Tamil month by its English name, on the Tamil page */
+  tamilMonth?: string;
 };
 
 /** One way of narrowing: `also`, other names a choice can be found by. */
@@ -26,7 +30,7 @@ export type NoteFilter = {
 const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 const KEYS = ["temple", "festival", "month", "type"] as const;
 type Key = (typeof KEYS)[number];
-const tamilMonthOf = (r: NoteRowData) => r.local?.split(" ")[0];
+const tamilMonthOf = (r: BrowsedNote) => r.tamilMonth ?? r.local?.split(" ")[0];
 
 /** Whether a note is under a choice. */
 const isUnder = (r: BrowsedNote, key: Key, id: string) => {
@@ -49,7 +53,7 @@ type Quote = { before: string; word: string; after: string };
 function quoteFrom(text: string, spellings: string[]): Quote | null {
   for (const m of text.matchAll(/[\p{L}\p{M}\p{N}]+/gu)) {
     const w = searchForm(m[0]).trim();
-    if (!spellings.some((s) => w.startsWith(s) || (s.length > 3 && w.endsWith(s)))) continue;
+    if (!spellings.some((s) => w.startsWith(stemOf(s)) || (s.length > 3 && w.endsWith(s)))) continue;
     const at = m.index ?? 0;
     let from = Math.max(0, at - 40);
     let to = Math.min(text.length, at + m[0].length + 60);
@@ -79,12 +83,16 @@ export function FieldNotesBrowser({
   filters,
   intro,
   strip,
+  ta = false,
 }: {
   rows: BrowsedNote[];
   filters: NoteFilter[];
   intro: ReactNode;
   strip: ReactNode;
+  /** in Tamil (content/writingsTa) */
+  ta?: boolean;
 }) {
+  const T = ta ? WRITINGS_TA : null;
   const router = useRouter();
   const [query, setQuery] = useState("");
   const [chosen, setChosen] = useState<Partial<Record<Key, string>>>({});
@@ -101,13 +109,13 @@ export function FieldNotesBrowser({
   const fetchTexts = useCallback(() => {
     if (fetched.current) return;
     fetched.current = true;
-    fetch("/field-notes/text")
+    fetch(ta ? "/ta/field-notes/text" : "/field-notes/text")
       .then((r) => (r.ok ? r.json() : Promise.reject()))
       .then(setTexts)
       .catch(() => {
         fetched.current = false; // tried again at the next search
       });
-  }, []);
+  }, [ta]);
 
   // what the address asks for, on arriving; then the address follows the search
   const read = useRef(false);
@@ -230,8 +238,8 @@ export function FieldNotesBrowser({
     const out: { head?: string; items: Suggestion[] }[] = [];
     const fixed = putRight(read);
     if (terms.length) {
-      const items: Suggestion[] = [{ type: "words", label: `Search all notes for “${query.trim()}”` }];
-      if (fixed) items.unshift({ type: "words", label: `Did you mean “${fixed}”?`, query: fixed });
+      const items: Suggestion[] = [{ type: "words", label: T?.searchAll(query.trim()) ?? `Search all notes for “${query.trim()}”` }];
+      if (fixed) items.unshift({ type: "words", label: T?.didYouMean(fixed) ?? `Did you mean “${fixed}”?`, query: fixed });
       out.push({ items });
     }
     for (const f of filters) {
@@ -255,7 +263,7 @@ export function FieldNotesBrowser({
       const notes = [...rows.filter((r) => exact(r.title)), ...rows.filter((r) => !exact(r.title) && near(r.title))]
         .slice(0, 5)
         .map((r) => ({ type: "note" as const, href: r.href, label: r.title, date: `${r.day} ${r.shortMonth}` }));
-      if (notes.length) out.push({ head: "Field notes", items: notes });
+      if (notes.length) out.push({ head: T?.notes ?? "Field notes", items: notes });
       // then notes with the words in their text, a few words shown where they are
       const titled = new Set(notes.map((n) => n.href));
       const spellings = read.flatMap((r) => r.as);
@@ -264,10 +272,10 @@ export function FieldNotesBrowser({
         const quote = quoteFrom(texts?.[r.id] ?? r.longExcerpt ?? "", spellings);
         return quote ? [{ type: "note" as const, href: r.href, label: r.title, date: `${r.day} ${r.shortMonth}`, quote }] : [];
       });
-      if (quoted.length) out.push({ head: `In the text · ${inText.length} ${inText.length === 1 ? "note" : "notes"}`, items: quoted.slice(0, 5) });
+      if (quoted.length) out.push({ head: T?.inText(inText.length) ?? `In the text · ${inText.length} ${inText.length === 1 ? "note" : "notes"}`, items: quoted.slice(0, 5) });
     }
     return out;
-  }, [query, filters, chosen, rows, readTerms, putRight, hay, texts]);
+  }, [query, filters, chosen, rows, readTerms, putRight, hay, texts, T]);
   const flat = useMemo(() => groups.flatMap((g) => g.items), [groups]);
   useEffect(() => setActive(-1), [query]);
 
@@ -345,14 +353,14 @@ export function FieldNotesBrowser({
   return (
     <>
       <header className="page-head landing-head tight-head">
-        <div className="kicker">From the temples</div>
-        <h1 className="page-title">Writings</h1>
-        <WritingsTabs current="field-notes" searching={line}>
+        <div className="kicker">{T?.kicker ?? "From the temples"}</div>
+        <h1 className="page-title">{T?.title ?? "Writings"}</h1>
+        <WritingsTabs current="field-notes" searching={line} ta={ta}>
           <div className={`notes-search${line ? " open" : ""}${query ? " filled" : ""}`} ref={box}>
             <button
               type="button"
               className="notes-search-go"
-              aria-label="Search the field notes"
+              aria-label={T?.search ?? "Search the field notes"}
               onClick={() => {
                 flushSync(() => {
                   setLine(true);
@@ -373,8 +381,8 @@ export function FieldNotesBrowser({
               aria-expanded={panel}
               aria-controls="notes-suggest"
               aria-activedescendant={active >= 0 ? `notes-suggest-${active}` : undefined}
-              aria-label="Search the field notes"
-              placeholder="Search field notes"
+              aria-label={T?.search ?? "Search the field notes"}
+              placeholder={T?.search ?? "Search field notes"}
               value={query}
               onChange={(e) => {
                 setQuery(e.target.value);
@@ -387,12 +395,12 @@ export function FieldNotesBrowser({
               onKeyDown={onKey}
             />
             {(query || line) && (
-              <button type="button" className="notes-search-x" aria-label="Clear the search" onClick={clear}>
+              <button type="button" className="notes-search-x" aria-label={T?.clearSearch ?? "Clear the search"} onClick={clear}>
                 ×
               </button>
             )}
             {panel && flat.length > 0 && (
-              <ul className="notes-suggest" id="notes-suggest" role="listbox" aria-label="Suggestions">
+              <ul className="notes-suggest" id="notes-suggest" role="listbox" aria-label={T?.suggestions ?? "Suggestions"}>
                 {groups.map((g, n) => (
                   <li key={g.head ?? n} role="presentation">
                     {g.head && <div className="notes-suggest-head">{g.head}</div>}
@@ -438,19 +446,19 @@ export function FieldNotesBrowser({
       <section className="section" style={{ paddingTop: 12 }}>
         {searching && (
           <p className="notes-count" aria-live="polite">
-            {shown.length} of {rows.length} field notes
-            {meant && <span className="notes-meant"> with “{meant}”, as none has “{words.trim()}”</span>}
-            {!meant && alsoWith.length > 0 && <span className="notes-meant"> with “{words.trim()}” or “{alsoWith.join("”, “")}”</span>}
+            {T?.count(shown.length, rows.length) ?? `${shown.length} of ${rows.length} field notes`}
+            {meant && <span className="notes-meant">{T?.meant(meant, words.trim()) ?? ` with “${meant}”, as none has “${words.trim()}”`}</span>}
+            {!meant && alsoWith.length > 0 && <span className="notes-meant">{T?.also(words.trim(), alsoWith) ?? ` with “${words.trim()}” or “${alsoWith.join("”, “")}”`}</span>}
             {KEYS.filter((k) => chosen[k]).map((k) => (
-              <button key={k} type="button" aria-label={`Show all, not only ${nameOf(k)}`} onClick={() => setChosen((c) => ({ ...c, [k]: undefined }))}>
+              <button key={k} type="button" aria-label={ta ? HIDDEN_TA.notOnly(nameOf(k)) : `Show all, not only ${nameOf(k)}`} onClick={() => setChosen((c) => ({ ...c, [k]: undefined }))}>
                 {nameOf(k)} ×
               </button>
             ))}
             <button type="button" onClick={clear}>
-              Clear all
+              {T?.clearAll ?? "Clear all"}
             </button>
             <button type="button" className="notes-order" onClick={() => setOldestFirst(!oldestFirst)}>
-              {oldestFirst ? "Oldest first" : "Newest first"} ⇅
+              {oldestFirst ? (T?.oldest ?? "Oldest first") : (T?.newest ?? "Newest first")} ⇅
             </button>
           </p>
         )}
@@ -459,7 +467,7 @@ export function FieldNotesBrowser({
             <NoteRow key={r.id} row={r} withPicture />
           ))}
         </div>
-        {!shown.length && <p className="empty">No field notes match this search.</p>}
+        {!shown.length && <p className="empty">{T?.none ?? "No field notes match this search."}</p>}
       </section>
     </>
   );

@@ -204,7 +204,7 @@ export async function RegionView({ regionId, ta = false }: { regionId: string; t
                   />
                   {/* its name opens its field note (those of all its days), when there is one */}
                   {e.notes.length > 0 ? (
-                    <Link className="temple-row plain" href={`/field-notes/${e.notes[0]}`}>
+                    <Link className="temple-row plain" href={`${ta ? "/ta" : ""}/field-notes/${e.notes[0]}`}>
                       <div>
                         <div className="temple-name">{nameOf(e.title)}</div>
                         {e.dates.length > 0 && <div className="temple-sub">{ta ? daysTa(e.dates) : formatDays(e.dates)}</div>}

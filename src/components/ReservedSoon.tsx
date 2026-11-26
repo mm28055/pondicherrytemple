@@ -31,7 +31,7 @@ export function ReservedLede({ intro, words }: { intro: string; /** on a Tamil p
     return (
       <p className="page-lede">
         {words.lede}
-        <Link className="lede-link" href="/field-notes">
+        <Link className="lede-link" href="/ta/field-notes">
           {words.link}
         </Link>
       </p>
